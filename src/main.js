@@ -1277,12 +1277,13 @@ const STEER_EASE     = 8      // per-second ease rate for steering AND peek retu
 /* Max angular speed of a joystick turn. The exponential ease alone made a
    180° flip nearly as quick as a small nudge (its speed scales with the
    remaining angle), which read as a disorienting jump-cut. Capping the rate
-   makes turn DURATION grow with turn SIZE — at 3.7 rad/s a full about-turn
-   sweeps for ~0.8s, a 90° turn ~0.45s, while anything under ~26° never hits
+   makes turn DURATION grow with turn SIZE — at 4.2 rad/s a full about-turn
+   sweeps for ~0.7s, a 90° turn ~0.4s, while anything under ~30° never hits
    the cap and keeps the snappy ease. Applies only to the joystick's eased
    steering: a swipe rotates the frame 1:1 with the finger and is never
-   rate-limited. (Dialed in on-device: 2.4 too slow, 3.2 still a touch slow.) */
-const STEER_MAX_RATE = 3.7    // rad/s (~212°/s) — lower = slower, more cinematic big turns
+   rate-limited. (Dialed in on-device: 2.4 too slow, 3.2 and 3.7 still a
+   touch slow on the 180.) */
+const STEER_MAX_RATE = 4.2    // rad/s (~241°/s) — lower = slower, more cinematic big turns
 const STICK_DEADZONE = 0.25   // fraction of JOYSTICK_MAX; inside it the stick neither walks nor steers (the angle is pure noise near the centre)
 let headingYaw       = 0      // persistent facing = walking direction
 let targetHeadingYaw = 0      // where the joystick is currently steering the heading
