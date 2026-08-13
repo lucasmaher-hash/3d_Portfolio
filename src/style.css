@@ -382,3 +382,16 @@ canvas {
   }
 }
 
+/* Touch devices: overlay chrome shadows reduced 35% (offsets & blur ×0.65),
+   matching the site-wide mobile neumorphic scale. Desktop untouched. */
+@media (pointer: coarse) {
+  .overlay-close,
+  .overlay-back {
+    box-shadow: 1.95px 1.95px 5.2px rgba(174,174,192,0.65), -1.95px -1.95px 5.2px rgba(255,255,255,1);
+  }
+  .overlay-close:active,
+  .overlay-back:active {
+    box-shadow: inset 1.95px 1.95px 4.55px rgba(174,174,192,0.6), inset -1.95px -1.95px 4.55px rgba(255,255,255,1);
+  }
+}
+

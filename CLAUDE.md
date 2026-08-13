@@ -188,6 +188,8 @@ Surface colour: `#DCDCE3`
 
 Raised shadow = element pops out. Pressed/inset shadow = element pushed in (used for text insets, active states).
 
+**Mobile (≤640px): all three shadow tokens are redefined ×0.65** — offsets and blur reduced 35%, colors/alphas unchanged: raised-sm `3.25/7.8`, raised `5.2/11.7`, pressed `inset 3.25/6.5` — extending the nav toggle segment's already-reduced pressed inset (Lucas's reference) to the whole mobile experience (2026-08-13). The override is a `@media (max-width: 640px) { :root { … } }` block appended at the **end** of every token-defining file (the 8 2D pages, `top_row_permanent_V3.html`, `index.html`); everything using `var(--shadow-*)` inherits it automatically, desktop values above are untouched. Hardcoded (non-token) neumorphic shadows got individual ×0.65 mobile overrides in the same appended blocks: `about2d`/`contact2d` item shadows (≤640px), and the five 3D overlay pages (`about3d`, `contact3d`, `craft3d`, `controls_open3d`, `controls_fullscreen3d`) plus `src/style.css`'s `.overlay-close`/`.overlay-back` under **`pointer: coarse`, not a width query** — those pages render inside iframes whose box width lies about the device. Hover-only shadows (the `11px` lift) were deliberately not reduced — hover isn't a designed state on touch. Verified over CDP both ways: mobile emulation computes the reduced values (tile `5.2/11.7`, nav island `3.25/7.8`, items `3.25/7.8`), desktop computes the originals. **A new 2D page bootstrapped from an existing one must keep the appended mobile token block**, same as the other copy-the-whole-style-block conventions in this file.
+
 ## Fonts
 
 - `OCR-A-BT` (local TTF at `/OCR-A-BT.ttf`) — headings / project titles

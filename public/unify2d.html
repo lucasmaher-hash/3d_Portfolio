@@ -1433,6 +1433,16 @@
          primary ink, no partial highlights (they were unwrapped from this key). */
       [data-i18n-html="overview-text"] { color: var(--text-primary); }
     }
+    /* Mobile: neumorphic shadow spread/radius reduced 35% (offsets & blur ×0.65),
+       matching the nav's 2D/3D toggle segment. Redefining only the tokens keeps
+       desktop untouched; every var(--shadow-*) user inherits this automatically. */
+    @media (max-width: 640px) {
+      :root {
+        --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(174,174,192,0.65), -3.25px -3.25px 7.8px rgba(255,255,255,1);
+        --shadow-raised: 5.2px 5.2px 11.7px rgba(174,174,192,0.65), -5.2px -5.2px 11.7px rgba(255,255,255,1);
+        --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
+      }
+    }
   </style>
 </head>
 <body>

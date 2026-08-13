@@ -440,6 +440,19 @@
          so the fade starts into space the header has already left. */
       transition: opacity 550ms ease 720ms;
     }
+    /* Touch devices: shadows reduced 35% (offsets & blur ×0.65) to match the
+       site-wide mobile scale. pointer:coarse, not a width query — this page
+       lives in an iframe whose box width lies about the device. */
+    @media (pointer: coarse) {
+      .card { box-shadow: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.55), inset -3.25px -3.25px 6.5px rgba(255,255,255,0.7); }
+      .key { box-shadow: 2.28px 2.28px 5.46px rgba(174,174,192,0.65), -2.28px -2.28px 5.46px rgba(255,255,255,1); }
+      .lm-button { box-shadow: inset -3.9px -3.9px 9.75px rgba(255,255,255,1), inset 3.9px 3.9px 9.75px rgba(174,174,192,0.65); }
+      .mouse-left, .mouse-right--raised { box-shadow: -3.25px -3.25px 7.8px rgba(255,255,255,1), 3.25px 3.25px 7.8px rgba(174,174,192,0.65); }
+      .mouse-right, .mouse-left--pressed { box-shadow: inset 2.6px 2.6px 6.5px rgba(174,174,192,0.6), inset -2.6px -2.6px 6.5px rgba(255,255,255,1); }
+      .touch-joystick { box-shadow: inset 2.6px 2.6px 6.5px rgba(174,174,192,0.6), inset -2.6px -2.6px 6.5px rgba(255,255,255,1); }
+      .touch-joystick-thumb { box-shadow: 1.95px 1.95px 4.55px rgba(174,174,192,0.65), -1.95px -1.95px 4.55px rgba(255,255,255,1); }
+      .touch-swipe, .touch-tap { box-shadow: 3.25px 3.25px 7.8px rgba(174,174,192,0.65), -3.25px -3.25px 7.8px rgba(255,255,255,1); }
+    }
   </style>
   <script>
     /* Runs before first paint so the correct guide is what renders — no flash of
