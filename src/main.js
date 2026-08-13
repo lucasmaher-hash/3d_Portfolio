@@ -1236,6 +1236,72 @@ function applyRotation() {
   camera.rotation.x = pitch
 }
 
+/* ── Mobile steering model ─────────────────────────────────────────
+   On touch devices the camera is composed per-frame from:
+
+     yaw   = headingYaw
+     pitch = headingPitch + peekPitch
+
+   headingYaw is the persistent "frontal view" — the direction you walk. The
+   joystick steers it: grabbing the stick captures the current heading as a
+   reference, and the thumb's direction then points at a TARGET heading
+   relative to that reference (up = straight on, left = 90° left, straight
+   back = 180° about-turn). Each frame the heading EASES toward the target
+   (exponential, STEER_EASE) with the per-frame step capped at STEER_MAX_RATE,
+   so a hard stick flip swings the camera around at a legible, deliberate
+   speed — bigger turns take proportionally longer — rather than teleporting
+   the view. Releasing the stick freezes the heading where it is
+   (target := heading) — the view and position stay put, only the thumb
+   snaps home.
+
+   The horizontal swipe ROTATES THE WHOLE STEERING FRAME, live: every yaw
+   delta is applied to headingYaw, targetHeadingYaw AND stickRefYaw together,
+   so swiping re-aims "forward" in real time. Standing still that just turns
+   you; while walking, the path curves with the finger and a held joystick
+   keeps its thumb angle but measures it against the swiped frame — thumb
+   still pushed "up", but "up" now means the new direction. Shifting all
+   three by the same amount is what preserves an in-flight steering ease
+   instead of cancelling it, and it means nothing snaps back on release
+   (there is nothing left to snap to). peekPitch is the one remaining
+   temporary offset: vertical look follows the finger, then eases back to
+   the ~level frontal pitch on release — so you can never end up stuck
+   staring at the floor or ceiling.
+
+   Desktop (isMobile false) never runs the composition — mouse/wheel keep
+   writing yaw/pitch directly exactly as before. The isMobile branches inside
+   those handlers exist only for touchscreen laptops, where isMobile is true
+   (maxTouchPoints > 0) and the per-frame composition would otherwise
+   overwrite mouse look every frame: routing their deltas through the heading
+   keeps both input styles live on such devices. */
+const STEER_EASE     = 8      // per-second ease rate for steering AND peek return — higher = snappier (≈96% of the way after 0.4s)
+/* Max angular speed of a joystick turn. The exponential ease alone made a
+   180° flip nearly as quick as a small nudge (its speed scales with the
+   remaining angle), which read as a disorienting jump-cut. Capping the rate
+   makes turn DURATION grow with turn SIZE — at 3.7 rad/s a full about-turn
+   sweeps for ~0.8s, a 90° turn ~0.45s, while anything under ~26° never hits
+   the cap and keeps the snappy ease. Applies only to the joystick's eased
+   steering: a swipe rotates the frame 1:1 with the finger and is never
+   rate-limited. (Dialed in on-device: 2.4 too slow, 3.2 still a touch slow.) */
+const STEER_MAX_RATE = 3.7    // rad/s (~212°/s) — lower = slower, more cinematic big turns
+const STICK_DEADZONE = 0.25   // fraction of JOYSTICK_MAX; inside it the stick neither walks nor steers (the angle is pure noise near the centre)
+let headingYaw       = 0      // persistent facing = walking direction
+let targetHeadingYaw = 0      // where the joystick is currently steering the heading
+let headingPitch     = 0      // frontal pitch (the spawn's framing, ~level)
+let peekPitch        = 0      // temporary vertical look, eases back to 0
+let stickRefYaw      = 0      // heading captured the moment the stick is grabbed
+
+function wrapAngle(a) { return Math.atan2(Math.sin(a), Math.cos(a)) }  // → [-π, π]
+
+/* Re-seat the steering model on the current yaw/pitch. Must run after ANY
+   code that writes yaw/pitch directly (spawn, sessionStorage restore,
+   resetScene) — otherwise the next animate() frame composes the camera from
+   a stale heading and visibly snaps the view back. */
+function syncSteeringToView() {
+  headingYaw = yaw; targetHeadingYaw = yaw
+  headingPitch = pitch
+  peekPitch = 0
+}
+
 let isLookDown = false
 let lastX = 0, lastY = 0
 
@@ -1256,21 +1322,33 @@ window.addEventListener('contextmenu', e => e.preventDefault())
 window.addEventListener('auxclick', e => { if (e.button === 1) e.preventDefault() })
 window.addEventListener('mousemove', e => {
   if (!isLookDown || isOverlayOpen) return
-  yaw   -= (e.clientX - lastX) * MOUSE_SENS
-  pitch -= (e.clientY - lastY) * MOUSE_SENS
+  const dYaw   = -(e.clientX - lastX) * MOUSE_SENS
+  const dPitch = -(e.clientY - lastY) * MOUSE_SENS
   lastX  = e.clientX
   lastY  = e.clientY
+  if (isMobile) {  // touchscreen laptop: rotate the steering frame so the composition doesn't eat mouse look
+    headingYaw += dYaw; targetHeadingYaw += dYaw; stickRefYaw += dYaw
+    headingPitch = Math.max(-PITCH_LIMIT, Math.min(PITCH_LIMIT, headingPitch + dPitch))
+  }
+  yaw   += dYaw
+  pitch += dPitch
   clampPitch(); applyRotation()
 })
 renderer.domElement.addEventListener('wheel', e => {
   e.preventDefault()
   if (isOverlayOpen) return
-  yaw   += e.deltaX * SCROLL_SENS
-  pitch += e.deltaY * SCROLL_SENS
+  const dYaw   = e.deltaX * SCROLL_SENS
+  const dPitch = e.deltaY * SCROLL_SENS
+  if (isMobile) {  // same touchscreen-laptop guard as mousemove above
+    headingYaw += dYaw; targetHeadingYaw += dYaw; stickRefYaw += dYaw
+    headingPitch = Math.max(-PITCH_LIMIT, Math.min(PITCH_LIMIT, headingPitch + dPitch))
+  }
+  yaw   += dYaw
+  pitch += dPitch
   clampPitch(); applyRotation()
 }, { passive: false })
 
-// ── Touch swipe camera look + inertia ────────────────────────────
+// ── Touch swipe camera look — a temporary "peek" ─────────────────
 const TOUCH_SENS    = 0.004   // horizontal (yaw) — unchanged
 /* Vertical (pitch) is deliberately ~30% of horizontal, so up/down look is a
    subtle adjustment rather than an equal partner to turning.
@@ -1281,17 +1359,20 @@ const TOUCH_SENS    = 0.004   // horizontal (yaw) — unchanged
    No isMobile guard needed — these handlers only ever fire for touch input,
    so mouse and trackpad look are untouched by definition. */
 const TOUCH_SENS_PITCH = 0.0012
-const INERTIA_DECAY = 5.0   // higher = snappier stop; fast swipes coast longer naturally
 let cameraTouchId = null
 let lastTouchX = 0, lastTouchY = 0
-let yawVel = 0, pitchVel = 0  // radians per frame (smoothed)
 
+/* Horizontal swipe = rotate the steering frame live (heading, target and
+   stick reference together — see the steering-model comment above), so a
+   sideways look is immediately and permanently the new forward, even while
+   the joystick is held. Vertical swipe = a temporary pitch peek that eases
+   back to level after release. The old release-inertia (yawVel/pitchVel
+   coasting) is gone. */
 renderer.domElement.addEventListener('touchstart', e => {
   if (isOverlayOpen || cameraTouchId !== null) return
   cameraTouchId = e.changedTouches[0].identifier
   lastTouchX    = e.changedTouches[0].clientX
   lastTouchY    = e.changedTouches[0].clientY
-  yawVel = 0; pitchVel = 0  // kill leftover inertia on new touch
 }, { passive: true })
 
 renderer.domElement.addEventListener('touchmove', e => {
@@ -1299,24 +1380,40 @@ renderer.domElement.addEventListener('touchmove', e => {
   e.preventDefault()
   for (const t of e.changedTouches) {
     if (t.identifier !== cameraTouchId) continue
-    const dyaw   = (t.clientX - lastTouchX) * TOUCH_SENS
-    const dpitch = (t.clientY - lastTouchY) * TOUCH_SENS_PITCH
+    // Rotate the whole frame by the same delta — heading (the view), target
+    // (so the ease doesn't fight back) and stick reference (so a held
+    // joystick's angles are measured against the new forward).
+    const dyaw = (t.clientX - lastTouchX) * TOUCH_SENS
+    headingYaw += dyaw; targetHeadingYaw += dyaw; stickRefYaw += dyaw
+    // Clamp at accumulate time so the COMPOSED pitch (heading + peek) stays
+    // inside ±PITCH_LIMIT. Clamping only the composed value would let
+    // peekPitch wind up past the visible stop, and the release-ease would
+    // then spend its first stretch unwinding invisible surplus — a dead
+    // pause before the view actually moves.
+    peekPitch = Math.max(-PITCH_LIMIT - headingPitch,
+                Math.min( PITCH_LIMIT - headingPitch,
+                          peekPitch + (t.clientY - lastTouchY) * TOUCH_SENS_PITCH))
     lastTouchX = t.clientX
     lastTouchY = t.clientY
-    yaw   += dyaw
-    pitch += dpitch
-    clampPitch(); applyRotation()
-    // EMA smoothing so single-frame noise doesn't corrupt the kick velocity
-    yawVel   = yawVel   * 0.5 + dyaw   * 0.5
-    pitchVel = pitchVel * 0.5 + dpitch * 0.5
     break
   }
 }, { passive: false })
 
-renderer.domElement.addEventListener('touchend', e => {
+const endLookTouch = e => {
   for (const t of e.changedTouches)
-    if (t.identifier === cameraTouchId) { cameraTouchId = null; break }
-}, { passive: true })
+    if (t.identifier === cameraTouchId) {
+      // Yaw needs no release handling — the frame already rotated live
+      // during the swipe. Clearing the id is what lets the pitch peek in
+      // animate() ease back home.
+      cameraTouchId = null
+      break
+    }
+}
+// touchcancel too: if the OS steals the touch (notification shade, app
+// switch) and only touchend were handled, cameraTouchId would stay stuck —
+// blocking every future look and freezing the pitch return mid-glance.
+renderer.domElement.addEventListener('touchend',    endLookTouch, { passive: true })
+renderer.domElement.addEventListener('touchcancel', endLookTouch, { passive: true })
 
 // ── Virtual joystick ──────────────────────────────────────────────
 const JOYSTICK_MAX = 33
@@ -1330,6 +1427,10 @@ if (joystickBase) {
     e.stopPropagation()
     if (joystickTouchId !== null) return
     joystickTouchId = e.changedTouches[0].identifier
+    // "Stick sets an angle": the heading at grab time is the reference all
+    // stick directions are measured against for this hold. Re-captured on
+    // every grab, so successive nudges compound naturally.
+    stickRefYaw = headingYaw
   }, { passive: true })
 
   window.addEventListener('touchmove', e => {
@@ -1350,15 +1451,23 @@ if (joystickBase) {
     }
   }, { passive: true })
 
-  window.addEventListener('touchend', e => {
+  const endStickTouch = e => {
     for (const t of e.changedTouches) {
       if (t.identifier !== joystickTouchId) continue
       joystickTouchId = null
       joystickX = 0; joystickY = 0
+      // Release keeps the CURRENT view: freeze the heading where the ease has
+      // got it rather than letting it finish the remaining arc to the target.
+      // Predictable — the view never moves after the thumb lifts.
+      targetHeadingYaw = headingYaw
       joystickThumb.style.transform = 'translate(0,0)'
       break
     }
-  }, { passive: true })
+  }
+  // touchcancel too — a stolen touch would otherwise leave joystickX/Y stuck
+  // and the camera walking forever with no finger down.
+  window.addEventListener('touchend',    endStickTouch, { passive: true })
+  window.addEventListener('touchcancel', endStickTouch, { passive: true })
 }
 
 // ── WASD ─────────────────────────────────────────────────────────
@@ -1735,6 +1844,7 @@ loader.load(
       pitch = 0.0540
     }
     applyRotation()
+    syncSteeringToView()
     spawnPos = camera.position.clone()
     spawnYaw = yaw
     spawnPitch = pitch
@@ -1785,7 +1895,13 @@ const BOB_FREQ      = 2.0    // Zyklen pro Sekunde (Schrittrhythmus)
 function animate() {
   requestAnimationFrame(animate)
 
-  const delta = clock.getDelta()
+  // Clamped: after any rAF stall (backgrounded tab, notification shade, iOS
+  // throttling) the first frame back reports the WHOLE gap as one delta —
+  // unclamped, that frame teleports the player SPEED×gap units (far past the
+  // 0.4-unit collision probe, i.e. straight through walls) and snaps every
+  // exponential ease to its target. 0.1s caps the damage: stalls simply
+  // don't advance the simulation, normal frames (16–33ms) are untouched.
+  const delta = Math.min(clock.getDelta(), 0.1)
   camera.getWorldDirection(forward)
   forward.y = 0
   forward.normalize()
@@ -1793,16 +1909,36 @@ function animate() {
 
   if (isOverlayOpen) { renderer.render(scene, camera); return }
 
-  // Touch inertia — coasts after finger lifts, decays exponentially
-  if (cameraTouchId === null && (yawVel !== 0 || pitchVel !== 0)) {
-    yaw   += yawVel
-    pitch += pitchVel
+  // ── Mobile steering composition (see the steering-model comment block) ──
+  // Joystick beyond the deadzone → retarget the heading; heading eases toward
+  // the target; a released peek eases home; camera = heading + peek.
+  let stickWalking = false
+  if (isMobile) {
+    if (Math.hypot(joystickX, joystickY) >= STICK_DEADZONE) {
+      stickWalking = true
+      // atan2(-x, -y): stick up = 0 (straight on), left = +π/2 (left turn),
+      // straight down = π (about-turn) — matching yaw's left-positive sense.
+      targetHeadingYaw = stickRefYaw + Math.atan2(-joystickX, -joystickY)
+    }
+    const k = 1 - Math.exp(-STEER_EASE * delta)   // framerate-independent ease
+    // wrapAngle → always the short arc, so a hard 180° stick flip swings
+    // round the near way instead of unwinding the long way. The step is then
+    // capped at STEER_MAX_RATE so big turns take proportionally longer (see
+    // the constant's comment); small corrections never reach the cap.
+    let steerStep = wrapAngle(targetHeadingYaw - headingYaw) * k
+    const maxStep = STEER_MAX_RATE * delta
+    if (steerStep >  maxStep) steerStep =  maxStep
+    if (steerStep < -maxStep) steerStep = -maxStep
+    headingYaw += steerStep
+    // Only PITCH returns after a look — swiped yaw is already part of the
+    // heading (the frame rotates live in the touchmove handler).
+    if (cameraTouchId === null && peekPitch !== 0) {
+      peekPitch -= peekPitch * k
+      if (Math.abs(peekPitch) < 0.0005) peekPitch = 0
+    }
+    yaw   = headingYaw
+    pitch = headingPitch + peekPitch
     clampPitch(); applyRotation()
-    const decay = Math.exp(-INERTIA_DECAY * delta)
-    yawVel   *= decay
-    pitchVel *= decay
-    if (Math.abs(yawVel) < 0.00005) yawVel = 0
-    if (Math.abs(pitchVel) < 0.00005) pitchVel = 0
   }
 
   // Arrow keys are full aliases for WASD, not a separate mode — they feed the same
@@ -1823,9 +1959,15 @@ function animate() {
   // makes both sides real booleans. Truthiness treats undefined and false alike.
   if (goL || goR) move.addScaledVector(right,   goR ? 1 : -1)
   if (goF || goB) move.addScaledVector(forward, goF ? 1 : -1)
-  if (joystickX !== 0 || joystickY !== 0) {
-    move.addScaledVector(right,   joystickX)
-    move.addScaledVector(forward, -joystickY)
+  // The stick no longer strafes: you always walk along the heading (the
+  // direction the camera is turning to face), so during a steer the path
+  // curves with the view. Deliberately headingYaw and not the camera's
+  // forward — the composed camera includes the peek, and glancing around
+  // mid-walk must not bend the path. Constant speed above the deadzone,
+  // exactly like the key path (move is normalized below).
+  if (stickWalking) {
+    move.x -= Math.sin(headingYaw)
+    move.z -= Math.cos(headingYaw)
   }
 
   if (move.lengthSq() > 0) {
@@ -2042,6 +2184,7 @@ window.resetScene = function () {
   yaw   = spawnYaw
   pitch = spawnPitch
   applyRotation()
+  syncSteeringToView()
 }
 
 aboutOverlay.addEventListener('click', e => { if (e.target === aboutOverlay) closeAbout() })
