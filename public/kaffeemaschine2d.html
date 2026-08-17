@@ -1232,7 +1232,11 @@
       menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
       menu.querySelectorAll('[data-mode]').forEach(btn => {
         btn.addEventListener('click', () => {
-          if (btn.dataset.mode === '3d') window._nav('/', 'right');
+          if (btn.dataset.mode === '3d') {
+            // _enter3d: deliberate switch to 3D — see the "/" guard in index.html
+            try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
+            window._nav('/', 'right');
+          }
           else window.location.href = '/2D.html';
         });
       });

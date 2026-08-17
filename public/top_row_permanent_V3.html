@@ -730,6 +730,9 @@
             if (seg.dataset.mode === '2d') {
               window.top.location.href = '/2D.html';
             } else if (seg.dataset.mode === '3d') {
+              // _enter3d marks a deliberate switch to 3D — without it the "/"
+              // guard on index.html forwards straight back to /2D.html.
+              try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
               sessionStorage.setItem('_sv', 'right');
               window.top.location.href = '/';
             } else if (seg.dataset.page === 'about') {

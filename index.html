@@ -2,6 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      /* 2D is the site's default view: a direct or external visit to "/" is
+         forwarded to the 2D landing page. Only an explicit in-site switch to
+         3D lands here — the nav's 3D toggle and the mobile menus' 3D button
+         set sessionStorage._enter3d before navigating (per-tab, so the choice
+         sticks across reloads/back in this tab; a fresh tab defaults to 2D
+         again). A same-origin referrer is the fallback for any entry path
+         without the flag (e.g. a project page's "Exit" pill opened from a
+         bookmarked ?from=3d URL) and for disabled storage.
+         location.replace() keeps "/" out of history AND does not halt
+         parsing — later scripts (intro gate, loader) must check
+         window._redirecting2d before touching sessionStorage. */
+      (function () {
+        var enter3d = false;
+        try { enter3d = sessionStorage.getItem('_enter3d') === '1'; } catch (e) {}
+        var sameOriginRef = document.referrer.indexOf(location.origin + '/') === 0;
+        if (enter3d || sameOriginRef) {
+          try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
+        } else {
+          window._redirecting2d = true;
+          location.replace('/2D.html');
+        }
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
     <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
@@ -356,6 +380,11 @@
     <script>
       (function () {
         var KEY = 'introSeen';
+        // Redirecting to the 2D landing (see the guard in <head>): touch NOTHING.
+        // Marking introSeen here would silently burn the once-per-tab intro on a
+        // visit that never showed the 3D page at all — the first real switch to
+        // 3D would then skip the welcome/controls screens.
+        if (window._redirecting2d) { window._introGate = { show: false }; return; }
         var seen = false;
         // Private mode / disabled storage must not break the page — fall back to showing.
         try { seen = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
@@ -375,6 +404,10 @@
     <script>
       (function () {
         var overlay = document.getElementById('load-overlay');
+
+        // Redirecting to 2D: keep the page-colored overlay up so nothing of
+        // the 3D scene flashes while the browser swaps to /2D.html; skip init.
+        if (window._redirecting2d) return;
 
         // Reload / same-tab return: drop the loader entirely and never define
         // window._loader. src/main.js already calls it defensively
