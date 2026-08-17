@@ -218,78 +218,11 @@
       align-items: center;
       justify-content: center;
     }
-    /* ── Loading screen ─────────────────────────────────────────── */
-    #load-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: var(--bg-surface);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 1200ms ease;
-    }
-    #load-overlay.is-done { opacity: 0; pointer-events: none; }
-    #load-circle {
-      position: relative;
-      width: min(27.6vw, 27.6vh, 192px);
-      height: min(27.6vw, 27.6vh, 192px);
-      border-radius: 50%;
-      background: var(--bg-surface);
-      box-shadow: var(--shadow-pressed);
-      overflow: hidden;
-    }
-    #load-liquid {
-      position: absolute;
-      left: 0; bottom: 0;
-      width: 100%;
-      height: 0%;
-      background: #FF5C00;
-      transition: height 120ms linear;
-    }
-    /* wave surface: a wide rotating rounded square poking above the liquid */
-    #load-liquid::before {
-      content: '';
-      position: absolute;
-      top: -14px;
-      left: -50%;
-      width: 200%;
-      aspect-ratio: 1 / 1;
-      background: #FF5C00;
-      /* Asymmetric radii: the four corners sweep past at different heights as
-         the disc turns, so successive crests differ instead of repeating one
-         identical bump every revolution. */
-      border-radius: 43% 41% 44% 40%;
-      /* Two animations, two clocks: the rotation makes the travelling wave,
-         the bob (animating `top`) makes the whole surface rise and sink a few
-         px. 4.4s and 3.2s share no common multiple, so crest and level never
-         line up the same way twice. */
-      animation: loadWave 4.4s linear infinite, loadBobA 3.2s ease-in-out infinite alternate;
-    }
-    @keyframes loadWave {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
+    /* The orange liquid loading ball moved to 2D.html (2026-08-14): it is the
+       SITE's entrance animation now, not the 3D world's — see the loader
+       block near the top of 2D.html's <body>. */
 
-    @keyframes loadBobA {
-      from { top: -11px; }
-      to   { top: -19px; }
-    }
-
-    #load-count {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'VT323', monospace;
-      font-size: clamp(34px, 6vw, 56px);
-      color: var(--text-primary);
-      z-index: 2;
-      user-select: none;
-    }
-
-    /* ── Fullscreen controls intro (after loading screen) ───────── */
+    /* ── Fullscreen controls intro (first 3D entry per tab) ───────── */
     #intro-controls {
       position: fixed;
       inset: 0;
@@ -364,8 +297,8 @@
   </style>
   </head>
   <body>
-    <!-- Intro gate — decides ONCE per tab whether the loading screen and the fullscreen
-         controls intro run at all. Both consult window._introGate below.
+    <!-- Intro gate — decides ONCE per tab whether the fullscreen controls intro runs
+         (the orange loading ball moved to 2D.html and has its own per-tab gate there).
 
          sessionStorage is the right store here precisely because it is neither permanent
          nor per-request: it survives reloads within the same tab, and the browser wipes it
@@ -395,60 +328,10 @@
       })();
     </script>
 
-    <div id="load-overlay">
-      <div id="load-circle">
-        <div id="load-liquid"></div>
-        <div id="load-count">0%</div>
-      </div>
-    </div>
-    <script>
-      (function () {
-        var overlay = document.getElementById('load-overlay');
-
-        // Redirecting to 2D: keep the page-colored overlay up so nothing of
-        // the 3D scene flashes while the browser swaps to /2D.html; skip init.
-        if (window._redirecting2d) return;
-
-        // Reload / same-tab return: drop the loader entirely and never define
-        // window._loader. src/main.js already calls it defensively
-        // (`if (window._loader) ...`), so leaving it undefined is the whole opt-out.
-        if (!window._introGate.show) { overlay.remove(); return; }
-
-        var liquid  = document.getElementById('load-liquid');
-        var count   = document.getElementById('load-count');
-        var target = 0;      // real progress 0..1 (set from main.js)
-        var shown  = 0;      // displayed, eased toward target
-        var doneRequested = false;
-        var MIN_DURATION = 3000; // the fill always takes at least this long
-        var t0 = performance.now();
-
-        function frame() {
-          // ease displayed value toward target so it fills smoothly;
-          // a time cap keeps the fill from completing before MIN_DURATION
-          var timeCap = Math.min(1, (performance.now() - t0) / MIN_DURATION);
-          var goal = Math.min(doneRequested ? 1 : target, timeCap);
-          shown += (goal - shown) * (doneRequested ? 0.14 : 0.06);
-          if (goal - shown < 0.001) shown = goal;
-          var pct = Math.round(shown * 100);
-          liquid.style.height = (shown * 100) + '%';
-          count.textContent = pct + '%';
-          if (doneRequested && pct >= 100) {
-            overlay.classList.add('is-done');
-            // reveal the controls intro beneath the fading loader
-            if (window._showIntroControls) window._showIntroControls();
-            setTimeout(function () { overlay.remove(); }, 1300);
-            return;
-          }
-          requestAnimationFrame(frame);
-        }
-        requestAnimationFrame(frame);
-
-        window._loader = {
-          progress: function (p) { target = Math.max(target, Math.min(p, 1)); },
-          done: function () { doneRequested = true; }
-        };
-      })();
-    </script>
+    <!-- The orange liquid loader that used to live here moved to 2D.html — it
+         is the site's entrance animation, not the 3D world's. src/main.js
+         still calls window._loader defensively (`if (window._loader) ...`);
+         with no loader defined those calls are no-ops by design. -->
 
     <div id="info-overlay">
       <div id="info-panel">
@@ -468,31 +351,30 @@
          padding contributes height without contributing content. -->
     <iframe id="top-bar" src="/top_row_permanent_V3.html" allowtransparency="true" scrolling="no"></iframe>
 
-    <!-- Fullscreen controls intro — shown once the loader finishes; click/key dismisses.
+    <!-- Fullscreen controls intro — first 3D entry per tab; click/key dismisses.
          src is set from JS below rather than here so that a gated reload does not fetch
-         the page at all. It is still assigned early enough to preload during the loader's
-         3s minimum fill, so showing it is instant. -->
+         the page at all. With the orange loader moved to 2D.html, this intro is the only
+         cover for the loading 3D scene and reveals ITSELF on its iframe's load event —
+         previously the loader called _showIntroControls() when its fill finished. -->
     <iframe id="intro-controls" allowtransparency="true"></iframe>
     <script>
       (function () {
         var intro = document.getElementById('intro-controls');
 
-        // Reload / same-tab return: no intro at all. Leaving _showIntroControls undefined
-        // is harmless — the loader only calls it behind an `if`, and the loader itself is
-        // already gone in this branch.
+        // Reload / same-tab return: no intro at all.
         if (!window._introGate.show) { intro.remove(); return; }
 
-        intro.src = '/controls_fullscreen3d.html';
-        window._showIntroControls = function () {
+        // Reveal on the iframe's load event, not immediately: the WELCOME
+        // sequence is started via postMessage, and posting before the child
+        // document's listener exists would silently drop the message (that
+        // was a real bug in the original loader-driven version too).
+        intro.addEventListener('load', function () {
           intro.classList.add('is-visible');
-          // Start the WELCOME sequence inside the iframe NOW, not at its own
-          // load: the frame preloads behind the loading screen, so a
-          // load-driven timeline would play out entirely while invisible —
-          // which is exactly what happened on the first attempt.
           try {
             intro.contentWindow.postMessage({ type: 'intro-controls-show' }, '*');
           } catch (e) {}
-        };
+        });
+        intro.src = '/controls_fullscreen3d.html';
         window.addEventListener('message', function (e) {
           if (e.data && e.data.type === 'intro-controls-dismiss') {
             intro.classList.remove('is-visible');
