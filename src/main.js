@@ -1284,6 +1284,21 @@ const STEER_EASE     = 8      // per-second ease rate for steering AND peek retu
    rate-limited. (Dialed in on-device: 2.4 too slow, 3.2 and 3.7 still a
    touch slow on the 180.) */
 const STEER_MAX_RATE = 4.2    // rad/s (~241°/s) — lower = slower, more cinematic big turns
+/* Big joystick turns (> ~120°) pause WALKING while the view swings: you turn
+   on the spot instead of arcing across the room, and only once the swing is
+   nearly done does movement ease back in — no abrupt lurch. Hysteresis: the
+   hold engages above TURN_HOLD_ANGLE and releases only below
+   TURN_RESUME_ANGLE, so the in-between range can't flicker the state.
+   Swipes never trigger this — they rotate heading and target TOGETHER, so
+   the remaining-angle gap this watches stays unchanged. Mobile-only by
+   construction: walkFactor is only ever written inside the isMobile steering
+   block, so desktop keys always run at full SPEED. */
+const TURN_HOLD_ANGLE   = 2.094  // rad (~120°) — a steer this big pauses walking
+const TURN_RESUME_ANGLE = 0.30   // rad (~17°) — "ganz kurz vor fertig": walking eases back in below this
+const WALK_EASE_IN      = 5      // per-second ramp back to full speed (≈0.6s)
+const WALK_EASE_OUT     = 14     // fast but non-jarring stop when the hold engages
+let bigTurnHold = false
+let walkFactor  = 1              // scales SPEED at the three movement sites; desktop stays 1 forever
 const STICK_DEADZONE = 0.25   // fraction of JOYSTICK_MAX; inside it the stick neither walks nor steers (the angle is pure noise near the centre)
 let headingYaw       = 0      // persistent facing = walking direction
 let targetHeadingYaw = 0      // where the joystick is currently steering the heading
@@ -1931,6 +1946,12 @@ function animate() {
     if (steerStep >  maxStep) steerStep =  maxStep
     if (steerStep < -maxStep) steerStep = -maxStep
     headingYaw += steerStep
+    // Turn-on-the-spot hold for big steers (see the TURN_HOLD_ANGLE comment).
+    const turnRemaining = Math.abs(wrapAngle(targetHeadingYaw - headingYaw))
+    if (turnRemaining > TURN_HOLD_ANGLE) bigTurnHold = true
+    else if (turnRemaining < TURN_RESUME_ANGLE) bigTurnHold = false
+    walkFactor += ((bigTurnHold ? 0 : 1) - walkFactor)
+                * (1 - Math.exp(-(bigTurnHold ? WALK_EASE_OUT : WALK_EASE_IN) * delta))
     // Only PITCH returns after a look — swiped yaw is already part of the
     // heading (the frame rotates live in the touchmove handler).
     if (cameraTouchId === null && peekPitch !== 0) {
@@ -1982,7 +2003,7 @@ function animate() {
       }
     }
     if (!probe.blocked) {
-      camera.position.addScaledVector(move, SPEED * delta)
+      camera.position.addScaledVector(move, SPEED * walkFactor * delta)
     } else if (probe.normal) {
       // Project the movement onto the wall (strip the normal component), then, if that
       // slide is itself blocked, project ONCE more against whatever stopped it. The second
@@ -1997,14 +2018,14 @@ function animate() {
         slide.normalize()
         const p2 = probeMove(camera.position, slide)
         if (!p2.blocked) {
-          camera.position.addScaledVector(slide, SPEED * delta)
+          camera.position.addScaledVector(slide, SPEED * walkFactor * delta)
         } else if (p2.normal) {
           const slide2 = _slideB.copy(slide).addScaledVector(p2.normal, -slide.dot(p2.normal))
           slide2.y = 0
           if (slide2.lengthSq() > 0.001) {
             slide2.normalize()
             if (!probeMove(camera.position, slide2).blocked)
-              camera.position.addScaledVector(slide2, SPEED * delta)
+              camera.position.addScaledVector(slide2, SPEED * walkFactor * delta)
           }
         }
       }
