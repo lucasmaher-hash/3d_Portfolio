@@ -1626,21 +1626,29 @@
       btn.textContent = 'Exit';
       document.body.appendChild(btn);
 
-      // Keep the button clear of .page-wrapper's left border: sit 24px from
-      // the viewport edge while there's room for the whole button in that
-      // open margin; once the frame's border would be under (or past) it,
-      // tuck the button in just inside the frame instead (right of the
-      // border line) rather than let the border cut across it.
+      // Keep the button clear of .page-wrapper's left border. It CENTRES in the
+      // open margin between the viewport edge and that border, capped at
+      // MARGIN_GAP so wide monitors don't push it far from the corner; if the
+      // margin is too tight for the pill to breathe, it tucks just inside the
+      // frame instead of letting the border cut across it.
+      //
+      // Centring rather than a fixed offset is what fixes MacBook widths: at
+      // 1440–1512 the margin is 110px and the pill 76px, so a flat 34px put its
+      // right edge at exactly 110 — touching the border, with the raised
+      // shadow (5px offset + 12px blur ≈ 17px) spilling over it. Centring
+      // leaves 17px either side, which is precisely the room that shadow needs.
+      // Above ~1700px the cap takes over and the position is unchanged.
       function positionExitBtn() {
         var wrapper = document.querySelector('.page-wrapper');
         if (!wrapper) return;
         var wrapperLeft = wrapper.getBoundingClientRect().left;
         var btnWidth    = btn.offsetWidth;
-        // Both branches nudged +10px right from their original 24 / 16.
-        var MARGIN_GAP  = 34;
-        var INSET_GAP   = 26;
-        btn.style.left = (wrapperLeft - MARGIN_GAP >= btnWidth)
-          ? MARGIN_GAP + 'px'
+        var MARGIN_GAP  = 34;   // cap: furthest from the viewport edge it may sit
+        var INSET_GAP   = 26;   // fallback: tucked just inside the frame
+        var MIN_SIDE    = 14;   // least breathing room wanted on each side
+        var margin = wrapperLeft - btnWidth;   // free space beside the frame
+        btn.style.left = (margin >= MIN_SIDE * 2)
+          ? Math.min(MARGIN_GAP, margin / 2) + 'px'
           : (wrapperLeft + INSET_GAP) + 'px';
       }
       positionExitBtn();
