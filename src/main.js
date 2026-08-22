@@ -1318,26 +1318,53 @@ function syncSteeringToView() {
   peekPitch = 0
 }
 
+/* All three mouse buttons orbit the camera. Left-drag is the addition, and it
+   has to share the button with object-picking: the two are separated by
+   MOVEMENT, not by button. A press that ends within DRAG_SLOP pixels stays a
+   click and opens the project; anything further is a look-drag and the
+   trailing `click` event is suppressed via lookMoved (see the picking handler
+   near the bottom of this file). The slop is what makes a click with a shaky
+   hand still count as a click. Rotation itself starts immediately rather than
+   after the slop, so the drag never feels like it lags — a sub-5px rotation is
+   imperceptible anyway. */
+const DRAG_SLOP = 5   // px of travel before a press stops counting as a click
 let isLookDown = false
+let lookButton = -1
+let lookMoved  = false   // read by the picking `click` handler; reset on each press
 let lastX = 0, lastY = 0
+let downX = 0, downY = 0
 
 renderer.domElement.addEventListener('mousedown', e => {
   if (isOverlayOpen) return
-  if (e.button === 2 || e.button === 1) {
-    if (e.button === 1) e.preventDefault()   // stop middle-click autoscroll
+  if (e.button === 0 || e.button === 1 || e.button === 2) {
+    // Left: stops the canvas starting a text/image selection drag. Middle:
+    // stops the OS autoscroll widget. Neither blocks the `click` event.
+    e.preventDefault()
     isLookDown = true
-    lastX = e.clientX
-    lastY = e.clientY
-    document.body.classList.add('looking')
+    lookButton = e.button
+    lookMoved  = false
+    lastX = downX = e.clientX
+    lastY = downY = e.clientY
+    // Left button keeps the normal cursor until the press proves to be a drag,
+    // so hovering-and-clicking an object never flashes the grab cursor.
+    if (e.button !== 0) document.body.classList.add('looking')
   }
 })
 window.addEventListener('mouseup', e => {
-  if (e.button === 2 || e.button === 1) { isLookDown = false; document.body.classList.remove('looking') }
+  if (e.button === lookButton) {
+    isLookDown = false
+    lookButton = -1
+    document.body.classList.remove('looking')
+  }
 })
 window.addEventListener('contextmenu', e => e.preventDefault())
 window.addEventListener('auxclick', e => { if (e.button === 1) e.preventDefault() })
 window.addEventListener('mousemove', e => {
   if (!isLookDown || isOverlayOpen) return
+  if (!lookMoved && Math.hypot(e.clientX - downX, e.clientY - downY) > DRAG_SLOP) {
+    lookMoved = true                                    // → this press is a look, not a pick
+    if (lookButton === 0) document.body.classList.add('looking')
+  }
   const dYaw   = -(e.clientX - lastX) * MOUSE_SENS
   const dPitch = -(e.clientY - lastY) * MOUSE_SENS
   lastX  = e.clientX
@@ -2275,6 +2302,9 @@ const mouse    = new THREE.Vector2()
 
 renderer.domElement.addEventListener('click', e => {
   if (isOverlayOpen) return
+  // The press that produced this click was a camera drag, not a pick — see
+  // DRAG_SLOP where lookMoved is set.
+  if (lookMoved) return
   mouse.x =  (e.clientX / window.innerWidth)  * 2 - 1
   mouse.y = -(e.clientY / window.innerHeight) * 2 + 1
   clickRay.setFromCamera(mouse, camera)
