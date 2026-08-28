@@ -1588,6 +1588,12 @@ renderer.domElement.addEventListener('touchmove', e => {
     // joystick's angles are measured against the new forward).
     const dyaw = (t.clientX - lastTouchX) * TOUCH_SENS
     headingYaw += dyaw; targetHeadingYaw += dyaw; stickRefYaw += dyaw
+    // Track the swipe's angular velocity for the release fling. Lightly
+    // smoothed (50/50 with the previous sample) so one jittery event can't
+    // set the coast; dt from event timestamps, guarded against 0.
+    const dt = (e.timeStamp - lastTouchT) / 1000
+    if (dt > 0) swipeVelYaw = swipeVelYaw * 0.5 + (dyaw / dt) * 0.5
+    lastTouchT = e.timeStamp
     // Clamp at accumulate time so the COMPOSED pitch (heading + peek) stays
     // inside ±PITCH_LIMIT. Clamping only the composed value would let
     // peekPitch wind up past the visible stop, and the release-ease would
@@ -1605,9 +1611,13 @@ renderer.domElement.addEventListener('touchmove', e => {
 const endLookTouch = e => {
   for (const t of e.changedTouches)
     if (t.identifier === cameraTouchId) {
-      // Yaw needs no release handling — the frame already rotated live
-      // during the swipe. Clearing the id is what lets the pitch peek in
-      // animate() ease back home.
+      // Clearing the id lets the pitch peek in animate() ease back home.
+      // A real lift (touchend) hands the swipe's velocity to the fling coast;
+      // an OS-stolen touch (touchcancel) flings nothing.
+      if (e.type === 'touchend' && Math.abs(swipeVelYaw) > FLING_MIN) {
+        flingVelYaw = Math.max(-FLING_MAX, Math.min(FLING_MAX, swipeVelYaw))
+      }
+      swipeVelYaw = 0
       cameraTouchId = null
       break
     }
@@ -2359,6 +2369,14 @@ function animate() {
     if (cameraTouchId === null && peekPitch !== 0) {
       peekPitch -= peekPitch * k
       if (Math.abs(peekPitch) < 0.0005) peekPitch = 0
+    }
+    // Swipe fling: coast the released swipe's velocity out over ~0.2s,
+    // rotating the same frame triple the live swipe does (see FLING_DECAY).
+    if (cameraTouchId === null && flingVelYaw !== 0) {
+      const dFling = flingVelYaw * delta
+      headingYaw += dFling; targetHeadingYaw += dFling; stickRefYaw += dFling
+      flingVelYaw *= Math.exp(-FLING_DECAY * delta)
+      if (Math.abs(flingVelYaw) < 0.02) flingVelYaw = 0
     }
     yaw   = headingYaw
     pitch = headingPitch + peekPitch
