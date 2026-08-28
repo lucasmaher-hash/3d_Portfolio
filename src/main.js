@@ -5,6 +5,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 // textures the area-light shader integrates against; without init() having run, the light
 // is constructed fine and simply emits NOTHING, with no error or warning.
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js'
+// Used ONLY as the project arrows' private envMap — NOT as scene.environment
+// (that is deliberately uniform; see uniformEnvironment below).
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 
 // Scene
 const scene = new THREE.Scene()
@@ -1211,6 +1214,133 @@ function addFixtureLights(model) {
   }
 }
 
+/* ── Project arrows ────────────────────────────────────────────────
+   A chrome arrow floats above each clickable project object, bobbing and
+   slowly spinning, to signal "this opens a project page". Built procedurally
+   (an extruded 2D shape with a bevel) rather than modelled in Blender: no
+   GLB re-export, and every dimension is a live-tunable constant below.
+
+   MATERIAL — the one non-obvious part: scene.environment is deliberately
+   UNIFORM white (see uniformEnvironment above — the splotchy-walls fix), and
+   a metalness-1 surface reflecting flat white renders as a featureless grey
+   blob, not chrome. So the arrow material carries its OWN envMap, a PMREM of
+   RoomEnvironment, whose bright panels against dark walls paint exactly the
+   light/dark sweeps that read as polished metal. A per-material envMap
+   overrides scene.environment for that material ONLY — the walls keep their
+   uniform flood. (envMapIntensity works here; the documented no-op applies
+   only to materials inheriting scene.environment.)
+
+   To give another project an arrow, add one PROJECT_ARROWS row: its meshes
+   are matched in the model, the arrow hovers over their union bbox, and a
+   runtime CONTENT entry + clickables.push route a click on the arrow through
+   the existing pipeline (return-state save, ?from=3d, analytics, drag-slop). */
+const ARROW_HEIGHT    = 0.55   // total height, world units (~1 unit = 1 m)
+const ARROW_THICKNESS = 0.12   // extrusion depth
+const ARROW_GAP       = 0.35   // air between the object's bbox top and the arrow tip
+const ARROW_BOB_AMP   = 0.06   // bob amplitude
+const ARROW_BOB_FREQ  = 0.5    // bob cycles per second
+const ARROW_SPIN      = 0.8    // rad/s around its own vertical axis
+// Matches the same way the click handler resolves CONTENT keys: the mesh
+// itself carries the name, OR its direct parent does (multi-primitive nodes
+// load as a group of that name with generated child mesh names).
+const byKey = k => c => c.name === k || (c.parent && c.parent.name === k)
+// The table lamp's six meshes sit DIRECTLY under SpinPivot — the exporter
+// collapsed their empty, and SpinPivot is the WHOLE scene, so they can only
+// be addressed by name. Shared with the click-pop (see resolvePopTargets).
+const MACLAMP_TABLE_MESHES = [
+  'Base_Orange_Table', 'VerticalPlate_Orange_Table', 'KB_Grey_Panel_Table',
+  'Back_Grey_Panel_Table', 'Trackpad_Back_Grey_Table', 'Trackpad_Front_Grey_Table',
+]
+const PROJECT_ARROWS = [
+  { title: 'Mac-Lamp',         url: '/mac-lamp2d.html',        match: byKey('Pivot_MacLamp') },
+  { title: 'Mac-Lamp',         url: '/mac-lamp2d.html',        match: c => MACLAMP_TABLE_MESHES.includes(c.name) },
+  { title: 'Double Packaging', url: '/vaccine2d.html',         match: byKey('bottle_body_Podest') },
+  { title: 'Double Packaging', url: '/vaccine2d.html',         match: byKey('bottle_body') },
+  { title: 'Cybercoffee',      url: '/kaffeemaschine2d.html',  match: byKey('egg-rig') },
+  { title: 'Unify',            url: '/unify2d.html',           match: byKey('Pivot_UNify') },
+  { title: 'Virtual Cooking',  url: '/virtual_cooking2d.html', match: byKey('Pivot_VRPanel') },
+]
+const projectArrows = []
+let arrowTime = 0
+
+function makeArrowGeometry() {
+  // Downward arrow, screenshot proportions: head is ~half the height at the
+  // full width, the shaft ~42% of the width. Drawn tip-at-origin, +Y up;
+  // geometry.center() afterwards so the Y spin turns about its own axis.
+  const H = ARROW_HEIGHT
+  const W = H * 0.78
+  const shaftW = W * 0.42
+  const headH  = H * 0.52
+  const s = new THREE.Shape()
+  s.moveTo(0, 0)                    // tip (points down)
+  s.lineTo(W / 2, headH)            // head right corner
+  s.lineTo(shaftW / 2, headH)       // notch right
+  s.lineTo(shaftW / 2, H)           // shaft top right
+  s.lineTo(-shaftW / 2, H)          // shaft top left
+  s.lineTo(-shaftW / 2, headH)      // notch left
+  s.lineTo(-W / 2, headH)           // head left corner
+  s.closePath()
+  const geo = new THREE.ExtrudeGeometry(s, {
+    depth: ARROW_THICKNESS,
+    // The bevel is what sells the metal: it gives every edge a facet that
+    // catches its own band of the envMap, like the highlights in the
+    // reference photo.
+    bevelEnabled: true,
+    bevelThickness: 0.018,
+    bevelSize: 0.018,
+    bevelSegments: 3,
+  })
+  geo.center()
+  return geo
+}
+
+function addProjectArrows(model) {
+  const pmrem = new THREE.PMREMGenerator(renderer)
+  const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+  pmrem.dispose()
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    metalness: 1.0,
+    roughness: 0.12,
+    envMap: envTex,
+    envMapIntensity: 1.2,
+  })
+  const geo = makeArrowGeometry()
+  const placed = []
+  PROJECT_ARROWS.forEach((spec, i) => {
+    const box = new THREE.Box3()
+    let found = 0
+    model.traverse(c => {
+      if (!c.isMesh || !spec.match(c)) return
+      box.union(new THREE.Box3().setFromObject(c))
+      found++
+    })
+    if (found === 0) {
+      console.warn(`Project-Arrow ohne Anker: ${spec.title} (#${i}) — match() trifft kein Mesh`)
+      return
+    }
+    // The union box is MODEL-LOCAL (stale matrices — the same story as the
+    // fixture lights above): add model.position, and do NOT "fix" it with
+    // model.updateMatrixWorld(true), which ejects the camera via the spawn
+    // probe. Sizes are unaffected, positions need the offset.
+    const centre = box.getCenter(new THREE.Vector3()).add(model.position)
+    const topY   = box.max.y + model.position.y
+    const mesh = new THREE.Mesh(geo, mat)
+    mesh.castShadow = false
+    mesh.name = 'ProjectArrow_' + i
+    CONTENT[mesh.name] = { title: spec.title, url: spec.url }
+    // Geometry is centered, so the tip hangs H/2 below position.y — this
+    // puts the TIP exactly ARROW_GAP above the object's bbox top.
+    const baseY = topY + ARROW_GAP + ARROW_HEIGHT / 2
+    mesh.position.set(centre.x, baseY, centre.z)
+    scene.add(mesh)          // direct scene child (world coords) — never a collidable
+    clickables.push(mesh)
+    projectArrows.push({ mesh, baseY, phase: i * 1.3 })
+    placed.push(`${spec.title}[${found} Meshes] @ (${centre.x.toFixed(1)}, ${baseY.toFixed(1)}, ${centre.z.toFixed(1)})`)
+  })
+  console.log(`Project-Arrows: ${placed.length} — ${placed.join(' | ')}`)
+}
+
 // ── Camera rotation ──────────────────────────────────────────────
 let yaw   = 0
 let pitch = 0
@@ -1811,6 +1941,11 @@ loader.load(
     // NOT be a model.updateMatrixWorld() call here.
     addFixtureLights(model)
 
+    // Floating chrome "clickable" arrows over the project objects — same
+    // timing requirement as the fixture lights (needs model.position final,
+    // reads model-local bboxes with the same .add(model.position) fix).
+    addProjectArrows(model)
+
     const fixedClearance = size.y * 0.20
     const roofCutoff     = size.y * 0.35  // obere 35% = Dach, wird ausgeschlossen
 
@@ -1935,6 +2070,99 @@ let bobIntensity = 0
 const BOB_AMPLITUDE = 0.07   // vertikale Schwingweite in Einheiten
 const BOB_FREQ      = 2.0    // Zyklen pro Sekunde (Schrittrhythmus)
 
+/* MOVED above animate(): animate() is first CALLED during module
+   evaluation (the bootstrap call further down), and its updatePops(delta)
+   read popAnims/POP_* while those consts were still in the temporal dead
+   zone — a first-frame ReferenceError that killed the whole module and
+   blacked out the scene. Function declarations hoist; const state does
+   not. Keep this block ABOVE animate(). */
+// ── Click-pop: button-style grow animation on clickable project objects ──
+// On click the object's group scales up and back (sine pulse) before the
+// navigation fires, so the press reads like a button. Scaling happens around
+// the group's world-bbox CENTRE, not its transform origin — several pivots
+// (egg-body notably) have origins outside their own geometry, so a naive
+// scale would make the object drift sideways as it grows. The centre is
+// taken at click time, when matrixWorld is current (the stale-matrix trap
+// documented at addFixtureLights only exists before the first render).
+const POP_SCALE    = 1.15   // peak scale factor
+const POP_DURATION = 0.28   // seconds; navigation fires when the pulse ends
+// Roster of pop-able names — the CONTENT-resolved click target (group name or
+// mesh name), see resolvePopTargets. The table lamp is deliberately NOT here:
+// its six meshes live directly under SpinPivot, and SpinPivot is the WHOLE
+// scene — escalating to the parent would pulse every room. It pops as a
+// composite via MACLAMP_TABLE_MESHES instead. Project arrows pop themselves
+// (matched by prefix, their names are generated at load).
+const POP_ENABLED = new Set([
+  'Pivot_UNify', 'Pivot_MacLamp', 'egg-rig', 'Pivot_VRPanel',
+  'bottle_body_Podest', 'bottle_body',
+])
+// Objects that sit ON a surface (podium, table): the pop scales about the
+// bbox's BOTTOM centre instead of its middle, so they grow upward and their
+// base stays planted — a centre-scale would push the underside through the
+// podium mesh for the pulse's duration. Names as resolved by
+// resolvePopTargets (group or mesh name).
+// 'MACLAMP_TABLE' is the synthetic key resolvePopTargets uses for the table
+// lamp's six-mesh composite (the meshes have no shared group of their own).
+const POP_BOTTOM_ANCHORED = new Set(['Pivot_MacLamp', 'bottle_body_Podest', 'MACLAMP_TABLE'])
+const popAnims = []
+let popNavigating = false   // guards a double-click firing two navigations
+
+// The clicked mesh → the object(s) that should visually pop, or null for a
+// plain instant navigation. Mirrors the click handler's CONTENT resolution.
+function resolvePopTargets(obj) {
+  const t = obj.name in CONTENT ? obj : obj.parent
+  if (!t) return null
+  if (POP_ENABLED.has(t.name) || t.name.startsWith('ProjectArrow_'))
+    return { targets: [t], bottom: POP_BOTTOM_ANCHORED.has(t.name) }
+  if (MACLAMP_TABLE_MESHES.includes(t.name))
+    return {
+      targets: MACLAMP_TABLE_MESHES.map(n => scene.getObjectByName(n)).filter(Boolean),
+      bottom: POP_BOTTOM_ANCHORED.has('MACLAMP_TABLE'),
+    }
+  return null
+}
+
+function startPop(targets, done, anchorBottom) {
+  // ONE shared centre — the union bbox of everything popping together — so a
+  // multi-mesh object (the table lamp) grows as one body, not as six meshes
+  // each inflating about its own middle.
+  const box = new THREE.Box3()
+  for (const t of targets) box.union(new THREE.Box3().setFromObject(t))
+  const centreWorld = box.getCenter(new THREE.Vector3())
+  if (anchorBottom) centreWorld.y = box.min.y   // grow upward, base stays planted
+  popAnims.push({
+    done, t: 0,
+    parts: targets.map(t => ({
+      target: t,
+      p0: t.position.clone(),   // rest position (parent space)
+      s0: t.scale.clone(),      // rest scale — multiplied, so mirrored/negative scales survive
+      c:  t.parent.worldToLocal(centreWorld.clone()),
+    })),
+  })
+}
+
+function updatePops(delta) {
+  for (let i = popAnims.length - 1; i >= 0; i--) {
+    const a = popAnims[i]
+    a.t += delta
+    const p = Math.min(a.t / POP_DURATION, 1)
+    const s = 1 + (POP_SCALE - 1) * Math.sin(Math.PI * p)
+    for (const part of a.parts) {
+      part.target.scale.copy(part.s0).multiplyScalar(s)
+      // Scale about the shared centre c: pos = c + (p0 - c) · s keeps c fixed.
+      part.target.position.copy(part.c).addScaledVector(part.p0.clone().sub(part.c), s)
+    }
+    if (p >= 1) {
+      for (const part of a.parts) {
+        part.target.scale.copy(part.s0)
+        part.target.position.copy(part.p0)
+      }
+      popAnims.splice(i, 1)
+      if (a.done) a.done()
+    }
+  }
+}
+
 function animate() {
   requestAnimationFrame(animate)
 
@@ -1945,6 +2173,7 @@ function animate() {
   // exponential ease to its target. 0.1s caps the damage: stalls simply
   // don't advance the simulation, normal frames (16–33ms) are untouched.
   const delta = Math.min(clock.getDelta(), 0.1)
+  updatePops(delta)   // click-pop pulses run regardless of overlay state
   camera.getWorldDirection(forward)
   forward.y = 0
   forward.normalize()
@@ -2112,6 +2341,16 @@ function animate() {
   const bob     = Math.sin(bobTime * Math.PI * 2 * BOB_FREQ) * BOB_AMPLITUDE * bobIntensity
 
   camera.position.y = floorY + playerHeight + bob
+
+  // Float + spin the project arrows (delta already stall-clamped above)
+  if (projectArrows.length) {
+    arrowTime += delta
+    for (const a of projectArrows) {
+      a.mesh.position.y = a.baseY +
+        Math.sin(arrowTime * Math.PI * 2 * ARROW_BOB_FREQ + a.phase) * ARROW_BOB_AMP
+      a.mesh.rotation.y += ARROW_SPIN * delta
+    }
+  }
 
   renderer.render(scene, camera)
 }
@@ -2334,7 +2573,15 @@ renderer.domElement.addEventListener('click', e => {
       // ?from=3d tells the destination page it was opened from the 3D scene,
       // so it swaps its usual nav bar for a fixed "Exit" button that returns
       // here — see the per-page <script> block that checks this param.
-      window._nav(data.url + '?from=3d', 'left')
+      const navigate = () => window._nav(data.url + '?from=3d', 'left')
+      const pop = resolvePopTargets(obj)
+      if (pop && pop.targets.length) {
+        if (popNavigating) return
+        popNavigating = true
+        startPop(pop.targets, navigate, pop.bottom)
+      } else {
+        navigate()
+      }
     } else {
       openOverlay(name)
     }

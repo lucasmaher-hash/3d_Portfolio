@@ -1619,12 +1619,28 @@
       // Both shadows are gated on .is-raised — see updateExitShadow() below.
       // The transform lift is NOT gated: it works on any background.
       style.textContent = '.exit-3d-btn{position:fixed;top:24px;left:24px;z-index:10000;background:var(--bg-surface);border:none;border-radius:9999px;padding:10px 24px;font-family:"VT323",monospace;font-size:16px;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-primary);box-shadow:none;cursor:pointer;text-decoration:none;transition:left 200ms ease, transform 150ms ease, box-shadow 260ms cubic-bezier(.2,.7,.2,1);}.exit-3d-btn.is-raised{box-shadow:var(--shadow-raised-sm);}.exit-3d-btn:hover{transform:translateY(-2px) scale(1.03);transition:left 200ms ease, transform 150ms ease, box-shadow 150ms ease;}.exit-3d-btn.is-raised:hover{box-shadow:11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);}';
+      style.textContent += /* keyframes start AND end in the :hover pose: an animation replaces the
+         whole transform, so plain scale(1) frames made the button first DROP
+         out of its hover lift on click. The mouse is on the button when this
+         runs, so the hover pose is the correct base in every frame. */
+      '@keyframes exitPop{0%{transform:translateY(-2px) scale(1.03)}50%{transform:translateY(-2px) scale(1.15)}100%{transform:translateY(-2px) scale(1.03)}}';
       document.head.appendChild(style);
       var btn = document.createElement('a');
       btn.href = '/';
       btn.className = 'exit-3d-btn';
       btn.textContent = 'Exit';
       document.body.appendChild(btn);
+
+      // Same button-pop as the 3D scene objects: pulse ~0.28s, THEN navigate.
+      // The deliberate delay is what makes the press visible before the page
+      // leaves — without it the pulse would be cut off by the navigation.
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (btn.dataset.leaving) return;   // double-click guard
+        btn.dataset.leaving = '1';
+        btn.style.animation = 'exitPop 280ms ease';
+        setTimeout(function () { window.location.href = btn.getAttribute('href'); }, 280);
+      });
 
       // Keep the button clear of .page-wrapper's left border. It CENTRES in the
       // open margin between the viewport edge and that border, capped at

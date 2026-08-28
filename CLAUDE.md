@@ -915,6 +915,53 @@ Sub-headings inside a project section, above a per-item image/video. **OCR-A-BT 
 
 **`data-i18n` is applied with `textContent`, not `innerHTML`** — so a translation value must contain a real `&`, never `&amp;`, or the entity renders literally as "Profil &amp; Freunde". Use `data-i18n-html` if a value genuinely needs markup.
 
+## 3D Mode: Project arrows (floating chrome "clickable" markers)
+
+`PROJECT_ARROWS` + `addProjectArrows(model)` in `src/main.js` (right after `addFixtureLights`). A
+procedurally built chrome arrow (extruded 2D shape with a bevel — no Blender, no GLB re-export)
+floats above each configured project object, bobbing (`ARROW_BOB_*`) and slowly spinning
+(`ARROW_SPIN`) in `animate()`. **All 7 project objects have one**: Mac-Lamp ×2, both bottles, the
+Cybercoffee egg, the Unify figure, the VR panel. The `byKey(name)` helper matches exactly the way
+the click handler resolves `CONTENT` keys (mesh name OR direct-parent name — multi-primitive glTF
+nodes load as a group of that name with generated child names, which is why `bottle_body_Podest`
+[3 meshes] and `egg-rig` [4] work via the parent branch). **To add a project: one `PROJECT_ARROWS`
+row** (`title`, `url`, `match(mesh)` predicate) — the arrow hovers over the matched meshes' union
+bbox, gets a runtime `CONTENT` entry + `clickables.push`, so clicking it runs the full existing
+pipeline (return-state save, `?from=3d`, analytics, left-drag slop).
+
+**Click-pop (bounce)** — `POP_*` block directly above `animate()` (it MUST stay above: `animate()`
+is first CALLED during module evaluation, and the pop state being declared after that call was a
+real first-frame TDZ ReferenceError that black-screened the whole scene). Every project object and
+every arrow pops on click (~0.28s sine pulse to 1.15×, navigation deferred until it ends;
+`popNavigating` guards double-clicks). `resolvePopTargets(obj)` mirrors the CONTENT resolution:
+names in `POP_ENABLED` and `ProjectArrow_*` pop as themselves. **The table lamp is the special
+case: its six meshes sit DIRECTLY under `SpinPivot`, and `SpinPivot` is the ENTIRE scene** — never
+escalate a pop (or any group operation) to it, or every room pulses. The lamp pops as a composite:
+`MACLAMP_TABLE_MESHES` are scaled together about their shared union-bbox centre (`startPop` takes
+an array of targets for exactly this). Pop scaling happens about the world-bbox centre, not the
+transform origin — several pivots (egg notably) have origins outside their own geometry.
+`POP_BOTTOM_ANCHORED` (currently `Pivot_MacLamp`, `bottle_body_Podest`, and `MACLAMP_TABLE` — the
+synthetic key for the table lamp's six-mesh composite) switches the scale centre
+to the bbox's BOTTOM centre: objects sitting on a podium grow upward with their base planted,
+instead of a centre-scale pushing their underside through the podium mesh mid-pulse. Add a
+resolved name to the set to give another sitting object the same treatment.
+**The Exit pill on the `?from=3d` project pages pops too** (all 5 pages, in the same injected
+script as `positionExitBtn`): click → `exitPop` keyframe pulse (280ms; frames start AND end in the :hover pose — an animation
+replaces the whole transform, so plain scale(1) frames made the button visibly drop out of its
+hover lift on click) →
+navigation deferred by the same 280ms so the press is visible before the page leaves;
+`btn.dataset.leaving` guards double-clicks.
+
+Three things future edits must preserve:
+- **The union bbox is MODEL-LOCAL** — position needs `.add(model.position)`, the same stale-matrix
+  correction as the fixture lights, and the same prohibition on `model.updateMatrixWorld(true)`.
+- **The arrow material carries its OWN `envMap`** (PMREM of `RoomEnvironment`, imported solely for
+  this). `scene.environment` is deliberately uniform white; metalness-1 chrome reflecting it renders
+  as a flat grey blob. A per-material envMap overrides the scene env for that material only, so the
+  splotchy-walls fix stays intact — and `envMapIntensity` DOES work on it (the documented no-op is
+  only for materials inheriting `scene.environment`).
+- Arrows are direct scene children — never collidables (walk under them freely), `castShadow` off.
+
 ## 3D Mode: Lighting
 
 All illumination is created in `src/main.js` — **the Blender scene contains zero light objects.** Do lighting work in the code, not Blender: Three.js has no global illumination, so emissive materials glow without casting light, and iterating in Blender would cost a full GLB re-export per tweak. Only the fixture's *appearance* (its emissive material) belongs in Blender.
