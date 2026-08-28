@@ -1268,7 +1268,8 @@ const PROJECT_ARROWS = [
   { title: 'Double Packaging', url: '/vaccine2d.html',         match: byKey('bottle_body_Podest') },
   { title: 'Double Packaging', url: '/vaccine2d.html',         match: byKey('bottle_body') },
   { title: 'Cybercoffee',      url: '/kaffeemaschine2d.html',  match: byKey('egg-rig') },
-  { title: 'Unify',            url: '/unify2d.html',           match: byKey('Pivot_UNify') },
+  // Unify deliberately has NO arrow (removed 2026-08-28 per Lucas) — the blob
+  // itself is the landmark. The object stays clickable via CONTENT.
   { title: 'Virtual Cooking',  url: '/virtual_cooking2d.html', match: byKey('Pivot_VRPanel') },
 ]
 const projectArrows = []
@@ -1544,7 +1545,22 @@ const TOUCH_SENS    = 0.004   // horizontal (yaw) — unchanged
    so mouse and trackpad look are untouched by definition. */
 const TOUCH_SENS_PITCH = 0.0012
 let cameraTouchId = null
-let lastTouchX = 0, lastTouchY = 0
+let lastTouchX = 0, lastTouchY = 0, lastTouchT = 0
+
+/* Swipe fling (mobile look ease-out, added 2026-08-28 per Lucas): a horizontal
+   swipe used to stop dead the instant the finger lifted. Now the release
+   carries the swipe's final angular velocity into a short exponential coast,
+   applied in animate() to the SAME frame triple (heading/target/stickRef) the
+   live swipe rotates — so the glide is just "the swipe continuing", and a held
+   joystick keeps its reference consistent throughout. This is deliberately
+   NOT the old INERTIA_DECAY free-coasting (large, floaty, rejected): the cap
+   and decay keep it a subtle finish, ~0.2s and at most ~30° of extra travel.
+   touchcancel (OS stole the touch) flings nothing; a new touch kills a coast. */
+const FLING_DECAY  = 5.5   // 1/s exponential decay — ease-out time constant ~0.18s
+const FLING_MAX    = 3.0   // rad/s cap on release velocity (a hard flick ≈ 6)
+const FLING_MIN    = 0.15  // rad/s below which a release just stops (taps, slow pans)
+let swipeVelYaw = 0        // smoothed live swipe velocity, rad/s
+let flingVelYaw = 0        // active coast velocity after release
 
 /* Horizontal swipe = rotate the steering frame live (heading, target and
    stick reference together — see the steering-model comment above), so a
@@ -1557,6 +1573,9 @@ renderer.domElement.addEventListener('touchstart', e => {
   cameraTouchId = e.changedTouches[0].identifier
   lastTouchX    = e.changedTouches[0].clientX
   lastTouchY    = e.changedTouches[0].clientY
+  lastTouchT    = e.timeStamp
+  swipeVelYaw   = 0
+  flingVelYaw   = 0   // grabbing the screen stops an active coast
 }, { passive: true })
 
 renderer.domElement.addEventListener('touchmove', e => {
