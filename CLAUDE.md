@@ -474,6 +474,47 @@ Organized by project for clarity:
 **Deployment:**
 - ✅ Live at `https://lucasmaher.com` (custom domain, HTTPS working) and `https://lucasmaher-hash.github.io/3d-Portfolio-current/` — see "Deployment" section below
 
+## Recent Changes (2026-08-28)
+
+One long 3D session (code + live Blender over MCP). The .blend (`severance_V25.blend`) was
+saved at end of day; scene backups from every step live in `glb-backups/`.
+
+1. **Pixel-font room titles above each door** — VT323 (`public/VT323-Regular.ttf`, parsed at
+   runtime by three's TTFLoader — no typeface.json), bent onto the wall cylinder, dark grey
+   `0x1e1e1e`. Driven by `ROOM_TITLES` in `src/main.js`: unify / interfaces / packaging /
+   mac-lamp. Same system renders the smaller "contact"/"about" captions via `wallLabel()`.
+2. **Click-pop on every clickable project object** — sine scale pulse (~0.28s) about the
+   union bbox centre (bottom-anchored for podium/table objects), navigation deferred until
+   the pulse ends. `POP_ENABLED` / `resolvePopTargets` in `src/main.js`. Unify's overhead
+   arrow was removed (`PROJECT_ARROWS`); the blob itself is the landmark.
+3. **Mobile:** swipe release now glides out (`FLING_*` consts — deliberately subtle, NOT the
+   old rejected inertia); `PITCH_LIMIT` 0.20 → 0.32.
+4. **Wall plaques between the mac-lamp and packaging doors** — `WallIcon_Mail` +
+   `WallIcon_Logo` (Blender objects, material `Icon_Chrome`, dark grey), curved to the wall
+   (radius shell 9.535–9.59), each centred in one rail panel, clickable via `CONTENT`
+   `action:` entries → the in-scene contact/about overlays, with the click-pop.
+   **Placement trap: the wall rails sit ~6° rotated at RUNTIME vs their Blender-world
+   angles, and unparented objects don't inherit that** — panel angles must be measured in
+   the live scene (`Wall_Rails` vertices), not in Blender. Doors at runtime: 87.6°
+   (packaging) / 177.6° (mac-lamp) / 267.6° (interfaces) / 357.6° (unify).
+5. **Brown-room entrance** rebuilt several times; final state is Lucas's own manual Blender
+   fix (`BlueRoom_Tunnel.002` + a denser `Wall_Cylinder` that also closes the old
+   wall-to-ceiling-rim gap). Lesson that cost a day of holes: **zero-thickness single-sided
+   liner quads leak sightlines into the void between rooms — door framing must be a closed
+   solid wider than both wall cuts.** Also: that tunnel object carries a ~94° baked
+   rotation — build its mesh in world coords and bake `matrix_world.inverted()` in, or the
+   geometry lands rotated off the doorway.
+6. **Scene GLB churn:** model now includes the `_staging` duplicates + `dome-lattice`
+   (bbox-centre unchanged — always verify delta `[0,0,0]` before deploying, plus node
+   names, material list, per-mesh tri counts). Export = visible objects only,
+   `export_apply=True`, subsurf viewport levels pinned to render levels.
+7. **Testing:** headless CDP tooling lives in the session scratchpad (`shot3d.mjs` etc.,
+   raw-WebSocket CDP, SwiftShader flags). SwiftShader parks rAF when idle — animations
+   freeze mid-pulse unless you dispatch pointer nudges; close overlays via a real Escape
+   (stripping the CSS class leaves `isOverlayOpen` latched). Session hit the API image cap,
+   so all visual verification was done by pixel analysis of PNGs; Lucas's screenshots are
+   at `~/Desktop/Screenshot *.png` when chat images fail.
+
 ## Recent Changes (2026-07-31)
 
 Two Claude sessions ran in parallel on this day and both are folded in below. **Scope note:** the
