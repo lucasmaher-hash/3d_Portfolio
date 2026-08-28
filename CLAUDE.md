@@ -915,6 +915,24 @@ Sub-headings inside a project section, above a per-item image/video. **OCR-A-BT 
 
 **`data-i18n` is applied with `textContent`, not `innerHTML`** — so a translation value must contain a real `&`, never `&amp;`, or the entity renders literally as "Profil &amp; Freunde". Use `data-i18n-html` if a value genuinely needs markup.
 
+## 3D Mode: Startup — deferred reveal + compileAsync
+
+The first frame rendered after `scene.add(model)` used to compile EVERY shader program
+synchronously — a multi-hundred-ms (seconds on slow GPUs) main-thread freeze that also hung the
+welcome panel, since the intro iframe shares the thread. That freeze is what read as "the 3D start
+hangs / gets stuck". Fixed at the end of the GLB `onLoad` (2026-08-28): the model and the project
+arrows are added **invisible**, `renderer.compileAsync(scene, camera)` compiles all programs in
+parallel (`KHR_parallel_shader_compile`), and only then does the reveal flip everything visible —
+logged as `Szene sichtbar — Shader kompiliert nach Xms`. Raycasts ignore visibility (verified
+against three r184), so ALL the bbox/collision/spawn/click setup runs unchanged while hidden — do
+not reorder that setup around the reveal (stale-matrix minefield). Belt-and-braces: the promise's
+rejection path AND a 4s timeout both reveal anyway, so no driver quirk can leave the scene
+invisible. `compile()`/`compileAsync()` use `scene.traverse`, not `traverseVisible`, which is why
+compiling invisible objects works. Related: per-mesh load logging (~400 console calls with
+JSON.stringify) is now behind `DEBUG_SCENE_LOGS = false` (top of `src/main.js`) — flip it on when
+verifying CONTENT keys or collision filtering after a GLB re-export; the one-line summaries always
+log.
+
 ## 3D Mode: Project arrows (floating chrome "clickable" markers)
 
 `PROJECT_ARROWS` + `addProjectArrows(model)` in `src/main.js` (right after `addFixtureLights`). A

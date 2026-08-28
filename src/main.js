@@ -1,6 +1,11 @@
 import './style.css'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+// Room-title lettering: TTFLoader triangulates the site's pixel font (VT323,
+// /public/VT323-Regular.ttf) at runtime — no typeface.json to generate/commit.
+import { TTFLoader } from 'three/addons/loaders/TTFLoader.js'
+import { Font } from 'three/addons/loaders/FontLoader.js'
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
 // Needed by any THREE.RectAreaLight (BlueRoom's ceiling panel). It uploads the LTC lookup
 // textures the area-light shader integrates against; without init() having run, the light
 // is constructed fine and simply emits NOTHING, with no error or warning.
@@ -26,6 +31,12 @@ camera.rotation.order = 'YXZ'
 
 // Renderer
 const isMobile = navigator.maxTouchPoints > 0
+// Per-mesh load logging ("Mesh:"/"Kollision ignoriert:") — ~400 console calls
+// with JSON.stringify per load, real milliseconds during the startup jank
+// window (Safari especially). Flip on when verifying CONTENT keys / collision
+// filtering after a GLB re-export; the one-line summaries (Clickables
+// gefunden, Fixture-Lichter, Project-Arrows, Kamerastart) always log.
+const DEBUG_SCENE_LOGS = false
 // The try/catch exists ONLY to report the failure — it rethrows, so behaviour is
 // unchanged. A device with no working WebGL gets a blank page and leaves, which
 // is indistinguishable from a bounce in the pageview numbers; this is the one
@@ -1840,6 +1851,88 @@ function probeMove(origin, direction) {
   return _probeResult
 }
 
+// ── Room titles: pixel-font lettering above each room entrance ──────────
+// Extruded 3D text in VT323 (the 2D site's pixel font), mounted just proud of
+// the wall above a room's doorway — real geometry, so it catches the room
+// lighting like raised signage. The TTF is parsed and triangulated at runtime
+// by TTFLoader (no typeface.json asset needed).
+//
+// Coordinates are MODEL-LOCAL and get model.position added at placement —
+// the same stale-matrixWorld fix as the fixture lights (see the
+// .add(model.position) note in addFixtureLights; matrices are NOT refreshed
+// here for the same spawn-probe reason).
+//
+// Geometry facts the Unify entry derives from (measured in the GLB):
+// the PinkRoom tunnel mouth opens through the MainRoom cylinder wall at
+// z ±0.93, y 0→3; the wall's INNER surface is radius 9.6 (outer 10.0). The
+// letters' back plane sits at x 9.58 — 0.02 into the wall at z=0, so the
+// curvature (inner wall pulls in to x≈9.55 at |z|=1) never opens a visible
+// gap behind a glyph — and the 0.07 extrusion is what reads as "raised".
+// One uniform font scale for every title (constant letter HEIGHT — widths then
+// vary naturally with word length). Calibrated on "unify": at size-1 the word
+// measures 2.68 units, so 0.273 renders it ≈0.73 wide, the look Lucas settled
+// on after three shrink passes.
+const TITLE_SCALE = 0.273
+// Door cuts in Wall_Cylinder sit at 0° / ±90° / 180°, each z(or x) ±0.9, lintel
+// y=3, inner wall face radius 9.6. The lettering is BENT to that curvature
+// (see the vertex loop below): a flat run's far letters would dip inside the
+// concave wall — the trailing "s" of "interfaces" was visibly swallowed. Each
+// entry's radial coordinate is TITLE_R, the bend's tangent point.
+// The tangential 0.36 is Lucas's visually-tuned nudge (viewer's right when
+// facing each door), not a derived value.
+const TITLE_R     = 9.605  // back-plane radius: 5mm inside the 9.6 inner wall face, so no gap shows
+const TITLE_DEPTH = 0.18   // extrusion (pre-scale); rendered ≈0.05 — the "slightly raised" read
+const ROOM_TITLES = [
+  { text: 'unify',      pos: [ TITLE_R,  3.30,  0.36   ], rotY: -Math.PI / 2 }, // PinkRoom door (+x)
+  { text: 'interfaces', pos: [-0.36,     3.30,  TITLE_R], rotY:  Math.PI },     // BlueRoom door (+z): egg + VR panel
+  { text: 'packaging',  pos: [ 0.36,     3.30, -TITLE_R], rotY:  0 },           // NewRoom door (−z): vaccine bottle
+  { text: 'mac-lamp',   pos: [-TITLE_R,  3.30, -0.36   ], rotY:  Math.PI / 2 }, // YellowRoom door (−x)
+]
+
+function addRoomTitles(model) {
+  new TTFLoader().load('/VT323-Regular.ttf', ttf => {
+    const font = new Font(ttf)
+    // Very dark grey (site --text-primary is #1A1A1A), dielectric, fairly matte.
+    const mat = new THREE.MeshStandardMaterial({ color: 0x1e1e1e, roughness: 0.65, metalness: 0 })
+    for (const spec of ROOM_TITLES) {
+      // curveSegments 2: VT323 outlines are near-rectangular; more adds nothing.
+      const geo = new TextGeometry(spec.text, {
+        font, size: 1, depth: TITLE_DEPTH, curveSegments: 2, bevelEnabled: false,
+      })
+      geo.computeBoundingBox()
+      const bb = geo.boundingBox
+      const w  = bb.max.x - bb.min.x
+      // Centre the run horizontally on the doorway; baseline stays at pos y.
+      geo.translate(-(bb.min.x + w / 2), 0, 0)
+      // Bend the run onto the wall cylinder. The MainRoom wall is CONCAVE from
+      // the viewer's side, so a flat plane tangent at the door centre ends up
+      // BEHIND the wall at its far letters (longer words lost their ends —
+      // "interfaces" rendered with the s swallowed). Cylinder axis in text-local
+      // space sits at (0, ·, +R): x becomes an arc length, extrusion depth (z)
+      // becomes radius. Runs are ≤ ~14° of arc, so the original normals stay
+      // visually fine unrecomputed.
+      const R = TITLE_R / TITLE_SCALE
+      const pa = geo.attributes.position
+      for (let i = 0; i < pa.count; i++) {
+        const a = pa.getX(i) / R, rho = R - pa.getZ(i)
+        pa.setX(i, Math.sin(a) * rho)
+        pa.setZ(i, R - Math.cos(a) * rho)
+      }
+      pa.needsUpdate = true
+      const mesh = new THREE.Mesh(geo, mat)
+      mesh.scale.setScalar(TITLE_SCALE)
+      mesh.rotation.y = spec.rotY
+      mesh.position.set(
+        spec.pos[0] + model.position.x,
+        spec.pos[1] + model.position.y,
+        spec.pos[2] + model.position.z,
+      )
+      scene.add(mesh)
+    }
+    console.log('Room-Titles:', ROOM_TITLES.map(t => t.text).join(', '))
+  })
+}
+
 // ── Load model ───────────────────────────────────────────────────
 const loader = new GLTFLoader()
 const glbT0 = performance.now()
@@ -1852,6 +1945,10 @@ loader.load(
     const size   = box.getSize(new THREE.Vector3())
     model.position.sub(center)
     scene.add(model)
+    // Hidden until the shaders are compiled — see the deferred reveal at the
+    // very end of this callback. Raycasts ignore visibility (verified against
+    // three r184), so every bbox/collision/spawn probe below is unaffected.
+    model.visible = false
 
     // Relative Schwellenwerte basierend auf der tatsächlichen Modellgröße
     const thinThresh = size.y * 0.04                        // 4 % der Gebäudehöhe
@@ -1888,12 +1985,12 @@ loader.load(
       }
 
       if (nameExcluded || isThinCylinder || (minDim < thinThresh && volume < volThresh)) {
-        console.log('Kollision ignoriert:', JSON.stringify(child.name), `minDim=${minDim.toFixed(3)} vol=${volume.toFixed(3)}`)
+        if (DEBUG_SCENE_LOGS) console.log('Kollision ignoriert:', JSON.stringify(child.name), `minDim=${minDim.toFixed(3)} vol=${volume.toFixed(3)}`)
       } else {
         collidables.push(child)
       }
 
-      console.log('Mesh:', JSON.stringify(child.name), '| Parent:', JSON.stringify(child.parent?.name))
+      if (DEBUG_SCENE_LOGS) console.log('Mesh:', JSON.stringify(child.name), '| Parent:', JSON.stringify(child.parent?.name))
       if (child.name in CONTENT || (child.parent && child.parent.name in CONTENT))
         clickables.push(child)
     })
@@ -1945,6 +2042,10 @@ loader.load(
     // timing requirement as the fixture lights (needs model.position final,
     // reads model-local bboxes with the same .add(model.position) fix).
     addProjectArrows(model)
+
+    // Pixel-font room titles above each room entrance — same timing
+    // requirement (positions are model-local + model.position).
+    addRoomTitles(model)
 
     const fixedClearance = size.y * 0.20
     const roofCutoff     = size.y * 0.35  // obere 35% = Dach, wird ausgeschlossen
@@ -2043,6 +2144,32 @@ loader.load(
     })
 
     if (window._loader) window._loader.done()
+
+    // ── Deferred reveal: compile every shader program OFF the first visible
+    // frame. Without this, the first frame rendered after scene.add(model)
+    // compiles all programs synchronously — a multi-hundred-ms main-thread
+    // freeze (seconds on slow GPUs) that also hangs the welcome panel, since
+    // the intro iframe shares the thread. That freeze is what read as "the
+    // start hangs / gets stuck". compileAsync uses KHR_parallel_shader_compile
+    // where available, so the main thread stays responsive while the driver
+    // compiles; the model (and the arrows, which would otherwise float alone
+    // in an empty room) stays hidden until everything is ready and the first
+    // visible frame renders clean. Belt-and-braces: a timeout AND the promise's
+    // rejection path both reveal anyway, so no driver quirk can ever leave the
+    // scene invisible.
+    const hiddenForCompile = [model, ...projectArrows.map(a => a.mesh)]
+    for (const o of hiddenForCompile) o.visible = false
+    let revealed = false
+    const revealScene = () => {
+      if (revealed) return
+      revealed = true
+      for (const o of hiddenForCompile) o.visible = true
+      console.log(`Szene sichtbar — Shader kompiliert nach ${Math.round(performance.now() - glbT0)}ms`)
+    }
+    try {
+      renderer.compileAsync(scene, camera).then(revealScene, revealScene)
+    } catch (e) { revealScene() }
+    setTimeout(revealScene, 4000)
   },
   e => {
     // Real download progress for the loading screen (e.total is 0 if the
@@ -2465,6 +2592,10 @@ function closeAbout() {
 }
 
 window.openAboutOverlay = openAbout
+
+// Console/debug handle on the live scene graph (used by headless test tooling
+// to measure world positions without guessing at module-scoped state).
+window._3dDebug = { scene, camera, THREE }
 
 window.resetScene = function () {
   if (!spawnPos) return
