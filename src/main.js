@@ -1317,6 +1317,10 @@ function addProjectArrows(model) {
     envMap: envTex,
     envMapIntensity: 1.2,
   })
+  // The wall plaques (WallIcon_Mail / WallIcon_Logo) briefly borrowed this
+  // chrome via a name-swap here; per Lucas they are now the room-title dark
+  // grey instead, which is authored directly in the GLB's Icon_Chrome
+  // material (0x1e1e1e, matte dielectric) — no runtime swap needed.
   const geo = makeArrowGeometry()
   const placed = []
   PROJECT_ARROWS.forEach((spec, i) => {
@@ -1368,7 +1372,7 @@ const SCROLL_SENS = 0.003
    Gated on isMobile (navigator.maxTouchPoints > 0, defined at the top of this
    file) rather than a width query, matching how this file already switches
    antialiasing and shadows — so a mouse-driven desktop is untouched. */
-const PITCH_LIMIT = isMobile ? 0.20 : Math.PI / 2 - 0.01
+const PITCH_LIMIT = isMobile ? 0.32 : Math.PI / 2 - 0.01   // 0.20 → 0.32 (2026-08-28): more Spielraum before the peek eases back
 
 function clampPitch() {
   pitch = Math.max(-PITCH_LIMIT, Math.min(PITCH_LIMIT, pitch))
@@ -1777,6 +1781,14 @@ const CONTENT = {
   'egg-rig':             { title: 'Cybercoffee',      url: '/kaffeemaschine2d.html' }, // Pivot_Kaffeemaschine's mesh parent
   'Pivot_UNify':         { title: 'Unify',            url: '/unify2d.html' },
   'Pivot_VRPanel':       { title: 'Virtual Cooking',  url: '/virtual_cooking2d.html' },
+  // Wall plaques between the mac-lamp and packaging doors. These open the
+  // SAME in-scene overlays the nav's Kontakt/Über-mich buttons open, rather
+  // than navigating away — the 3D scene has its own contact/about pages
+  // (contact3d.html / about3d.html) and leaving the room for them would be a
+  // one-way trip. `action` instead of `url`; both are handled in the click
+  // handler below, and both plaques are in POP_ENABLED so they press first.
+  'WallIcon_Mail':       { title: 'Contact', action: () => openContact() },
+  'WallIcon_Logo':       { title: 'About',   action: () => openAbout() },
 }
 
 const ray = new THREE.Raycaster()
@@ -1911,11 +1923,36 @@ const TITLE_SCALE = 0.273
 // facing each door), not a derived value.
 const TITLE_R     = 9.605  // back-plane radius: 5mm inside the 9.6 inner wall face, so no gap shows
 const TITLE_DEPTH = 0.18   // extrusion (pre-scale); rendered ≈0.05 — the "slightly raised" read
+//
+// Captions under the two wall plaques use the SAME mechanism (font, bend,
+// material) at a smaller `scale`, so they can never drift from the titles.
+// Their placement is polar, because the plaques are not on a door axis:
+// `wallLabel(angleDeg, …)` converts a runtime wall angle to the model-local
+// x/z and the matching rotY. Those angles are MEASURED IN THE RUNNING SCENE
+// (Wall_Rails' own vertices), not taken from Blender — the rails sit 6° off
+// their Blender-world angles at runtime, so Blender-side centring lands the
+// icons straddling a rail. Doors measured at 87.6 / 177.6 / 267.6 / 357.6,
+// rails every 11.25 between them.
+const LABEL_SCALE = 0.20
+const wallLabel = (text, angleDeg, y) => {
+  const a = angleDeg * Math.PI / 180
+  return {
+    text, scale: LABEL_SCALE,
+    pos: [TITLE_R * Math.cos(a), y, -TITLE_R * Math.sin(a)],
+    // rotY is 0 at the packaging door (87.6°) and advances with the angle.
+    rotY: (angleDeg - 87.6) * Math.PI / 180,
+  }
+}
 const ROOM_TITLES = [
   { text: 'unify',      pos: [ TITLE_R,  3.30,  0.36   ], rotY: -Math.PI / 2 }, // PinkRoom door (+x)
   { text: 'interfaces', pos: [-0.36,     3.30,  TITLE_R], rotY:  Math.PI },     // BlueRoom door (+z): egg + VR panel
   { text: 'packaging',  pos: [ 0.36,     3.30, -TITLE_R], rotY:  0 },           // NewRoom door (−z): vaccine bottle
   { text: 'mac-lamp',   pos: [-TITLE_R,  3.30, -0.36   ], rotY:  Math.PI / 2 }, // YellowRoom door (−x)
+  // Plaque captions. Angles match WallIcon_Mail / WallIcon_Logo exactly; y is
+  // just under each plaque's lower edge (plaques span y 1.89–2.61 after the
+  // +0.30 raise on 2026-08-28).
+  wallLabel('contact', 126.975, 1.60),
+  wallLabel('about',   138.225, 1.60),
 ]
 
 function addRoomTitles(model) {
@@ -1940,7 +1977,8 @@ function addRoomTitles(model) {
       // space sits at (0, ·, +R): x becomes an arc length, extrusion depth (z)
       // becomes radius. Runs are ≤ ~14° of arc, so the original normals stay
       // visually fine unrecomputed.
-      const R = TITLE_R / TITLE_SCALE
+      const s = spec.scale || TITLE_SCALE
+      const R = TITLE_R / s
       const pa = geo.attributes.position
       for (let i = 0; i < pa.count; i++) {
         const a = pa.getX(i) / R, rho = R - pa.getZ(i)
@@ -1949,7 +1987,7 @@ function addRoomTitles(model) {
       }
       pa.needsUpdate = true
       const mesh = new THREE.Mesh(geo, mat)
-      mesh.scale.setScalar(TITLE_SCALE)
+      mesh.scale.setScalar(s)
       mesh.rotation.y = spec.rotY
       mesh.position.set(
         spec.pos[0] + model.position.x,
@@ -2251,6 +2289,10 @@ const POP_DURATION = 0.28   // seconds; navigation fires when the pulse ends
 const POP_ENABLED = new Set([
   'Pivot_UNify', 'Pivot_MacLamp', 'egg-rig', 'Pivot_VRPanel',
   'bottle_body_Podest', 'bottle_body',
+  // Wall plaques — centre-anchored: they are flat against the wall, so growing
+  // about the middle keeps them centred in their panel. The extra depth goes
+  // INTO the wall, which is already where their back face sits.
+  'WallIcon_Mail', 'WallIcon_Logo',
 ])
 // Objects that sit ON a surface (podium, table): the pop scales about the
 // bbox's BOTTOM centre instead of its middle, so they grow upward and their
@@ -2750,6 +2792,15 @@ renderer.domElement.addEventListener('click', e => {
       } else {
         navigate()
       }
+    } else if (data.action) {
+      // In-scene overlay (the wall plaques). Same press-then-act flow as a
+      // navigation, but nothing is left behind, so no return state is saved
+      // and popNavigating is NOT latched — it never resets without a page
+      // load, and that would kill every later plaque click.
+      if (window.track) window.track('nav_open', { panel: data.title, via: '3d-click' })
+      const pop = resolvePopTargets(obj)
+      if (pop && pop.targets.length) startPop(pop.targets, data.action, pop.bottom)
+      else data.action()
     } else {
       openOverlay(name)
     }
