@@ -2325,11 +2325,21 @@ window.addEventListener('pageshow', e => {
     }
   }
   popAnims.length = 0
-  // The camera is already exactly where this state would have put it (the
-  // whole scene came back intact), so the restore is moot — but the loader
-  // callback that normally consumes it never runs on a bfcache restore, and a
-  // stale entry would hijack the next genuine 3D entry's spawn point.
-  try { sessionStorage.removeItem('_3dReturnState') } catch (_) {}
+  // _3dReturnState is deliberately NOT cleared here, and that is load-bearing.
+  // A restore is not the end of the story on iOS: Safari will happily hand the
+  // page back from the bfcache and then still tear it down and reload it a
+  // moment later (a WebGL scene this size is an obvious eviction candidate).
+  // Clearing the key made that reload fall through to the fixed spawn, which
+  // is the "back-swipe resets the whole scene" report. Left in place, the
+  // reload restores the same spot the Exit pill would.
+  // Refreshed rather than merely kept, so a reload lands where the player
+  // actually is now — they may have walked on since coming back.
+  try {
+    sessionStorage.setItem('_3dReturnState', JSON.stringify({
+      x: camera.position.x, y: camera.position.y, z: camera.position.z,
+      yaw, pitch
+    }))
+  } catch (_) {}
 })
 
 // The clicked mesh → the object(s) that should visually pop, or null for a
