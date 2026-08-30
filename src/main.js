@@ -2305,6 +2305,33 @@ const POP_BOTTOM_ANCHORED = new Set(['Pivot_MacLamp', 'bottle_body_Podest', 'MAC
 const popAnims = []
 let popNavigating = false   // guards a double-click firing two navigations
 
+// popNavigating latches until the page reloads — and an iOS/Safari back-swipe
+// out of a project page does NOT reload: it restores this page from the
+// back-forward cache, script state and all. So the flag stayed true and every
+// later project click hit its early return, i.e. nothing in the scene was
+// clickable any more. The Exit pill was unaffected because it is a plain link
+// to `/`, which is a fresh load rather than a history traversal.
+// `pageshow` with `persisted` is the only signal a bfcache restore gives.
+window.addEventListener('pageshow', e => {
+  if (!e.persisted) return
+  popNavigating = false
+  // A pop still running when we left would resume here and fire its `done`
+  // callback — navigating the user straight back out of the page they just
+  // came back to. Drop the pulses, put the meshes back at rest.
+  for (const a of popAnims) {
+    for (const part of a.parts) {
+      part.target.scale.copy(part.s0)
+      part.target.position.copy(part.p0)
+    }
+  }
+  popAnims.length = 0
+  // The camera is already exactly where this state would have put it (the
+  // whole scene came back intact), so the restore is moot — but the loader
+  // callback that normally consumes it never runs on a bfcache restore, and a
+  // stale entry would hijack the next genuine 3D entry's spawn point.
+  try { sessionStorage.removeItem('_3dReturnState') } catch (_) {}
+})
+
 // The clicked mesh → the object(s) that should visually pop, or null for a
 // plain instant navigation. Mirrors the click handler's CONTENT resolution.
 function resolvePopTargets(obj) {

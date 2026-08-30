@@ -2353,6 +2353,16 @@
         setTimeout(function () { window.location.href = btn.getAttribute('href'); }, 280);
       });
 
+      // An iOS forward-swipe back into this page restores it from the
+      // back-forward cache with `leaving` still set, which leaves the pill
+      // permanently dead. Same latched-guard bug as the 3D scene's
+      // popNavigating; `persisted` is the only signal a bfcache restore gives.
+      window.addEventListener('pageshow', function (e) {
+        if (!e.persisted) return;
+        delete btn.dataset.leaving;
+        btn.style.animation = '';
+      });
+
       // Keep the button clear of .page-wrapper's left border. It CENTRES in the
       // open margin between the viewport edge and that border, capped at
       // MARGIN_GAP so wide monitors don't push it far from the corner; if the
