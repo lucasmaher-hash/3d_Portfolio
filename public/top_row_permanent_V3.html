@@ -502,6 +502,7 @@
   <div id="craft-dropdown" class="craft-dropdown">
     <span class="craft-dropdown-item" onclick="window.top.location.href='/unify2d.html'">Unify</span>
     <span class="craft-dropdown-item" onclick="window.top.location.href='/virtual_cooking2d.html'">Virtual Cooking</span>
+    <span class="craft-dropdown-item" onclick="window.top.location.href='/to-shove2d.html'">To Shove</span>
     <span class="craft-dropdown-item" onclick="window.top.location.href='/kaffeemaschine2d.html'">Cybercoffee</span>
     <span class="craft-dropdown-item" onclick="window.top.location.href='/mac-lamp2d.html'">Mac-Lamp</span>
     <span class="craft-dropdown-item" onclick="window.top.location.href='/vaccine2d.html'">Double Packaging</span>
@@ -554,7 +555,7 @@
     document.getElementById('logo-btn').addEventListener('click', e => {
       e.preventDefault();
       const parentPath = window.top.location.pathname;
-      const is2DView = parentPath.includes('2D') || parentPath.includes('about2d') || parentPath.includes('contact2d') || parentPath.includes('vaccine2d') || parentPath.includes('mac-lamp2d') || parentPath.includes('kaffeemaschine2d') || parentPath.includes('virtual_cooking2d') || parentPath.includes('unify2d');
+      const is2DView = parentPath.includes('2D') || parentPath.includes('about2d') || parentPath.includes('contact2d') || parentPath.includes('vaccine2d') || parentPath.includes('mac-lamp2d') || parentPath.includes('kaffeemaschine2d') || parentPath.includes('virtual_cooking2d') || parentPath.includes('to-shove2d') || parentPath.includes('unify2d');
       if (is2DView) {
         if (window.top.location.pathname === '/2D.html') {
           window.top.scrollTo({ top: 0, behavior: 'smooth' });
@@ -575,8 +576,9 @@
       const isMacLamp2D = parentPath.includes('mac-lamp2d');
       const isKaffeemaschine2D = parentPath.includes('kaffeemaschine2d');
       const isVirtualCooking2D = parentPath.includes('virtual_cooking2d');
+      const isToShove2D = parentPath.includes('to-shove2d');
       const isUnify2D = parentPath.includes('unify2d');
-      const is2DView = is2D || isAbout2D || isContact2D || isVaccine2D || isMacLamp2D || isKaffeemaschine2D || isVirtualCooking2D || isUnify2D;
+      const is2DView = is2D || isAbout2D || isContact2D || isVaccine2D || isMacLamp2D || isKaffeemaschine2D || isVirtualCooking2D || isToShove2D || isUnify2D;
       const navIsland = document.querySelector('.nav-island');
 
       // 3D view: clip hover shadow bleed to the island's own rounded edge
@@ -771,7 +773,7 @@
       const is2DView = parentPath.includes('2D') || parentPath.includes('about2d') ||
                        parentPath.includes('contact2d') || parentPath.includes('vaccine2d') ||
                        parentPath.includes('mac-lamp2d') ||
-                       parentPath.includes('kaffeemaschine2d') || parentPath.includes('virtual_cooking2d') || parentPath.includes('unify2d');
+                       parentPath.includes('kaffeemaschine2d') || parentPath.includes('virtual_cooking2d') || parentPath.includes('to-shove2d') || parentPath.includes('unify2d');
       if (is2DView) helpBtn.style.setProperty('display', 'none', 'important');
       helpBtn.addEventListener('click', () => {
         window.parent.postMessage({ type: 'openControls' }, '*');
@@ -825,7 +827,7 @@
     // ── Craft dropdown (2D mode only) ────────────────────────────
     (function () {
       const parentPath = window.top.location.pathname;
-      const is2DView = parentPath.includes('2D') || parentPath.includes('about2d') || parentPath.includes('contact2d') || parentPath.includes('vaccine2d') || parentPath.includes('mac-lamp2d') || parentPath.includes('kaffeemaschine2d') || parentPath.includes('virtual_cooking2d') || parentPath.includes('unify2d');
+      const is2DView = parentPath.includes('2D') || parentPath.includes('about2d') || parentPath.includes('contact2d') || parentPath.includes('vaccine2d') || parentPath.includes('mac-lamp2d') || parentPath.includes('kaffeemaschine2d') || parentPath.includes('virtual_cooking2d') || parentPath.includes('to-shove2d') || parentPath.includes('unify2d');
       if (!is2DView) return;
 
       const craftSeg = document.querySelector('[data-page="craft"]');

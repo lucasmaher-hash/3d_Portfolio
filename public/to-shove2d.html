@@ -36,9 +36,8 @@
 
     html, body {
       width: 100%;
-      /* clip (not hidden): still prevents horizontal scroll, but unlike
-         hidden it does NOT create a scroll container — hidden here silently
-         breaks position:sticky for the .lamp-scrolly pin. */
+      /* clip (not hidden): prevents horizontal scroll without becoming a
+         scroll container, which would break position:sticky descendants. */
       overflow-x: clip;
       background: var(--bg-surface);
       color: var(--text-primary);
@@ -85,10 +84,7 @@
       /* Cap the content card on wide monitors; page bg fills the sides.
          Only bites above ~1550px — 13"/14" MacBooks stay edge-to-edge. */
       max-width: 1440px;
-      /* clip (not hidden): clips content to the bordered card without
-         becoming a scroll container, which hidden does — and a scroll-
-         container ancestor breaks the .lamp-scrolly sticky pin. */
-      overflow: clip;
+      overflow: hidden;
     }
 
     /* ── Hero ── */
@@ -107,6 +103,17 @@
       object-fit: cover;
       object-position: center center;
       display: block;
+    }
+
+    /* Phones swap in vr_hero_mobile.jpg via the <picture> in the markup, and the
+       box takes that image's OWN pixel ratio so it shows uncropped — per explicit
+       request ("exactly the new image's aspect ratio, no crop"). With box ratio ==
+       image ratio, the cover fit has nothing to cut; only the base rule's 1px
+       overscan is clipped, which exists to hide the sub-pixel seam. Desktop keeps
+       16/10. If the mobile image is ever re-exported at different dimensions,
+       update this ratio with it. */
+    @media (max-width: 640px) {
+      .hero { aspect-ratio: 3213 / 2790; }
     }
 
     /* ── Shared section padding ── */
@@ -201,7 +208,22 @@
       color: var(--text-secondary);
     }
 
-    /* ── Section heading ── */
+    /* ── Guide column ──────────────────────────────────────
+       No border of its own — the two vertical lines framing this
+       content are the existing .page-wrapper outer border. Content
+       uses the same horizontal padding as every other section on the
+       page (meta grid, header) so widths line up, as a single track
+       instead of the multi-column grids the other pages use. */
+    .guide-section {
+      padding: clamp(32px, 5vw, 56px) clamp(40px, 8vw, 80px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 3vw, 28px);
+    }
+
+    .guide-section:last-child { border-bottom: none; }
+
     .section-heading-row {
       display: flex;
       align-items: center;
@@ -217,16 +239,6 @@
       letter-spacing: -0.04em;
     }
 
-    /* ── At a glance lead paragraph (big, light) ── */
-    .glance-lead {
-      font-family: 'Roboto Flex', sans-serif;
-      font-weight: 300;
-      font-size: clamp(18px, 2.2vw, 24px);
-      line-height: 1.4;
-      letter-spacing: -0.01em;
-      color: var(--text-secondary);
-    }
-
     .step-badge {
       width: 38px; height: 38px;
       background: var(--accent-orange);
@@ -240,142 +252,110 @@
       flex-shrink: 0;
     }
 
-    .step-badge--sm {
-      width: 26px; height: 26px;
-      font-size: 16px;
-      border-radius: 50%;
-    }
-
-    /* ── Overview rows ── */
-    .overview-row {
-      display: grid;
-      grid-template-columns: 58fr 42fr;
-      gap: clamp(16px, 2vw, 24px);
-      align-items: stretch;
-    }
-
-    .overview-row.reverse {
-      grid-template-columns: 42fr 58fr;
-    }
-
-    .overview-img {
-      width: 100%;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: var(--shadow-pressed);
-    }
-
-    .overview-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .overview {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .text-inset {
-      background: var(--bg-surface);
-      border-radius: 16px;
-      padding: 20px 20px 20px 24px;
-      box-shadow: var(--shadow-pressed);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .step-heading-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .step-title {
-      font-family: 'VT323', monospace;
-      font-size: 28px;
-      color: var(--text-primary);
-      text-transform: uppercase;
-      line-height: 1.2;
-    }
-
-    .text-inset p {
-      font-size: 13px;
-      line-height: 1.55;
+    .guide-text {
+      font-size: 14.4px;
+      line-height: 1.7;
       color: var(--text-secondary);
     }
 
+    .guide-text + .guide-text { margin-top: -8px; }
 
-    /* ── Step tile (raised card) ── */
-    .step-tile {
-      background: var(--bg-surface);
-      border-radius: 24px;
-      box-shadow: var(--shadow-raised);
-      padding: 16px;
+    /* ── At a glance ── */
+    .glance-list {
       display: flex;
-      gap: 16px;
+      flex-direction: column;
+      gap: 14px;
     }
 
-    .step-tile.vertical { flex-direction: column; }
+    .glance-row {
+      display: grid;
+      grid-template-columns: 20px 120px 1fr;
+      gap: 14px;
+      align-items: baseline;
+    }
 
-    .step-img {
-      border-radius: 14px;
+    .glance-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--accent-orange);
+      transform: translateY(-1px);
+    }
+
+    .glance-label {
+      font-family: 'VT323', monospace;
+      font-size: 17px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .glance-value {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 640px) {
+      .glance-row { grid-template-columns: 14px 1fr; }
+      .glance-label { grid-column: 2; }
+      .glance-value { grid-column: 2; }
+      .glance-dot { grid-row: 1; }
+    }
+
+    /* ── Media block inside a guide section ── */
+    .guide-media {
+      width: 100%;
+      border-radius: 16px;
       overflow: hidden;
       box-shadow: var(--shadow-pressed);
-      flex-shrink: 0;
+      background: #111;
     }
 
-    .step-img img {
+    .guide-media img,
+    .guide-media video {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
       display: block;
     }
 
-    /* ── Process row layouts ── */
-    .process-row {
-      display: grid;
-      gap: clamp(16px, 2vw, 24px);
-      align-items: stretch;
+    /* Breakout image — same horizontal padding as every other section */
+    .breakout-media {
+      width: 100%;
+      overflow: hidden;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: clamp(32px, 5vw, 56px) clamp(40px, 8vw, 80px);
     }
 
-    .process-row.cols-65-35 { grid-template-columns: 65fr 35fr; }
-    .process-row.cols-50-50 { grid-template-columns: 1fr 1fr; }
-
-    .stack {
-      display: flex;
-      flex-direction: column;
-      gap: clamp(16px, 2vw, 24px);
+    .breakout-media img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      object-position: center 30%;
+      display: block;
+      border-radius: 16px;
+      box-shadow: var(--shadow-pressed);
     }
 
-    /* Process step 1: horizontal image+text inside tile */
-    .step-tile.horizontal {
-      flex-direction: row;
-      align-items: stretch;
+    /* ── Reflection sections (no step badge, softer tone) ── */
+    .reflection-title {
+      font-family: 'OCR-A-BT', monospace;
+      font-size: clamp(22px, 3vw, 30px);
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
     }
 
-    .step-tile.horizontal .step-img {
-      width: 55%;
-      aspect-ratio: unset;
+    .reflection-tag {
+      font-family: 'VT323', monospace;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-orange);
     }
-
-    .step-tile.compact { flex-direction: column; padding: 20px; gap: 14px; }
-    .step-tile.compact .step-img { aspect-ratio: 4/3; }
 
     /* ── Mobile layout ─────────────────────────────────────── */
-    /* ── Mid layout ────────────────────────────────────────── */
     @media (max-width: 860px) {
       .meta-grid { grid-template-columns: 1fr 1fr; }
-      .overview-row,
-      .overview-row.reverse { grid-template-columns: 1fr; }
-      .process-row,
-      .process-row.cols-65-35,
-      .process-row.cols-50-50 { grid-template-columns: 1fr; }
-      .step-tile.horizontal { flex-direction: column; }
-      .step-tile.horizontal .step-img { width: 100%; aspect-ratio: 4/3; }
     }
 
     /* Endpoint of the fluid shrink above: padding is already 0 by here via
@@ -404,13 +384,7 @@
       .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
       .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
       .meta-inset { padding: 8px 10px; }
-      .overview-row,
-      .overview-row.reverse { grid-template-columns: 1fr; }
-      .process-row,
-      .process-row.cols-65-35,
-      .process-row.cols-50-50 { grid-template-columns: 1fr; }
-      .step-tile.horizontal { flex-direction: column; }
-      .step-tile.horizontal .step-img { width: 100%; aspect-ratio: 4/3; }
+      .guide-section { padding: 32px 20px; }
     }
 
     /* ── Project nav ──────────────────────────────────────── */
@@ -445,10 +419,7 @@
       transition: transform 200ms ease;
     }
 
-    .project-nav-item:hover .project-nav-item-inner {
-      transform: translateY(-2px) scale(1.03);
-      transition: transform 150ms ease;
-    }
+    .project-nav-item:hover .project-nav-item-inner { transform: translateY(-2px) scale(1.03); transition: transform 150ms ease; }
 
     .project-nav-top {
       display: flex;
@@ -593,93 +564,6 @@
       box-shadow: var(--shadow-pressed);
     }
 
-    /* ── Gallery / Diashow ─────────────────────────────────── */
-    .gallery-with-text {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: clamp(20px, 3vw, 40px);
-      align-items: start;
-    }
-
-    .gallery-layout {
-      display: flex;
-      flex-direction: column;
-      gap: clamp(12px, 2vw, 20px);
-      margin-top: 27px;
-    }
-
-    .gallery-main-wrap {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      max-width: min(988px, 100%);
-      margin: 0;
-    }
-
-    /* Frame matches the photos' own ~4:3 aspect so the full image always
-       shows — no cropping — instead of forcing a wide box and letting
-       object-fit: cover cut the top/bottom off taller-than-box images. */
-    .gallery-main {
-      background: var(--bg-surface);
-      border-radius: 0;
-      box-shadow: none;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 180ms ease;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-    }
-    .gallery-main.fading { opacity: 0; }
-    .gallery-main img,
-    .gallery-main video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-
-    .gallery-thumbs {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      gap: clamp(10px, 1.6vw, 18px);
-      overflow: visible;
-      padding: 4px 2px;
-    }
-
-    .gallery-thumb {
-      width: clamp(37px, 4.9vw, 52px);
-      aspect-ratio: 1;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: transform 150ms ease, opacity 150ms ease;
-      background: var(--bg-surface);
-      opacity: 0.3;
-    }
-    .gallery-thumb img,
-    .gallery-thumb video {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .gallery-thumb.active {
-      opacity: 1;
-      transform: scale(1.12);
-    }
-    .gallery-thumb:hover:not(.active) {
-      opacity: 0.55;
-      transform: scale(1.03);
-    }
-    .gallery-thumb.is-video { position: relative; }
-
-    @media (max-width: 640px) {
-      .gallery-thumb { width: clamp(32px, 9vw, 41px); }
-    }
-
     html { scrollbar-width: none; }
     html::-webkit-scrollbar { display: none; }
     #scroll-track {
@@ -726,32 +610,68 @@
       #scroll-track.is-dragging .scroll-dot { transform: scale(1.3); }
     }
 
-    /* ── Process — staggered stills + text ── */
-    .guide-text {
+    /* ── At a glance lead paragraph (big, light) ── */
+    .glance-lead {
+      font-family: 'Roboto Flex', sans-serif;
+      font-weight: 300;
+      font-size: clamp(18px, 2.2vw, 24px);
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      color: var(--text-secondary);
+    }
+
+    /* ── Design-process: staggered 3D-panel renders + text ── */
+    .stagger-list {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(56px, 8vw, 120px);
+      margin-top: clamp(24px, 4vw, 48px);
+    }
+
+    .stagger-row {
+      display: flex;
+      align-items: center;
+      gap: clamp(28px, 5vw, 72px);
+      max-width: 860px;
+    }
+
+    /* image right, text left — pushed to the right side */
+    .stagger-row.right {
+      flex-direction: row-reverse;
+      margin-left: auto;
+    }
+
+    /* image left, text right — indented from the left edge */
+    .stagger-row.indent { margin-left: clamp(20px, 7vw, 110px); }
+
+    .stagger-figure {
+      flex: 0 0 auto;
+      width: clamp(220px, 32vw, 380px);
+    }
+
+    .stagger-figure img { width: 100%; height: auto; display: block; }
+
+    .stagger-copy {
       font-size: 14.4px;
       line-height: 1.7;
       color: var(--text-secondary);
     }
 
-    .guide-media {
-      width: 100%;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: var(--shadow-pressed);
-      background: #111;
-    }
-
-    .guide-media img,
-    .guide-media video {
-      width: 100%;
-      height: auto;
-      display: block;
+    /* Kicker + title + paragraph column inside a stagger row.
+       NOTE: the max-width lives HERE, not on .stagger-copy where it used to, so the
+       heading wraps on the same measure as the paragraph below it. Any responsive
+       override of this width must target .stagger-body too — see the 17/10 block. */
+    .stagger-body {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(10px, 1.2vw, 14px);
+      max-width: 440px;
     }
 
 
-    /* Sized to sit clearly BELOW .section-title (clamp(28px, 4vw, 44px)) — these are
-       sub-items inside a section that already carries its own big heading, so this
-       intentionally does not use Unify's larger clamp(22px, 3vw, 34px). */
+    /* Deliberately sized to match .result-subhead, NOT Unify's .feature-title
+       (clamp(22px, 3vw, 34px)). These are sub-items inside a section that already has a
+       .section-title at clamp(28px, 4vw, 44px), so they must stay clearly below it. */
     .feature-title {
       font-family: 'OCR-A-BT', monospace;
       font-size: clamp(20px, 2.6vw, 26px);
@@ -760,135 +680,67 @@
       color: var(--text-primary);
     }
 
-
-    /* Process stills — constrained + staggered, caption above image */
+    /* Process screenshots — constrained + staggered, caption above image */
     .process-shot {
       display: flex;
       flex-direction: column;
       gap: clamp(14px, 1.6vw, 20px);
     }
 
-    /* centre at the 2/3 mark (right-third line): 43.6% + 46.2%/2 ≈ 66.7% */
-    .process-shot.shift-right { width: 46.2%; margin-left: 43.6%; }
-    /* centre at the 1/3 mark (left-third line): 5.3% + 56%/2 ≈ 33.3% */
-    .process-shot.shift-left  { width: 64.4%; margin-left: 1.1%; }
+    .process-shot.shift-right { width: 66%; margin-left: 27%; }
+    .process-shot.shift-left  { width: 80%; }
+
+
+    .result-subhead {
+      font-family: 'OCR-A-BT', monospace;
+      font-size: clamp(20px, 2.6vw, 26px);
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .result-image-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 3vw, 40px);
+    }
+
+    .result-image-pair img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 16px;
+      box-shadow: var(--shadow-pressed);
+    }
 
     @media (max-width: 860px) {
+      .stagger-row,
+      .stagger-row.right,
+      .stagger-row.indent {
+        margin-left: 0; max-width: none; flex-direction: row;
+      }
+      .stagger-figure { width: clamp(160px, 34vw, 240px); }
       .process-shot.shift-right,
       .process-shot.shift-left { width: 100%; margin-left: 0; }
     }
 
-    /* ── Scroll-driven dual-video pair (ported from Unify's .scrolly) ──
-       A tall spacer pins the sticky panel; scrolling past its midpoint
-       (or clicking a video) swaps which video is full-size and which
-       text panel shows. Mirrored like Unify's timetable/socials pair:
-       text left, videos right. */
-    .lamp-scrolly {
-      position: relative;
-      height: 175vh;
+    @media (max-width: 640px) {
+      .stagger-row,
+      .stagger-row.right,
+      .stagger-row.indent { flex-direction: column; align-items: flex-start; gap: 18px; }
+      .stagger-figure { width: clamp(180px, 60vw, 280px); }
+      .result-image-pair { grid-template-columns: 1fr; }
     }
 
-    .lamp-scrolly-sticky {
-      position: sticky;
-      top: 12vh;
-      height: 76vh;
-      display: flex;
-      align-items: center;
-    }
-
-    /* Centred at the right-third line (66.667%), matching the two staggered
-       process-shot images above. Absolute + translateX(-50%) self-centers
-       regardless of the pair's rendered width, which changes as the
-       active/inactive video swap animates — a fixed margin-% (the approach
-       used for the fixed-width images) can't track that. */
-    .lamp-scrolly-media {
-      position: absolute;
-      left: 66.667%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: flex-end;
-      gap: clamp(16px, 2vw, 32px);
-    }
-
-    .lamp-scrolly-vid { cursor: pointer; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-pressed); }
-
-    /* Video size is driven by HEIGHT (width: auto), but .lamp-scrolly-copy beside it is
-       sized by WIDTH (38%). Those two don't talk to each other, and because
-       .lamp-scrolly-media is position:absolute it is out of flex flow, so nothing stops
-       them colliding: as the window narrowed, the media's share of the row grew
-       (57.8% at 1920px → 88.9% at 1000px) and slid under the text. Measured overlap was
-       3px at 1920px but 50px at 1440px and 124px at 1000px.
-       Fix: take the smallest of three caps.
-         75.3vh  — the original height-driven size, keeps tall windows feeling generous
-         42vw    — shrinks the media as the window NARROWS (this is what fixes 1000-1440px)
-         720px   — a hard ceiling, and it must be ABSOLUTE, not vw. .page-wrapper is
-                   max-width: 1440px, so past that viewport width the row stops growing
-                   at ~1280px while any vw term keeps growing — which is exactly why a
-                   vw-only cap still left 27px of overlap at 1920px and 32px at 2560px.
-       The old clamp()'s 538px FLOOR is deliberately gone: a floor is precisely what
-       prevented the media from shrinking at the narrow widths that needed it most. */
-    .lamp-scrolly-vid video {
-      display: block;
-      width: auto;
-      height: calc(min(75.3vh, 42vw, 720px) * 0.6);
-      transition: height 480ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .lamp-scrolly-vid.is-active video {
-      height: min(75.3vh, 42vw, 720px);
-    }
-
-    .lamp-scrolly-copy {
-      position: relative;
-      /* media is absolutely positioned now (out of flex flow), so this is
-         the sticky row's only flex child — cap its width to roughly the
-         left two-thirds so text never runs under the video pair. */
-      flex: 0 1 auto;
-      width: calc(38% - 30px);   /* 30px narrower so the copy clears the video pair */
-      min-width: 0;
-      align-self: center;
-      min-height: 140px;
-    }
-
-    .lamp-scrolly-panel {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      transform: translateY(-50%);
-      opacity: 0;
-      transition: opacity 350ms ease;
-      pointer-events: none;
-      /* Now a container (kicker + title + paragraph) rather than the paragraph itself.
-         This element must KEEP this class and its data-step: the scrolly JS toggles
-         .is-active on it by matching p.dataset.step. The body copy moved to an inner
-         <p class="guide-text">, which is also what still picks up the 640px font bump. */
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .lamp-scrolly-panel.is-active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    @media (max-width: 860px) {
-      .lamp-scrolly { height: auto; }
-      .lamp-scrolly-sticky {
-        position: static; height: auto;
-        flex-direction: column; align-items: stretch;
-        gap: 28px; padding: 32px 0;
-      }
-      .lamp-scrolly-media {
-        position: static; left: auto; transform: none;
-        justify-content: center;
-      }
-      .lamp-scrolly-vid video,
-      .lamp-scrolly-vid.is-active video { height: clamp(345px, 73.6vw, 460px); }
-      .lamp-scrolly-copy { width: 100%; min-height: 0; }
-      .lamp-scrolly-panel { position: static; transform: none; opacity: 1; pointer-events: auto; }
-      .lamp-scrolly-panel + .lamp-scrolly-panel { margin-top: 24px; }
+    /* Wide-aspect external monitors (wider than the 16:10 MacBook screen):
+       pull the staggered rows into a centred column and enlarge the panels
+       so they don't read as small and far apart. MacBook (~1.55) is untouched. */
+    @media (min-width: 1600px) and (min-aspect-ratio: 17/10) {
+      .stagger-list { max-width: 1180px; margin-left: auto; margin-right: auto; }
+      .stagger-row { max-width: 980px; gap: clamp(48px, 5vw, 96px); }
+      .stagger-row.indent { margin-left: clamp(40px, 5vw, 110px); }
+      .stagger-figure { width: clamp(320px, 25vw, 460px); }
+      .stagger-body { max-width: 520px; }
+      .stagger-copy { font-size: 16px; }
     }
     /* ── Reduced motion (apple-design §14): drop non-essential movement,
        keep layout + opacity cues. No effect unless the OS pref is set. */
@@ -925,7 +777,7 @@
     @media (max-width: 640px) {
       /* proportional body copy */
       .guide-text,
-      .lamp-scrolly-panel { font-size: 16px; }
+      .stagger-copy { font-size: 16px; }
       /* short but real content, kept below body size */
       .meta-inset { font-size: 15px; }
       /* VT323 UI labels */
@@ -1016,7 +868,7 @@
          script at the bottom of this file. That split is necessary, not incidental —
          measured in Blink:
            · br{display:none} / br{display:contents} -> one line, but the runs merge
-             into "CAD Modeling3D PrintingMetal Tooling" with nothing between them;
+             into "FigmaPrototypingClaude Code" with nothing between them;
            · br::after{content:", "}                 -> adds 0px, i.e. generated
              content on a <br> never renders;
            · <br> as a flex item                     -> still forces the break.
@@ -1038,229 +890,74 @@
        PHONES ONLY — see the identical block on the other project pages.
        Desktop is untouched: everything is inside max-width: 640px.
 
-       ONE COLUMN, ONE WIDTH: every media block shares the content
-       column's left/right edges. */
+       ONE COLUMN, ONE WIDTH. .stagger-figure was 234px on a 390px screen
+       while the .process-shot stills around it filled the full 350px
+       content column; that mix of edges is what made the page read as a
+       squeezed desktop layout. All media now shares the column's edges.
+       .result-image-pair is already single-column at this width. */
     @media (max-width: 640px) {
+      .stagger-figure { width: 100%; }
+      .stagger-row,
+      .stagger-row.right,
+      .stagger-row.indent { gap: 20px; }
       .process-shot,
       .guide-media { width: 100%; margin-left: 0; margin-right: 0; }
-
-      /* The dual-video scrolly was the one hard overflow on any project
-         page. At <=860px the pin is already off and the block goes static,
-         but .lamp-scrolly-media stayed a flex ROW while each video kept
-         height: clamp(345px, 73.6vw, 460px) — 73.6vw is only 287px at this
-         width so the 345px floor won, giving two 194x345 portrait clips
-         plus a 16px gap = 404px inside a 390px viewport. Measured: the
-         second video ran from x 203 to x 397, i.e. 7px off-screen.
-         Stacking them full-width fixes the overflow and makes each clip
-         actually legible instead of thumbnail-sized. */
-      .lamp-scrolly-media {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 16px;
-      }
-      .lamp-scrolly-vid { width: 100%; }
-      .lamp-scrolly-vid video,
-      .lamp-scrolly-vid.is-active video {
-        width: 100%;
-        height: auto;   /* portrait clips size from the column, not a vh floor */
-      }
-
-      /* 35px measured — under the 44px minimum tap target. */
-      .gallery-thumb { width: 44px; }
-    }
-
-    /* ── Mobile gallery pager ─────────────────────────────────────────
-       Desktop keeps the thumbnail strip. On a phone those stills land at 44px —
-       too small to read as previews, and five of them under the image compete
-       with it for attention. Below 640px they're replaced by a pager: a pressed
-       neumorphic well holding one dot per slide, the active one stretched into
-       an orange pill.
-
-       Both controls stay in the DOM and are swapped by media query rather than
-       one being built conditionally in JS, so rotating the phone or resizing
-       across 640px switches cleanly with no rebuild and no lost state — goTo()
-       updates whichever is currently visible. */
-    .gallery-dots { display: none; }
-    .gallery-track { display: none; }
-
-    @media (max-width: 640px) {
-      .gallery-thumbs { display: none; }
-
-      /* ── Mobile: a real sliding track, replacing the crossfade ────────
-         Desktop swaps the ONE <img>'s src behind an opacity fade. That is what
-         flickered: the fade runs on a timer, and when the src is swapped at the
-         180ms mark the new file usually has not decoded yet, so the element
-         paints empty for a frame or two just as the opacity comes back up.
-         Nothing about the timing can fix that — the flicker is the decode.
-
-         Here every image is in the DOM from the start, laid out edge to edge in
-         a flex row, and navigation only moves the row. There is no src swap and
-         nothing to decode mid-transition, so there is nothing left to flicker.
-         Pulling from either side slides that way, because the row simply moves
-         to the requested offset.
-
-         Desktop is untouched — it never sees this track, and its fade path is
-         still exactly what it was. */
-      .gallery-main { overflow: hidden; }
-
-      /* The fade would otherwise still dip the whole track's opacity on every
-         change, which is the other half of the flicker. */
-      .gallery-main.fading { opacity: 1; }
-
-      /* Inline display:block is set on these by the desktop path, hence the
-         !important — the track is the only visible layer on a phone. */
-      #gallery-active-img,
-      #gallery-active-video { display: none !important; }
-
-      .gallery-track {
-        display: flex;
-        width: 100%;
-        height: 100%;
-        will-change: transform;
-        transition: transform 460ms cubic-bezier(.22, .61, .36, 1);
-      }
-
-      /* flex-basis 100% with no shrink — .gallery-main img above sets width
-         100%, but in a flex row that alone would let them compress to fit. */
-      .gallery-track img {
-        flex: 0 0 100%;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        display: block;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .gallery-track { transition: none; }
-      }
-
-      .gallery-dots {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 13px;
-        width: max-content;
-        max-width: 100%;
-        margin: 20px auto 0;
-        padding: 14px 20px;
-        border-radius: 999px;
-        background: var(--bg-surface);
-        box-shadow: var(--shadow-pressed);
-      }
-
-      .gallery-dot {
-        width: 13px;
-        height: 13px;
-        flex: 0 0 auto;
-        padding: 0;
-        border: none;
-        border-radius: 999px;
-        background: var(--bg-surface);
-        /* A shallower raised shadow than --shadow-raised-sm: at this size the 5px
-           offsets of the shared token overshoot the dot itself and read as a
-           smudge rather than a bead. The blur is deliberately tight (half the
-           offset) so the highlight and shadow stay crisp against the bead's edge
-           instead of diffusing into the well around it. */
-        box-shadow: 2px 2px 2px rgba(174,174,192,0.75), -2px -2px 2px rgba(255,255,255,1);
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        transition: width 340ms cubic-bezier(.2,.7,.2,1),
-                    background-color 340ms ease,
-                    box-shadow 340ms ease;
-      }
-
-      .gallery-dot.active {
-        width: 47px;
-        background: var(--accent-orange);
-        box-shadow: 2px 2px 2.5px rgba(174,174,192,0.9), -2px -2px 2.5px rgba(255,255,255,1);
-      }
-
-      /* The bead is 13px inside a ~41px row; the pseudo-element pads the hit area
-         out to the 44px minimum without moving the visible dot or widening the
-         well. Recompute the vertical inset if the dot size changes: it is
-         (44 - width) / 2. */
-      .gallery-dot::after {
-        content: '';
-        position: absolute;
-        inset: -15px -5px;
-      }
-      .gallery-dot { position: relative; }
-
-      @media (prefers-reduced-motion: reduce) {
-        .gallery-dot { transition: none; }
-      }
-    }
-
-    /* ── Mobile: hero cropped to portrait so the lamp reads at phone scale ────
-       Same treatment as kaffeemaschine2d.html: turn the frame portrait and let
-       the base .hero img rule's `object-fit: cover` crop the empty floor off the
-       SIDES while showing the full height, which is where the subject is.
-
-       9/10 rather than Cybercoffee's 4/5, because the source is a different
-       shape. IMG_3729_SnapseedCopy.jpeg is 3941x2956 — 4:3, not 16:9 — so it
-       needs far less cropping to enlarge the lamp by the same amount. Measured
-       off the source, the lamp sits at x 0.236 -> 0.773 (width 0.537, centre
-       0.504, i.e. already centred, so no object-position shift) and
-       y 0.284 -> 0.909. Under full-height cover its rendered width is
-       0.537 x (4/3) / hero-aspect of the hero width, so 9/10 puts it at 0.80.
-       4/5 was tried and pushes it to 0.90, which leaves the laptop's corners
-       almost touching both screen edges.
-
-       This also fixes the nav overlap, without needing a coloured extension
-       band: at the old 16/10 the hero was only 244px tall and the lamp's top
-       edge landed at y~59, directly behind the nav pill (which occupies roughly
-       y 28-72). At 9/10 the hero is 433px and the lamp starts at y~123, so the
-       bar sits over empty backdrop with ~50px to spare.
-
-       The background colour is the image's own top row, measured (9,2,2) and
-       flat to within 3.4 luminance across its full width — so it covers the
-       frame with the right tone while the 1.5MB JPEG loads instead of flashing
-       white. It is never seen once the image paints, since cover fills the box. */
-    @media (max-width: 640px) {
-      .hero {
-        aspect-ratio: 9 / 10;
-        background: #090202;
-
-        /* 7px band added ABOVE the photo, extending the frame rather than eating
-           into it — the photo keeps its full 9/10 box and is pushed down by 7px.
-           See the matching block in vaccine2d.html for why this is a border on a
-           content-box element rather than padding: `aspect-ratio` sizes the box
-           that `box-sizing` names, and this page's .hero img is absolutely
-           positioned, so it resolves `top` against the padding box and padding
-           would not move it.
-           #090202 rather than pure black: it is the photo's own top row,
-           measured and flat to within 3.4 luminance across its full width, so
-           the band and the image read as one continuous surface instead of two
-           tones. Same value as .hero's background above — a border cannot
-           inherit it, so it is restated. */
-        box-sizing: content-box;
-        border-top: 7px solid #090202;
-      }
     }
   
-    /* Keyword emphasis for skimming — inert by default (desktop unchanged);
-       the mobile block below supplies the darker ink. */
+    /* Keyword emphasis for skimming (Hanwha-style). Inert by default — the <b>
+       must not bold or recolor anything on desktop, which stays as designed;
+       the mobile block below is what turns the ink darker. */
     b.kw { font-weight: inherit; color: inherit; }
 
     /* ── Mobile breathing room (design pass, 2026-07-31) ─────────────────
-       Appended LAST so it wins earlier ≤640px rules on source order. Same
-       treatment as virtual_cooking2d.html (tianqicraft / junhyungpark-hanwha
-       references): more air border-to-border, air below the divider before
-       the body, darker skim keywords. Sticky/scrolly sections keep their own
-       geometry — padding on .guide-section only adds air around the spacer. */
+       Appended LAST so it wins every earlier ≤640px rule on source order.
+       References: tianqicraft.com (section rhythm: hairline dividers with
+       generous symmetric air), junhyungpark.com/hanwha (grey body text with
+       darker keywords for skimming; media never crowded by text).
+       Measured before: sections met their border with 32px each side, body
+       paragraphs sat 12px apart, divider→body 20px. */
     @media (max-width: 640px) {
+      /* Section rhythm: 64px → 104px border-to-border. */
       .guide-section { padding: 52px 20px; }
+      /* Header/glance/meta blocks: slighter bump, they are shorter units. */
       .section { padding: 32px 20px; }
-      /* This page has no .guide-section — content sections are plain .section.
-         The ones carrying a real heading get the full 52px tier; header/meta
-         blocks keep 32px. Graceful without :has() support: they stay at 32px. */
-      .section:has(.section-title) { padding: 52px 20px; }
+
+      /* The heading + divider stay one tight unit (20px); the air goes below
+         the divider, before the body. */
       .guide-section .dot-divider,
       .section .dot-divider { margin-bottom: 12px; }
+
+      /* Paragraph gap 12px → 20px: the base sheet pulls consecutive
+         paragraphs together with -8px; on a phone that reads as one slab. */
+      .guide-text + .guide-text { margin-top: 0; }
+
+      /* Endergebnis: the two demo units separate more than their internals
+         (52px → 76px). Only subheads FOLLOWING content — the first subhead
+         after the divider keeps its existing 84px. */
+      .guide-text + .result-subhead { margin-top: 24px; }
+
+      /* Skim keywords: darker grey ink, weight unchanged (only wght 400 is
+         loaded here; synthetic bold renders muddy on this face). */
       b.kw { color: #4a4a52; }
       /* The At-a-Glance lead reads as the project's one-paragraph pitch — full
          primary ink, no partial highlights (they were unwrapped from this key). */
       .glance-lead { color: var(--text-primary); }
+
+      /* The three silver-panel renders: 65% width (35% smaller) and staggered —
+         first left, second right, third centred. This deliberately reverses the
+         earlier "one column, one width" rule that squared them off against the
+         text column: that rule exists to stop MIXED media edges reading as a
+         squeezed desktop layout, but these three are a set, and alternating which
+         edge each hangs off is how a single column expresses the desktop stagger.
+         The .process-shot stills below them still fill the column, so the two
+         groups stay visually distinct rather than merely inconsistent.
+         align-self, not margin: .stagger-row is a flex COLUMN at this width, so
+         cross-axis alignment is the honest lever — and it moves only the figure,
+         leaving each caption on the left where it reads from. */
+      .stagger-figure { width: 65%; }
+      .stagger-row .stagger-figure        { align-self: flex-start; }
+      .stagger-row.right .stagger-figure  { align-self: flex-end; }
+      .stagger-row.indent .stagger-figure { align-self: center; }
     }
     /* Mobile: neumorphic shadow spread/radius reduced 35% (offsets & blur ×0.65),
        matching the nav's 2D/3D toggle segment. Redefining only the tokens keeps
@@ -1295,145 +992,46 @@
 
   <div class="page-wrapper">
 
-    <!-- Hero -->
-    <div class="hero">
-      <img src="/images/mac-lamp/IMG_3729_SnapseedCopy.jpeg" alt="Mac-Lamp hero" />
-    </div>
-
-    <!-- Header -->
+    <!-- Header. No .hero on this page yet: with no hero element at all, the nav
+         bar takes its "no hero → raised shadow always on" branch, which is the
+         correct treatment for a page that does not open on a full-bleed image. -->
     <div class="section" style="border-bottom: none;">
       <div class="project-header">
-        <p class="breadcrumb" data-i18n-html="breadcrumb">Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;Mac-Lamp</p>
+        <p class="breadcrumb" data-i18n-html="breadcrumb">Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;To Shove</p>
         <div class="title-row">
-          <h1 class="project-title">Mac-Lamp</h1>
+          <h1 class="project-title">To Shove</h1>
           <span class="accent-dot"></span>
         </div>
         <div class="dot-divider"></div>
       </div>
     </div>
 
-    <!-- At a Glance -->
-    <div class="section" style="border-bottom: none; padding-bottom: 0;">
-      <h2 class="section-title" data-i18n="section-glance">At a Glance</h2>
-      <p class="glance-lead" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n-html="glance-lead">I've always loved the colorful, translucent look of old Apple products, and wanted to capture some of that magic myself — while finally trying my hand at 3D printing. Mac-Lamp is a desk lamp built around the salvaged shell of an old, broken MacBook: a 3D-printed housing in transparent orange PLA glows through the trackpad and the Apple logo, just like those old devices used to, and the trackpad itself doubles as the on/off switch.</p>
-    </div>
-
-    <!-- Meta -->
-    <div class="section">
-      <div class="meta-grid">
-        <div class="meta-tile">
-          <div class="meta-label" data-i18n="label-timeline">Timeline</div>
-          <div class="meta-inset" data-i18n-html="val-timeline">Jan 2026 —<br>Apr 2026</div>
-        </div>
-        <div class="meta-tile">
-          <div class="meta-label" data-i18n="label-team">Team</div>
-          <div class="meta-inset" data-i18n="val-team">Lucas Maher</div>
-        </div>
-        <div class="meta-tile">
-          <div class="meta-label" data-i18n="label-role">Role</div>
-          <div class="meta-inset" data-i18n="val-role">Designer &amp; Maker</div>
-        </div>
-        <div class="meta-tile">
-          <div class="meta-label" data-i18n="label-tools">Tools</div>
-          <div class="meta-inset" data-i18n-html="val-tools">CAD Modeling<br>3D Printing<br>Metal Tooling</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Process -->
-    <div class="section">
-      <div class="section-heading-row" style="margin-bottom: clamp(20px, 3vw, 28px);">
-        <h2 class="section-title" data-i18n="section-process">Process</h2>
-        <span class="step-badge">1</span>
-      </div>
-      <div class="dot-divider" style="margin-bottom: clamp(20px, 3vw, 28px);"></div>
-
-      <div class="process-shot shift-right">
-        <h3 class="feature-title" data-i18n="process-cad-title">Modeled Around Real Hardware</h3>
-        <div class="guide-media">
-          <img src="/images/mac-lamp/1.png" alt="CAD render of the housing" />
-        </div>
-        <p class="guide-text" data-i18n-html="process-cad">Every part was modeled in Blender to the exact dimensions of the MacBook.</p>
-      </div>
-
-      <div class="process-shot shift-left" style="margin-top: clamp(72px, 11vw, 96px); margin-bottom: clamp(72px, 11vw, 96px);">
-        <h3 class="feature-title" data-i18n="process-print-title">Printed to Glow</h3>
-        <div class="guide-media">
-          <video src="/videos/mac-lamp/2.MOV" autoplay loop muted playsinline></video>
-        </div>
-        <p class="guide-text" data-i18n-html="process-print">For the 3D print I used a translucent PLA filament at 20% infill, to let as much light through as possible.</p>
-      </div>
-
-      <div class="lamp-scrolly">
-        <div class="lamp-scrolly-sticky">
-          <div class="lamp-scrolly-media">
-            <div class="lamp-scrolly-vid is-active" data-step="cut">
-              <video autoplay loop muted playsinline>
-                <source src="/videos/mac-lamp/3.MOV" type="video/quicktime" />
-                <source src="/videos/mac-lamp/3.MOV" type="video/mp4" />
-              </video>
-            </div>
-            <div class="lamp-scrolly-vid" data-step="sand">
-              <video autoplay loop muted playsinline>
-                <source src="/videos/mac-lamp/4.MOV" type="video/quicktime" />
-                <source src="/videos/mac-lamp/4.MOV" type="video/mp4" />
-              </video>
-            </div>
-          </div>
-          <div class="lamp-scrolly-copy">
-            <div class="lamp-scrolly-panel is-active" data-step="cut">
-              <h3 class="feature-title" data-i18n="process-cut-title">Cut From the Original Shell</h3>
-              <p class="guide-text" data-i18n-html="process-cut">The salvaged MacBook's own aluminium shell was cut down on a bandsaw — reusing the real hardware rather than just referencing its look was the whole point.</p>
-            </div>
-            <div class="lamp-scrolly-panel" data-step="sand">
-              <h3 class="feature-title" data-i18n="process-sand-title">Sanded Flush by Hand</h3>
-              <p class="guide-text" data-i18n-html="process-sand">Every cut edge was sanded smooth by hand, so the reused aluminium sits flush against the printed housing instead of looking bolted on.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gallery + Overview -->
-    <div class="section" style="border-bottom: none;">
-      <div class="section-heading-row" style="margin-bottom: clamp(20px, 3vw, 28px);">
-        <h2 class="section-title" data-i18n="section-result">Final result</h2>
-        <span class="step-badge">2</span>
-      </div>
-      <div class="dot-divider" style="margin-bottom: clamp(20px, 3vw, 28px);"></div>
-      <p class="guide-text" data-i18n-html="result-text" style="margin-bottom: clamp(28px, 4vw, 44px);">The finished lamp does what I set out to do: the trackpad clicks on and off like a real button, and once it's lit, the trackpad and the Apple logo glow through the orange housing the same way the display and logo used to on the machine it came from. It's less a tribute to one specific MacBook than to a whole era of translucent, colorful Apple hardware I grew up loving.</p>
-      <div class="gallery-with-text">
-        <div class="gallery-layout">
-          <div class="gallery-main-wrap">
-            <div class="gallery-main" id="gallery-main">
-              <img id="gallery-active-img" src="" alt="Mac-Lamp" />
-              <video id="gallery-active-video" autoplay loop muted playsinline style="display:none;"></video>
-              <div class="gallery-track" id="gallery-track" aria-hidden="true"></div>
-            </div>
-          </div>
-          <div class="gallery-thumbs" id="gallery-thumbs"></div>
-          <div class="gallery-dots" id="gallery-dots" role="tablist" aria-label="Galerie"></div>
-        </div>
-      </div>
+    <!-- CONTENT GOES HERE — deliberately empty for now.
+         The page keeps the full shared chrome (nav, mobile menu, scroll dots,
+         dot-divider sizing, ?from=3d Exit pill, i18n) so sections can be dropped
+         in without wiring anything up first. Build it out with the shared
+         pattern: At a Glance → meta grid → Overview/Process → result. -->
+    <div class="guide-section">
+      <p class="guide-text" data-i18n="placeholder">[ Placeholder ]</p>
     </div>
 
     <div class="project-nav">
-      <a href="/kaffeemaschine2d.html" class="project-nav-item">
+      <a href="/virtual_cooking2d.html" class="project-nav-item">
         <div class="project-nav-item-inner">
           <div class="project-nav-top">
-            <span class="project-nav-number">04</span>
-            <span class="project-nav-label" data-i18n="nav-prev"><< PREVIOUS</span>
+            <span class="project-nav-number">02</span>
+            <span class="project-nav-label" data-i18n="nav-prev">&lt;&lt; PREVIOUS</span>
           </div>
-          <span class="project-nav-title">Cybercoffee</span>
+          <span class="project-nav-title">Virtual Cooking</span>
         </div>
       </a>
-      <a href="/vaccine2d.html" class="project-nav-item" style="text-align: right;">
+      <a href="/kaffeemaschine2d.html" class="project-nav-item" style="text-align: right;">
         <div class="project-nav-item-inner">
           <div class="project-nav-top">
-            <span class="project-nav-label" data-i18n="nav-next">NEXT >></span>
-            <span class="project-nav-number">06</span>
+            <span class="project-nav-label" data-i18n="nav-next">NEXT &gt;&gt;</span>
+            <span class="project-nav-number">04</span>
           </div>
-          <span class="project-nav-title" data-i18n="nav-double-packaging">Double Packaging</span>
+          <span class="project-nav-title" data-i18n="nav-cybercoffee">Cybercoffee</span>
         </div>
       </a>
     </div>
@@ -1574,51 +1172,17 @@
     const TRANSLATIONS = {
       en: {
         'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;Mac-Lamp',
-        'label-timeline': 'Timeline', 'val-timeline': 'Jan 2026 —<br>Apr 2026',
-        'label-team': 'Team', 'val-team': 'Lucas Maher',
-        'label-role': 'Role', 'val-role': 'Designer & Maker',
-        'label-tools': 'Tools', 'val-tools': 'CAD Modeling<br>3D Printing<br>Metal Tooling',
-        'section-glance': 'At a Glance',
-        'glance-lead': 'I\'ve always loved the colorful, translucent look of old Apple products, and wanted to capture some of that magic myself — while finally trying my hand at 3D printing. Mac-Lamp is a desk lamp built around the salvaged shell of an old, broken MacBook: a 3D-printed housing in transparent orange PLA glows through the trackpad and the Apple logo, just like those old devices used to, and the trackpad itself doubles as the on/off switch.',
-        'section-result': 'Final result',
-        'result-text': 'The finished lamp does what I set out to do: the trackpad clicks on and off <b class="kw">like a real button</b>, and once it\'s lit, the trackpad and the Apple logo <b class="kw">glow through the orange housing</b> the same way the display and logo used to on the machine it came from. It\'s less a tribute to one specific MacBook than to a whole era of translucent, colorful Apple hardware I grew up loving.',
-        'section-process': 'Process',
-        'process-cut-title': 'Cut From the Original Shell',
-        'process-cut': 'The salvaged MacBook\'s own aluminium shell was <b class="kw">cut down on a bandsaw</b> — reusing the real hardware rather than just referencing its look was the whole point.',
-        'process-sand-title': 'Sanded Flush by Hand',
-        'process-sand': 'Every cut edge was <b class="kw">sanded smooth by hand</b>, so the reused aluminium sits flush against the printed housing instead of looking bolted on.',
-        'process-cad-title': 'Modeled Around Real Hardware',
-        'process-cad': 'Every part was <b class="kw">modeled in Blender</b> to the exact dimensions of the MacBook.',
-        'process-print-title': 'Printed to Glow',
-        'process-print': 'For the 3D print I used a <b class="kw">translucent PLA filament</b> at 20% infill, to let as much light through as possible.',
-        'section-gallery': 'Gallery', 'gallery-meta': '3 Videos · 6 Photos',
+        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;To Shove',
+        'placeholder': '[ Placeholder ]',
         'nav-prev': '<< PREVIOUS', 'nav-next': 'NEXT >>',
-        'nav-double-packaging': 'Double Packaging',
+        'nav-cybercoffee': 'Cybercoffee',
       },
       de: {
         'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;Mac-Lamp',
-        'label-timeline': 'Zeitraum', 'val-timeline': 'Jan. 2026 —<br>Apr. 2026',
-        'label-team': 'Team', 'val-team': 'Lucas Maher',
-        'label-role': 'Rolle', 'val-role': 'Designer & Hersteller',
-        'label-tools': 'Werkzeuge', 'val-tools': 'CAD-Modellierung<br>3D-Druck<br>Metallbearbeitung',
-        'section-glance': 'Auf einen Blick',
-        'glance-lead': 'Ich habe den bunten, transluzenten Look alter Apple-Produkte schon immer geliebt und wollte diese Magie selbst einfangen — und endlich 3D-Druck ausprobieren. Mac-Lamp ist eine Schreibtischlampe aus einem alten MacBook-Gehäuse: 3D-gedruckt in transparentem orangem PLA, leuchtet sie durch Trackpad und Apple-Logo wie einst die alten Geräte, und das Trackpad dient als Ein-/Ausschalter.',
-        'section-result': 'Endergebnis',
-        'result-text': 'Die fertige Lampe macht genau das, was ich wollte: Das Trackpad <b class="kw">klickt wie ein echter Taster</b> ein und aus, und sobald sie leuchtet, scheinen Trackpad und Apple-Logo <b class="kw">durch das orange Gehäuse</b> — wie einst Display und Logo am Original. Weniger Hommage an ein bestimmtes MacBook als an eine ganze Ära bunter, transluzenter Apple-Hardware.',
-        'section-process': 'Prozess',
-        'process-cut-title': 'Aus der Originalhülle',
-        'process-cut': 'Die Hülle des MacBooks wurde <b class="kw">mit einer Bandsäge zugeschnitten</b> — echte Hardware statt nur ihr Look, genau darum ging es.',
-        'process-sand-title': 'Von Hand geschliffen',
-        'process-sand': 'Jede Schnittkante wurde <b class="kw">von Hand glatt geschliffen</b>, damit das Aluminium bündig am Gehäuse sitzt statt angeschraubt zu wirken.',
-        'process-cad-title': 'Gebaut um echte Hardware',
-        'process-cad': 'Jedes Teil wurde <b class="kw">in Blender</b> exakt nach den MacBook-Maßen modelliert.',
-        'process-print-title': 'Gedruckt, um zu leuchten',
-        'process-print': 'Ich habe <b class="kw">transluzentes PLA</b> mit 20 % Fülldichte verwendet, um möglichst viel Licht durchzulassen.',
-        'section-gallery': 'Galerie', 'gallery-meta': '3 Videos · 6 Fotos',
+        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;To Shove',
+        'placeholder': '[ Platzhalter ]',
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
-        'nav-double-packaging': 'Double Packaging',
+        'nav-cybercoffee': 'Cybercoffee',
       }
     };
     function applyLang(lang) {
@@ -1634,243 +1198,6 @@
       if (e.data.type === 'nav-collapse') topBar.style.height = '140px';
       if (e.data.type === 'lang-change') applyLang(e.data.lang);
     });
-
-    // ── Scroll-driven dual-video pair (ported from Unify's initScrolly) ──
-    // The sticky panel is pinned; crossing the section's midpoint (or
-    // clicking a video) swaps which video is full-size and which text
-    // panel is shown.
-    (function initLampScrolly() {
-      const scrolly = document.querySelector('.lamp-scrolly');
-      if (!scrolly) return;
-      const vids   = scrolly.querySelectorAll('.lamp-scrolly-vid');
-      const panels = scrolly.querySelectorAll('.lamp-scrolly-panel');
-      const steps  = Array.from(vids).map(v => v.dataset.step);
-      if (steps.length < 2) return;
-      let current = steps[0];
-
-      function setActive(step) {
-        if (step === current) return;
-        current = step;
-        vids.forEach(v => {
-          const on = v.dataset.step === step;
-          v.classList.toggle('is-active', on);
-          const video = v.querySelector('video');
-          if (video) {
-            if (on) { video.play().catch(() => {}); }
-            else { video.pause(); }
-          }
-        });
-        panels.forEach(p => p.classList.toggle('is-active', p.dataset.step === step));
-      }
-
-      vids.forEach(v => {
-        if (!v.classList.contains('is-active')) {
-          const video = v.querySelector('video');
-          if (video) video.pause();
-        }
-      });
-
-      function metrics() {
-        const rect = scrolly.getBoundingClientRect();
-        const top = rect.top + window.scrollY;
-        const total = Math.max(scrolly.offsetHeight - window.innerHeight, 1);
-        return { top, total };
-      }
-      let ticking = false;
-      function onScroll() {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          const { top, total } = metrics();
-          const p = Math.min(Math.max((window.scrollY - top) / total, 0), 1);
-          setActive(p < 0.5 ? steps[0] : steps[1]);
-          ticking = false;
-        });
-      }
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onScroll);
-      onScroll();
-
-      vids.forEach(v => {
-        v.addEventListener('click', () => {
-          const { top, total } = metrics();
-          const p = v.dataset.step === steps[0] ? 0.15 : 0.85;
-          window.scrollTo({ top: Math.round(top + p * total), behavior: 'smooth' });
-        });
-      });
-    })();
-
-    // ── Gallery ──────────────────────────────────────────────
-    (function() {
-      const ITEMS = [
-        { type: 'img',   src: '/images/mac-lamp/5.jpg', contain: true },
-        { type: 'img',   src: '/images/mac-lamp/6.jpg', contain: true },
-        { type: 'img',   src: '/images/mac-lamp/7.jpg', contain: true },
-        { type: 'img',   src: '/images/mac-lamp/8.jpg', contain: true },
-        { type: 'img',   src: '/images/mac-lamp/9.jpg', contain: true },
-      ];
-
-      const thumbsEl    = document.getElementById('gallery-thumbs');
-      const dotsEl      = document.getElementById('gallery-dots');
-      const mainEl      = document.getElementById('gallery-main');
-      const trackEl     = document.getElementById('gallery-track');
-      const activeImg   = document.getElementById('gallery-active-img');
-      const activeVideo = document.getElementById('gallery-active-video');
-      let current = 0;
-
-      function goTo(idx, isInit) {
-        current = (idx + ITEMS.length) % ITEMS.length;
-        const item = ITEMS[current];
-
-        const fit = item.contain ? 'contain' : 'cover';
-        const pos = item.pos || 'center center';
-
-        // Mobile slide. Set before the fade path below so the movement starts on
-        // this frame rather than after the 180ms timer — the track is the only
-        // visible layer on a phone, and it must not wait on the desktop swap.
-        trackEl.style.transform = 'translateX(' + (-current * 100) + '%)';
-
-        mainEl.classList.add('fading');
-        setTimeout(() => {
-          if (item.type === 'video') {
-            activeImg.style.display = 'none';
-            activeVideo.style.display = 'block';
-            activeVideo.style.objectFit = fit;
-            activeVideo.style.objectPosition = pos;
-            activeVideo.src = item.src;
-            activeVideo.load();
-            activeVideo.play().catch(() => {});
-          } else {
-            activeVideo.pause();
-            activeVideo.style.display = 'none';
-            activeImg.style.display = 'block';
-            activeImg.style.objectFit = fit;
-            activeImg.style.objectPosition = pos;
-            activeImg.src = item.src;
-          }
-          mainEl.classList.remove('fading');
-        }, 180);
-
-        thumbsEl.querySelectorAll('.gallery-thumb').forEach((t, i) => {
-          t.classList.toggle('active', i === current);
-        });
-        dotsEl.querySelectorAll('.gallery-dot').forEach((d, i) => {
-          const on = i === current;
-          d.classList.toggle('active', on);
-          d.setAttribute('aria-selected', on ? 'true' : 'false');
-          d.tabIndex = on ? 0 : -1;
-        });
-        // Only keep the thumbnail strip in view for real user navigation. On the
-        // initial goTo(0) this would scroll the whole PAGE down to the gallery,
-        // which is why the page used to open mid-way instead of at the top.
-        if (!isInit) {
-          thumbsEl.children[current]?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
-        }
-      }
-
-      // Build the mobile track first so every frame exists before any navigation
-      // happens. Images only — the gallery has no video items; if one is ever
-      // added, give it a <video> here or it will slide in as a gap.
-      ITEMS.forEach((item, i) => {
-        if (item.type === 'video') return;
-        const im = document.createElement('img');
-        im.src = item.src;
-        im.alt = 'Mac-Lamp ' + (i + 1);
-        im.style.objectFit = item.contain ? 'contain' : 'cover';
-        im.style.objectPosition = item.pos || 'center center';
-        // Not lazy: a lazy image one slide away is still undecoded when it
-        // slides in, which reintroduces exactly the flicker this replaces.
-        im.decoding = 'async';
-        trackEl.appendChild(im);
-      });
-
-      ITEMS.forEach((item, i) => {
-        const wrap = document.createElement('div');
-        wrap.className = 'gallery-thumb' + (i === 0 ? ' active' : '');
-        if (item.type === 'video') {
-          wrap.classList.add('is-video');
-          const vid = document.createElement('video');
-          vid.src = item.src;
-          vid.preload = 'metadata';
-          vid.muted = true;
-          vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';
-          vid.addEventListener('loadedmetadata', () => { vid.currentTime = 0.001; });
-          wrap.appendChild(vid);
-        } else {
-          const img = document.createElement('img');
-          img.src = item.src;
-          img.alt = 'Mac-Lamp ' + (i + 1);
-          img.loading = 'lazy';
-          wrap.appendChild(img);
-        }
-        wrap.addEventListener('click', () => goTo(i));
-        thumbsEl.appendChild(wrap);
-
-        // Mobile pager — a real <button> so it is focusable and keyboard-operable,
-        // rather than a styled <div>. Hidden above 640px by CSS alone.
-        const dot = document.createElement('button');
-        dot.type = 'button';
-        dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
-        dot.setAttribute('role', 'tab');
-        dot.setAttribute('aria-label', 'Bild ' + (i + 1));
-        dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-        dot.tabIndex = i === 0 ? 0 : -1;
-        dot.addEventListener('click', () => goTo(i));
-        dotsEl.appendChild(dot);
-      });
-
-      // ── Swipe (touch only) ──────────────────────────────────────────────
-      // Axis-locked on the first meaningful movement of a gesture: until we know
-      // whether the finger is going sideways or down, nothing is claimed. Once it
-      // reads as horizontal we preventDefault so the page doesn't scroll under the
-      // swipe; once it reads as vertical we bow out for the rest of the gesture and
-      // never touch it again, so scrolling past the gallery still feels native.
-      //
-      // That decision REQUIRES touchmove to be non-passive ({ passive: false }) —
-      // a passive listener silently ignores preventDefault, which would leave the
-      // page scrolling diagonally while the image tracked the same finger.
-      (function initGallerySwipe() {
-        const SWIPE_MIN  = 45;   // px of travel before it counts as a swipe
-        const AXIS_LOCK  = 10;   // px before committing to an axis
-        let startX = 0, startY = 0, axis = null, active = false;
-
-        mainEl.addEventListener('touchstart', e => {
-          if (e.touches.length !== 1) { active = false; return; }
-          active = true; axis = null;
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-        }, { passive: true });
-
-        mainEl.addEventListener('touchmove', e => {
-          if (!active || e.touches.length !== 1) return;
-          const dx = e.touches[0].clientX - startX;
-          const dy = e.touches[0].clientY - startY;
-          if (!axis && Math.hypot(dx, dy) > AXIS_LOCK) {
-            axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-          }
-          if (axis === 'x') e.preventDefault();
-        }, { passive: false });
-
-        mainEl.addEventListener('touchend', e => {
-          if (!active) return;
-          active = false;
-          if (axis !== 'x') return;
-          const dx = e.changedTouches[0].clientX - startX;
-          if (Math.abs(dx) < SWIPE_MIN) return;
-          // Clamped, not wrapped: with a pager showing exactly where you are,
-          // jumping from the last image back to the first reads as a glitch.
-          const next = Math.min(ITEMS.length - 1, Math.max(0, current + (dx < 0 ? 1 : -1)));
-          if (next !== current) goTo(next);
-        }, { passive: true });
-      })();
-
-      document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft')  goTo(current - 1);
-        if (e.key === 'ArrowRight') goTo(current + 1);
-      });
-
-      goTo(0, true);
-    })();
   </script>
   <div id="scroll-track">
     <div id="scroll-thumb">
@@ -2206,8 +1533,8 @@
           var sep = document.createElement('span');
           sep.className = 'meta-sep';
           /* A comma is wrong where the text already ends in punctuation that joins
-             the two halves — Timeline reads "Jan 2026 —" / "Apr 2026", which a comma
-             turns into "Jan 2026 —, Apr 2026". Fall back to a plain space there. */
+             the two halves — Timeline reads "May 2026 —" / "Jul 2026", which a comma
+             turns into "May 2026 —, Jul 2026". Fall back to a plain space there. */
           sep.textContent = /[—–,;:/-]$/.test(before) ? ' ' : ', ';
           br.parentNode.insertBefore(sep, br);
         });
