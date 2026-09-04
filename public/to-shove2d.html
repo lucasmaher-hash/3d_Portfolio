@@ -196,7 +196,16 @@
 
     .morrow-track .dot-divider {
       position: absolute;
-      left: 0; right: 0; top: 50%;
+      left: 0; right: 0;
+      /* NOT 50% (track-centre) — that runs the dots through the letters'
+         x-height, well above where they actually stand. 80.36% is the real
+         text baseline, measured as a fraction of the line-height box: a
+         zero-size marker span given the default inline vertical-align:
+         baseline lands 81px down a 100.8px-tall box at font-size 96px
+         (Range().getBoundingClientRect() vs the marker, via CDP). That
+         ratio is a font-metric constant — line-height is unitless (1.05),
+         so it holds at every breakpoint's font-size with no re-measuring. */
+      top: 80.36%;
       transform: translateY(-50%);
     }
 
@@ -235,18 +244,22 @@
       }
     }
 
-    /* Placeholder for the real asset (see screenshot ref) — a dark bubble,
-       a light ring, a solid centre dot. em-sized off the word's own
-       font-size so it scales at every breakpoint with no separate rule.
-       Swap the background/box-shadow/::after below for the real graphic;
-       nothing else here (layout, animation, a11y) needs to change. */
+    /* Placeholder for the real asset (a dark bubble with a light ring and
+       centre dot — see Lucas's reference screenshot). A solid dark bubble
+       fill read as visibly HEAVIER than the thin OCR-A-BT strokes around
+       it — the letters are confirmed byte-identical in weight/size/family
+       to every other page's title, so the mismatch was the icon, not the
+       text. Built instead as a thin outline + dot in the text's own ink
+       colour, stroke width eyeballed against the letterforms, so it reads
+       at roughly the same visual weight as "m r r w" until the real asset
+       replaces it. em-sized off the word's own font-size, so it scales at
+       every breakpoint with no separate rule. */
     .mw-ring {
       position: relative;
       display: inline-block;
-      width: 0.62em; height: 0.62em;
+      width: 0.6em; height: 0.6em;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 30%, #4a4a4a, #101010 72%);
-      box-shadow: inset 0 0 0 0.08em rgba(255, 255, 255, 0.85);
+      border: 0.06em solid var(--text-primary);
       vertical-align: middle;
       margin: 0 0.01em;
     }
@@ -254,9 +267,9 @@
       content: '';
       position: absolute;
       top: 50%; left: 50%;
-      width: 0.2em; height: 0.2em;
+      width: 0.16em; height: 0.16em;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.92);
+      background: var(--text-primary);
       transform: translate(-50%, -50%);
     }
 
