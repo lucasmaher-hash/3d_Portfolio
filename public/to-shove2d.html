@@ -477,19 +477,10 @@
       50%       { transform: scale(0.86); }
     }
 
-    /* Two phone screens side by side inside one stagger-row figure. The
-       base .stagger-figure is sized for a single portrait image, so this
-       widens it and splits it in two. */
+    /* Wider figure for the two-phone Live clip: the base .stagger-figure
+       is sized for a single portrait phone, and that pair is one file
+       roughly twice as wide. */
     .stagger-figure.duo { width: clamp(260px, 42vw, 480px); }
-    .duo-phones {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(10px, 1.6vw, 20px);
-      align-items: start;
-    }
-    .duo-phones img,
-    .duo-phones video { width: 100%; height: auto; display: block; }
-
     /* The recordings carry the phone frame baked in, so they size exactly
        like the stills do. Deliberately NO drop-shadow on these: the frame
        sits on an opaque page-coloured background inside the file (H.264
@@ -1367,14 +1358,14 @@
         <!-- 2.1b the same feature in the app: copy left, two screens right -->
         <div class="stagger-row right">
           <div class="stagger-figure duo">
-            <div class="duo-phones">
-              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe in morrow wird als Live Activity aktiviert">
-                <source src="/videos/morrow/live1.mp4" type="video/mp4" />
-              </video>
-              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Dieselbe Aufgabe als Live Activity auf dem Sperrbildschirm">
-                <source src="/videos/morrow/live2.mp4" type="video/mp4" />
-              </video>
-            </div>
+            <!-- Both phones are ONE file, not two <video> elements side by
+                 side: the right-hand screen has to stay exactly 5.24s behind
+                 the left, and two independently looping videos drift apart
+                 within a few cycles. Baked together, the offset can never
+                 slip. -->
+            <video autoplay loop muted playsinline width="1636" height="1600" aria-label="Links wird in morrow eine Aufgabe als Live Activity aktiviert, rechts erscheint sie daraufhin auf dem Sperrbildschirm">
+              <source src="/videos/morrow/live-pair.mp4" type="video/mp4" />
+            </video>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f1b-title">Vom Eintrag zum Sperrbildschirm</h3>
