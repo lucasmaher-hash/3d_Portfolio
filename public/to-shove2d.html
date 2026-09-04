@@ -194,17 +194,28 @@
       pointer-events: none;
     }
 
+    /* Zero-size, sits right after the sizer's text. Its default inline
+       vertical-align is "baseline" — for a replaced/empty inline-block with
+       no line box of its own, the spec makes that its OWN bottom margin
+       edge, so this marker's bottom edge lands exactly on "morrow"'s real
+       text baseline. Same technique as .accent-dot above; the JS below
+       reads its position instead of eyeballing one heading size, because a
+       hardcoded percentage measured in one browser is NOT safe to assume
+       for another — this exact font, in Safari, put the line 80.36% (the
+       Chrome-measured value) noticeably above the letters' true base. */
+    .morrow-baseline-marker {
+      display: inline-block;
+      width: 0; height: 0;
+    }
+
     .morrow-track .dot-divider {
       position: absolute;
       left: 0; right: 0;
-      /* NOT 50% (track-centre) — that runs the dots through the letters'
-         x-height, well above where they actually stand. 80.36% is the real
-         text baseline, measured as a fraction of the line-height box: a
-         zero-size marker span given the default inline vertical-align:
-         baseline lands 81px down a 100.8px-tall box at font-size 96px
-         (Range().getBoundingClientRect() vs the marker, via CDP). That
-         ratio is a font-metric constant — line-height is unitless (1.05),
-         so it holds at every breakpoint's font-size with no re-measuring. */
+      /* 80.36% is a Chrome-measured fallback only — shows correctly for an
+         instant before JS (below) measures the REAL baseline in whatever
+         browser is actually running and overwrites this with an exact px
+         value. Never delete the fallback; it's what renders if JS is
+         disabled or hasn't run yet. */
       top: 80.36%;
       transform: translateY(-50%);
     }
@@ -1110,7 +1121,7 @@
              sensible to sit next to a word that slides. -->
         <div class="morrow-track">
           <div class="dot-divider"></div>
-          <div class="project-title morrow-sizer" aria-hidden="true">morrow</div>
+          <div class="project-title morrow-sizer" aria-hidden="true">morrow<span class="morrow-baseline-marker"></span></div>
           <h1 class="project-title morrow-word" aria-label="morrow">
             <span aria-hidden="true">m</span><span class="mw-ring" aria-hidden="true"></span><span aria-hidden="true">rr</span><span class="mw-ring" aria-hidden="true"></span><span aria-hidden="true">w</span>
           </h1>
@@ -1118,11 +1129,18 @@
       </div>
     </div>
 
-    <!-- CONTENT GOES HERE — deliberately empty for now.
-         The page keeps the full shared chrome (nav, mobile menu, scroll dots,
-         dot-divider sizing, ?from=3d Exit pill, i18n) so sections can be dropped
-         in without wiring anything up first. Build it out with the shared
-         pattern: At a Glance → meta grid → Overview/Process → result. -->
+    <!-- At a Glance. Exact markup pattern from the other project pages
+         (virtual_cooking2d.html etc.) — same classes, same inline
+         margin-top on the lead paragraph. Real copy isn't written yet, so
+         it holds the page's existing [ Platzhalter ] text for now; swap
+         both TRANSLATIONS values below once it is. -->
+    <div class="section" style="border-bottom: none; padding-bottom: 0;">
+      <h2 class="section-title" data-i18n="section-glance">Auf einen Blick</h2>
+      <p class="glance-lead" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n="placeholder">[ Platzhalter ]</p>
+    </div>
+
+    <!-- EVERYTHING BELOW STILL TO COME — meta grid → Overview/Process →
+         result, same shared chrome/i18n as the rest of the site. -->
     <div class="guide-section">
       <p class="guide-text" data-i18n="placeholder">[ Placeholder ]</p>
     </div>
@@ -1285,6 +1303,7 @@
       en: {
         'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
         'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;morrow',
+        'section-glance': 'At a Glance',
         'placeholder': '[ Placeholder ]',
         'nav-prev': '<< PREVIOUS', 'nav-next': 'NEXT >>',
         'nav-cybercoffee': 'Cybercoffee',
@@ -1292,6 +1311,7 @@
       de: {
         'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
         'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;morrow',
+        'section-glance': 'Auf einen Blick',
         'placeholder': '[ Platzhalter ]',
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
         'nav-cybercoffee': 'Cybercoffee',
@@ -1418,6 +1438,46 @@
       document.addEventListener('DOMContentLoaded', scheduleFix);
       window.addEventListener('load', scheduleFix);
       window.addEventListener('resize', scheduleFix);
+    })();
+  </script>
+
+  <script>
+    // morrow's dotted line, positioned at "morrow"'s REAL text baseline —
+    // not the eyeballed/CSS-only 80.36% fallback in the stylesheet above.
+    // That number was measured in Chrome and looked right there, but Safari
+    // computes this custom font's line-height/baseline split differently
+    // (a font's ascent/descent tables are read differently across engines),
+    // so the same percentage put the line visibly above the letters —
+    // the exact class of bug this codebase has hit before with font-metric
+    // assumptions (see the dot-divider Safari note two scripts up). Fixed
+    // by measuring the ACTUAL baseline live, in whatever browser is
+    // running, the same way .accent-dot already does: an empty inline
+    // element's default vertical-align:baseline puts its own bottom edge
+    // on the true text baseline — read that edge's position instead of
+    // assuming it.
+    (function () {
+      function positionMorrowLine() {
+        var track = document.querySelector('.morrow-track');
+        var marker = track && track.querySelector('.morrow-baseline-marker');
+        var line = track && track.querySelector('.dot-divider');
+        if (!track || !marker || !line) return;
+        var trackRect = track.getBoundingClientRect();
+        var markerRect = marker.getBoundingClientRect();
+        if (!trackRect.height) return;
+        line.style.top = (markerRect.top - trackRect.top) + 'px';
+      }
+      var raf;
+      function schedule() {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(positionMorrowLine);
+      }
+      document.addEventListener('DOMContentLoaded', schedule);
+      window.addEventListener('load', schedule);
+      window.addEventListener('resize', schedule);
+      // The very first measurement, before OCR-A-BT has downloaded, would
+      // read the fallback monospace font's metrics instead — re-measure
+      // once the real font is actually in.
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
     })();
   </script>
   <script>
