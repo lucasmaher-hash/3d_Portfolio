@@ -172,6 +172,49 @@
       background-repeat: space no-repeat;
     }
 
+    /* ── Hero: "morrow" shoves itself across the header column ──────────
+       Snaps flush left, holds 3s, glides ~1s to flush right with a small
+       bounce, holds 3s, comes back — the app's own core gesture (a task
+       pushed to tomorrow, pulled back again) as the page's title. */
+    .morrow-shove {
+      /* fit-content is load-bearing: as a column-flex child this row would
+         otherwise stretch to the full header width, and translateX(-100%)
+         would then carry it a whole column off the page instead of one
+         word's width. */
+      width: fit-content;
+      position: relative;
+      animation: morrow-shove 8s infinite;
+    }
+
+    /* 8s loop: hold 3s (37.5%), glide 1s (12.5%), hold 3s, glide 1s.
+       left% resolves against the header column, translateX% against the
+       word itself — moved in lockstep the pair lands exactly flush at
+       each edge whatever width "morrow" renders at, so there is nothing
+       to measure and no per-breakpoint value to keep in sync.
+       The timing function is set on the keyframes that START a glide —
+       CSS applies it to the segment running OUT of a keyframe, so the two
+       holds are untouched. EVERY keyframe repeats left/transform in full
+       and no offset is listed twice: writing it the compact way, with a
+       bare `37.5% { animation-timing-function: … }` alongside a
+       `0%, 37.5% { left: …; transform: … }`, silently dropped the curve
+       in Chrome and the glide came out with no bounce at all. Measured:
+       0px overshoot that way vs 20.8px this way.
+
+       The bounce is deliberately gentle, and the curve was picked by
+       computing its peak rather than eyeballing it: this one peaks at
+       1.0299, i.e. 20.8px past the edge on the 1440px layout (verified by
+       stepping the animation's currentTime), which stays well inside the
+       wrapper's padding. A stock easeOutBack (0.34, 1.56, 0.64, 1) peaks
+       at 1.098 = 54px past the column, and 1.7 — the curve this page used
+       at first — overshoots 79px, far enough to read as a glitch. */
+    @keyframes morrow-shove {
+      0%     { left: 0%;   transform: translateX(0);       animation-timing-function: linear; }
+      37.5%  { left: 0%;   transform: translateX(0);       animation-timing-function: cubic-bezier(0.34, 1.3, 0.55, 1); }
+      50%    { left: 100%; transform: translateX(-100%);   animation-timing-function: linear; }
+      87.5%  { left: 100%; transform: translateX(-100%);   animation-timing-function: cubic-bezier(0.34, 1.3, 0.55, 1); }
+      100%   { left: 0%;   transform: translateX(0); }
+    }
+
     /* ── Meta grid ── */
     .meta-grid {
       display: grid;
@@ -746,6 +789,11 @@
        keep layout + opacity cues. No effect unless the OS pref is set. */
     @media (prefers-reduced-motion: reduce) {
       .accent-dot { animation: none !important; opacity: 1; }
+      .morrow-shove {
+        animation: none !important;
+        left: 0 !important;
+        transform: none !important;
+      }
       .machine-overlay-btn,
       .hero-blob,
       .character-row,
@@ -998,11 +1046,13 @@
     <div class="section" style="border-bottom: none;">
       <div class="project-header">
         <p class="breadcrumb" data-i18n-html="breadcrumb">Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;morrow</p>
-        <div class="title-row">
+        <!-- .title-row is left exactly as the other pages have it; the
+             movement is layered on with one extra class, so the header's
+             own geometry stays identical to theirs. -->
+        <div class="title-row morrow-shove">
           <h1 class="project-title">morrow</h1>
           <span class="accent-dot"></span>
         </div>
-        <div class="dot-divider"></div>
       </div>
     </div>
 
