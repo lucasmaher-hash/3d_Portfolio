@@ -172,6 +172,35 @@
       background-repeat: space no-repeat;
     }
 
+    /* ── Hero: the three app screens, sitting above the header ─────────
+       Deliberately NOT called "hero". The nav reads a .hero element as
+       "full-bleed image — let the bar sit transparent over it until the
+       user scrolls past" (updateNavShadow in top_row_permanent_V3.html).
+       These phones sit on the ordinary page background, so the nav needs
+       its raised shadow from the first frame, which is exactly what it
+       does when a page has no .hero at all. */
+    .morrow-devices {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(12px, 3vw, 48px);
+      align-items: start;
+      /* Horizontal padding matches .section so the outer two phones line
+         up with the breadcrumb, title and divider underneath them. The
+         top padding clears the fixed nav: the pill's bottom edge sits at
+         ~88px and its neumorphic shadow needs ~17px more below that. */
+      padding: clamp(116px, 11vw, 150px) clamp(40px, 8vw, 80px) 0;
+    }
+
+    .morrow-devices img {
+      width: 100%;
+      height: auto;
+      display: block;
+      /* drop-shadow, not box-shadow: the frames are transparent, so this
+         follows the phone silhouette instead of drawing a rectangle.
+         Tint is the design system's own shadow colour. */
+      filter: drop-shadow(0 16px 28px rgba(174, 174, 192, 0.5));
+    }
+
     /* ── Hero: "morrow" shoves itself across the header column ──────────
        Snaps flush left, holds 3s, glides ~1s to flush right with a small
        bounce, holds 3s, comes back — the app's own core gesture (a task
@@ -423,6 +452,9 @@
       #top-bar { height: 140px; }
       #top-bar.hide { transform: translateY(-90px); }
       .section { padding: 24px 20px; }
+      /* match .section's tighter mobile gutter so the phones stay aligned
+         with the header below them */
+      .morrow-devices { padding-left: 20px; padding-right: 20px; gap: 10px; }
       .project-title { font-size: clamp(32px, 9vw, 56px); }
       .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
       .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
@@ -1040,9 +1072,19 @@
 
   <div class="page-wrapper">
 
-    <!-- Header. No .hero on this page yet: with no hero element at all, the nav
-         bar takes its "no hero → raised shadow always on" branch, which is the
-         correct treatment for a page that does not open on a full-bleed image. -->
+    <!-- Hero: three app screens, above the header. Intrinsic width/height
+         are on each img so the row reserves its space before the files
+         land and nothing below it jumps. Not lazy-loaded — this is the
+         top of the page. -->
+    <div class="morrow-devices">
+      <img src="/images/morrow/screen1.webp" width="700" height="1444" alt="morrow im Hellmodus: eine Aufgabe mit Live-Schaltfläche, darunter die Reiter Today, Tomorrow und Soon" />
+      <img src="/images/morrow/screen2.webp" width="700" height="1444" alt="Der Sperrbildschirm mit der laufenden Aufgabe als Live Activity" />
+      <img src="/images/morrow/screen3.webp" width="700" height="1444" alt="morrow im Dunkelmodus: die Aufgabenliste des heutigen Tages" />
+    </div>
+
+    <!-- Header. Note there is deliberately no element with class "hero" on
+         this page — see the .morrow-devices comment in the stylesheet for
+         why that matters to the nav bar's shadow. -->
     <div class="section" style="border-bottom: none;">
       <div class="project-header">
         <p class="breadcrumb" data-i18n-html="breadcrumb">Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;morrow</p>
