@@ -409,6 +409,29 @@
       display: block;
     }
 
+    /* A stand-in for a real screenshot/video that isn't shot yet. Pressed
+       (not raised) so it reads as an empty slot rather than a finished
+       tile — same shadow token .meta-inset already uses for "not final."
+       aspect-ratio is set per-use via style="--ph-ratio: …", default 4/3.
+       Drop a real <img>/<video> in and delete the two ph- classes; nothing
+       about the surrounding layout (.guide-media / .stagger-figure /
+       .process-shot) needs to change either way. */
+    .ph-media {
+      width: 100%;
+      aspect-ratio: var(--ph-ratio, 4 / 3);
+      border-radius: 16px;
+      box-shadow: var(--shadow-pressed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      font-family: 'VT323', monospace;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      color: var(--text-tertiary);
+    }
+
     /* Breakout image — same horizontal padding as every other section */
     .breakout-media {
       width: 100%;
@@ -1138,10 +1161,160 @@
       <p class="glance-lead" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n-html="glance-lead">In jeder To-do-App ist eine Aufgabe schnell angelegt und mühsam verschoben: öffnen, Datumsauswahl suchen, Datum wählen, speichern. Also lässt man es — und die Heute-Liste stimmt schon am Vormittag nicht mehr. morrow macht das Verschieben zur wichtigsten Geste: drei Listen — Heute, Morgen, Bald —, jede Aufgabe liegt in genau einer, ein Wisch nach rechts schiebt sie weiter, einer nach links zurück.</p>
     </div>
 
-    <!-- EVERYTHING BELOW STILL TO COME — meta grid → Overview/Process →
-         result, same shared chrome/i18n as the rest of the site. -->
+    <!-- Meta grid — same position as every other project page: directly
+         under At a Glance. -->
+    <div class="section">
+      <div class="meta-grid">
+        <div class="meta-tile">
+          <div class="meta-label" data-i18n="label-timeline">Zeitraum</div>
+          <div class="meta-inset" data-i18n="placeholder">[ Platzhalter ]</div>
+        </div>
+        <div class="meta-tile">
+          <div class="meta-label" data-i18n="label-role">Rolle</div>
+          <div class="meta-inset" data-i18n="placeholder">[ Platzhalter ]</div>
+        </div>
+        <div class="meta-tile">
+          <div class="meta-label" data-i18n="label-team">Team</div>
+          <div class="meta-inset" data-i18n="placeholder">[ Platzhalter ]</div>
+        </div>
+        <div class="meta-tile">
+          <div class="meta-label" data-i18n="label-platform">Plattform</div>
+          <div class="meta-inset" data-i18n="placeholder">[ Platzhalter ]</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         Everything from here down is STRUCTURE ONLY. Every heading below
+         is a real, generic case-study label — safe, since it asserts
+         nothing about morrow specifically. Every body text and every
+         image is a placeholder, deliberately, even where real facts
+         exist in the shove95casestudyplan.md brief this was built
+         against (the Windows-95-era pivot, the App Store rejection, the
+         specific contrast ratios) — that plan was written for a project
+         called "shove.95", and nothing in this conversation has actually
+         confirmed that history is morrow's own, under an older name,
+         rather than a different or earlier-stage concept. Safer to leave
+         every one of those specifics out until Lucas confirms them than
+         to put possibly-wrong claims on a page a hiring manager reads.
+         Ask him before writing any of it in for real.
+
+         The section shape itself follows the canonical case-study beats
+         (problem → key idea → a real decision/trade-off → craft/process
+         → accessibility → outcome) cross-checked against
+         junhyungpark.com/dopago, adapted to a shipped solo app rather
+         than that page's academic Discover/Empathize/Ideate/Prototype
+         labels — morrow has no persona, journey map or usability-test
+         panel to show, and labelling a section as if it did would be the
+         same kind of unconfirmed claim the rest of this block is
+         avoiding. Every section reuses this site's own shared classes
+         (.guide-section / .stagger-row / .process-shot / .ph-media) —
+         nothing here is bespoke to this page. ═══════════════════════ -->
+
+    <!-- Das Problem -->
     <div class="guide-section">
-      <p class="guide-text" data-i18n="placeholder">[ Placeholder ]</p>
+      <div class="section-heading-row">
+        <h2 class="section-title" data-i18n="section-problem">Das Problem</h2>
+        <span class="step-badge">1</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
+      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
+    </div>
+
+    <!-- Die Idee -->
+    <div class="guide-section">
+      <div class="section-heading-row">
+        <h2 class="section-title" data-i18n="section-idea">Die Idee</h2>
+        <span class="step-badge">2</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
+      <div class="guide-media">
+        <div class="ph-media" style="--ph-ratio: 9 / 16;" data-i18n="placeholder">[ Platzhalter ]</div>
+      </div>
+    </div>
+
+    <!-- Eine wichtige Entscheidung — structural slot for a real
+         decision/trade-off/pivot, per the canonical case-study shape.
+         Content stays placeholder until the underlying story is
+         confirmed (see the block comment above). -->
+    <div class="guide-section">
+      <div class="section-heading-row">
+        <h2 class="section-title" data-i18n="section-decision">Eine wichtige Entscheidung</h2>
+        <span class="step-badge">3</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
+      <!-- Before/after pair — the plan's own asset table calls a
+           side-by-side the single most valuable image for this section,
+           whatever the confirmed story turns out to be. -->
+      <div class="stagger-list" style="gap: clamp(16px, 3vw, 32px);">
+        <div class="stagger-row" style="max-width: none;">
+          <div class="ph-media" style="--ph-ratio: 4 / 3; flex: 1 1 0;" data-i18n="placeholder">[ Platzhalter ]</div>
+          <div class="ph-media" style="--ph-ratio: 4 / 3; flex: 1 1 0;" data-i18n="placeholder">[ Platzhalter ]</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Design-Prozess -->
+    <div class="guide-section">
+      <div class="section-heading-row">
+        <h2 class="section-title" data-i18n="section-process">Design-Prozess</h2>
+        <span class="step-badge">4</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
+      <div class="stagger-list">
+        <div class="stagger-row">
+          <div class="stagger-figure">
+            <div class="ph-media" data-i18n="placeholder">[ Platzhalter ]</div>
+          </div>
+          <div class="stagger-body">
+            <h3 class="feature-title" data-i18n="placeholder">[ Platzhalter ]</h3>
+            <p class="stagger-copy" data-i18n="placeholder">[ Platzhalter ]</p>
+          </div>
+        </div>
+        <div class="stagger-row right">
+          <div class="stagger-figure">
+            <div class="ph-media" data-i18n="placeholder">[ Platzhalter ]</div>
+          </div>
+          <div class="stagger-body">
+            <h3 class="feature-title" data-i18n="placeholder">[ Platzhalter ]</h3>
+            <p class="stagger-copy" data-i18n="placeholder">[ Platzhalter ]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barrierefreiheit — a short factual list, per the plan; the
+         SHAPE of a fact-list is safe to build now, the facts inside it
+         (contrast ratios, AX5, VoiceOver audit findings) are not, until
+         confirmed. -->
+    <div class="guide-section">
+      <div class="section-heading-row">
+        <h2 class="section-title" data-i18n="section-a11y">Barrierefreiheit</h2>
+        <span class="step-badge">5</span>
+      </div>
+      <div class="dot-divider"></div>
+      <ul class="guide-text" style="list-style: none; display: flex; flex-direction: column; gap: 6px;">
+        <li data-i18n="placeholder">— [ Platzhalter ]</li>
+        <li data-i18n="placeholder">— [ Platzhalter ]</li>
+        <li data-i18n="placeholder">— [ Platzhalter ]</li>
+      </ul>
+    </div>
+
+    <!-- Ergebnis -->
+    <div class="guide-section">
+      <div class="section-heading-row">
+        <h2 class="section-title" data-i18n="section-result">Ergebnis</h2>
+        <span class="step-badge">6</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
+      <div class="guide-media">
+        <div class="ph-media" style="--ph-ratio: 16 / 10;" data-i18n="placeholder">[ Platzhalter ]</div>
+      </div>
     </div>
 
     <div class="project-nav">
@@ -1312,6 +1485,9 @@
         'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;morrow',
         'section-glance': 'Auf einen Blick',
         'glance-lead': 'In jeder To-do-App ist eine Aufgabe schnell angelegt und mühsam verschoben: öffnen, Datumsauswahl suchen, Datum wählen, speichern. Also lässt man es — und die Heute-Liste stimmt schon am Vormittag nicht mehr. morrow macht das Verschieben zur wichtigsten Geste: drei Listen — Heute, Morgen, Bald —, jede Aufgabe liegt in genau einer, ein Wisch nach rechts schiebt sie weiter, einer nach links zurück.',
+        'label-timeline': 'Zeitraum', 'label-role': 'Rolle', 'label-team': 'Team', 'label-platform': 'Plattform',
+        'section-problem': 'Das Problem', 'section-idea': 'Die Idee', 'section-decision': 'Eine wichtige Entscheidung',
+        'section-process': 'Design-Prozess', 'section-a11y': 'Barrierefreiheit', 'section-result': 'Ergebnis',
         'placeholder': '[ Platzhalter ]',
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
         'nav-cybercoffee': 'Cybercoffee',
