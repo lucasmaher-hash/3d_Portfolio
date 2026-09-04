@@ -180,15 +180,25 @@
        its raised shadow from the first frame, which is exactly what it
        does when a page has no .hero at all. */
     .morrow-devices {
+      /* Horizontal padding matches .section, so at full width the outer
+         two phones would line up with the breadcrumb/title/divider below.
+         The top padding clears the fixed nav: the pill's bottom edge sits
+         at ~88px and its neumorphic shadow needs ~17px more below that. */
+      padding: clamp(116px, 11vw, 150px) clamp(40px, 8vw, 80px) 0;
+    }
+
+    /* The row is scaled to 65% of the content column — 35% smaller than
+       full width — and centred. Width AND gap are both scaled by the same
+       0.65, so it is a true uniform reduction: shrinking only the images
+       inside full-width columns would have made the phones smaller while
+       pushing them further apart, which is not what "scale down" means. */
+    .morrow-devices-inner {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: clamp(12px, 3vw, 48px);
+      gap: clamp(7.8px, 1.95vw, 31.2px);
       align-items: start;
-      /* Horizontal padding matches .section so the outer two phones line
-         up with the breadcrumb, title and divider underneath them. The
-         top padding clears the fixed nav: the pill's bottom edge sits at
-         ~88px and its neumorphic shadow needs ~17px more below that. */
-      padding: clamp(116px, 11vw, 150px) clamp(40px, 8vw, 80px) 0;
+      width: 65%;
+      margin-inline: auto;
     }
 
     .morrow-devices img {
@@ -454,7 +464,11 @@
       .section { padding: 24px 20px; }
       /* match .section's tighter mobile gutter so the phones stay aligned
          with the header below them */
-      .morrow-devices { padding-left: 20px; padding-right: 20px; gap: 10px; }
+      .morrow-devices { padding-left: 20px; padding-right: 20px; }
+      /* No 65% reduction down here: three-across on a 390px screen is
+         already only ~110px per phone, and 65% of that reads as noise.
+         The column is the constraint on a phone, not the scale. */
+      .morrow-devices-inner { width: 100%; gap: 10px; }
       .project-title { font-size: clamp(32px, 9vw, 56px); }
       .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
       .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
@@ -1077,9 +1091,11 @@
          land and nothing below it jumps. Not lazy-loaded — this is the
          top of the page. -->
     <div class="morrow-devices">
-      <img src="/images/morrow/screen1.webp" width="700" height="1444" alt="morrow im Hellmodus: eine Aufgabe mit Live-Schaltfläche, darunter die Reiter Today, Tomorrow und Soon" />
-      <img src="/images/morrow/screen2.webp" width="700" height="1444" alt="Der Sperrbildschirm mit der laufenden Aufgabe als Live Activity" />
-      <img src="/images/morrow/screen3.webp" width="700" height="1444" alt="morrow im Dunkelmodus: die Aufgabenliste des heutigen Tages" />
+      <div class="morrow-devices-inner">
+        <img src="/images/morrow/screen1.webp" width="700" height="1444" alt="morrow im Hellmodus: eine Aufgabe mit Live-Schaltfläche, darunter die Reiter Today, Tomorrow und Soon" />
+        <img src="/images/morrow/screen2.webp" width="700" height="1444" alt="Der Sperrbildschirm mit der laufenden Aufgabe als Live Activity" />
+        <img src="/images/morrow/screen3.webp" width="700" height="1444" alt="morrow im Dunkelmodus: die Aufgabenliste des heutigen Tages" />
+      </div>
     </div>
 
     <!-- Header. Note there is deliberately no element with class "hero" on
