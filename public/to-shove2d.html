@@ -487,7 +487,14 @@
       gap: clamp(10px, 1.6vw, 20px);
       align-items: start;
     }
-    .duo-phones img { width: 100%; height: auto; display: block; }
+    .duo-phones img,
+    .duo-phones video { width: 100%; height: auto; display: block; }
+
+    /* The recordings carry the phone frame baked in, so they size exactly
+       like the stills do. Deliberately NO drop-shadow on these: the frame
+       sits on an opaque page-coloured background inside the file (H.264
+       has no alpha), so a silhouette shadow would draw a rectangle. */
+    .stagger-figure video { width: 100%; height: auto; display: block; }
 
     /* Centred lead paragraph — used where a point introduces a feature
        rather than sitting beside it. */
@@ -1361,8 +1368,12 @@
         <div class="stagger-row right">
           <div class="stagger-figure duo">
             <div class="duo-phones">
-              <img src="/images/morrow/screen1.webp" width="700" height="1444" alt="Eine Aufgabe in morrow, mit der Schaltfläche zum Aktivieren der Live Activity" />
-              <img src="/images/morrow/screen2.webp" width="700" height="1444" alt="Dieselbe Aufgabe als Live Activity auf dem Sperrbildschirm" />
+              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe in morrow wird als Live Activity aktiviert">
+                <source src="/videos/morrow/live1.mp4" type="video/mp4" />
+              </video>
+              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Dieselbe Aufgabe als Live Activity auf dem Sperrbildschirm">
+                <source src="/videos/morrow/live2.mp4" type="video/mp4" />
+              </video>
             </div>
           </div>
           <div class="stagger-body">
@@ -1379,7 +1390,9 @@
 
         <div class="stagger-row">
           <div class="stagger-figure">
-            <div class="ph-media" style="--ph-ratio: 9 / 16;" data-i18n="placeholder">[ Platzhalter ]</div>
+            <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben">
+              <source src="/videos/morrow/swipe.mp4" type="video/mp4" />
+            </video>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f2b-title">Ein Wisch nach vorn, einer zurück</h3>
@@ -1390,7 +1403,9 @@
         <!-- 2.3 Workspaces & Co: copy left, recording right -->
         <div class="stagger-row right">
           <div class="stagger-figure">
-            <div class="ph-media" style="--ph-ratio: 9 / 16;" data-i18n="placeholder">[ Platzhalter ]</div>
+            <video autoplay loop muted playsinline width="792" height="1600" aria-label="Workspaces wechseln, Aufgaben abhaken, löschen und neu anordnen">
+              <source src="/videos/morrow/restfeatures.mp4" type="video/mp4" />
+            </video>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f3-title">Workspaces &amp; Co</h3>
