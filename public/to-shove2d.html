@@ -187,17 +187,26 @@
       padding: clamp(116px, 11vw, 150px) clamp(40px, 8vw, 80px) 0;
     }
 
-    /* The row is scaled to 65% of the content column — 35% smaller than
-       full width — and centred. Width AND gap are both scaled by the same
-       0.65, so it is a true uniform reduction: shrinking only the images
-       inside full-width columns would have made the phones smaller while
-       pushing them further apart, which is not what "scale down" means. */
+    /* The row is centred and narrower than the content column so the
+       phones render 35% smaller than full width.
+
+       The gap is a PERCENTAGE of the row, not a vw/px clamp: at 5% the
+       phone-to-gap ratio is then identical at every viewport, so the
+       composition scales as one piece instead of the gaps creeping open
+       or closed relative to the phones as the window changes.
+
+       The two numbers are a pair. 3 phones + 2 gaps fill the row, so
+       widening the gap inside a fixed row would shrink the phones —
+       width is set to whatever keeps them at the agreed size:
+       phone = width x (1 - 2 x 0.05) / 3, so 66.5% of a 1058px column
+       gives 211px phones with 35px between them. Change one, redo the
+       other, or the phones silently resize. */
     .morrow-devices-inner {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: clamp(7.8px, 1.95vw, 31.2px);
+      gap: 5%;
       align-items: start;
-      width: 65%;
+      width: 66.5%;
       margin-inline: auto;
     }
 
@@ -465,10 +474,12 @@
       /* match .section's tighter mobile gutter so the phones stay aligned
          with the header below them */
       .morrow-devices { padding-left: 20px; padding-right: 20px; }
-      /* No 65% reduction down here: three-across on a 390px screen is
-         already only ~110px per phone, and 65% of that reads as noise.
-         The column is the constraint on a phone, not the scale. */
-      .morrow-devices-inner { width: 100%; gap: 10px; }
+      /* No reduction down here: three-across on a 390px screen is already
+         only ~110px per phone, and taking another 35% off reads as noise.
+         The column is the constraint on a phone, not the scale. The 5%
+         gap carries over, so the phones keep the same proportions as on
+         desktop, just filling the full width. */
+      .morrow-devices-inner { width: 100%; }
       .project-title { font-size: clamp(32px, 9vw, 56px); }
       .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
       .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
