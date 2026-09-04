@@ -432,6 +432,143 @@
       color: var(--text-tertiary);
     }
 
+    /* ── The Live indicator, built in CSS until the real asset lands ────
+       Concentric rings on a raised neumorphic disc, pulsing on a loop —
+       the same mark the app puts on the Lock Screen. Sized in em off its
+       own font-size so one number scales the whole thing. */
+    .live-pulse {
+      width: 1em; height: 1em;
+      font-size: clamp(120px, 17vw, 210px);
+      border-radius: 50%;
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-raised);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-inline: auto;
+      position: relative;
+    }
+
+    /* Two rings + a solid core. Each is its own element so they can pulse
+       on slightly different delays — a single scaling parent would just
+       zoom the whole mark, which reads as a bounce rather than a pulse. */
+    .live-pulse span {
+      position: absolute;
+      border-radius: 50%;
+      border: 0.035em solid var(--text-tertiary);
+      animation: live-ring 2.4s ease-out infinite;
+    }
+    .live-pulse span:nth-child(1) { width: 0.62em; height: 0.62em; animation-delay: 0s; }
+    .live-pulse span:nth-child(2) { width: 0.40em; height: 0.40em; animation-delay: 0.35s; }
+    .live-pulse span:nth-child(3) {
+      width: 0.17em; height: 0.17em;
+      border: none;
+      background: var(--text-primary);
+      animation: live-core 2.4s ease-in-out infinite;
+    }
+
+    @keyframes live-ring {
+      0%        { transform: scale(0.82); opacity: 0.15; }
+      35%       { opacity: 0.9; }
+      100%      { transform: scale(1.16); opacity: 0; }
+    }
+    @keyframes live-core {
+      0%, 100%  { transform: scale(1); }
+      50%       { transform: scale(0.86); }
+    }
+
+    /* Two phone screens side by side inside one stagger-row figure. The
+       base .stagger-figure is sized for a single portrait image, so this
+       widens it and splits it in two. */
+    .stagger-figure.duo { width: clamp(260px, 42vw, 480px); }
+    .duo-phones {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(10px, 1.6vw, 20px);
+      align-items: start;
+    }
+    .duo-phones img { width: 100%; height: auto; display: block; }
+
+    /* Centred lead paragraph — used where a point introduces a feature
+       rather than sitting beside it. */
+    .centered-note {
+      max-width: 640px;
+      margin-inline: auto;
+      text-align: center;
+    }
+
+    /* ── Retro vs modern icon clusters ──────────────────────────────────
+       Two clusters side by side that grow as the block scrolls through
+       the viewport, then drift once they reach full size. --grow is
+       written by the script near the bottom of this file (0 → 1); all the
+       CSS does is map it onto a scale. Doing it this way rather than with
+       a keyframed animation means the growth follows the scroll position
+       exactly and reverses when scrolling back up. */
+    .icon-compare {
+      --grow: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 5vw, 80px);
+      align-items: start;
+      margin-top: clamp(20px, 3vw, 36px);
+    }
+
+    .icon-col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+    .icon-cluster {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(6px, 1.1vw, 14px);
+      transform: scale(calc(0.55 + 0.45 * var(--grow)));
+      transform-origin: center top;
+      /* short transition only to smooth the per-frame steps, not to
+         animate the growth itself — that is the scroll's job */
+      transition: transform 90ms linear;
+    }
+
+    .icon-cluster i {
+      width: clamp(30px, 4.4vw, 54px);
+      aspect-ratio: 1;
+      display: block;
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-raised-sm);
+    }
+    /* Sharp corners for the pixel set, soft for the current one — the
+       whole point of the comparison, and the one part that still reads
+       correctly while these are placeholders. */
+    .icon-cluster.retro i  { border-radius: 2px; }
+    .icon-cluster.modern i { border-radius: 30%; }
+
+    .icon-caption {
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    /* Drift starts only once the cluster is at full size. Alternating
+       delays per tile so the group breathes instead of pumping in unison. */
+    .icon-compare.is-full .icon-cluster i { animation: icon-drift 4.5s ease-in-out infinite; }
+    .icon-cluster i:nth-child(2) { animation-delay: 0.4s; }
+    .icon-cluster i:nth-child(3) { animation-delay: 0.9s; }
+    .icon-cluster i:nth-child(4) { animation-delay: 1.3s; }
+    .icon-cluster i:nth-child(5) { animation-delay: 0.7s; }
+    .icon-cluster i:nth-child(6) { animation-delay: 1.6s; }
+    .icon-cluster i:nth-child(7) { animation-delay: 0.2s; }
+    .icon-cluster i:nth-child(8) { animation-delay: 1.1s; }
+    .icon-cluster i:nth-child(9) { animation-delay: 0.5s; }
+
+    @keyframes icon-drift {
+      0%, 100% { transform: translate(0, 0); }
+      50%      { transform: translate(0, -5px); }
+    }
+
+    @media (max-width: 640px) {
+      .icon-compare { gap: 14px; }
+      .live-pulse { font-size: clamp(110px, 34vw, 150px); }
+    }
+
     /* Breakout image — same horizontal padding as every other section */
     .breakout-media {
       width: 100%;
@@ -1167,153 +1304,159 @@
       <div class="meta-grid">
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-timeline">Zeitraum</div>
-          <div class="meta-inset" data-i18n="placeholder">[ Platzhalter ]</div>
+          <div class="meta-inset" data-i18n-html="val-timeline">Aug. 2026 —<br>laufend</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-role">Rolle</div>
-          <div class="meta-inset" data-i18n="placeholder">[ Platzhalter ]</div>
+          <div class="meta-inset" data-i18n-html="val-role">Konzept, Design,<br>Design-System,<br>Umsetzung</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-team">Team</div>
-          <div class="meta-inset" data-i18n="placeholder">[ Platzhalter ]</div>
+          <div class="meta-inset" data-i18n="val-team">Solo</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-platform">Plattform</div>
-          <div class="meta-inset" data-i18n="placeholder">[ Platzhalter ]</div>
+          <div class="meta-inset" data-i18n-html="val-platform">iOS 18+<br>SwiftUI<br>SwiftData + CloudKit</div>
         </div>
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════
-         Everything from here down is STRUCTURE ONLY. Every heading below
-         is a real, generic case-study label — safe, since it asserts
-         nothing about morrow specifically. Every body text and every
-         image is a placeholder, deliberately, even where real facts
-         exist in the shove95casestudyplan.md brief this was built
-         against (the Windows-95-era pivot, the App Store rejection, the
-         specific contrast ratios) — that plan was written for a project
-         called "shove.95", and nothing in this conversation has actually
-         confirmed that history is morrow's own, under an older name,
-         rather than a different or earlier-stage concept. Safer to leave
-         every one of those specifics out until Lucas confirms them than
-         to put possibly-wrong claims on a page a hiring manager reads.
-         Ask him before writing any of it in for real.
-
-         The section shape itself follows the canonical case-study beats
-         (problem → key idea → a real decision/trade-off → craft/process
-         → accessibility → outcome) cross-checked against
-         junhyungpark.com/dopago, adapted to a shipped solo app rather
-         than that page's academic Discover/Empathize/Ideate/Prototype
-         labels — morrow has no persona, journey map or usability-test
-         panel to show, and labelling a section as if it did would be the
-         same kind of unconfirmed claim the rest of this block is
-         avoiding. Every section reuses this site's own shared classes
-         (.guide-section / .stagger-row / .process-shot / .ph-media) —
-         nothing here is bespoke to this page. ═══════════════════════ -->
-
-    <!-- Das Problem -->
+    <!-- ══ 1. Das Problem erkennen ═══════════════════════════════════ -->
     <div class="guide-section">
       <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="section-problem">Das Problem</h2>
+        <h2 class="section-title" data-i18n="section-problem">Das Problem erkennen</h2>
         <span class="step-badge">1</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
-      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
+      <p class="guide-text" data-i18n-html="problem-1">Eine To-do-App ist die einzige App, die man möglichst wenig benutzen möchte. Sie soll nicht unterhalten und keine Aufmerksamkeit binden — sie soll den Kopf freiräumen und danach wieder verschwinden. Genau daran scheitern die meisten: Sie sammeln Ansichten, Felder und Einstellungen, bis das Pflegen der Liste selbst zur Aufgabe wird.</p>
+      <p class="guide-text" data-i18n-html="problem-2">Dazu kommt eine Schieflage, die fast alle teilen: Eine Aufgabe anzulegen ist billig, sie zu verschieben ist teuer. Von heute auf morgen heißt öffnen, Datumsauswahl suchen, Datum wählen, speichern — vier Schritte für eine Entscheidung, die im Kopf längst gefallen ist. Also verschiebt man nicht, und alles sammelt sich in einer einzigen Heute-Liste, die ab dem späten Vormittag nicht mehr stimmt.</p>
+      <p class="guide-text" data-i18n-html="problem-3">Diese Beobachtung stammt aus keiner Studie, sondern aus meinem eigenen Arbeitsablauf — über Jahre und über Reminders, Things, Todoist, Notizen und Papier hinweg. Das ist n=1, und das sage ich bewusst so: als Ausgangspunkt reicht es, als Nutzungsforschung nicht.</p>
+      <p class="guide-text" data-i18n-html="problem-4">morrow antwortet darauf mit zwei Funktionen statt mit Funktionsumfang. Die eine bringt die Aufgabe, an der gerade gearbeitet wird, auf den Sperrbildschirm — sichtbar, ohne die App zu öffnen. Die andere macht das Verschieben zur Hauptgeste. Alles Weitere im Entwurf musste sich daran messen lassen, ob es diese beiden Dinge stützt oder nur von ihnen ablenkt.</p>
     </div>
 
-    <!-- Die Idee -->
+    <!-- ══ 2. Die App ════════════════════════════════════════════════ -->
     <div class="guide-section">
       <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="section-idea">Die Idee</h2>
+        <h2 class="section-title" data-i18n="section-app">Die App</h2>
         <span class="step-badge">2</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
-      <div class="guide-media">
-        <div class="ph-media" style="--ph-ratio: 9 / 16;" data-i18n="placeholder">[ Platzhalter ]</div>
+
+      <div class="stagger-list">
+
+        <!-- 2.1 Live-Benachrichtigungen: pulsing mark left, copy right -->
+        <div class="stagger-row">
+          <div class="stagger-figure">
+            <!-- CSS stand-in for the real Live mark; three spans = two
+                 rings + the core (see .live-pulse in the stylesheet). -->
+            <div class="live-pulse" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+          <div class="stagger-body">
+            <h3 class="feature-title" data-i18n="f1-title">Live-Benachrichtigungen</h3>
+            <p class="stagger-copy" data-i18n-html="f1-text">Die Aufgabe, an der gerade gearbeitet wird, liegt als Live Activity auf dem Sperrbildschirm. Kein Entsperren, kein Suchen: Ein Blick genügt, um zu sehen, was ansteht, ein Tippen, um sie abzuhaken. Dort liegt immer genau eine Aufgabe — nie eine Liste.</p>
+          </div>
+        </div>
+
+        <!-- 2.1b the same feature in the app: copy left, two screens right -->
+        <div class="stagger-row right">
+          <div class="stagger-figure duo">
+            <div class="duo-phones">
+              <img src="/images/morrow/screen1.webp" width="700" height="1444" alt="Eine Aufgabe in morrow, mit der Schaltfläche zum Aktivieren der Live Activity" />
+              <img src="/images/morrow/screen2.webp" width="700" height="1444" alt="Dieselbe Aufgabe als Live Activity auf dem Sperrbildschirm" />
+            </div>
+          </div>
+          <div class="stagger-body">
+            <h3 class="feature-title" data-i18n="f1b-title">Vom Eintrag zum Sperrbildschirm</h3>
+            <p class="stagger-copy" data-i18n-html="f1b-text">In der App markiert ein Schalter die aktive Aufgabe. Sie erscheint sofort auf dem Sperrbildschirm und bleibt dort, bis sie erledigt oder abgelegt ist. Das ist der einzige Weg, morrow zu benutzen, ohne morrow zu öffnen — und für die meisten Tage der einzige, den es braucht.</p>
+          </div>
+        </div>
+
+        <!-- 2.2 Verschieben: centred lead, then recording left / copy right -->
+        <div class="centered-note">
+          <h3 class="feature-title" data-i18n="f2-title">Verschieben statt verwalten</h3>
+          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f2-text">Eine Liste bildet die Woche nur ab, solange das Umsortieren nichts kostet. Sobald Verschieben vier Schritte braucht, bleibt alles liegen, wo es liegt — und die Struktur, die man sich beim Anlegen überlegt hat, löst sich innerhalb eines Tages auf.</p>
+        </div>
+
+        <div class="stagger-row">
+          <div class="stagger-figure">
+            <div class="ph-media" style="--ph-ratio: 9 / 16;" data-i18n="placeholder">[ Platzhalter ]</div>
+          </div>
+          <div class="stagger-body">
+            <h3 class="feature-title" data-i18n="f2b-title">Ein Wisch nach vorn, einer zurück</h3>
+            <p class="stagger-copy" data-i18n-html="f2b-text">Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch nach rechts schiebt sie eine Stufe weiter, einer nach links zurück. Die drei Listen sind dabei keine Ordner, sondern Filter auf ein echtes Datum — deshalb braucht es keinen nächtlichen Umzug, und was heute liegen bleibt, steht morgen von selbst wieder da.</p>
+          </div>
+        </div>
+
+        <!-- 2.3 Workspaces & Co: copy left, recording right -->
+        <div class="stagger-row right">
+          <div class="stagger-figure">
+            <div class="ph-media" style="--ph-ratio: 9 / 16;" data-i18n="placeholder">[ Platzhalter ]</div>
+          </div>
+          <div class="stagger-body">
+            <h3 class="feature-title" data-i18n="f3-title">Workspaces &amp; Co</h3>
+            <p class="stagger-copy" data-i18n-html="f3-text">Aufgaben lassen sich in getrennten Workspaces halten — Arbeit, Privat, ein einzelnes Projekt — und mit einem Griff umschalten, ohne dass sich die Listen vermischen. Dazu kommt der Rest dessen, was eine Liste braucht und nicht mehr: abhaken, löschen, neu anordnen, mit einem Foto versehen. Jede dieser Funktionen ist eine Geste oder ein Tippen tief; keine bekommt einen eigenen Bildschirm.</p>
+          </div>
+        </div>
+
+        <!-- 2.4 Einstellungen: recording left, copy right -->
+        <div class="stagger-row">
+          <div class="stagger-figure">
+            <div class="ph-media" style="--ph-ratio: 9 / 16;" data-i18n="placeholder">[ Platzhalter ]</div>
+          </div>
+          <div class="stagger-body">
+            <h3 class="feature-title" data-i18n="f4-title">Einstellungen</h3>
+            <p class="stagger-copy" data-i18n-html="f4-text">Die Einstellungen bleiben kurz: Erscheinungsbild, Farbe, Schrift. Sie entscheiden, wie die App aussieht, nicht wie sie funktioniert — es gibt keine Option, die das Verhalten der drei Listen verändert. Was einstellbar ist, ist Oberfläche; was die App ausmacht, steht fest.</p>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Eine wichtige Entscheidung — structural slot for a real
-         decision/trade-off/pivot, per the canonical case-study shape.
-         Content stays placeholder until the underlying story is
-         confirmed (see the block comment above). -->
+    <!-- ══ 3. Design-Prozess ═════════════════════════════════════════ -->
     <div class="guide-section">
       <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="section-decision">Eine wichtige Entscheidung</h2>
+        <h2 class="section-title" data-i18n="section-design">Design-Prozess</h2>
         <span class="step-badge">3</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
-      <!-- Before/after pair — the plan's own asset table calls a
-           side-by-side the single most valuable image for this section,
-           whatever the confirmed story turns out to be. -->
-      <div class="stagger-list" style="gap: clamp(16px, 3vw, 32px);">
+
+      <p class="guide-text" data-i18n-html="pivot-1">Die erste Version war eine vollständige Windows-95-Oberfläche im doppelten Pixelmaßstab: Taskleiste, abgeschrägte Ränder, Statuszeile, Pixelschrift. Sie war fertig, nicht bloß eine Stimmung — und musste trotzdem weg. Der Witz war lauter als die App. Eine originalgetreue Oberfläche von 1995 ist ein Kostüm: Sie macht ein tägliches Werkzeug anstrengend, kämpft gegen jede iOS-Konvention, und das Publikum, dem sie schmeichelt, ist nicht das Publikum, das morgens damit arbeitet.</p>
+      <p class="guide-text" data-i18n-html="pivot-2">An ihre Stelle kam SkeuKit: ein weich-skeuomorphes System aus Tokens, vier Themes in Hell und Dunkel. Tiefe entsteht dort aus Licht statt aus Textur — Mulden für Vertieftes, Glas für Bedienelemente, einfacher Text auf der Fläche für Inhalt. Ein Druckverhalten für jedes Element der App. Die Pixelschrift ist geblieben, aber als optionaler Retro-Modus, der nur die Rahmen betrifft; der Aufgabentext bleibt in der Systemschrift. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
+
+      <!-- Before/after. Not in the layout brief, but the pivot is the
+           strongest thing on this page and it doesn't land without both
+           versions visible side by side. -->
+      <div class="stagger-list" style="gap: clamp(16px, 3vw, 32px); margin-top: 0;">
         <div class="stagger-row" style="max-width: none;">
           <div class="ph-media" style="--ph-ratio: 4 / 3; flex: 1 1 0;" data-i18n="placeholder">[ Platzhalter ]</div>
           <div class="ph-media" style="--ph-ratio: 4 / 3; flex: 1 1 0;" data-i18n="placeholder">[ Platzhalter ]</div>
         </div>
       </div>
-    </div>
 
-    <!-- Design-Prozess -->
-    <div class="guide-section">
-      <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="section-process">Design-Prozess</h2>
-        <span class="step-badge">4</span>
-      </div>
-      <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
-      <div class="stagger-list">
-        <div class="stagger-row">
-          <div class="stagger-figure">
-            <div class="ph-media" data-i18n="placeholder">[ Platzhalter ]</div>
+      <p class="guide-text" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links das Pixelset der ersten Version, rechts das heutige: dieselben Funktionen, zwei Haltungen.</p>
+
+      <div class="icon-compare">
+        <div class="icon-col">
+          <div class="icon-cluster retro" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           </div>
-          <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="placeholder">[ Platzhalter ]</h3>
-            <p class="stagger-copy" data-i18n="placeholder">[ Platzhalter ]</p>
-          </div>
+          <span class="icon-caption" data-i18n="icons-retro">Pixel · v1</span>
         </div>
-        <div class="stagger-row right">
-          <div class="stagger-figure">
-            <div class="ph-media" data-i18n="placeholder">[ Platzhalter ]</div>
+        <div class="icon-col">
+          <div class="icon-cluster modern" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           </div>
-          <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="placeholder">[ Platzhalter ]</h3>
-            <p class="stagger-copy" data-i18n="placeholder">[ Platzhalter ]</p>
-          </div>
+          <span class="icon-caption" data-i18n="icons-modern">Aktuell</span>
         </div>
       </div>
-    </div>
 
-    <!-- Barrierefreiheit — a short factual list, per the plan; the
-         SHAPE of a fact-list is safe to build now, the facts inside it
-         (contrast ratios, AX5, VoiceOver audit findings) are not, until
-         confirmed. -->
-    <div class="guide-section">
-      <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="section-a11y">Barrierefreiheit</h2>
-        <span class="step-badge">5</span>
-      </div>
-      <div class="dot-divider"></div>
-      <ul class="guide-text" style="list-style: none; display: flex; flex-direction: column; gap: 6px;">
-        <li data-i18n="placeholder">— [ Platzhalter ]</li>
-        <li data-i18n="placeholder">— [ Platzhalter ]</li>
-        <li data-i18n="placeholder">— [ Platzhalter ]</li>
-      </ul>
-    </div>
+      <p class="guide-text" style="margin-top: clamp(24px, 4vw, 40px);" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes, jedes in Hell und Dunkel, jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente — Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich, damit kein Theme die App unbenutzbar machen kann.</p>
 
-    <!-- Ergebnis -->
-    <div class="guide-section">
-      <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="section-result">Ergebnis</h2>
-        <span class="step-badge">6</span>
-      </div>
-      <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n="placeholder">[ Platzhalter ]</p>
-      <div class="guide-media">
-        <div class="ph-media" style="--ph-ratio: 16 / 10;" data-i18n="placeholder">[ Platzhalter ]</div>
+      <div class="icon-compare" style="grid-template-columns: repeat(4, 1fr); --grow: 1;">
+        <div class="ph-media" style="--ph-ratio: 1;" data-i18n="placeholder">[ Platzhalter ]</div>
+        <div class="ph-media" style="--ph-ratio: 1;" data-i18n="placeholder">[ Platzhalter ]</div>
+        <div class="ph-media" style="--ph-ratio: 1;" data-i18n="placeholder">[ Platzhalter ]</div>
+        <div class="ph-media" style="--ph-ratio: 1;" data-i18n="placeholder">[ Platzhalter ]</div>
       </div>
     </div>
 
@@ -1486,8 +1629,38 @@
         'section-glance': 'Auf einen Blick',
         'glance-lead': 'In jeder To-do-App ist eine Aufgabe schnell angelegt und mühsam verschoben: öffnen, Datumsauswahl suchen, Datum wählen, speichern. Also lässt man es — und die Heute-Liste stimmt schon am Vormittag nicht mehr. morrow macht das Verschieben zur wichtigsten Geste: drei Listen — Heute, Morgen, Bald —, jede Aufgabe liegt in genau einer, ein Wisch nach rechts schiebt sie weiter, einer nach links zurück.',
         'label-timeline': 'Zeitraum', 'label-role': 'Rolle', 'label-team': 'Team', 'label-platform': 'Plattform',
-        'section-problem': 'Das Problem', 'section-idea': 'Die Idee', 'section-decision': 'Eine wichtige Entscheidung',
-        'section-process': 'Design-Prozess', 'section-a11y': 'Barrierefreiheit', 'section-result': 'Ergebnis',
+        'val-timeline': 'Aug. 2026 —<br>laufend',
+        'val-role': 'Konzept, Design,<br>Design-System,<br>Umsetzung',
+        'val-team': 'Solo',
+        'val-platform': 'iOS 18+<br>SwiftUI<br>SwiftData + CloudKit',
+
+        'section-problem': 'Das Problem erkennen',
+        'problem-1': 'Eine To-do-App ist die einzige App, die man möglichst wenig benutzen möchte. Sie soll nicht unterhalten und keine Aufmerksamkeit binden — sie soll den Kopf freiräumen und danach wieder verschwinden. Genau daran scheitern die meisten: Sie sammeln Ansichten, Felder und Einstellungen, bis das Pflegen der Liste selbst zur Aufgabe wird.',
+        'problem-2': 'Dazu kommt eine Schieflage, die fast alle teilen: Eine Aufgabe anzulegen ist billig, sie zu verschieben ist teuer. Von heute auf morgen heißt öffnen, Datumsauswahl suchen, Datum wählen, speichern — vier Schritte für eine Entscheidung, die im Kopf längst gefallen ist. Also verschiebt man nicht, und alles sammelt sich in einer einzigen Heute-Liste, die ab dem späten Vormittag nicht mehr stimmt.',
+        'problem-3': 'Diese Beobachtung stammt aus keiner Studie, sondern aus meinem eigenen Arbeitsablauf — über Jahre und über Reminders, Things, Todoist, Notizen und Papier hinweg. Das ist n=1, und das sage ich bewusst so: als Ausgangspunkt reicht es, als Nutzungsforschung nicht.',
+        'problem-4': 'morrow antwortet darauf mit zwei Funktionen statt mit Funktionsumfang. Die eine bringt die Aufgabe, an der gerade gearbeitet wird, auf den Sperrbildschirm — sichtbar, ohne die App zu öffnen. Die andere macht das Verschieben zur Hauptgeste. Alles Weitere im Entwurf musste sich daran messen lassen, ob es diese beiden Dinge stützt oder nur von ihnen ablenkt.',
+
+        'section-app': 'Die App',
+        'f1-title': 'Live-Benachrichtigungen',
+        'f1-text': 'Die Aufgabe, an der gerade gearbeitet wird, liegt als Live Activity auf dem Sperrbildschirm. Kein Entsperren, kein Suchen: Ein Blick genügt, um zu sehen, was ansteht, ein Tippen, um sie abzuhaken. Dort liegt immer genau eine Aufgabe — nie eine Liste.',
+        'f1b-title': 'Vom Eintrag zum Sperrbildschirm',
+        'f1b-text': 'In der App markiert ein Schalter die aktive Aufgabe. Sie erscheint sofort auf dem Sperrbildschirm und bleibt dort, bis sie erledigt oder abgelegt ist. Das ist der einzige Weg, morrow zu benutzen, ohne morrow zu öffnen — und für die meisten Tage der einzige, den es braucht.',
+        'f2-title': 'Verschieben statt verwalten',
+        'f2-text': 'Eine Liste bildet die Woche nur ab, solange das Umsortieren nichts kostet. Sobald Verschieben vier Schritte braucht, bleibt alles liegen, wo es liegt — und die Struktur, die man sich beim Anlegen überlegt hat, löst sich innerhalb eines Tages auf.',
+        'f2b-title': 'Ein Wisch nach vorn, einer zurück',
+        'f2b-text': 'Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch nach rechts schiebt sie eine Stufe weiter, einer nach links zurück. Die drei Listen sind dabei keine Ordner, sondern Filter auf ein echtes Datum — deshalb braucht es keinen nächtlichen Umzug, und was heute liegen bleibt, steht morgen von selbst wieder da.',
+        'f3-title': 'Workspaces & Co',
+        'f3-text': 'Aufgaben lassen sich in getrennten Workspaces halten — Arbeit, Privat, ein einzelnes Projekt — und mit einem Griff umschalten, ohne dass sich die Listen vermischen. Dazu kommt der Rest dessen, was eine Liste braucht und nicht mehr: abhaken, löschen, neu anordnen, mit einem Foto versehen. Jede dieser Funktionen ist eine Geste oder ein Tippen tief; keine bekommt einen eigenen Bildschirm.',
+        'f4-title': 'Einstellungen',
+        'f4-text': 'Die Einstellungen bleiben kurz: Erscheinungsbild, Farbe, Schrift. Sie entscheiden, wie die App aussieht, nicht wie sie funktioniert — es gibt keine Option, die das Verhalten der drei Listen verändert. Was einstellbar ist, ist Oberfläche; was die App ausmacht, steht fest.',
+
+        'section-design': 'Design-Prozess',
+        'pivot-1': 'Die erste Version war eine vollständige Windows-95-Oberfläche im doppelten Pixelmaßstab: Taskleiste, abgeschrägte Ränder, Statuszeile, Pixelschrift. Sie war fertig, nicht bloß eine Stimmung — und musste trotzdem weg. Der Witz war lauter als die App. Eine originalgetreue Oberfläche von 1995 ist ein Kostüm: Sie macht ein tägliches Werkzeug anstrengend, kämpft gegen jede iOS-Konvention, und das Publikum, dem sie schmeichelt, ist nicht das Publikum, das morgens damit arbeitet.',
+        'pivot-2': 'An ihre Stelle kam SkeuKit: ein weich-skeuomorphes System aus Tokens, vier Themes in Hell und Dunkel. Tiefe entsteht dort aus Licht statt aus Textur — Mulden für Vertieftes, Glas für Bedienelemente, einfacher Text auf der Fläche für Inhalt. Ein Druckverhalten für jedes Element der App. Die Pixelschrift ist geblieben, aber als optionaler Retro-Modus, der nur die Rahmen betrifft; der Aufgabentext bleibt in der Systemschrift. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.',
+        'icons-text': 'Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links das Pixelset der ersten Version, rechts das heutige: dieselben Funktionen, zwei Haltungen.',
+        'icons-retro': 'Pixel · v1',
+        'icons-modern': 'Aktuell',
+        'color-text': 'Zuletzt die Farbe: vier Themes, jedes in Hell und Dunkel, jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente — Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich, damit kein Theme die App unbenutzbar machen kann.',
         'placeholder': '[ Platzhalter ]',
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
         'nav-cybercoffee': 'Cybercoffee',
@@ -1614,6 +1787,53 @@
       document.addEventListener('DOMContentLoaded', scheduleFix);
       window.addEventListener('load', scheduleFix);
       window.addEventListener('resize', scheduleFix);
+    })();
+  </script>
+
+  <script>
+    // Retro-vs-modern icon clusters: grow with scroll position, then drift.
+    //
+    // Driven by scroll position rather than a keyframed animation on
+    // purpose — the growth has to track the scrollbar exactly and run
+    // backwards when scrolling back up, which an animation can't do. All
+    // this writes is a 0..1 --grow custom property; the scale maths lives
+    // in CSS (.icon-cluster), so nothing here needs to know about sizes.
+    (function () {
+      var blocks = document.querySelectorAll('.icon-compare');
+      if (!blocks.length) return;
+
+      // Reduced motion: skip straight to full size, never drift.
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        blocks.forEach(function (el) { el.style.setProperty('--grow', '1'); });
+        return;
+      }
+
+      function update() {
+        blocks.forEach(function (el) {
+          // The colour-swatch row reuses .icon-compare purely for its grid
+          // and pins --grow inline; leave anything already pinned alone.
+          if (el.style.getPropertyValue('--grow').trim() === '1') return;
+          var r = el.getBoundingClientRect();
+          var start = window.innerHeight;          // 0 as it enters from below
+          var end = window.innerHeight * 0.35;     // 1 once it is well inside
+          var p = (start - r.top) / (start - end);
+          p = Math.max(0, Math.min(1, p));
+          el.style.setProperty('--grow', p.toFixed(3));
+          el.classList.toggle('is-full', p > 0.98);
+        });
+      }
+
+      var ticking = false;
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () { ticking = false; update(); });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      document.addEventListener('DOMContentLoaded', update);
+      window.addEventListener('load', update);
+      update();
     })();
   </script>
 
