@@ -172,6 +172,94 @@
       background-repeat: space no-repeat;
     }
 
+    /* ── Hero: "morrow" riding the dotted line ──────────────────────────
+       Custom hero for this page only — replaces the usual static title-row.
+       The line never moves; the word slides along it, snapping flush left,
+       holding, then bouncing flush right (see the animation below).
+
+       .morrow-sizer is an invisible, in-flow duplicate of the word. It is
+       what actually gives .morrow-track its height — the real line and the
+       real word are both position:absolute (removed from flow) so they can
+       slide/centre without affecting layout. Sizing off a real element
+       rather than a hand-picked height means it stays correct at the
+       ≤640px .project-title font-size override for free, with nothing to
+       keep in sync by hand. */
+    .morrow-track {
+      position: relative;
+      width: 100%;
+    }
+
+    .morrow-sizer {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .morrow-track .dot-divider {
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .morrow-word {
+      position: absolute;
+      top: 50%; left: 0%;
+      white-space: nowrap;
+      /* left + translateX together (not just translateX) is what makes the
+         flush-right snap width-independent: at left:100%/translateX(-100%)
+         the word's RIGHT edge sits at the track's right edge regardless of
+         how wide "morrow" renders at a given breakpoint — no JS measurement
+         needed. See the keyframes for why both are animated in lockstep. */
+      transform: translateY(-50%) translateX(0%);
+      animation: morrow-glide 8s ease-in-out infinite;
+    }
+
+    /* Timings as a fraction of the 8s loop: hold 3s (37.5%), glide 1s (12.5%),
+       hold 3s (37.5%), glide 1s (12.5%). The bouncy cubic-bezier is set only
+       on the keyframe that STARTS each glide segment — CSS applies a
+       keyframe's timing-function to the segment running out of it, so the
+       two hold segments (which don't move) are unaffected. */
+    @keyframes morrow-glide {
+      0%, 37.5% {
+        left: 0%;
+        transform: translateY(-50%) translateX(0%);
+      }
+      37.5% { animation-timing-function: cubic-bezier(0.34, 1.7, 0.5, 1); }
+      50%, 87.5% {
+        left: 100%;
+        transform: translateY(-50%) translateX(-100%);
+      }
+      87.5% { animation-timing-function: cubic-bezier(0.34, 1.7, 0.5, 1); }
+      100% {
+        left: 0%;
+        transform: translateY(-50%) translateX(0%);
+      }
+    }
+
+    /* Placeholder for the real asset (see screenshot ref) — a dark bubble,
+       a light ring, a solid centre dot. em-sized off the word's own
+       font-size so it scales at every breakpoint with no separate rule.
+       Swap the background/box-shadow/::after below for the real graphic;
+       nothing else here (layout, animation, a11y) needs to change. */
+    .mw-ring {
+      position: relative;
+      display: inline-block;
+      width: 0.62em; height: 0.62em;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #4a4a4a, #101010 72%);
+      box-shadow: inset 0 0 0 0.08em rgba(255, 255, 255, 0.85);
+      vertical-align: middle;
+      margin: 0 0.01em;
+    }
+    .mw-ring::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0.2em; height: 0.2em;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      transform: translate(-50%, -50%);
+    }
+
     /* ── Meta grid ── */
     .meta-grid {
       display: grid;
@@ -746,6 +834,11 @@
        keep layout + opacity cues. No effect unless the OS pref is set. */
     @media (prefers-reduced-motion: reduce) {
       .accent-dot { animation: none !important; opacity: 1; }
+      .morrow-word {
+        animation: none !important;
+        left: 0% !important;
+        transform: translateY(-50%) translateX(0%) !important;
+      }
       .machine-overlay-btn,
       .hero-blob,
       .character-row,
@@ -997,12 +1090,18 @@
          correct treatment for a page that does not open on a full-bleed image. -->
     <div class="section" style="border-bottom: none;">
       <div class="project-header">
-        <p class="breadcrumb" data-i18n-html="breadcrumb">Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;To Shove</p>
-        <div class="title-row">
-          <h1 class="project-title">To Shove</h1>
-          <span class="accent-dot"></span>
+        <p class="breadcrumb" data-i18n-html="breadcrumb">Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;morrow</p>
+        <!-- .accent-dot (the blinking cursor-dot every other page's static
+             title carries) is deliberately dropped here — it was a fixed
+             decoration next to a fixed word, and doesn't have anywhere
+             sensible to sit next to a word that slides. -->
+        <div class="morrow-track">
+          <div class="dot-divider"></div>
+          <div class="project-title morrow-sizer" aria-hidden="true">morrow</div>
+          <h1 class="project-title morrow-word" aria-label="morrow">
+            <span aria-hidden="true">m</span><span class="mw-ring" aria-hidden="true"></span><span aria-hidden="true">rr</span><span class="mw-ring" aria-hidden="true"></span><span aria-hidden="true">w</span>
+          </h1>
         </div>
-        <div class="dot-divider"></div>
       </div>
     </div>
 
@@ -1172,14 +1271,14 @@
     const TRANSLATIONS = {
       en: {
         'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;To Shove',
+        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;morrow',
         'placeholder': '[ Placeholder ]',
         'nav-prev': '<< PREVIOUS', 'nav-next': 'NEXT >>',
         'nav-cybercoffee': 'Cybercoffee',
       },
       de: {
         'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;To Shove',
+        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;morrow',
         'placeholder': '[ Platzhalter ]',
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
         'nav-cybercoffee': 'Cybercoffee',
