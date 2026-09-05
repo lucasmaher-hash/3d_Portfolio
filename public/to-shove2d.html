@@ -1368,6 +1368,28 @@
         --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
       }
     }
+
+    /* ── Video press feedback ───────────────────────────────────────────
+       Click a video to restart it from the beginning, with a button-like
+       swell on press.
+
+       The transform goes on the video's PARENT, not on the video itself.
+       Most of these videos sit inside a container that clips —
+       .guide-media, .scrolly-vid, the mac-lamp gallery frame — and
+       scaling the video inside one of those reads as a zoom, because the
+       growth is cut off at the container's edge. Scaling the container
+       moves the whole object, which is what makes it feel like a button.
+
+       Curve overshoots slightly on release, so it settles rather than
+       snapping back. */
+    .vid-press { transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
+    .vid-press.is-pressed { transform: scale(1.035); transition-duration: 110ms; }
+    .vid-press video { cursor: pointer; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .vid-press,
+      .vid-press.is-pressed { transition: none; transform: none; }
+    }
   </style>
 </head>
 <body>
@@ -2284,5 +2306,43 @@
     })();
   </script>
 
+
+  <script>
+    // Click a video to replay it from the start, and give it a press.
+    //
+    // Two exclusions, both deliberate:
+    //   · videos inside an <a> — on the landing page the tiles ARE the
+    //     navigation, so a click leaves the page and restarting playback
+    //     first would be pointless work on the way out;
+    //   · videos inside .hero — full-bleed decoration, and scaling a
+    //     whole hero band on click reads as the page lurching, not as a
+    //     control responding.
+    (function () {
+      var vids = Array.prototype.slice.call(document.querySelectorAll('video'))
+        .filter(function (v) { return !v.closest('a') && !v.closest('.hero'); });
+
+      vids.forEach(function (v) {
+        // See the .vid-press comment in the stylesheet for why this is the
+        // parent and not the video.
+        var target = v.parentElement || v;
+        target.classList.add('vid-press');
+
+        function press()   { target.classList.add('is-pressed'); }
+        function release() { target.classList.remove('is-pressed'); }
+        v.addEventListener('pointerdown', press);
+        ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (e) {
+          v.addEventListener(e, release);
+        });
+
+        v.addEventListener('click', function () {
+          v.currentTime = 0;
+          var p = v.play();
+          // play() rejects under autoplay policy in some states; the reset
+          // has already happened either way, so there is nothing to handle.
+          if (p && p.catch) p.catch(function () {});
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
