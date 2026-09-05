@@ -600,10 +600,14 @@
     }
 
     .color-fan {
-      --card-w: clamp(126px, 20.33vw, 232px);   /* matches every other phone */
+      /* 15% down from the phone width used elsewhere on the page — this
+         group reads as a composition rather than as more UI to inspect,
+         so it does not need to match the single phones. */
+      --card-w: clamp(107px, 17.28vw, 197px);
       /* Slightly tighter than the card is wide, so the scattered cards
-         overlap the way they do in the reference instead of sitting apart. */
-      --step: clamp(118px, 18.8vw, 214px);
+         overlap the way they do in the reference instead of sitting apart.
+         Scaled by the same 0.85 as --card-w so the overlap ratio holds. */
+      --step: clamp(100px, 15.98vw, 182px);
       position: relative;
       /* Room for the tallest card once it is scaled up and pushed down. */
       height: calc(var(--card-w) * (1600 / 792) * 1.18);
@@ -635,7 +639,7 @@
       /* Four across has to fit a 350px column, so the cards shrink here:
          18vw + 3 x 22.5vw = 333px at 390px wide. They read as colour
          swatches at this size, which is the point of the section. */
-      .color-fan { --card-w: 18vw; --step: 22.5vw; }
+      .color-fan { --card-w: 15.3vw; --step: 14.3vw; }
       .fan-scrolly { height: 190vh; }
       .icon-compare { gap: 14px; }
       .live-pulse { font-size: clamp(110px, 34vw, 150px); }
@@ -1553,13 +1557,13 @@
         <div class="fan-sticky">
           <div class="color-fan" aria-label="Vier Farbthemen von morrow im Hellmodus">
         <img class="color-card" src="/images/morrow/theme-pink.webp"  width="792" height="1600" alt="morrow im Farbthema Rosé"
-             style="--slot: -1.5; --rot: -11; --sc: 0.80; --dy:  55px; --lag: 0.12; z-index: 1;" />
+             style="--slot: -1.5; --rot: -11; --sc: 0.80; --dy:  47px; --lag: 0.12; z-index: 1;" />
         <img class="color-card" src="/images/morrow/theme-green.webp" width="792" height="1600" alt="morrow im Farbthema Grün"
-             style="--slot: -0.5; --rot:  -8; --sc: 0.97; --dy: -30px; --lag: 0.06; z-index: 2;" />
+             style="--slot: -0.5; --rot:  -8; --sc: 0.97; --dy: -26px; --lag: 0.06; z-index: 2;" />
         <img class="color-card" src="/images/morrow/theme-grey.webp"  width="792" height="1600" alt="morrow im Farbthema Grau"
-             style="--slot:  0.5; --rot:   5; --sc: 1.05; --dy:  25px; --lag: 0.00; z-index: 4;" />
+             style="--slot:  0.5; --rot:   5; --sc: 1.05; --dy:  21px; --lag: 0.00; z-index: 4;" />
         <img class="color-card" src="/images/morrow/theme-beige.webp" width="792" height="1600" alt="morrow im Farbthema Beige"
-             style="--slot:  1.5; --rot:   9; --sc: 0.88; --dy: -20px; --lag: 0.10; z-index: 3;" />
+             style="--slot:  1.62; --rot:   9; --sc: 0.78; --dy: -32px; --lag: 0.10; z-index: 3;" />
       </div>
         </div>
       </div>
