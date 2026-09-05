@@ -686,47 +686,104 @@
       text-align: center;
     }
 
-    /* ── Retro vs modern icon clusters ──────────────────────────────────
-       Two clusters side by side that grow as the block scrolls through
-       the viewport, then drift once they reach full size. --grow is
-       written by the script near the bottom of this file (0 → 1); all the
-       CSS does is map it onto a scale. Doing it this way rather than with
-       a keyframed animation means the growth follows the scroll position
-       exactly and reverses when scrolling back up. */
-    .icon-compare {
-      --grow: 0;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(20px, 5vw, 80px);
-      align-items: start;
+    /* ── Pixel vs modern: two clusters that open in turn ────────────────
+       Deliberately NOT scroll-scrubbed. Scroll position only picks a state
+       (0 clustered, 1 left open, 2 right open); the growth is a CSS
+       transition and the swirl is an infinite animation, both running on
+       their own clock once a state is entered. That is what Lucas asked
+       for — the motion continues while you sit still, rather than freezing
+       the moment the scrollbar does.
+
+       State is recomputed every scroll, so it is fully reversible: scroll
+       back up and the sides re-cluster.
+
+       Each element owns exactly ONE transform, because they compose badly
+       otherwise: .ic-side pushes to its edge, .ic-scale sizes, .ic-orbit
+       spins, .ic-item places on the circle, and the glyph counter-spins.
+       Collapsing any two of those into one element means one of the two
+       silently wins. */
+    @property --ic-r { syntax: "<length>"; inherits: true; initial-value: 0px; }
+
+    .icons-compare {
+      --push: clamp(16px, 4vw, 60px);
+      --ic-w: clamp(150px, 22vw, 230px);   /* the orbit box at full size */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(8px, 1.6vw, 22px);
       margin-top: clamp(20px, 3vw, 36px);
     }
 
-    .icon-col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-
-    .icon-cluster {
+    /* The side's WIDTH is animated as well as its transform. A scale()
+       does not change layout, so with a fixed-width box the two collapsed
+       clusters sat ~250px apart with empty space between them and never
+       read as "close together". The width tracks the visible cluster
+       instead: the orbit box overflows it while collapsed, which is
+       harmless because that overflow is empty. */
+    .ic-side {
+      --z: 0.62;                       /* SkeuKit's own scale token */
+      width: calc(var(--ic-w) * 0.34);
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: clamp(6px, 1.1vw, 14px);
-      transform: scale(calc(0.55 + 0.45 * var(--grow)));
-      transform-origin: center top;
-      /* short transition only to smooth the per-frame steps, not to
-         animate the growth itself — that is the scroll's job */
-      transition: transform 90ms linear;
+      place-items: center;
+      transition: transform 700ms cubic-bezier(.2, .8, .3, 1),
+                  width     700ms cubic-bezier(.2, .8, .3, 1);
     }
 
-    .icon-cluster i {
-      width: clamp(30px, 4.4vw, 54px);
+    .ic-scale {
+      position: relative;
+      width: var(--ic-w);
       aspect-ratio: 1;
-      display: block;
-      background: var(--bg-surface);
-      box-shadow: var(--shadow-raised-sm);
+      /* Radius and overall size move separately, so spacing opens up more
+         than the glyphs grow — scaling alone kept them looking clustered.
+         36px collapsed is the floor: with four icons at 90 degrees they
+         overlap below about 2 x icon / sqrt(2). */
+      --ic-r: 36px;
+      transform: scale(.58);
+      transition: transform 700ms cubic-bezier(.2, .8, .3, 1),
+                  --ic-r   700ms cubic-bezier(.2, .8, .3, 1);
     }
-    /* Sharp corners for the pixel set, soft for the current one — the
-       whole point of the comparison, and the one part that still reads
-       correctly while these are placeholders. */
-    .icon-cluster.retro i  { border-radius: 2px; }
-    .icon-cluster.modern i { border-radius: 30%; }
+
+    .ic-orbit {
+      position: absolute; inset: 0;
+      animation: ic-orbit 30s linear infinite;
+      animation-play-state: paused;    /* resumes where it stopped, not from 0 */
+    }
+
+    .ic-item {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%) rotate(var(--a))
+                 translate(var(--ic-r)) rotate(calc(var(--a) * -1));
+    }
+
+    /* Counter-spin, same duration as the orbit, so the glyph stays upright
+       while the wheel turns. */
+    .ic-item > .sk-round {
+      animation: ic-counter 30s linear infinite;
+      animation-play-state: paused;
+    }
+
+    @keyframes ic-orbit   { to { transform: rotate(360deg); } }
+    @keyframes ic-counter { to { transform: rotate(-360deg); } }
+
+    /* state 1 — left open, right shoved toward its edge */
+    .icons-compare[data-ic="1"] .ic-side--left  { --z: 1; width: calc(var(--ic-w) * 0.92); }
+    .icons-compare[data-ic="1"] .ic-side--left  .ic-scale { transform: scale(1); --ic-r: 78px; }
+    .icons-compare[data-ic="1"] .ic-side--right { transform: translateX(var(--push)); }
+    .icons-compare[data-ic="1"] .ic-side--left  .ic-orbit,
+    .icons-compare[data-ic="1"] .ic-side--left  .ic-item > .sk-round { animation-play-state: running; }
+
+    /* state 2 — right open, left collapses back and is shoved the other way */
+    .icons-compare[data-ic="2"] .ic-side--right { --z: 1; width: calc(var(--ic-w) * 0.92); }
+    .icons-compare[data-ic="2"] .ic-side--right .ic-scale { transform: scale(1); --ic-r: 78px; }
+    .icons-compare[data-ic="2"] .ic-side--left  { transform: translateX(calc(var(--push) * -1)); }
+    .icons-compare[data-ic="2"] .ic-side--right .ic-orbit,
+    .icons-compare[data-ic="2"] .ic-side--right .ic-item > .sk-round { animation-play-state: running; }
+
+    .ic-captions {
+      display: flex; justify-content: center;
+      gap: clamp(40px, 12vw, 160px);
+      margin-top: clamp(8px, 1.4vw, 16px);
+    }
 
     .icon-caption {
       font-family: 'VT323', monospace;
@@ -736,90 +793,73 @@
       color: var(--text-secondary);
     }
 
-    /* Drift starts only once the cluster is at full size. Alternating
-       delays per tile so the group breathes instead of pumping in unison. */
-    .icon-compare.is-full .icon-cluster i { animation: icon-drift 4.5s ease-in-out infinite; }
-    .icon-cluster i:nth-child(2) { animation-delay: 0.4s; }
-    .icon-cluster i:nth-child(3) { animation-delay: 0.9s; }
-    .icon-cluster i:nth-child(4) { animation-delay: 1.3s; }
-    .icon-cluster i:nth-child(5) { animation-delay: 0.7s; }
-    .icon-cluster i:nth-child(6) { animation-delay: 1.6s; }
-    .icon-cluster i:nth-child(7) { animation-delay: 0.2s; }
-    .icon-cluster i:nth-child(8) { animation-delay: 1.1s; }
-    .icon-cluster i:nth-child(9) { animation-delay: 0.5s; }
-
-    @keyframes icon-drift {
-      0%, 100% { transform: translate(0, 0); }
-      50%      { transform: translate(0, -5px); }
+    /* ── SkeuKit, only the parts these icons need ───────────────────────
+       Lifted from shove95-components.css rather than linked, so the page
+       stays self-contained like every other page here. Light palette only;
+       the .dark half of that file is left out rather than shipped dead. */
+    .sk {
+      --z: 1;
+      --canvas:#CACFD6; --material:#D5D9E0; --material-top:#E4E8EE;
+      --recess:#9BA1AB; --recess-bottom:#C9CED6;
+      --outline:#7A7F87; --outline-bottom:#DDE0E5;
+      --edge-light:#FFFFFF; --edge-shade:#464B52;
+      --ink:#212224; --shadow:#242629;
+      color: var(--ink);
     }
 
-    /* ── Colour themes: four phones stacked, fanning out on scroll ──────
-       --p is written by the same script that drives .icon-compare, but on
-       a there-and-back curve: 0 stacked, 1 fully spread, back to 0 as the
-       block leaves. Each card carries its own --slot (-1.5 … 1.5), so one
-       transform expression covers all four and the row stays centred.
-       The cards are transparent-cornered WebP rather than page-coloured
-       like the video clips, because here they overlap — an opaque
-       rectangle would cover the phone behind it instead of nesting. */
-    /* The fan has to open AND close on scroll, so it needs scroll room of
-       its own. Measured without it: sitting near the end of the page, the
-       block could only travel 68px past the viewport centre before hitting
-       the bottom of the document — nowhere near enough to fold shut, so it
-       opened and stayed open. A tall spacer with a sticky child gives the
-       animation a guaranteed range regardless of how long the page is,
-       the same idiom kaffeemaschine2d uses for its turntable. */
-    .fan-scrolly { position: relative; height: 220vh; }
-
-    .fan-sticky {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .color-fan {
-      /* 15% down from the phone width used elsewhere on the page — this
-         group reads as a composition rather than as more UI to inspect,
-         so it does not need to match the single phones. */
-      --card-w: clamp(107px, 17.28vw, 197px);
-      /* Slightly tighter than the card is wide, so the scattered cards
-         overlap the way they do in the reference instead of sitting apart.
-         Scaled by the same 0.85 as --card-w so the overlap ratio holds. */
-      --step: clamp(100px, 15.98vw, 182px);
+    .sk-glass {
+      --k: calc(var(--h) * var(--z) / 104.54);
+      --str: 1;
       position: relative;
-      /* Room for the tallest card once it is scaled up and pushed down. */
-      height: calc(var(--card-w) * (1600 / 792) * 1.18);
-      margin-top: clamp(24px, 4vw, 40px);
+      background:
+        radial-gradient(ellipse 62% 62% at 50% 118%,
+          rgba(255,255,255,calc(.30 * var(--str))) 0%, rgba(255,255,255,0) 70%),
+        linear-gradient(to bottom,
+          color-mix(in srgb, var(--edge-light) calc(39.2% * var(--str)), transparent) 0%,
+          color-mix(in srgb, var(--edge-light) calc(12.3% * var(--str)), transparent) 14%,
+          transparent 34%, transparent 60%,
+          color-mix(in srgb, var(--edge-shade) calc(10.2% * var(--str)), transparent) 80%,
+          color-mix(in srgb, var(--edge-shade) calc(24% * var(--str)), transparent) 100%);
+      box-shadow:
+        0 calc(29.9px * var(--k)) calc(35.0px * var(--k)) color-mix(in srgb, var(--shadow) calc(5% * var(--str)), transparent),
+        0 calc(13.4px * var(--k)) calc(26.8px * var(--k)) color-mix(in srgb, var(--shadow) calc(9% * var(--str)), transparent),
+        0 calc(3.09px * var(--k)) calc(14.4px * var(--k)) color-mix(in srgb, var(--shadow) calc(10% * var(--str)), transparent);
     }
 
-    .color-card {
-      --pe: 0;              /* this card's own eased progress, written by JS */
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: var(--card-w);
-      height: auto;
-      display: block;
-      /* Every end state is interpolated from the same --pe, so at 0 all four
-         sit stacked dead centre, unrotated and identical in size — which is
-         what makes the collapsed state read as a single phone. */
-      transform:
-        translateX(calc(-50% + var(--pe) * var(--slot) * var(--step)))
-        translateY(calc(var(--pe) * var(--dy)))
-        rotate(calc(var(--pe) * var(--rot) * 1deg))
-        scale(calc(1 + var(--pe) * (var(--sc) - 1)));
-      /* no transition — the position IS the scroll offset, and easing it
-         here would make the cards lag the scrollbar */
-      will-change: transform;
+    /* the rim: bright top and bottom, gone across the middle of the sides */
+    .sk-glass::after {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+      padding: max(.8px, calc(2.971px * var(--k) * 1.35));
+      background: linear-gradient(to bottom,
+        color-mix(in srgb, var(--edge-light) calc(71.5% * var(--str)), transparent) 0%,
+        color-mix(in srgb, var(--edge-light) calc(5% * var(--str)), transparent) 50%,
+        color-mix(in srgb, var(--edge-light) calc(60% * var(--str)), transparent) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+              mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
     }
 
-    /* --n must stay unitless (trap 10.3), so the size steps at
-       breakpoints rather than using clamp(). Ordered widest-first: these
-       queries all match on a phone, so the narrowest has to come last to
-       win — the other way round, 1100px would override 640px. */
-    @media (max-width: 1100px) { .live { --n: 94; } }
+    .sk-round {
+      --h: 44.4;
+      display: grid; place-items: center; border: 0; padding: 0;
+      width: calc(var(--h) * var(--z) * 1px);
+      height: calc(var(--h) * var(--z) * 1px);
+      border-radius: 999px; color: var(--ink);
+    }
+    .sk-round svg { width: calc(22.2px * var(--z)); height: calc(22.2px * var(--z)); display: block; }
+    /* A bitmap glyph FILLS its box where a vector one leaves optical margin,
+       so matching the raw figure makes the pixel version read as the larger
+       of the two. 0.82 for gear and close, 1.85 for the tick. */
+    .sk-round .px { width: calc(22.2px * var(--z) * .82); height: calc(22.2px * var(--z) * .82); }
+
+    @media (prefers-reduced-motion: reduce) {
+      /* No orbit, no shuffling between states: show both sides open and
+         still, so the comparison the section is making survives. */
+      .ic-orbit, .ic-item > .sk-round { animation: none !important; }
+      .ic-side { transform: none !important; }
+      .ic-scale { transform: scale(1) !important; --ic-r: 78px !important; }
+      .ic-side { --z: 1 !important; width: calc(var(--ic-w) * 0.92) !important; }
+    }
 
     @media (max-width: 640px) {
       /* Four across has to fit a 350px column, so the cards shrink here:
@@ -827,7 +867,7 @@
          swatches at this size, which is the point of the section. */
       .color-fan { --card-w: 15.3vw; --step: 14.3vw; }
       .fan-scrolly { height: 190vh; }
-      .icon-compare { gap: 14px; }
+      .icons-compare { gap: 8px; }
       .live { --n: 71; }
     }
 
@@ -1749,19 +1789,39 @@
 
       <p class="guide-text" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links das Pixelset der ersten Version, rechts das heutige: dieselben Funktionen, zwei Haltungen.</p>
 
-      <div class="icon-compare">
-        <div class="icon-col">
-          <div class="icon-cluster retro" aria-hidden="true">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-          </div>
-          <span class="icon-caption" data-i18n="icons-retro">Pixel · v1</span>
+      <!-- Pixel vs modern. Four marks only — gear, close, check and the live
+           ring — because those are the four the components doc lists as
+           transcribed cell-for-cell from the app. It has pixel versions of
+           plus/edit/grip/chevron too, but they were drawn for the web set
+           and never shipped in the Windows-95 build, so showing them here
+           would make the sentence above this block untrue.
+
+           The vector icons are redrawn from scratch as plain SVG, not SF
+           Symbols: Apple licenses those for software running on Apple
+           platforms, which a portfolio site is not, and the licence does
+           not permit close redrawing either. -->
+      <div class="icons-compare" data-ic="0">
+        <div class="ic-side ic-side--left sk">
+          <div class="ic-scale"><div class="ic-orbit">
+            <span class="ic-item" style="--a: 0deg"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 12 12" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="2" width="8" height="2"/><rect x="2" y="8" width="8" height="2"/><rect x="2" y="2" width="2" height="8"/><rect x="8" y="2" width="2" height="8"/><rect x="5" y="0" width="2" height="2"/><rect x="5" y="10" width="2" height="2"/><rect x="0" y="5" width="2" height="2"/><rect x="10" y="5" width="2" height="2"/><rect x="1" y="1" width="1" height="1"/><rect x="10" y="1" width="1" height="1"/><rect x="1" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/></svg></span></span>
+            <span class="ic-item" style="--a: 90deg"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 8 8" fill="currentColor" shape-rendering="crispEdges"><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="5" y="2" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="4" y="3" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="3" y="4" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/></svg></span></span>
+            <span class="ic-item" style="--a: 180deg"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 12 12" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="5" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="4" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/><rect x="5" y="7" width="1" height="1"/><rect x="6" y="5" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="7" y="4" width="1" height="1"/><rect x="7" y="5" width="1" height="1"/><rect x="8" y="3" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/></svg></span></span>
+            <span class="ic-item" style="--a: 270deg"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 11 11" fill="currentColor" shape-rendering="crispEdges"><rect x="4" y="0" width="1" height="1"/><rect x="5" y="0" width="1" height="1"/><rect x="6" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="3" y="1" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="5" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="7" y="1" width="1" height="1"/><rect x="8" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="8" y="2" width="1" height="1"/><rect x="9" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="8" y="3" width="1" height="1"/><rect x="9" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="5" y="4" width="1" height="1"/><rect x="6" y="4" width="1" height="1"/><rect x="9" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="1" y="5" width="1" height="1"/><rect x="4" y="5" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/><rect x="6" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="10" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="1" y="7" width="1" height="1"/><rect x="2" y="7" width="1" height="1"/><rect x="8" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="1" y="8" width="1" height="1"/><rect x="2" y="8" width="1" height="1"/><rect x="3" y="8" width="1" height="1"/><rect x="7" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="9" y="8" width="1" height="1"/><rect x="2" y="9" width="1" height="1"/><rect x="3" y="9" width="1" height="1"/><rect x="4" y="9" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="6" y="9" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/><rect x="8" y="9" width="1" height="1"/><rect x="4" y="10" width="1" height="1"/><rect x="5" y="10" width="1" height="1"/><rect x="6" y="10" width="1" height="1"/></svg></span></span>
+          </div></div>
         </div>
-        <div class="icon-col">
-          <div class="icon-cluster modern" aria-hidden="true">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-          </div>
-          <span class="icon-caption" data-i18n="icons-modern">Aktuell</span>
+        <div class="ic-side ic-side--right sk">
+          <div class="ic-scale"><div class="ic-orbit">
+            <span class="ic-item" style="--a: 0deg"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="6.3" stroke-width="1.8"/><circle cx="12" cy="12" r="2.5" stroke-width="1.5"/><path stroke-width="2.1" d="M18.3 12.0L20.6 12.0M16.5 16.5L18.1 18.1M12.0 18.3L12.0 20.6M7.5 16.5L5.9 18.1M5.7 12.0L3.4 12.0M7.5 7.5L5.9 5.9M12.0 5.7L12.0 3.4M16.5 7.5L18.1 5.9"/></svg></span></span>
+            <span class="ic-item" style="--a: 90deg"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></span>
+            <span class="ic-item" style="--a: 180deg"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.6l5 5 10-10.2"/></svg></span></span>
+            <span class="ic-item" style="--a: 270deg"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.1" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.8" fill="currentColor"/></svg></span></span>
+          </div></div>
         </div>
+      </div>
+      <div class="ic-captions">
+        <span class="icon-caption" data-i18n="icons-retro">Pixel · v1</span>
+        <span class="icon-caption" data-i18n="icons-modern">Aktuell</span>
+      </div>
       </div>
 
       <p class="guide-text" style="margin-top: clamp(24px, 4vw, 40px);" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.</p>
@@ -2133,7 +2193,7 @@
     // this writes is a 0..1 --grow custom property; the scale maths lives
     // in CSS (.icon-cluster), so nothing here needs to know about sizes.
     (function () {
-      var blocks = document.querySelectorAll('.icon-compare, .fan-scrolly');
+      var blocks = document.querySelectorAll('.icons-compare, .fan-scrolly');
       if (!blocks.length) return;
 
       // Reduced motion: skip straight to full size, never drift.
@@ -2142,7 +2202,9 @@
           // Reduced motion: show the spread state, never animate it.
           if (el.classList.contains('fan-scrolly')) {
             el.querySelectorAll('.color-card').forEach(function (c) { c.style.setProperty('--pe', '1'); });
-          } else el.style.setProperty('--grow', '1');
+          }
+          // .icons-compare needs nothing here — its reduced-motion state is
+          // handled entirely in CSS, which shows both sides open and still.
         });
         return;
       }
@@ -2187,12 +2249,20 @@
             p = Math.max(0, Math.min(1, p));
             setFan(el, p);
           } else {
-            var start = window.innerHeight;          // 0 as it enters from below
-            var end = window.innerHeight * 0.35;     // 1 once it is well inside
-            p = (start - r.top) / (start - end);
-            p = Math.max(0, Math.min(1, p));
-            el.style.setProperty('--grow', p.toFixed(3));
-            el.classList.toggle('is-full', p > 0.98);
+            // Icon clusters: scroll picks a STATE, not a position. Once a
+            // state is entered the growth transition and the orbit run on
+            // their own clock, so the motion keeps going while the reader
+            // sits still — which a scrubbed animation cannot do.
+            //
+            // Measured against the block's own travel through the viewport:
+            // 0 as its top reaches the bottom of the screen, 1 as its bottom
+            // leaves the top. Recomputed every scroll, so scrolling back up
+            // re-clusters both sides.
+            var travel = window.innerHeight + r.height;
+            var t = (window.innerHeight - r.top) / travel;
+            t = Math.max(0, Math.min(1, t));
+            var state = t < 0.34 ? '0' : (t < 0.60 ? '1' : '2');
+            if (el.dataset.ic !== state) el.dataset.ic = state;
           }
         });
       }
