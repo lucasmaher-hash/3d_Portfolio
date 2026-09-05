@@ -84,7 +84,11 @@
       /* Cap the content card on wide monitors; page bg fills the sides.
          Only bites above ~1550px — 13"/14" MacBooks stay edge-to-edge. */
       max-width: 1440px;
-      overflow: hidden;
+      /* clip, NOT hidden: hidden makes this a scroll container and silently
+         breaks position:sticky for everything inside it — which is exactly
+         what the colour fan below relies on. This is the recurring trap
+         documented in CLAUDE.md; clip does the same visual job without it. */
+      overflow: clip;
     }
 
     /* ── Hero ── */
@@ -569,7 +573,60 @@
       50%      { transform: translate(0, -5px); }
     }
 
+    /* ── Colour themes: four phones stacked, fanning out on scroll ──────
+       --p is written by the same script that drives .icon-compare, but on
+       a there-and-back curve: 0 stacked, 1 fully spread, back to 0 as the
+       block leaves. Each card carries its own --slot (-1.5 … 1.5), so one
+       transform expression covers all four and the row stays centred.
+       The cards are transparent-cornered WebP rather than page-coloured
+       like the video clips, because here they overlap — an opaque
+       rectangle would cover the phone behind it instead of nesting. */
+    /* The fan has to open AND close on scroll, so it needs scroll room of
+       its own. Measured without it: sitting near the end of the page, the
+       block could only travel 68px past the viewport centre before hitting
+       the bottom of the document — nowhere near enough to fold shut, so it
+       opened and stayed open. A tall spacer with a sticky child gives the
+       animation a guaranteed range regardless of how long the page is,
+       the same idiom kaffeemaschine2d uses for its turntable. */
+    .fan-scrolly { position: relative; height: 220vh; }
+
+    .fan-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .color-fan {
+      --p: 0;
+      --step: clamp(132px, 21.5vw, 246px);   /* one slot = phone + gap */
+      position: relative;
+      height: calc(var(--card-w) * (1600 / 792));
+      --card-w: clamp(126px, 20.33vw, 232px);   /* matches every other phone */
+      margin-top: clamp(24px, 4vw, 40px);
+    }
+
+    .color-card {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: var(--card-w);
+      height: auto;
+      display: block;
+      transform: translateX(calc(-50% + var(--p) * var(--slot) * var(--step)));
+      /* no transition — the position IS the scroll offset, and easing it
+         would make the cards lag the scrollbar */
+      will-change: transform;
+    }
+
     @media (max-width: 640px) {
+      /* Four across has to fit a 350px column, so the cards shrink here:
+         18vw + 3 x 22.5vw = 333px at 390px wide. They read as colour
+         swatches at this size, which is the point of the section. */
+      .color-fan { --card-w: 18vw; --step: 22.5vw; }
+      .fan-scrolly { height: 190vh; }
       .icon-compare { gap: 14px; }
       .live-pulse { font-size: clamp(110px, 34vw, 150px); }
     }
@@ -1011,6 +1068,9 @@
        keep layout + opacity cues. No effect unless the OS pref is set. */
     @media (prefers-reduced-motion: reduce) {
       .accent-dot { animation: none !important; opacity: 1; }
+      /* No pinned scroll animation: drop the spacer and show the row spread. */
+      .fan-scrolly { height: auto !important; }
+      .fan-sticky { position: static !important; height: auto !important; }
       .morrow-shove {
         animation: none !important;
         left: 0 !important;
@@ -1467,11 +1527,21 @@
 
       <p class="guide-text" style="margin-top: clamp(24px, 4vw, 40px);" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes, jedes in Hell und Dunkel, jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente — Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich, damit kein Theme die App unbenutzbar machen kann.</p>
 
-      <div class="icon-compare" style="grid-template-columns: repeat(4, 1fr); --grow: 1;">
-        <div class="ph-media" style="--ph-ratio: 1;" data-i18n="placeholder">[ Platzhalter ]</div>
-        <div class="ph-media" style="--ph-ratio: 1;" data-i18n="placeholder">[ Platzhalter ]</div>
-        <div class="ph-media" style="--ph-ratio: 1;" data-i18n="placeholder">[ Platzhalter ]</div>
-        <div class="ph-media" style="--ph-ratio: 1;" data-i18n="placeholder">[ Platzhalter ]</div>
+      <!-- Stacked at the centre, fanning out sideways as the block passes
+           through the viewport and folding back in as it leaves. Grey is
+           the card on top — it carries the highest z-index and sits next to
+           the centre slot, so it is the one that moves least. Light mode
+           only for now; the four dark-mode shots are shot but unused.
+           Order here IS the left-to-right order in the row. -->
+      <div class="fan-scrolly">
+        <div class="fan-sticky">
+      <div class="color-fan" aria-label="Vier Farbthemen von morrow im Hellmodus">
+        <img class="color-card" style="--slot: -1.5; z-index: 2;" src="/images/morrow/theme-pink.webp"  width="792" height="1600" alt="morrow im Farbthema Rosé" />
+        <img class="color-card" style="--slot: -0.5; z-index: 4;" src="/images/morrow/theme-grey.webp"  width="792" height="1600" alt="morrow im Farbthema Grau" />
+        <img class="color-card" style="--slot:  0.5; z-index: 3;" src="/images/morrow/theme-green.webp" width="792" height="1600" alt="morrow im Farbthema Grün" />
+        <img class="color-card" style="--slot:  1.5; z-index: 1;" src="/images/morrow/theme-beige.webp" width="792" height="1600" alt="morrow im Farbthema Beige" />
+      </div>
+        </div>
       </div>
     </div>
 
@@ -1814,27 +1884,40 @@
     // this writes is a 0..1 --grow custom property; the scale maths lives
     // in CSS (.icon-cluster), so nothing here needs to know about sizes.
     (function () {
-      var blocks = document.querySelectorAll('.icon-compare');
+      var blocks = document.querySelectorAll('.icon-compare, .fan-scrolly');
       if (!blocks.length) return;
 
       // Reduced motion: skip straight to full size, never drift.
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        blocks.forEach(function (el) { el.style.setProperty('--grow', '1'); });
+        blocks.forEach(function (el) {
+          // Reduced motion: show the spread state, never animate it.
+          if (el.classList.contains('fan-scrolly')) el.querySelector('.color-fan').style.setProperty('--p', '1');
+          else el.style.setProperty('--grow', '1');
+        });
         return;
       }
 
       function update() {
         blocks.forEach(function (el) {
-          // The colour-swatch row reuses .icon-compare purely for its grid
-          // and pins --grow inline; leave anything already pinned alone.
-          if (el.style.getPropertyValue('--grow').trim() === '1') return;
           var r = el.getBoundingClientRect();
-          var start = window.innerHeight;          // 0 as it enters from below
-          var end = window.innerHeight * 0.35;     // 1 once it is well inside
-          var p = (start - r.top) / (start - end);
-          p = Math.max(0, Math.min(1, p));
-          el.style.setProperty('--grow', p.toFixed(3));
-          el.classList.toggle('is-full', p > 0.98);
+          var p;
+          if (el.classList.contains('fan-scrolly')) {
+            // t = how far through the pinned spacer we have scrolled, 0..1.
+            var travel = el.offsetHeight - window.innerHeight;
+            var t = travel > 0 ? (-r.top) / travel : 0;
+            t = Math.max(0, Math.min(1, t));
+            // Open over the first third, hold, fold shut over the last third.
+            p = t < 0.34 ? t / 0.34 : (t > 0.66 ? (1 - t) / 0.34 : 1);
+            p = Math.max(0, Math.min(1, p));
+            el.querySelector('.color-fan').style.setProperty('--p', p.toFixed(3));
+          } else {
+            var start = window.innerHeight;          // 0 as it enters from below
+            var end = window.innerHeight * 0.35;     // 1 once it is well inside
+            p = (start - r.top) / (start - end);
+            p = Math.max(0, Math.min(1, p));
+            el.style.setProperty('--grow', p.toFixed(3));
+            el.classList.toggle('is-full', p > 0.98);
+          }
         });
       }
 
