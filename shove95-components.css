@@ -1,0 +1,322 @@
+/* ─── SkeuKit components ─────────────────────────────────────────────────
+   Palettes and depth primitives: see shove95-skeukit-to-css.md
+   The Live button, in full detail:  see shove95-live-button.md            */
+
+.sk{
+  --z:1;                                   /* scale the whole set */
+  --canvas:#CACFD6; --material:#D5D9E0; --material-top:#E4E8EE;
+  --recess:#9BA1AB; --recess-bottom:#C9CED6;
+  --outline:#7A7F87; --outline-bottom:#DDE0E5;
+  --edge-light:#FFFFFF; --edge-shade:#464B52;
+  --ink:#212224; --ink-muted:#515357; --ink-faint:#787B80;
+  --accent:#3F5670; --critical:#6B180D;
+  --shadow:#242629;
+  color:var(--ink);
+  font:calc(16.4px*var(--z))/1.2 -apple-system,BlinkMacSystemFont,sans-serif;
+}
+.sk.dark{
+  --canvas:#2C2D30; --material:#2C2D30; --material-top:#3C3F42;
+  --recess:#191A1C; --recess-bottom:#35373B;
+  --outline:#141517; --outline-bottom:#505357;
+  --edge-light:#D6E5FF; --edge-shade:#070708;
+  --ink:#DCE5F5; --ink-muted:#9FAABD; --ink-faint:#707B8C;
+  --accent:#526D8C; --critical:#FF7866;
+  --shadow:#09090A;
+}
+
+/* ─── Typeface ───────────────────────────────────────────────────────────
+   W95FA by Alina Sava, SIL Open Font License 1.1. Self-hosting is permitted;
+   the attribution is a licence condition, not a courtesy. Ship
+   W95FA-LICENSE.txt beside it and credit the face on the page.            */
+@font-face{
+  font-family:"W95FA";
+  src:url("W95FA.otf") format("opentype");
+  font-display:swap;
+}
+
+/* THE BLEND RULE. Two faces, not three:
+     .sk         "Modern" — system face everywhere
+     .sk.retro   "Retro"  — pixel face on CHROME ONLY
+   Content — a task's title, a name someone typed — is NEVER pixel, in either
+   face. Mark furniture with .sk-chrome; everything else is content by default,
+   so anything unmarked gets the readable face.
+
+   W95FA is set 1.22x the system size: its glyphs fill their em box, so
+   matching the raw point size makes the system face look oversized in the
+   same layout. --fs carries that factor into every font-size below.        */
+.sk{--fs:1}
+.retro .sk-chrome{
+  font-family:"W95FA",ui-monospace,monospace;
+  --fs:1.22;
+  -webkit-font-smoothing:none;
+  font-smooth:never;
+}
+
+/* ─── Glass ──────────────────────────────────────────────────────────────
+   A control floating on the page. Set --h to the control's height in design
+   px; every figure scales from it. The five-layer lens stack is OMITTED —
+   it is invisible below ~100px and nothing here is that big. See the
+   live-button file if you need it.                                        */
+.sk-glass{
+  --k:calc(var(--h)*var(--z)/104.54);
+  --str:1;                                  /* 0.5 for a resting control */
+  position:relative;
+  background:
+    radial-gradient(ellipse 62% 62% at 50% 118%,
+      rgba(255,255,255,calc(.30*var(--str))) 0%, rgba(255,255,255,0) 70%),
+    linear-gradient(to bottom,
+      color-mix(in srgb,var(--edge-light) calc(39.2%*var(--str)),transparent) 0%,
+      color-mix(in srgb,var(--edge-light) calc(12.3%*var(--str)),transparent) 14%,
+      transparent 34%, transparent 60%,
+      color-mix(in srgb,var(--edge-shade) calc(10.2%*var(--str)),transparent) 80%,
+      color-mix(in srgb,var(--edge-shade) calc(24%*var(--str)),transparent) 100%);
+  box-shadow:
+    0 calc(29.9px*var(--k)) calc(35.0px*var(--k)) color-mix(in srgb,var(--shadow) calc(5%*var(--str)),transparent),
+    0 calc(13.4px*var(--k)) calc(26.8px*var(--k)) color-mix(in srgb,var(--shadow) calc(9%*var(--str)),transparent),
+    0 calc(3.09px*var(--k)) calc(14.4px*var(--k)) color-mix(in srgb,var(--shadow) calc(10%*var(--str)),transparent);
+}
+/* the rim: bright top and bottom, gone across the middle of the sides */
+.sk-glass::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  padding:max(.8px,calc(2.971px*var(--k)*1.35));
+  background:linear-gradient(to bottom,
+    color-mix(in srgb,var(--edge-light) calc(71.5%*var(--str)),transparent) 0%,
+    color-mix(in srgb,var(--edge-light) calc(5%*var(--str)),transparent) 50%,
+    color-mix(in srgb,var(--edge-light) calc(60%*var(--str)),transparent) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+}
+/* dark: no inward relief, thinner rim, no 1.3 boost on the top stop */
+.dark .sk-glass{
+  background:radial-gradient(ellipse 62% 62% at 50% 118%,
+    rgba(255,255,255,calc(.30*var(--str))) 0%, rgba(255,255,255,0) 70%);
+}
+.dark .sk-glass::after{
+  padding:max(.8px,calc(2.971px*var(--k)));
+  background:linear-gradient(to bottom,
+    color-mix(in srgb,var(--edge-light) calc(55%*var(--str)),transparent) 0%,
+    color-mix(in srgb,var(--edge-light) calc(5%*var(--str)),transparent) 50%,
+    color-mix(in srgb,var(--edge-light) calc(60%*var(--str)),transparent) 100%);
+}
+/* RESTING glass on a LIGHT page takes a CONTACT edge, not a lit one — a white
+   rim on a near-white material is not an edge. Dark along the lower arc,
+   gone by the top, where the page is already brighter than the object. */
+/* Resting = half-strength shadows, NO glow and NO relief. The rim below is
+   ABSOLUTE, not scaled by --str: this state only ever runs at rest, and
+   halving it a second time is what once made unchecked circles invisible. */
+.sk-glass--rest{--str:.5;background:none}
+.dark .sk-glass--rest{background:none}
+.sk-glass--rest::after{
+  background:linear-gradient(to bottom,
+    color-mix(in srgb,var(--edge-shade) 0%,transparent) 0%,
+    color-mix(in srgb,var(--edge-shade) 14%,transparent) 45%,
+    color-mix(in srgb,var(--edge-shade) 42%,transparent) 100%);
+}
+.dark .sk-glass--rest::after{
+  background:linear-gradient(to bottom,
+    color-mix(in srgb,var(--edge-light) 27.5%,transparent) 0%,
+    color-mix(in srgb,var(--edge-light) 2.5%,transparent) 50%,
+    color-mix(in srgb,var(--edge-light) 30%,transparent) 100%);
+}
+
+/* ─── Trough ─────────────────────────────────────────────────────────────
+   The fill and inner shadows live on ::before rather than on the element, so
+   a bloom child can sit UNDER them at z-index -1. isolation:isolate keeps that
+   negative layer from escaping to the page background — with the element's own
+   background transparent, "above the background, below ::before" is exactly
+   where the bloom belongs.
+
+   That also means a trough must be a real container, never an <input>:
+   replaced elements generate no ::before/::after, so an input styled directly
+   as a trough silently loses its contour. Wrap the input.                   */
+.sk-trough{
+  --c:calc(var(--h)*var(--z)/148.2);
+  position:relative;isolation:isolate;background:none;
+}
+.sk-trough::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(to bottom,var(--recess),var(--recess-bottom));
+  box-shadow:
+    inset 0 calc(17.828px*var(--c)) calc(23.77px*var(--c)) color-mix(in srgb,var(--shadow) 22%,transparent),
+    inset 0 calc(-11.885px*var(--c)) calc(32px*var(--c)) color-mix(in srgb,var(--shadow) 19%,transparent),
+    inset calc(8.217px*var(--c)) calc(12.326px*var(--c)) calc(16.434px*var(--c)) color-mix(in srgb,var(--shadow) 20%,transparent),
+    inset calc(-8.247px*var(--c)) calc(-2.062px*var(--c)) calc(16.494px*var(--c)) color-mix(in srgb,var(--shadow) 20%,transparent);
+}
+.sk-trough::after{                          /* the contour — the lip */
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  padding:max(1px,calc(7px*var(--c)));
+  background:linear-gradient(to bottom,
+    var(--outline) 0%,var(--outline) 45%,var(--outline-bottom) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+}
+
+/* ─── Bloom ──────────────────────────────────────────────────────────────
+   The soft lift that SEATS a trough in the ground, so the bar sits in a
+   shallow dish rather than on flat paint. Light over dark — the opposite of
+   the trough's own fill, which is what makes it read as an outer bevel:
+   highlight along the top edge, shade along the bottom.
+
+   The lit stop is --material-top, NOT --recess-bottom. recess-bottom and
+   canvas are the same brightness, so a bloom starting there was drawn in
+   exactly the tone behind it and the outer top edge got no lift at all —
+   only the dark half showed, which reads as a shadow UNDER the bar rather
+   than a dish it sits in.
+
+   Overhang and feather are absolute design px: they do NOT scale with the
+   control's height, only with --z. The feather is small — 1.85 — so this is
+   a crisp bevel, not a halo.
+
+   Segmented troughs (the tab bar, every settings toggle) and the Live tab
+   carry this. Text fields do NOT.                                          */
+.sk-trough__bloom{
+  position:absolute;inset:calc(-5.3px*var(--z));border-radius:inherit;
+  background:linear-gradient(to bottom,var(--material-top),var(--recess));
+  filter:blur(calc(1.85px*var(--z)));
+  z-index:-1;pointer-events:none;
+}
+
+/* ─── Press ──────────────────────────────────────────────────────────── */
+.sk-press{transition:transform 260ms cubic-bezier(.34,1.56,.64,1)}
+.sk-press:active{transform:scale(1.115)}
+@media (prefers-reduced-motion:reduce){.sk-press:active{transform:none}}
+
+/* ─── Round glass button — gear, ✕, ＋, edit ──────────────────────────── */
+.sk-round{
+  --h:44.4;
+  display:grid;place-items:center;border:0;cursor:pointer;padding:0;
+  width:calc(var(--h)*var(--z)*1px);height:calc(var(--h)*var(--z)*1px);
+  border-radius:999px;color:var(--ink);
+}
+.sk-round svg{width:calc(22.2px*var(--z));height:calc(22.2px*var(--z));display:block}
+/* A bitmap glyph FILLS its box where a vector one leaves optical margin, so
+   matching the raw figure makes the pixel version read as the larger of the
+   two. SkeuChromeGlyph.pixelScale: 0.82 for the gear and the ✕, 1.85 for the
+   tick — each glyph fills a different fraction of its own grid. */
+.sk-round .px{width:calc(22.2px*var(--z)*.82);height:calc(22.2px*var(--z)*.82)}
+.sk-round--sm{--h:37}
+.sk-round--sm svg{width:calc(18.5px*var(--z));height:calc(18.5px*var(--z))}
+.sk-round--sm .px{width:calc(18.5px*var(--z)*.82);height:calc(18.5px*var(--z)*.82)}
+
+/* ─── Checkbox ───────────────────────────────────────────────────────── */
+.sk-check{
+  --h:33.3;
+  display:grid;place-items:center;border:0;cursor:pointer;padding:0;
+  width:calc(var(--h)*var(--z)*1px);height:calc(var(--h)*var(--z)*1px);
+  border-radius:999px;color:var(--ink);
+}
+.sk-check svg{width:calc(11px*var(--z));height:calc(11px*var(--z));display:block}
+.sk-check .px{width:calc(11px*var(--z)*1.85);height:calc(11px*var(--z)*1.85)}
+
+/* ─── Pills ──────────────────────────────────────────────────────────── */
+.sk-pill{
+  --h:38;
+  display:inline-grid;place-items:center;border:0;cursor:pointer;
+  height:calc(var(--h)*var(--z)*1px);
+  padding:0 calc(17.1px*var(--z));
+  border-radius:999px;color:var(--ink);
+  font-family:inherit;font-size:calc(12.8px*var(--z)*var(--fs));
+  font-weight:500;line-height:1;
+}
+.sk-rowbtn{                                  /* Default · Delete · Add */
+  --h:34.6;
+  display:inline-grid;place-items:center;border:0;cursor:pointer;padding:0;
+  width:calc(88px*var(--z));height:calc(var(--h)*var(--z)*1px);
+  border-radius:999px;color:var(--ink);
+  font-family:inherit;font-size:calc(12.8px*var(--z)*var(--fs));
+  font-weight:500;line-height:1;
+}
+.sk-rowbtn--danger{color:var(--critical)}
+
+/* ─── Segmented toggle ───────────────────────────────────────────────── */
+.sk-seg{
+  --h:51;
+  display:flex;gap:calc(3px*var(--z));
+  height:calc(var(--h)*var(--z)*1px);
+  padding:0 calc(8.2px*var(--z));
+  border-radius:999px;
+}
+.sk-seg__opt{
+  --h:34.6;                                  /* the inner pill */
+  position:relative;flex:1;display:grid;place-items:center;
+  border:0;background:none;cursor:pointer;
+  padding:calc(8.2px*var(--z)) calc(7.6px*var(--z));
+  color:var(--ink-muted);font-family:inherit;
+  font-size:calc(16.4px*var(--z)*var(--fs));line-height:1;
+  border-radius:999px;
+}
+.sk-seg__opt.is-on{color:var(--ink)}
+/* The glass is a BACKGROUND the selected column carries. A real element, not a
+   pseudo — the rim needs ::after of its own. It sits UNDER the label and OVER
+   a colour swatch. */
+.sk-seg__pill{
+  --h:34.6;
+  position:absolute;inset:calc(8.2px*var(--z)) 0;border-radius:999px;
+  pointer-events:none;
+}
+.sk-seg__label{position:relative}
+/* Theme row: the choice IS a colour, so it fills the pill rather than sitting
+   in it as a dot. Unchosen swatches are HALF as wide; the COLUMN never moves. */
+.sk-seg__swatch{
+  position:absolute;top:calc(13.7px*var(--z));bottom:calc(13.7px*var(--z));
+  left:50%;transform:translateX(-50%);
+  width:calc(50% - 5.5px*var(--z));border-radius:999px;pointer-events:none;
+  transition:width 400ms cubic-bezier(.2,.8,.3,1);
+}
+.sk-seg__opt.is-on .sk-seg__swatch{width:calc(100% - 11px*var(--z))}
+
+/* ─── Text field ─────────────────────────────────────────────────────────
+   A trough is a place text LIVES. The input inside it carries no chrome of
+   its own — no border, no background, no ring.                             */
+.sk-field{
+  --h:51;
+  display:block;width:100%;box-sizing:border-box;
+  height:calc(var(--h)*var(--z)*1px);
+  border-radius:999px;
+}
+/* position:relative is load-bearing. ::before carries the trough fill and is a
+   POSITIONED descendant, so it paints above any in-flow sibling — an unpositioned
+   input disappears behind its own trough. */
+.sk-field__input{
+  display:block;width:100%;height:100%;box-sizing:border-box;
+  border:0;outline:0;background:none;
+  padding:0 calc(16px*var(--z));
+  border-radius:inherit;color:var(--ink);position:relative;
+  font-family:inherit;font-size:calc(12.8px*var(--z)*var(--fs));line-height:1;
+}
+.sk-field__input::placeholder{color:var(--ink-faint)}
+
+/* ─── Workspace pill ─────────────────────────────────────────────────── */
+.sk-ws{
+  --h:40.6;                                  /* (50.2 − 8.2×2) × 1.2 */
+  display:inline-block;cursor:pointer;
+  padding:0 calc(14.8px*var(--z));
+  border-radius:calc(var(--h)*var(--z)*.5px);
+  color:var(--ink);min-width:calc(70px*var(--z));
+}
+.sk-ws__head{
+  display:flex;align-items:center;gap:calc(12.2px*var(--z));
+  height:calc(var(--h)*var(--z)*1px);
+  font-size:calc(19.7px*var(--z)*var(--fs));letter-spacing:-.02em;white-space:nowrap;
+}
+.sk-ws__chev{
+  width:calc(10.8px*var(--z));height:calc(6.3px*var(--z));
+  flex:none;transition:transform 400ms cubic-bezier(.2,.8,.3,1);
+}
+.sk-ws__chev svg{display:block;width:100%;height:100%}
+.sk-ws.is-open .sk-ws__chev{transform:rotate(180deg)}
+.sk-ws__item{
+  display:flex;align-items:center;
+  height:calc(var(--h)*var(--z)*1px);
+  font-size:calc(19.7px*var(--z)*var(--fs));letter-spacing:-.02em;
+  color:var(--ink-muted);white-space:nowrap;
+}
+.sk-ws:not(.is-open) .sk-ws__list{display:none}
+
+/* ─── Eyebrow heading ────────────────────────────────────────────────── */
+.sk-eyebrow{
+  font-size:calc(12.8px*var(--z)*var(--fs));letter-spacing:.8px;text-transform:uppercase;
+  color:var(--ink-faint);
+}

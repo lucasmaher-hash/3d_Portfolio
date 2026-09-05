@@ -1,0 +1,138 @@
+<!doctype html><meta charset="utf-8"><title>Live button</title>
+<style>
+:root{
+  --canvas:#CACFD6; --material-top:#E4E8EE;
+  --recess:#9BA1AB; --recess-bottom:#C9CED6; --edge-light:#FFFFFF; --edge-shade:#464B52;
+  --ink:#212224; --shadow:#242629; --outline:#7A7F87; --outline-bottom:#DDE0E5;
+}
+.dark{
+  --canvas:#2C2D30; --material-top:#3C3F42;
+  --recess:#191A1C; --recess-bottom:#35373B; --edge-light:#D6E5FF; --edge-shade:#070708;
+  --ink:#DCE5F5; --shadow:#09090A; --outline:#141517; --outline-bottom:#505357;
+}
+body{margin:0;font:13px/1.4 -apple-system,sans-serif}
+.stage{display:flex;gap:54px;align-items:center;justify-content:center;padding:38px 0;background:var(--canvas)}
+figure{margin:0;display:grid;justify-items:center;gap:14px;color:var(--ink);opacity:.85}
+@property --core { syntax:"<color>"; inherits:true; initial-value:#212224; }
+
+.live{
+  --n:104;                              /* disc diameter, unitless px */
+  --disc:calc(var(--n)*1px);
+  --k:calc(var(--n)/104.54);            /* glass reference pill */
+  --s:calc(var(--n)/34.6);              /* design size */
+  --c:calc(var(--n)*1.474/148.2);   /* trough: 148.2 reference bar */          /* tab-bar height */
+  --pad:calc(var(--disc)*0.237);
+  position:relative;display:grid;place-items:center;flex:none;
+  width:calc(var(--disc) + var(--pad)*2);height:calc(var(--disc) + var(--pad)*2);
+  border:0;padding:0;background:none;cursor:pointer;
+}
+.live__bloom{position:absolute;inset:calc(-5.3px*var(--s));border-radius:999px;
+  background:linear-gradient(to bottom,var(--material-top),var(--recess));
+  filter:blur(calc(1.85px*var(--s)));pointer-events:none}
+.live__trough{position:absolute;inset:0;border-radius:999px;
+  background:linear-gradient(to bottom,var(--recess),var(--recess-bottom));
+  box-shadow:
+    inset 0 calc(17.828px*var(--c)) calc(23.77px*var(--c)) color-mix(in srgb,var(--shadow) 22%,transparent),
+    inset 0 calc(-11.885px*var(--c)) calc(32px*var(--c)) color-mix(in srgb,var(--shadow) 19%,transparent),
+    inset calc(8.217px*var(--c)) calc(12.326px*var(--c)) calc(16.434px*var(--c)) color-mix(in srgb,var(--shadow) 20%,transparent),
+    inset calc(-8.247px*var(--c)) calc(-2.062px*var(--c)) calc(16.494px*var(--c)) color-mix(in srgb,var(--shadow) 20%,transparent);
+  pointer-events:none}
+
+.live__contour{position:absolute;inset:0;border-radius:999px;pointer-events:none;
+  padding:max(1px,calc(7px*var(--c)));
+  background:linear-gradient(to bottom,
+    var(--outline) 0%, var(--outline) 45%, var(--outline-bottom) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+
+.live__glass{position:absolute;inset:var(--pad);border-radius:999px;opacity:0;
+  transition:opacity 160ms ease-out;pointer-events:none;isolation:isolate;
+  box-shadow:
+    0 calc(29.9px*var(--k)) calc(35.0px*var(--k)) color-mix(in srgb,var(--shadow) 5%,transparent),
+    0 calc(13.4px*var(--k)) calc(26.8px*var(--k)) color-mix(in srgb,var(--shadow) 9%,transparent),
+    0 calc(3.09px*var(--k)) calc(14.4px*var(--k)) color-mix(in srgb,var(--shadow) 10%,transparent)}
+.live[aria-selected="true"] .live__glass{opacity:1}
+
+.live__lens{position:absolute;inset:0;filter:blur(calc(3.281px*var(--k)))}
+.live__lens i{position:absolute;border-radius:999px;background:rgba(255,255,255,.01)}
+.live__lens i:nth-child(1){inset:0}
+.live__lens i:nth-child(2){inset:calc(2.46px*var(--k)) calc(1.70px*var(--k))}
+.live__lens i:nth-child(3){inset:calc(7.39px*var(--k)) calc(5.09px*var(--k))}
+.live__lens i:nth-child(4){inset:calc(15.59px*var(--k)) calc(10.74px*var(--k))}
+.live__lens i:nth-child(5){inset:calc(31.99px*var(--k)) calc(22.03px*var(--k))}
+
+.live__relief{position:absolute;inset:0;border-radius:999px;background:linear-gradient(to bottom,
+  color-mix(in srgb,var(--edge-light) 39.2%,transparent) 0%,
+  color-mix(in srgb,var(--edge-light) 12.3%,transparent) 14%,
+  transparent 34%,transparent 60%,
+  color-mix(in srgb,var(--edge-shade) 10.2%,transparent) 80%,
+  color-mix(in srgb,var(--edge-shade) 24%,transparent) 100%)}
+.live__relief::after{content:"";position:absolute;inset:0;border-radius:999px;
+  border:calc(13px*var(--k)) solid color-mix(in srgb,var(--edge-shade) 12.8%,transparent);
+  filter:blur(calc(9px*var(--k)));
+  -webkit-mask-image:linear-gradient(to right,#000 0%,transparent 30%,transparent 70%,#000 100%);
+  mask-image:linear-gradient(to right,#000 0%,transparent 30%,transparent 70%,#000 100%)}
+.dark .live__relief{display:none}
+
+.live__glow{position:absolute;inset:0;border-radius:999px;
+  background:radial-gradient(ellipse 62% 62% at 50% 120%,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 100%);
+  mix-blend-mode:plus-lighter}
+
+.live__rim{position:absolute;inset:0;border-radius:999px;
+  padding:calc(2.971px*var(--k)*1.35);
+  background:linear-gradient(to bottom,
+    color-mix(in srgb,var(--edge-light) 71.5%,transparent) 0%,
+    color-mix(in srgb,var(--edge-light) 5%,transparent) 50%,
+    color-mix(in srgb,var(--edge-light) 60%,transparent) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+.dark .live__rim{padding:calc(2.971px*var(--k));
+  background:linear-gradient(to bottom,
+    color-mix(in srgb,var(--edge-light) 55%,transparent) 0%,
+    color-mix(in srgb,var(--edge-light) 5%,transparent) 50%,
+    color-mix(in srgb,var(--edge-light) 60%,transparent) 100%)}
+
+.live__mark{--core:var(--ink);position:relative;width:calc(var(--disc)*.5);height:calc(var(--disc)*.5);
+  border-radius:999px;border:calc(1.7px*var(--s)) solid var(--ink);box-sizing:border-box;
+  transition:transform 260ms cubic-bezier(.34,1.56,.64,1)}
+.live__mark::after{content:"";position:absolute;inset:0;margin:auto;width:42%;height:42%;
+  border-radius:999px;background:var(--core)}
+.live:active .live__mark{transform:scale(1.115)}
+
+@keyframes breathe-light{
+  from{opacity:.28;transform:scale(.88);border-color:#212224;--core:#212224}
+  to  {opacity:1;transform:scale(1.08);border-color:#000;--core:#000}}
+@keyframes breathe-dark{
+  from{opacity:.28;transform:scale(.88);border-color:#DCE5F5;--core:#DCE5F5}
+  to  {opacity:1;transform:scale(1.08);border-color:#fff;--core:#fff}}
+.live[data-onair="true"] .live__mark{animation:breathe-light 1s ease-in-out infinite alternate}
+.dark .live[data-onair="true"] .live__mark{animation-name:breathe-dark}
+@media (prefers-reduced-motion:reduce){
+  .live[data-onair="true"] .live__mark{animation:none;opacity:1;transform:scale(1.08)}
+  .live:active .live__mark{transform:none}}
+</style>
+
+<div class="stage" id="light">
+  <figure><span id="a"></span><figcaption>off</figcaption></figure>
+  <figure><span id="b"></span><figcaption>selected</figcaption></figure>
+  <figure><span id="c"></span><figcaption>on air</figcaption></figure>
+</div>
+<div class="stage dark" id="darkstage">
+  <figure><span></span><figcaption>off</figcaption></figure>
+  <figure><span></span><figcaption>selected</figcaption></figure>
+  <figure><span></span><figcaption>on air</figcaption></figure>
+</div>
+
+<script>
+const html = (sel, air) => `<button class="live" aria-selected="${sel}" data-onair="${air}" aria-label="Live">
+  <span class="live__bloom"></span><span class="live__trough"></span><span class="live__contour"></span>
+  <span class="live__glass"><span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span>
+  <span class="live__relief"></span><span class="live__glow"></span><span class="live__rim"></span></span>
+  <span class="live__mark"></span></button>`;
+const states=[[false,false],[true,false],[true,true]];
+document.querySelectorAll('.stage').forEach(st=>{
+  st.querySelectorAll('figure > span').forEach((slot,i)=>slot.outerHTML=html(...states[i]));
+});
+</script>
