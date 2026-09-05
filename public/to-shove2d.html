@@ -483,7 +483,7 @@
          like 5.3px * var(--s) become px², which is invalid and silently
          drops the whole declaration: the layer just vanishes with no
          error. Stepped rather than clamp()ed for the same reason. */
-      --n: 186;
+      --n: 112;
       --disc: calc(var(--n) * 1px);
       --k: calc(var(--n) / 104.54);          /* glass reference pill */
       --s: calc(var(--n) / 34.6);            /* design size */
@@ -563,8 +563,10 @@
 
     /* Five 1%-white layers, group-blurred, accumulating toward the MIDDLE.
        Rim-weighted instead and it reads as a chrome ring, not glass. It is
-       sub-pixel at tab size — it only appears because this is rendered
-       large here. */
+       sub-pixel at tab size. At the sizes used here (--n 112 and below)
+       it is under the doc's ~100px visibility threshold and contributes
+       essentially nothing — kept because it costs only markup, and it
+       comes back if the mark is ever rendered larger. */
     .live__lens { position: absolute; inset: 0; filter: blur(calc(3.281px * var(--k))); }
     .live__lens i { position: absolute; border-radius: 999px; background: rgba(255,255,255,.01); }
     .live__lens i:nth-child(1) { inset: 0; }
@@ -817,7 +819,7 @@
        breakpoints rather than using clamp(). Ordered widest-first: these
        queries all match on a phone, so the narrowest has to come last to
        win — the other way round, 1100px would override 640px. */
-    @media (max-width: 1100px) { .live { --n: 156; } }
+    @media (max-width: 1100px) { .live { --n: 94; } }
 
     @media (max-width: 640px) {
       /* Four across has to fit a 350px column, so the cards shrink here:
@@ -826,7 +828,7 @@
       .color-fan { --card-w: 15.3vw; --step: 14.3vw; }
       .fan-scrolly { height: 190vh; }
       .icon-compare { gap: 14px; }
-      .live { --n: 118; }
+      .live { --n: 71; }
     }
 
     /* Breakout image — same horizontal padding as every other section */
