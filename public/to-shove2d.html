@@ -442,97 +442,221 @@
       color: var(--text-tertiary);
     }
 
-    /* ── The Live mark, rebuilt from SkeuKit ────────────────────────────
-       Every colour below is the Slate light palette read straight out of
-       shove95-skeukit-to-css.md — not sampled off a screenshot, so it
-       matches the running app. The structure follows the system's own
-       three treatments rather than being a generic neumorphic blob:
-       a GLASS control, with a TROUGH cut into it, holding the record dot.
+    /* ── The Live button ────────────────────────────────────────────────
+       Lifted from shove95-live-button.md / -demo.html, which Lucas built
+       and rendered against the app rather than my eyeballing a crop —
+       my earlier attempt had the whole control inverted (a raised disc
+       with a big grey trough, where the real one is a channel CUT INTO
+       the surface with a small stroked mark floating in it).
 
-       Two rules from that doc drive everything: depth comes from light,
-       never texture — so nothing here uses a border to do separation
-       work; and the light sits TOP-RIGHT, which is why every drop shadow
-       is offset down-and-LEFT. Get that sign wrong and the mark stops
-       agreeing with the app screenshots sitting beside it. */
-    .live-mark {
-      /* Slate, light */
-      --sk-material-top:    #E4E8EE;
-      --sk-material:        #D5D9E0;
-      --sk-material-bottom: #B5BAC1;
-      --sk-recess:          #9BA1AB;
-      --sk-recess-bottom:   #C9CED6;
-      --sk-outline:         #7A7F87;
-      --sk-edge-light:      #FFFFFF;
-      --sk-ink:             #212224;
-      --sk-shadow:          #242629;
+       Six layers for one button, in source order, no z-index anywhere —
+       the doc's trap 10.1: inside a stacking context a negative z-index
+       child paints above its parent's background and the channel
+       disappears. Order alone does the work.
 
-      font-size: clamp(120px, 17vw, 210px);   /* one number sizes the mark */
-      width: 1em; height: 1em;
-      border-radius: 50%;
+       Three signals that deliberately do not move together:
+         glass under the mark = you are on the Live tab   (selection)
+         breath on the mark   = something is on air        (state)
+         swell on press       = you touched it             (feedback)
+       Shown here selected AND on air, which is the state the section is
+       actually describing.
+
+       Palette tokens are scoped to .live rather than :root so SkeuKit's
+       names cannot collide with the portfolio's own. Slate light only —
+       this site has no dark mode, so the doc's .dark variants are left
+       out rather than shipped dead. */
+    @property --core { syntax: "<color>"; inherits: true; initial-value: #212224; }
+
+    .live {
+      --canvas:          #CACFD6;
+      --material-top:    #E4E8EE;
+      --recess:          #9BA1AB;
+      --recess-bottom:   #C9CED6;
+      --edge-light:      #FFFFFF;
+      --edge-shade:      #464B52;
+      --ink:             #212224;
+      --shadow:          #242629;
+      --outline:         #7A7F87;
+      --outline-bottom:  #DDE0E5;
+
+      /* UNITLESS on purpose — the doc's trap 10.3. As a length, factors
+         like 5.3px * var(--s) become px², which is invalid and silently
+         drops the whole declaration: the layer just vanishes with no
+         error. Stepped rather than clamp()ed for the same reason. */
+      --n: 186;
+      --disc: calc(var(--n) * 1px);
+      --k: calc(var(--n) / 104.54);          /* glass reference pill */
+      --s: calc(var(--n) / 34.6);            /* design size */
+      --c: calc(var(--n) * 1.474 / 148.2);   /* trough reference bar */
+      --pad: calc(var(--disc) * 0.237);
+
       position: relative;
+      display: grid;
+      place-items: center;
+      flex: none;                            /* or a flex row ovals it */
       margin-inline: auto;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg,
-        var(--sk-material-top) 0%, var(--sk-material) 50%, var(--sk-material-bottom) 100%);
-      box-shadow:
-        /* the rim: bright along the top edge, softer where light bounces
-           back up off the bottom. A flat 1px border will not read as glass. */
-        inset 0 0.013em 0 0.005em color-mix(in srgb, var(--sk-edge-light) 92%, transparent),
-        inset 0 -0.013em 0 0.005em color-mix(in srgb, var(--sk-edge-light) 42%, transparent),
-        /* ambient, falling down-and-left */
-        -0.030em 0.050em 0.120em color-mix(in srgb, var(--sk-shadow) 19%, transparent),
-        -0.110em 0.190em 0.240em color-mix(in srgb, var(--sk-shadow) 14%, transparent);
+      width:  calc(var(--disc) + var(--pad) * 2);
+      height: calc(var(--disc) + var(--pad) * 2);
+      border: 0; padding: 0; background: none;
     }
 
-    /* The channel cut into the button. Four inset shadows in the spec's own
-       order: the lip casting down, the far wall throwing shade back up, then
-       two diagonals that round the corners off. The doc gives them for a
-       ~51px control, so each is expressed as its fraction of that (6/51,
-       8/51 …) against this trough's own height — same proportions at any size. */
-    .lm-trough {
-      width: 0.62em; height: 0.62em;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(to bottom, var(--sk-recess) 0%, var(--sk-recess-bottom) 100%);
-      border: 0.006em solid var(--sk-outline);
-      box-shadow:
-        inset 0 0.073em 0.098em         color-mix(in srgb, var(--sk-shadow) 22%, transparent),
-        inset 0 -0.049em 0.134em        color-mix(in srgb, var(--sk-shadow) 19%, transparent),
-        inset 0.036em 0.049em 0.073em   color-mix(in srgb, var(--sk-shadow) 20%, transparent),
-        inset -0.036em -0.012em 0.073em color-mix(in srgb, var(--sk-shadow) 20%, transparent);
-    }
-
-    /* The record dot: an object sitting on the floor of the trough, casting
-       its own small shadow in the same direction as everything else. */
-    .lm-dot {
-      width: 0.235em; height: 0.235em;
-      border-radius: 50%;
-      background: linear-gradient(to bottom, #34373C 0%, var(--sk-ink) 100%);
-      box-shadow:
-        -0.004em 0.010em 0.022em color-mix(in srgb, var(--sk-shadow) 55%, transparent),
-        inset 0 0.006em 0 color-mix(in srgb, var(--sk-edge-light) 22%, transparent);
-    }
-
-    /* The pulse: a ring leaving the trough's edge and fading. The one thing
-       here the app itself does not do — this section is about a live
-       indicator, so the mark reads better alive than static. Uses the
-       system's own `present` spring curve rather than a generic ease. */
-    .live-mark::after {
-      content: '';
+    /* Light leaking round the OUTSIDE of the channel — an oversized
+       gradient slab with a small feather, behind everything. It is what
+       stops the trough reading as a hole punched in the page. Its blur is
+       NOT doubled: the halve-the-blur rule is for shadows, not .blur(). */
+    .live__bloom {
       position: absolute;
-      width: 0.62em; height: 0.62em;
-      border-radius: 50%;
-      border: 0.012em solid var(--sk-outline);
-      animation: live-emit 2.6s cubic-bezier(.2,.8,.3,1) infinite;
+      inset: calc(-5.3px * var(--s));
+      border-radius: 999px;
+      background: linear-gradient(to bottom, var(--material-top), var(--recess));
+      filter: blur(calc(1.85px * var(--s)));
       pointer-events: none;
     }
 
-    @keyframes live-emit {
-      0%   { transform: scale(1);    opacity: 0.55; }
-      70%  { opacity: 0; }
-      100% { transform: scale(1.42); opacity: 0; }
+    /* The channel. Four inset shadows: the lip casting down, the far wall
+       throwing shade back up off the floor, then two diagonals rounding
+       the corners. Dropping the diagonals flattens it immediately. */
+    .live__trough {
+      position: absolute; inset: 0;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, var(--recess), var(--recess-bottom));
+      box-shadow:
+        inset 0 calc(17.828px * var(--c)) calc(23.77px * var(--c))   color-mix(in srgb, var(--shadow) 22%, transparent),
+        inset 0 calc(-11.885px * var(--c)) calc(32px * var(--c))     color-mix(in srgb, var(--shadow) 19%, transparent),
+        inset calc(8.217px * var(--c)) calc(12.326px * var(--c)) calc(16.434px * var(--c)) color-mix(in srgb, var(--shadow) 20%, transparent),
+        inset calc(-8.247px * var(--c)) calc(-2.062px * var(--c)) calc(16.494px * var(--c)) color-mix(in srgb, var(--shadow) 20%, transparent);
+      pointer-events: none;
+    }
+
+    /* The lip — the ring the button looks wrong without, and the one layer
+       the doc says never to cut. A GRADIENT, held dark through the top 45%
+       then ramping lit at the base: dark at the near lip, lit at the far
+       one. Flattened to a single averaged colour it reads as an outline
+       drawn ON the surface instead of an edge cut INTO it. Drawn last,
+       over the inner shadows. */
+    .live__contour {
+      position: absolute; inset: 0;
+      border-radius: 999px;
+      padding: max(1px, calc(7px * var(--c)));
+      background: linear-gradient(to bottom,
+        var(--outline) 0%, var(--outline) 45%, var(--outline-bottom) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+              mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Selection only. */
+    .live__glass {
+      position: absolute; inset: var(--pad);
+      border-radius: 999px;
+      opacity: 0;
+      transition: opacity 160ms ease-out;
+      pointer-events: none;
+      isolation: isolate;                    /* contains the glow's blend */
+      box-shadow:
+        0 calc(29.9px * var(--k)) calc(35.0px * var(--k)) color-mix(in srgb, var(--shadow) 5%,  transparent),
+        0 calc(13.4px * var(--k)) calc(26.8px * var(--k)) color-mix(in srgb, var(--shadow) 9%,  transparent),
+        0 calc(3.09px * var(--k)) calc(14.4px * var(--k)) color-mix(in srgb, var(--shadow) 10%, transparent);
+    }
+    .live[aria-selected="true"] .live__glass { opacity: 1; }
+
+    /* Five 1%-white layers, group-blurred, accumulating toward the MIDDLE.
+       Rim-weighted instead and it reads as a chrome ring, not glass. It is
+       sub-pixel at tab size — it only appears because this is rendered
+       large here. */
+    .live__lens { position: absolute; inset: 0; filter: blur(calc(3.281px * var(--k))); }
+    .live__lens i { position: absolute; border-radius: 999px; background: rgba(255,255,255,.01); }
+    .live__lens i:nth-child(1) { inset: 0; }
+    .live__lens i:nth-child(2) { inset: calc(2.46px * var(--k))  calc(1.70px * var(--k)); }
+    .live__lens i:nth-child(3) { inset: calc(7.39px * var(--k))  calc(5.09px * var(--k)); }
+    .live__lens i:nth-child(4) { inset: calc(15.59px * var(--k)) calc(10.74px * var(--k)); }
+    .live__lens i:nth-child(5) { inset: calc(31.99px * var(--k)) calc(22.03px * var(--k)); }
+
+    /* Light mode only: on a light page a lit rim has no room, because the
+       material already sits near the top of the range. */
+    .live__relief {
+      position: absolute; inset: 0; border-radius: 999px;
+      background: linear-gradient(to bottom,
+        color-mix(in srgb, var(--edge-light) 39.2%, transparent) 0%,
+        color-mix(in srgb, var(--edge-light) 12.3%, transparent) 14%,
+        transparent 34%, transparent 60%,
+        color-mix(in srgb, var(--edge-shade) 10.2%, transparent) 80%,
+        color-mix(in srgb, var(--edge-shade) 24%,   transparent) 100%);
+    }
+    .live__relief::after {
+      content: ""; position: absolute; inset: 0; border-radius: 999px;
+      border: calc(13px * var(--k)) solid color-mix(in srgb, var(--edge-shade) 12.8%, transparent);
+      filter: blur(calc(9px * var(--k)));
+      -webkit-mask-image: linear-gradient(to right, #000 0%, transparent 30%, transparent 70%, #000 100%);
+              mask-image: linear-gradient(to right, #000 0%, transparent 30%, transparent 70%, #000 100%);
+    }
+
+    /* Centred BELOW the disc and blended additively, so it lifts the
+       material without tinting it. */
+    .live__glow {
+      position: absolute; inset: 0; border-radius: 999px;
+      background: radial-gradient(ellipse 62% 62% at 50% 120%,
+                  rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 100%);
+      mix-blend-mode: plus-lighter;
+    }
+
+    /* Bright top and bottom, all but gone across the sides — only surfaces
+       facing the key light catch it. padding + double-mask + exclude is how
+       you get a gradient border on a circle; border-image ignores
+       border-radius. */
+    .live__rim {
+      position: absolute; inset: 0; border-radius: 999px;
+      padding: calc(2.971px * var(--k) * 1.35);
+      background: linear-gradient(to bottom,
+        color-mix(in srgb, var(--edge-light) 71.5%, transparent) 0%,
+        color-mix(in srgb, var(--edge-light) 5%,    transparent) 50%,
+        color-mix(in srgb, var(--edge-light) 60%,   transparent) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+              mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+    }
+
+    /* Stroked circle, core at 0.42 of the diameter. --core is set on the
+       element, not left to var()'s fallback: once registered via @property
+       the initial-value wins over a fallback (trap 10.4). */
+    .live__mark {
+      --core: var(--ink);
+      position: relative;
+      width:  calc(var(--disc) * .5);
+      height: calc(var(--disc) * .5);
+      border-radius: 999px;
+      border: calc(1.7px * var(--s)) solid var(--ink);
+      box-sizing: border-box;
+      transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1);
+    }
+    .live__mark::after {
+      content: ""; position: absolute; inset: 0; margin: auto;
+      width: 42%; height: 42%;
+      border-radius: 999px;
+      background: var(--core);
+    }
+
+    /* Slow and shallow deliberately — this sits where people read. Growing
+       and becoming visible are one motion; the large end is pushed away
+       from the page, which on a light page clamps to pure black. */
+    @keyframes breathe-light {
+      from { opacity: .28; transform: scale(.88); border-color: #212224; --core: #212224; }
+      to   { opacity: 1;   transform: scale(1.08); border-color: #000;   --core: #000; }
+    }
+    .live[data-onair="true"] .live__mark { animation: breathe-light 1s ease-in-out infinite alternate; }
+
+    /* The swell rides the MARK, never the trough — pressing the whole
+       channel was a real bug in the app. */
+    .live:active .live__mark { transform: scale(1.115); }
+
+    @media (prefers-reduced-motion: reduce) {
+      /* The breath is the only thing saying something is on air, so with
+         motion off the mark settles at the large, fully-opaque end —
+         never the faint one. Removing motion must not remove information. */
+      .live[data-onair="true"] .live__mark { animation: none; opacity: 1; transform: scale(1.08); }
+      .live:active .live__mark { transform: none; }
+      .live__glass { transition: none; }
     }
 
     /* Wider figure for the two-phone Live clip: the base .stagger-figure
@@ -689,6 +813,12 @@
       will-change: transform;
     }
 
+    /* --n must stay unitless (trap 10.3), so the size steps at
+       breakpoints rather than using clamp(). Ordered widest-first: these
+       queries all match on a phone, so the narrowest has to come last to
+       win — the other way round, 1100px would override 640px. */
+    @media (max-width: 1100px) { .live { --n: 156; } }
+
     @media (max-width: 640px) {
       /* Four across has to fit a 350px column, so the cards shrink here:
          18vw + 3 x 22.5vw = 333px at 390px wide. They read as colour
@@ -696,7 +826,7 @@
       .color-fan { --card-w: 15.3vw; --step: 14.3vw; }
       .fan-scrolly { height: 190vh; }
       .icon-compare { gap: 14px; }
-      .live-mark { font-size: clamp(110px, 34vw, 150px); }
+      .live { --n: 118; }
     }
 
     /* Breakout image — same horizontal padding as every other section */
@@ -1136,7 +1266,6 @@
        keep layout + opacity cues. No effect unless the OS pref is set. */
     @media (prefers-reduced-motion: reduce) {
       .accent-dot { animation: none !important; opacity: 1; }
-      .live-mark::after { animation: none !important; opacity: 0; }
       /* No pinned scroll animation: drop the spacer and show the row spread. */
       .fan-scrolly { height: auto !important; }
       .fan-sticky { position: static !important; height: auto !important; }
@@ -1504,10 +1633,24 @@
         <div class="stagger-row">
           <div class="stagger-figure">
             <!-- CSS stand-in for the real Live mark; three spans = two
-                 glass control + trough + record dot, all on SkeuKit's
-                 own Slate tokens (see .live-mark in the stylesheet). -->
-            <div class="live-mark" aria-hidden="true">
-              <div class="lm-trough"><div class="lm-dot"></div></div>
+                 the app's Live button, rebuilt layer for layer from
+                 shove95-live-button.md (see .live in the stylesheet). -->
+            <!-- role="img", not <button>: on this page the control is an
+                 illustration of the app's Live button, and a focusable
+                 control that does nothing would be worse for keyboard and
+                 screen-reader users than an image that says what it is. -->
+            <div class="live" role="img" aria-selected="true" data-onair="true"
+                 aria-label="Der Live-Knopf aus morrow: ausgewählt und auf Sendung">
+              <span class="live__bloom"></span>
+              <span class="live__trough"></span>
+              <span class="live__contour"></span>
+              <span class="live__glass">
+                <span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span>
+                <span class="live__relief"></span>
+                <span class="live__glow"></span>
+                <span class="live__rim"></span>
+              </span>
+              <span class="live__mark"></span>
             </div>
           </div>
           <div class="stagger-body">
