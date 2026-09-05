@@ -600,24 +600,34 @@
     }
 
     .color-fan {
-      --p: 0;
-      --step: clamp(132px, 21.5vw, 246px);   /* one slot = phone + gap */
-      position: relative;
-      height: calc(var(--card-w) * (1600 / 792));
       --card-w: clamp(126px, 20.33vw, 232px);   /* matches every other phone */
+      /* Slightly tighter than the card is wide, so the scattered cards
+         overlap the way they do in the reference instead of sitting apart. */
+      --step: clamp(118px, 18.8vw, 214px);
+      position: relative;
+      /* Room for the tallest card once it is scaled up and pushed down. */
+      height: calc(var(--card-w) * (1600 / 792) * 1.18);
       margin-top: clamp(24px, 4vw, 40px);
     }
 
     .color-card {
+      --pe: 0;              /* this card's own eased progress, written by JS */
       position: absolute;
       top: 0;
       left: 50%;
       width: var(--card-w);
       height: auto;
       display: block;
-      transform: translateX(calc(-50% + var(--p) * var(--slot) * var(--step)));
+      /* Every end state is interpolated from the same --pe, so at 0 all four
+         sit stacked dead centre, unrotated and identical in size — which is
+         what makes the collapsed state read as a single phone. */
+      transform:
+        translateX(calc(-50% + var(--pe) * var(--slot) * var(--step)))
+        translateY(calc(var(--pe) * var(--dy)))
+        rotate(calc(var(--pe) * var(--rot) * 1deg))
+        scale(calc(1 + var(--pe) * (var(--sc) - 1)));
       /* no transition — the position IS the scroll offset, and easing it
-         would make the cards lag the scrollbar */
+         here would make the cards lag the scrollbar */
       will-change: transform;
     }
 
@@ -1527,19 +1537,29 @@
 
       <p class="guide-text" style="margin-top: clamp(24px, 4vw, 40px);" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes, jedes in Hell und Dunkel, jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente — Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich, damit kein Theme die App unbenutzbar machen kann.</p>
 
-      <!-- Stacked at the centre, fanning out sideways as the block passes
-           through the viewport and folding back in as it leaves. Grey is
-           the card on top — it carries the highest z-index and sits next to
-           the centre slot, so it is the one that moves least. Light mode
-           only for now; the four dark-mode shots are shot but unused.
-           Order here IS the left-to-right order in the row. -->
+      <!-- Stacked dead centre, scattering into the arrangement Lucas
+           specified: alternating tilt, staggered heights, varied scale —
+           not a flat row. Each card owns its own end state, so the layout
+           is these five numbers per card and nothing else:
+             --slot  horizontal position, in step-widths from centre
+             --rot   final tilt in degrees
+             --sc    final scale
+             --dy    final vertical offset in px
+             --lag   how late this card starts moving (0 = leads)
+           Grey is the front card: highest z-index, largest, and it leads
+           the stagger, so the one phone you see stacked is also the one
+           that arrives first. -->
       <div class="fan-scrolly">
         <div class="fan-sticky">
-      <div class="color-fan" aria-label="Vier Farbthemen von morrow im Hellmodus">
-        <img class="color-card" style="--slot: -1.5; z-index: 2;" src="/images/morrow/theme-pink.webp"  width="792" height="1600" alt="morrow im Farbthema Rosé" />
-        <img class="color-card" style="--slot: -0.5; z-index: 4;" src="/images/morrow/theme-grey.webp"  width="792" height="1600" alt="morrow im Farbthema Grau" />
-        <img class="color-card" style="--slot:  0.5; z-index: 3;" src="/images/morrow/theme-green.webp" width="792" height="1600" alt="morrow im Farbthema Grün" />
-        <img class="color-card" style="--slot:  1.5; z-index: 1;" src="/images/morrow/theme-beige.webp" width="792" height="1600" alt="morrow im Farbthema Beige" />
+          <div class="color-fan" aria-label="Vier Farbthemen von morrow im Hellmodus">
+        <img class="color-card" src="/images/morrow/theme-pink.webp"  width="792" height="1600" alt="morrow im Farbthema Rosé"
+             style="--slot: -1.5; --rot: -11; --sc: 0.80; --dy:  55px; --lag: 0.12; z-index: 1;" />
+        <img class="color-card" src="/images/morrow/theme-green.webp" width="792" height="1600" alt="morrow im Farbthema Grün"
+             style="--slot: -0.5; --rot:  -8; --sc: 0.97; --dy: -30px; --lag: 0.06; z-index: 2;" />
+        <img class="color-card" src="/images/morrow/theme-grey.webp"  width="792" height="1600" alt="morrow im Farbthema Grau"
+             style="--slot:  0.5; --rot:   5; --sc: 1.05; --dy:  25px; --lag: 0.00; z-index: 4;" />
+        <img class="color-card" src="/images/morrow/theme-beige.webp" width="792" height="1600" alt="morrow im Farbthema Beige"
+             style="--slot:  1.5; --rot:   9; --sc: 0.88; --dy: -20px; --lag: 0.10; z-index: 3;" />
       </div>
         </div>
       </div>
@@ -1891,10 +1911,37 @@
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         blocks.forEach(function (el) {
           // Reduced motion: show the spread state, never animate it.
-          if (el.classList.contains('fan-scrolly')) el.querySelector('.color-fan').style.setProperty('--p', '1');
-          else el.style.setProperty('--grow', '1');
+          if (el.classList.contains('fan-scrolly')) {
+            el.querySelectorAll('.color-card').forEach(function (c) { c.style.setProperty('--pe', '1'); });
+          } else el.style.setProperty('--grow', '1');
         });
         return;
+      }
+
+      // Overshoot, so the cards spring a little past their mark and settle
+      // instead of sliding to a dead stop. c1 tunes it: 1.4 peaks at ~1.06,
+      // i.e. about 6% past the target — visible as a bounce without the
+      // cards looking like they were thrown.
+      function backOut(x) {
+        var c1 = 1.4, c3 = c1 + 1, u = x - 1;
+        return 1 + c3 * u * u * u + c1 * u * u;
+      }
+
+      // Each card trails the one in front of it by its own --lag, so they
+      // arrive in sequence rather than as one rigid block — that stagger is
+      // most of what reads as "bouncy", the overshoot alone looks stiff.
+      function setFan(scrolly, open) {
+        var cards = scrolly.querySelectorAll('.color-card');
+        for (var i = 0; i < cards.length; i++) {
+          var c = cards[i];
+          if (c._lag === undefined) {
+            c._lag = parseFloat(getComputedStyle(c).getPropertyValue('--lag')) || 0;
+          }
+          var span = 1 - c._lag;
+          var pi = span > 0 ? (open - c._lag) / span : open;
+          pi = Math.max(0, Math.min(1, pi));
+          c.style.setProperty('--pe', backOut(pi).toFixed(4));
+        }
       }
 
       function update() {
@@ -1909,7 +1956,7 @@
             // Open over the first third, hold, fold shut over the last third.
             p = t < 0.34 ? t / 0.34 : (t > 0.66 ? (1 - t) / 0.34 : 1);
             p = Math.max(0, Math.min(1, p));
-            el.querySelector('.color-fan').style.setProperty('--p', p.toFixed(3));
+            setFan(el, p);
           } else {
             var start = window.innerHeight;          // 0 as it enters from below
             var end = window.innerHeight * 0.35;     // 1 once it is well inside
