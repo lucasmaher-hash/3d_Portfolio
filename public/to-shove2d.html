@@ -481,6 +481,13 @@
        is sized for a single portrait phone, and that pair is one file
        roughly twice as wide. */
     .stagger-figure.duo { width: clamp(260px, 42vw, 480px); }
+
+    /* A single phone, sized to render at exactly the same width as one of
+       the two inside the .duo clip, so every phone on the page matches.
+       One phone is 792 of that file's 1636px, i.e. 0.4841 of it — and a
+       clamp scales term by term, so this is just .duo's clamp x 0.4841.
+       If .duo's width changes, rescale all three numbers here with it. */
+    .stagger-figure.phone { width: clamp(126px, 20.33vw, 232px); }
     /* The recordings carry the phone frame baked in, so they size exactly
        like the stills do. Deliberately NO drop-shadow on these: the frame
        sits on an opaque page-coloured background inside the file (H.264
@@ -1380,7 +1387,7 @@
         </div>
 
         <div class="stagger-row">
-          <div class="stagger-figure">
+          <div class="stagger-figure phone">
             <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben">
               <source src="/videos/morrow/swipe.mp4" type="video/mp4" />
             </video>
@@ -1393,7 +1400,7 @@
 
         <!-- 2.3 Workspaces & Co: copy left, recording right -->
         <div class="stagger-row right">
-          <div class="stagger-figure">
+          <div class="stagger-figure phone">
             <video autoplay loop muted playsinline width="792" height="1600" aria-label="Workspaces wechseln, Aufgaben abhaken, löschen und neu anordnen">
               <source src="/videos/morrow/restfeatures.mp4" type="video/mp4" />
             </video>
@@ -1406,8 +1413,10 @@
 
         <!-- 2.4 Einstellungen: recording left, copy right -->
         <div class="stagger-row">
-          <div class="stagger-figure">
-            <div class="ph-media" style="--ph-ratio: 9 / 16;" data-i18n="placeholder">[ Platzhalter ]</div>
+          <div class="stagger-figure phone">
+            <!-- Settings recording still to come; sized and shaped like the
+                 real clips so it drops straight in. -->
+            <div class="ph-media" style="--ph-ratio: 792 / 1600;" data-i18n="placeholder">[ Platzhalter ]</div>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f4-title">Einstellungen</h3>
