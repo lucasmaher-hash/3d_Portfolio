@@ -319,6 +319,12 @@
 
     .guide-section:last-child { border-bottom: none; }
 
+    /* The last guide-section draws a border-bottom and .project-nav draws a
+       border-top, and they meet with a 0px gap — measured 2px of ink at that
+       boundary against 1px everywhere else, which is why the line above the
+       footer read as thick. Let the nav own that line. */
+    .guide-section:has(+ .project-nav) { border-bottom: none; }
+
     .section-heading-row {
       display: flex;
       align-items: center;
@@ -436,49 +442,97 @@
       color: var(--text-tertiary);
     }
 
-    /* ── The Live indicator, built in CSS until the real asset lands ────
-       Concentric rings on a raised neumorphic disc, pulsing on a loop —
-       the same mark the app puts on the Lock Screen. Sized in em off its
-       own font-size so one number scales the whole thing. */
-    .live-pulse {
+    /* ── The Live mark, rebuilt from SkeuKit ────────────────────────────
+       Every colour below is the Slate light palette read straight out of
+       shove95-skeukit-to-css.md — not sampled off a screenshot, so it
+       matches the running app. The structure follows the system's own
+       three treatments rather than being a generic neumorphic blob:
+       a GLASS control, with a TROUGH cut into it, holding the record dot.
+
+       Two rules from that doc drive everything: depth comes from light,
+       never texture — so nothing here uses a border to do separation
+       work; and the light sits TOP-RIGHT, which is why every drop shadow
+       is offset down-and-LEFT. Get that sign wrong and the mark stops
+       agreeing with the app screenshots sitting beside it. */
+    .live-mark {
+      /* Slate, light */
+      --sk-material-top:    #E4E8EE;
+      --sk-material:        #D5D9E0;
+      --sk-material-bottom: #B5BAC1;
+      --sk-recess:          #9BA1AB;
+      --sk-recess-bottom:   #C9CED6;
+      --sk-outline:         #7A7F87;
+      --sk-edge-light:      #FFFFFF;
+      --sk-ink:             #212224;
+      --sk-shadow:          #242629;
+
+      font-size: clamp(120px, 17vw, 210px);   /* one number sizes the mark */
       width: 1em; height: 1em;
-      font-size: clamp(120px, 17vw, 210px);
       border-radius: 50%;
-      background: var(--bg-surface);
-      box-shadow: var(--shadow-raised);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-inline: auto;
       position: relative;
+      margin-inline: auto;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg,
+        var(--sk-material-top) 0%, var(--sk-material) 50%, var(--sk-material-bottom) 100%);
+      box-shadow:
+        /* the rim: bright along the top edge, softer where light bounces
+           back up off the bottom. A flat 1px border will not read as glass. */
+        inset 0 0.013em 0 0.005em color-mix(in srgb, var(--sk-edge-light) 92%, transparent),
+        inset 0 -0.013em 0 0.005em color-mix(in srgb, var(--sk-edge-light) 42%, transparent),
+        /* ambient, falling down-and-left */
+        -0.030em 0.050em 0.120em color-mix(in srgb, var(--sk-shadow) 19%, transparent),
+        -0.110em 0.190em 0.240em color-mix(in srgb, var(--sk-shadow) 14%, transparent);
     }
 
-    /* Two rings + a solid core. Each is its own element so they can pulse
-       on slightly different delays — a single scaling parent would just
-       zoom the whole mark, which reads as a bounce rather than a pulse. */
-    .live-pulse span {
-      position: absolute;
+    /* The channel cut into the button. Four inset shadows in the spec's own
+       order: the lip casting down, the far wall throwing shade back up, then
+       two diagonals that round the corners off. The doc gives them for a
+       ~51px control, so each is expressed as its fraction of that (6/51,
+       8/51 …) against this trough's own height — same proportions at any size. */
+    .lm-trough {
+      width: 0.62em; height: 0.62em;
       border-radius: 50%;
-      border: 0.035em solid var(--text-tertiary);
-      animation: live-ring 2.4s ease-out infinite;
-    }
-    .live-pulse span:nth-child(1) { width: 0.62em; height: 0.62em; animation-delay: 0s; }
-    .live-pulse span:nth-child(2) { width: 0.40em; height: 0.40em; animation-delay: 0.35s; }
-    .live-pulse span:nth-child(3) {
-      width: 0.17em; height: 0.17em;
-      border: none;
-      background: var(--text-primary);
-      animation: live-core 2.4s ease-in-out infinite;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(to bottom, var(--sk-recess) 0%, var(--sk-recess-bottom) 100%);
+      border: 0.006em solid var(--sk-outline);
+      box-shadow:
+        inset 0 0.073em 0.098em         color-mix(in srgb, var(--sk-shadow) 22%, transparent),
+        inset 0 -0.049em 0.134em        color-mix(in srgb, var(--sk-shadow) 19%, transparent),
+        inset 0.036em 0.049em 0.073em   color-mix(in srgb, var(--sk-shadow) 20%, transparent),
+        inset -0.036em -0.012em 0.073em color-mix(in srgb, var(--sk-shadow) 20%, transparent);
     }
 
-    @keyframes live-ring {
-      0%        { transform: scale(0.82); opacity: 0.15; }
-      35%       { opacity: 0.9; }
-      100%      { transform: scale(1.16); opacity: 0; }
+    /* The record dot: an object sitting on the floor of the trough, casting
+       its own small shadow in the same direction as everything else. */
+    .lm-dot {
+      width: 0.235em; height: 0.235em;
+      border-radius: 50%;
+      background: linear-gradient(to bottom, #34373C 0%, var(--sk-ink) 100%);
+      box-shadow:
+        -0.004em 0.010em 0.022em color-mix(in srgb, var(--sk-shadow) 55%, transparent),
+        inset 0 0.006em 0 color-mix(in srgb, var(--sk-edge-light) 22%, transparent);
     }
-    @keyframes live-core {
-      0%, 100%  { transform: scale(1); }
-      50%       { transform: scale(0.86); }
+
+    /* The pulse: a ring leaving the trough's edge and fading. The one thing
+       here the app itself does not do — this section is about a live
+       indicator, so the mark reads better alive than static. Uses the
+       system's own `present` spring curve rather than a generic ease. */
+    .live-mark::after {
+      content: '';
+      position: absolute;
+      width: 0.62em; height: 0.62em;
+      border-radius: 50%;
+      border: 0.012em solid var(--sk-outline);
+      animation: live-emit 2.6s cubic-bezier(.2,.8,.3,1) infinite;
+      pointer-events: none;
+    }
+
+    @keyframes live-emit {
+      0%   { transform: scale(1);    opacity: 0.55; }
+      70%  { opacity: 0; }
+      100% { transform: scale(1.42); opacity: 0; }
     }
 
     /* Wider figure for the two-phone Live clip: the base .stagger-figure
@@ -642,7 +696,7 @@
       .color-fan { --card-w: 15.3vw; --step: 14.3vw; }
       .fan-scrolly { height: 190vh; }
       .icon-compare { gap: 14px; }
-      .live-pulse { font-size: clamp(110px, 34vw, 150px); }
+      .live-mark { font-size: clamp(110px, 34vw, 150px); }
     }
 
     /* Breakout image — same horizontal padding as every other section */
@@ -1082,6 +1136,7 @@
        keep layout + opacity cues. No effect unless the OS pref is set. */
     @media (prefers-reduced-motion: reduce) {
       .accent-dot { animation: none !important; opacity: 1; }
+      .live-mark::after { animation: none !important; opacity: 0; }
       /* No pinned scroll animation: drop the spacer and show the row spread. */
       .fan-scrolly { height: auto !important; }
       .fan-sticky { position: static !important; height: auto !important; }
@@ -1427,8 +1482,11 @@
         <div class="stagger-row">
           <div class="stagger-figure">
             <!-- CSS stand-in for the real Live mark; three spans = two
-                 rings + the core (see .live-pulse in the stylesheet). -->
-            <div class="live-pulse" aria-hidden="true"><span></span><span></span><span></span></div>
+                 glass control + trough + record dot, all on SkeuKit's
+                 own Slate tokens (see .live-mark in the stylesheet). -->
+            <div class="live-mark" aria-hidden="true">
+              <div class="lm-trough"><div class="lm-dot"></div></div>
+            </div>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f1-title">Live-Benachrichtigungen</h3>
