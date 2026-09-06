@@ -158,10 +158,13 @@
        · inline-grid and no auto margins, so it sits in the line;
        · the glass is always on (elsewhere that means "selected"; here it is
          an illustration, and the o should always look like the real button);
-       · vertical-align puts it on the x-height. OCR-A-BT's 'o' at 96px has
-         its ink from baseline-42.8 to baseline+5.5, so the ink centre is
-         0.194em above the baseline and a 0.618em box bottoms out 0.115em
-         below it.
+       · vertical-align puts it on the x-height. Centring the 0.618em box on
+         the glyph's ink band (OCR-A-BT's 'o' at 96px runs baseline-42.8 to
+         baseline+5.5) puts its bottom 0.115em BELOW the baseline — but the
+         bubble is the full 0.618em where the glyph's ink is only 0.5em, so
+         its extra mass hangs below and it read as sitting low. Lifted 15px
+         at the 96px desktop size, in em so it stays proportional as the
+         title's clamp() shrinks: -0.115 + 15/96 = 0.041em.
 
        SIZE IS SET FROM JS, not CSS. --n is unitless by design (the SkeuKit
        trap: it is multiplied by px literals, so as a length every derived
@@ -179,7 +182,7 @@
       --pad: 0px;
       display: inline-grid;
       margin-inline: 0;
-      vertical-align: -0.115em;
+      vertical-align: 0.041em;
       /* .project-title carries letter-spacing: -0.04em, and Blink does not
          apply it to an atomic inline the way it does to a letter — measured,
          each mark was pushing the rest of the word 3.84px right. */
