@@ -147,6 +147,49 @@
       letter-spacing: -0.04em;
     }
 
+    /* Sized in em so it tracks the title's own clamp() at every width, and
+       nudged onto the x-height rather than the baseline — an inline-block
+       sits on the baseline by default, which would leave it floating a
+       descender's worth too high next to the lowercase letters. */
+    /* Measured against the real glyph at 96px rather than eyeballed: OCR-A-BT's
+       'o' has 48px of ink on a 59.3px advance, sitting 43px above the baseline
+       and 5px below it. So the box takes the ADVANCE (0.618em) to keep the
+       monospace rhythm — letter-spacing applies to this span exactly as it does
+       to a letter — while the ring itself takes the ink height (0.5em) and is
+       centred in it. All em, so it tracks the title's clamp() at every width.
+
+       Ring and core are pseudo-elements rather than the element's own border,
+       because the element's box is wider than the circle. Proportions are
+       .live__mark's: core at 42% of the diameter, stroke at 9.8% of it. */
+    .o-mark {
+      display: inline-block;
+      position: relative;
+      width: 0.618em;
+      height: 0.5em;
+      vertical-align: -0.052em;
+      /* .project-title carries letter-spacing: -0.04em, and Blink does not
+         apply it to an atomic inline the way it does to a letter — measured,
+         each mark was pushing the rest of the word 3.84px right. This gives it
+         back, so the marks land on the same grid as the real glyphs. */
+      margin-right: -0.04em;
+    }
+    .o-mark::before {
+      content: "";
+      position: absolute; top: 0; bottom: 0; left: 50%;
+      width: 0.5em;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      border: 0.049em solid currentColor;
+      box-sizing: border-box;
+    }
+    .o-mark::after {
+      content: "";
+      position: absolute; inset: 0; margin: auto;
+      width: 0.21em; height: 0.21em;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
     @keyframes blink {
       0%, 49% { opacity: 1; }
       50%, 100% { opacity: 0; }
@@ -1807,14 +1850,21 @@
     .dna-stack {
       display: flex;
       flex-direction: column;
-      gap: clamp(11px, 1.6vw, 24px);
+      gap: clamp(13.75px, 2vw, 30px);
+      /* The definite width lives HERE, not on .dna-stage: the stages size
+         from it, and the troughs' own percentage widths size from those. Put
+         it on the stage instead and below 860px (where the stage is 100%) the
+         chain resolves against a shrink-to-fit flex item — circular, and the
+         troughs silently collapse to a third of their width. */
+      width: clamp(240px, 34vw, 360px);
+      flex: none;
     }
 
     /* The stage is a fixed box so the three demos line up on one column
        edge no matter how wide each control actually is. */
     .dna-stage {
       flex: 0 0 auto;
-      width: clamp(240px, 34vw, 360px);
+      width: 100%;
       display: grid;
       place-items: center;
       --z: 1;
@@ -1895,10 +1945,10 @@
     /* The lip is the only shrink-to-fit control in the stack; the two bars
        below are full width. Centring it left it floating over their middle,
        so this stage alone aligns to the start and all three share one edge. */
-    .dna-stage:first-child { justify-items: start; }
+    .dna-stack .dna-stage { justify-items: start; }
 
     /* ── Row 2 — indented panel ──────────────────────────────────────── */
-    .dna-fieldwrap { width: 100%; display: grid; gap: calc(10px * var(--z)); }
+    .dna-fieldwrap { width: 75%; display: grid; gap: calc(10px * var(--z)); }
     .sk-field {
       --h: 51;
       display: block; width: 100%; box-sizing: border-box;
@@ -1914,7 +1964,7 @@
       width: 100%; height: 100%; box-sizing: border-box;
       padding: 0 calc(20px * var(--z));
       border-radius: inherit; color: var(--ink);
-      font-size: calc(15.5px * var(--z) * var(--fs));
+      font-size: calc(12.22px * var(--z) * var(--fs));   /* levels with .sk-seg__opt: 12.22 x 1.35 = 15 x 1.1 */
       line-height: 1;
     }
     /* A caret drawn in CSS, not a real <input>: the row is a diagram of the
@@ -1975,7 +2025,15 @@
     }
 
     @media (max-width: 860px) {
-      .dna-stage { width: 100%; max-width: 340px; }
+      /* Still a definite width, not a percentage: the row is side by side down
+         to 640px, and 100% here would take the whole row and leave the copy
+         nothing. */
+      .dna-stack { width: clamp(200px, 34vw, 340px); }
+    }
+
+    @media (max-width: 640px) {
+      /* Below here .dna-row is a column, so a full-width stack is correct. */
+      .dna-stack { width: 100%; max-width: 340px; }
     }
   </style>
 </head>
@@ -2024,7 +2082,11 @@
              the other pages' blinking orange dot is deliberately dropped
              on this page. The divider below stays put; only the word moves. -->
         <div class="title-row morrow-shove">
-          <h1 class="project-title">morrow</h1>
+          <!-- The two o's are the Live mark itself — a stroked ring with a
+               core at 42% of the diameter, the same construction as
+               .live__mark further down. aria-label carries the real word, so
+               the heading still reads as "morrow" to a screen reader. -->
+          <h1 class="project-title" aria-label="morrow">m<span class="o-mark" aria-hidden="true"></span>rr<span class="o-mark" aria-hidden="true"></span>w</h1>
         </div>
         <div class="dot-divider"></div>
       </div>
@@ -2267,9 +2329,9 @@
            bottom of the page and pause when the block is off screen. -->
       <div class="dna-list dna">
         <div class="dna-row">
-          <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die erhabene Kante liegt auf der Fläche auf: heller Rand oben, Schatten darunter, Licht statt Umrandung. Beim Druck wölbt sie sich nach außen, statt einzusinken — ein weicher Gegenstand gibt nicht nach, er drückt zurück. Die vertiefte Mulde ist ihre Umkehrung: ein Loch in der Fläche, mit Schatten oben und einer schmalen Kante als Schnittrand. Sie ist kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide Formen zusammen ergeben die dritte, die Glasblase: eine Linse, die in einer Mulde liegt und die aktuelle Auswahl markiert. Sie gleitet dorthin, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen — der Weg ist es, der zeigt, was sich geändert hat, und die kleine Dehnung beim Ankommen gibt ihm ein Ende. Damit ist überall in der App ohne Beschriftung beantwortet, was man drücken kann, was einem gehört und wo man gerade ist.</p>
+          <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.</p>
           <div class="dna-stack">
-            <div class="dna-stage sk" style="--z: 1.35;">
+            <div class="dna-stage sk" style="--z: 0.84;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
                 <span>Personal</span>
               </button>
@@ -2285,7 +2347,7 @@
               </div>
             </div>
             <div class="dna-stage sk" style="--z: 1.1;">
-              <div class="sk-seg sk-trough dna-seg" style="width: 100%;">
+              <div class="sk-seg sk-trough dna-seg" style="width: 75%;">
                 <!-- The outer bevel. A segmented trough is furniture sitting in
                      the surface, and without this it reads as a channel with
                      nothing around it — see .sk-trough__bloom. -->
@@ -2545,7 +2607,7 @@
         'pivot-2': 'An ihre Stelle kam SkeuKit: ein weich-skeuomorphes System aus Tokens, vier Themes in Hell und Dunkel. Tiefe entsteht dort aus Licht statt aus Textur — Mulden für Vertieftes, Glas für Bedienelemente, einfacher Text auf der Fläche für Inhalt. Ein Druckverhalten für jedes Element der App. Die Pixelschrift ist geblieben, aber als optionaler Retro-Modus, der nur die Rahmen betrifft; der Aufgabentext bleibt in der Systemschrift. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.',
         'icons-text': 'Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).',
         'appstore-text': 'morrow liegt derzeit bei Apple im Prüfverfahren und erscheint im App&nbsp;Store, sobald die Review abgeschlossen ist.',
-        'dna-forms': 'Die erhabene Kante liegt auf der Fläche auf: heller Rand oben, Schatten darunter, Licht statt Umrandung. Beim Druck wölbt sie sich nach außen, statt einzusinken — ein weicher Gegenstand gibt nicht nach, er drückt zurück. Die vertiefte Mulde ist ihre Umkehrung: ein Loch in der Fläche, mit Schatten oben und einer schmalen Kante als Schnittrand. Sie ist kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide Formen zusammen ergeben die dritte, die Glasblase: eine Linse, die in einer Mulde liegt und die aktuelle Auswahl markiert. Sie gleitet dorthin, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen — der Weg ist es, der zeigt, was sich geändert hat, und die kleine Dehnung beim Ankommen gibt ihm ein Ende. Damit ist überall in der App ohne Beschriftung beantwortet, was man drücken kann, was einem gehört und wo man gerade ist.',
+        'dna-forms': 'Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.',
         'dna-intro': 'Unter der Oberfläche besteht SkeuKit aus drei Formen, und mehr sind es bewusst nicht. Jede beantwortet eine einzige Frage, die man sonst ausprobieren müsste: Kann ich das drücken? Gehört das mir? Wo bin ich gerade? Weil es nur drei sind, lernt man sie einmal — und danach ist jede neue Ansicht der App schon erklärt.',
         'color-text': 'Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.',
         'placeholder': '[ Platzhalter ]',
