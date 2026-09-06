@@ -1892,7 +1892,10 @@
       font-size: calc(19.7px * var(--z) * var(--fs));
       line-height: 1;
     }
-    .dna-ws svg { width: calc(13px * var(--z)); height: auto; display: block; opacity: .72; }
+    /* The lip is the only shrink-to-fit control in the stack; the two bars
+       below are full width. Centring it left it floating over their middle,
+       so this stage alone aligns to the start and all three share one edge. */
+    .dna-stage:first-child { justify-items: start; }
 
     /* ── Row 2 — indented panel ──────────────────────────────────────── */
     .dna-fieldwrap { width: 100%; display: grid; gap: calc(10px * var(--z)); }
@@ -1952,7 +1955,7 @@
       position: absolute; z-index: 0;
       top: calc(8.2px * var(--z)); bottom: calc(8.2px * var(--z));
       left: calc(8.2px * var(--z));
-      width: calc((100% - 16.4px * var(--z) - 6px * var(--z)) / 3);
+      width: calc((100% - 16.4px * var(--z) - 3px * var(--z)) / 2);
       border-radius: 999px; pointer-events: none;
       transform: translateX(calc(var(--i, 0) * (100% + 3px * var(--z))));
       transition: transform 400ms cubic-bezier(.2, .8, .3, 1),
@@ -2269,20 +2272,27 @@
             <div class="dna-stage sk" style="--z: 1.35;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
                 <span>Personal</span>
-                <svg viewBox="0 0 12 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.4 6 5.8 11 1.4"/></svg>
               </button>
             </div>
             <div class="dna-stage sk" style="--z: 1.35;">
               <div class="dna-fieldwrap">
-                <div class="sk-field sk-trough"><span class="dna-type"></span><i class="dna-caret"></i></div>
+                <!-- .sk-field__input is not decoration: .sk-trough's fill and
+                     lip are ::before/::after, i.e. POSITIONED descendants, so
+                     they paint above any unpositioned in-flow sibling. Without
+                     this wrapper the typed value sat at 0,0 with no padding and
+                     behind its own trough. -->
+                <div class="sk-field sk-trough"><span class="sk-field__input"><span class="dna-type"></span><i class="dna-caret"></i></span></div>
               </div>
             </div>
             <div class="dna-stage sk" style="--z: 1.1;">
               <div class="sk-seg sk-trough dna-seg" style="width: 100%;">
+                <!-- The outer bevel. A segmented trough is furniture sitting in
+                     the surface, and without this it reads as a channel with
+                     nothing around it — see .sk-trough__bloom. -->
+                <span class="sk-trough__bloom"></span>
                 <span class="dna-segpill sk-glass" style="--i: 0"></span>
                 <span class="sk-seg__opt is-on"><span>Heute</span></span>
                 <span class="sk-seg__opt"><span>Morgen</span></span>
-                <span class="sk-seg__opt"><span>Bald</span></span>
               </div>
             </div>
           </div>
@@ -3076,7 +3086,7 @@
 
       // ── 2. Trough: type the value in, hold it, take it back out. ─────
       var typeEl = root.querySelector('.dna-type');
-      var WORDS  = ['Heute', 'Steuer bis Freitag', 'Arbeit'];
+      var WORDS  = ['Personal', 'Work'];
       var wi = 0, ci = 0, erasing = false;
 
       // ── 3. Glass bubble: glide to the next column, swell on arrival. ──
@@ -3110,7 +3120,7 @@
 
       function stepSeg() {
         if (!pill) return;
-        si = (si + 1) % 3;
+        si = (si + 1) % opts.length;
         pill.style.setProperty('--i', si);
         for (var i = 0; i < opts.length; i++) opts[i].classList.toggle('is-on', i === si);
         // The swell lands WITH the pill, not with the departure: same
