@@ -151,44 +151,36 @@
        nudged onto the x-height rather than the baseline — an inline-block
        sits on the baseline by default, which would leave it floating a
        descender's worth too high next to the lowercase letters. */
-    /* Measured against the real glyph at 96px rather than eyeballed: OCR-A-BT's
-       'o' has 48px of ink on a 59.3px advance, sitting 43px above the baseline
-       and 5px below it. So the box takes the ADVANCE (0.618em) to keep the
-       monospace rhythm — letter-spacing applies to this span exactly as it does
-       to a letter — while the ring itself takes the ink height (0.5em) and is
-       centred in it. All em, so it tracks the title's clamp() at every width.
+    /* The two o's in the title are the Live control itself — trough, contour,
+       glass and mark, the same component as .live below, not a hand-drawn
+       ring. Only three things change for use inside a text run:
 
-       Ring and core are pseudo-elements rather than the element's own border,
-       because the element's box is wider than the circle. Proportions are
-       .live__mark's: core at 42% of the diameter, stroke at 9.8% of it. */
-    .o-mark {
-      display: inline-block;
-      position: relative;
-      width: 0.618em;
-      height: 0.5em;
-      vertical-align: -0.052em;
+       · inline-grid and no auto margins, so it sits in the line;
+       · the glass is always on (elsewhere that means "selected"; here it is
+         an illustration, and the o should always look like the real button);
+       · vertical-align puts it on the x-height. OCR-A-BT's 'o' at 96px has
+         its ink from baseline-42.8 to baseline+5.5, so the ink centre is
+         0.194em above the baseline and a 0.618em box bottoms out 0.115em
+         below it.
+
+       SIZE IS SET FROM JS, not CSS. --n is unitless by design (the SkeuKit
+       trap: it is multiplied by px literals, so as a length every derived
+       value becomes px² and the declaration is silently dropped), which means
+       it cannot be an em value and cannot follow the title's clamp() on its
+       own. The script near the bottom of this file measures the rendered font
+       size and writes it. The value here is the 96px default, so the mark is
+       right even if that script never runs. */
+    .project-title .o-live {
+      --n: 40.25;                  /* 0.4193 x 96px; JS keeps it in step */
+      display: inline-grid;
+      margin-inline: 0;
+      vertical-align: -0.115em;
       /* .project-title carries letter-spacing: -0.04em, and Blink does not
          apply it to an atomic inline the way it does to a letter — measured,
-         each mark was pushing the rest of the word 3.84px right. This gives it
-         back, so the marks land on the same grid as the real glyphs. */
+         each mark was pushing the rest of the word 3.84px right. */
       margin-right: -0.04em;
     }
-    .o-mark::before {
-      content: "";
-      position: absolute; top: 0; bottom: 0; left: 50%;
-      width: 0.5em;
-      transform: translateX(-50%);
-      border-radius: 999px;
-      border: 0.049em solid currentColor;
-      box-sizing: border-box;
-    }
-    .o-mark::after {
-      content: "";
-      position: absolute; inset: 0; margin: auto;
-      width: 0.21em; height: 0.21em;
-      border-radius: 999px;
-      background: currentColor;
-    }
+    .project-title .o-live .live__glass { opacity: 1; }
 
     @keyframes blink {
       0%, 49% { opacity: 1; }
@@ -741,6 +733,18 @@
        clamp scales term by term, so this is just .duo's clamp x 0.4841.
        If .duo's width changes, rescale all three numbers here with it. */
     .stagger-figure.phone { width: clamp(126px, 20.33vw, 232px); }
+
+    /* The lone phones sit further in than the rest of the column, to match
+       unify2d's. There the phone is centred inside a 42fr grid column, so its
+       edge never touches the text column's edge; here the figure is the first
+       flex item in .stagger-row and was flush with it.
+
+       Derived, not eyeballed: at a 1220px wrapper Unify's left column is 418px
+       and its phone 232px, so the phone is inset (418 - 232) / 2 = 93px, and
+       93/1440 = 6.46vw. The pair figure and the Live mark keep the column edge
+       — only the standalone screens move. */
+    .stagger-row .stagger-figure.phone       { margin-left: clamp(0px, 6.46vw, 110px); }
+    .stagger-row.right .stagger-figure.phone { margin-right: clamp(0px, 6.46vw, 110px); }
     /* The recordings carry the phone frame baked in, so they size exactly
        like the stills do. Deliberately NO drop-shadow on these: the frame
        sits on an opaque page-coloured background inside the file (H.264
@@ -1569,6 +1573,8 @@
         margin-left: 0; max-width: none; flex-direction: row;
       }
       .stagger-figure { width: clamp(160px, 34vw, 240px); }
+      .stagger-row .stagger-figure.phone,
+      .stagger-row.right .stagger-figure.phone { margin-left: 0; margin-right: 0; }
       .process-shot.shift-right,
       .process-shot.shift-left { width: 100%; margin-left: 0; }
     }
@@ -1588,6 +1594,11 @@
     @media (min-width: 1600px) and (min-aspect-ratio: 17/10) {
       .stagger-list { max-width: 1180px; margin-left: auto; margin-right: auto; }
       .stagger-row { max-width: 980px; gap: clamp(48px, 5vw, 96px); }
+      /* On a true widescreen the rows are already pulled into a centred 980px
+         band, which does the inward move on its own — keeping the margin as
+         well overshot Unify by ~110px. */
+      .stagger-row .stagger-figure.phone,
+      .stagger-row.right .stagger-figure.phone { margin-left: 0; margin-right: 0; }
       .stagger-row.indent { margin-left: clamp(40px, 5vw, 110px); }
       .stagger-figure { width: clamp(320px, 25vw, 460px); }
       .stagger-body { max-width: 520px; }
@@ -2118,7 +2129,7 @@
                core at 42% of the diameter, the same construction as
                .live__mark further down. aria-label carries the real word, so
                the heading still reads as "morrow" to a screen reader. -->
-          <h1 class="project-title" aria-label="morrow">m<span class="o-mark" aria-hidden="true"></span>rr<span class="o-mark" aria-hidden="true"></span>w</h1>
+          <h1 class="project-title" aria-label="morrow">m<span class="live o-live" aria-hidden="true"><span class="live__bloom"></span><span class="live__trough"></span><span class="live__contour"></span><span class="live__glass"><span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span><span class="live__relief"></span><span class="live__glow"></span><span class="live__rim"></span></span><span class="live__mark"></span></span>rr<span class="live o-live" aria-hidden="true"><span class="live__bloom"></span><span class="live__trough"></span><span class="live__contour"></span><span class="live__glass"><span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span><span class="live__relief"></span><span class="live__glow"></span><span class="live__rim"></span></span><span class="live__mark"></span></span>w</h1>
         </div>
         <div class="dot-divider"></div>
       </div>
@@ -3123,6 +3134,36 @@
     })();
   </script>
 
+
+  <script>
+    // Size the title's two Live marks.
+    //
+    // .live is driven by --n, which is UNITLESS on purpose (it is multiplied by
+    // px literals throughout, so as a length every derived value would become
+    // px² and the declaration would be dropped with no error). That means it
+    // cannot be written in em and cannot track .project-title's clamp() in CSS
+    // alone, so it is measured here — the same measure-then-set approach the
+    // dot dividers and the wrapper's bottom padding already use on this page.
+    //
+    // 0.4193 = 0.618 / 1.474: the mark's outer box is disc x 1.474, and 0.618em
+    // is the advance of one OCR-A-BT glyph, so the button occupies exactly one
+    // character cell and the word keeps its spacing.
+    (function () {
+      var h = document.querySelector('.project-title');
+      if (!h) return;
+      var marks = h.querySelectorAll('.o-live');
+      if (!marks.length) return;
+      function size() {
+        var fs = parseFloat(getComputedStyle(h).fontSize);
+        if (!fs) return;
+        var n = (fs * 0.4193).toFixed(2);
+        for (var i = 0; i < marks.length; i++) marks[i].style.setProperty('--n', n);
+      }
+      size();
+      window.addEventListener('resize', size);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
+    })();
+  </script>
 
   <script>
     // Click a video to replay it from the start, and give it a press.

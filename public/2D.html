@@ -446,12 +446,22 @@
        disc — so the same values that read as crisp at 112 read as washed out
        here. These pull them back. */
 
-    /* Halved reach and blur: the outer bloom was spreading ~29px past the
-       disc with a 10px feather, which at this size dissolved the silhouette
-       into the page instead of seating it on it. */
+    /* The outer bevel. Two independent knobs, and they were being confused
+       with each other: INSET is how far the slab reaches past the disc, BLUR
+       is how soft its edge is. Widening it means more inset at the SAME blur —
+       0.9px x --s is the feather that was dialled in earlier and is kept
+       untouched here; only the reach grows, 2.6 -> 6.4.
+
+       The gradient is also relit. It ran --material-top (#E4E8EE) to --recess,
+       and the page sits at #DCDCE3 — six levels apart, so the lit half of the
+       bevel was invisible against the background. It starts at white now, and
+       holds white through the first 30% so the top edge reads as a highlight
+       rather than as the start of a ramp. */
     .morrow-live-tile .live__bloom {
-      inset: calc(-2.6px * var(--s));
+      inset: calc(-6.4px * var(--s));
       filter: blur(calc(0.9px * var(--s)));
+      background: linear-gradient(to bottom,
+        #FFFFFF 0%, #FFFFFF 30%, var(--material-top) 55%, var(--recess) 100%);
     }
 
     /* The glass pill's own rim — the thin light edge just inside the dark
