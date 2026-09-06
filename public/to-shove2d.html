@@ -171,7 +171,12 @@
        size and writes it. The value here is the 96px default, so the mark is
        right even if that script never runs. */
     .project-title .o-live {
-      --n: 40.25;                  /* 0.4193 x 96px; JS keeps it in step */
+      --n: 59.33;                  /* 0.618 x 96px; JS keeps it in step */
+      /* No trough, no contour, no outer bloom — the glass bubble only, with
+         the ring and core sitting in it. --pad is the gap .live leaves between
+         its trough and its glass; with the trough gone the glass fills the box,
+         so the bubble is exactly one glyph cell wide. */
+      --pad: 0px;
       display: inline-grid;
       margin-inline: 0;
       vertical-align: -0.115em;
@@ -296,36 +301,45 @@
          word's width. */
       width: fit-content;
       position: relative;
+      will-change: transform;
       animation: morrow-shove 8s infinite;
     }
 
     /* 8s loop: hold 3s (37.5%), glide 1s (12.5%), hold 3s, glide 1s.
-       left% resolves against the header column, translateX% against the
-       word itself — moved in lockstep the pair lands exactly flush at
-       each edge whatever width "morrow" renders at, so there is nothing
-       to measure and no per-breakpoint value to keep in sync.
-       The timing function is set on the keyframes that START a glide —
-       CSS applies it to the segment running OUT of a keyframe, so the two
-       holds are untouched. EVERY keyframe repeats left/transform in full
-       and no offset is listed twice: writing it the compact way, with a
-       bare `37.5% { animation-timing-function: … }` alongside a
-       `0%, 37.5% { left: …; transform: … }`, silently dropped the curve
-       in Chrome and the glide came out with no bounce at all. Measured:
-       0px overshoot that way vs 20.8px this way.
 
-       The bounce is deliberately gentle, and the curve was picked by
-       computing its peak rather than eyeballing it: this one peaks at
-       1.0299, i.e. 20.8px past the edge on the 1440px layout (verified by
-       stepping the animation's currentTime), which stays well inside the
-       wrapper's padding. A stock easeOutBack (0.34, 1.56, 0.64, 1) peaks
-       at 1.098 = 54px past the column, and 1.7 — the curve this page used
-       at first — overshoots 79px, far enough to read as a glitch. */
+       TRANSFORM ONLY. This used to animate `left` from 0% to 100% with a
+       matching translateX(-100%), which is elegant — the pair lands flush at
+       either edge whatever width the word renders at, with nothing to measure.
+       But `left` is a layout property: every frame of the glide relaid out the
+       header and repainted it off the compositor, which desktop absorbs and a
+       phone does not. Measured on a 390px viewport, that is what read as the
+       animation being broken.
+
+       The travel distance is measured once instead and written to --shove-x by
+       the script near the bottom of this file (column width minus word width),
+       so the keyframes move nothing but a composited transform. Same landing
+       positions, same curve, no layout per frame.
+
+       The timing function is set on the keyframes that START a glide — CSS
+       applies it to the segment running OUT of a keyframe, so the two holds are
+       untouched. EVERY keyframe repeats the transform in full and no offset is
+       listed twice: writing it the compact way, with a bare
+       `37.5% { animation-timing-function: … }` alongside a
+       `0%, 37.5% { transform: … }`, silently dropped the curve in Chrome and
+       the glide came out with no bounce at all.
+
+       The bounce is deliberately gentle, and the curve was picked by computing
+       its peak rather than eyeballing it: this one peaks at 1.0299, i.e. 20.8px
+       past the edge on the 1440px layout, which stays well inside the wrapper's
+       padding. A stock easeOutBack (0.34, 1.56, 0.64, 1) peaks at 1.098 = 54px
+       past the column, and 1.7 — the curve this page used at first —
+       overshoots 79px, far enough to read as a glitch. */
     @keyframes morrow-shove {
-      0%     { left: 0%;   transform: translateX(0);       animation-timing-function: linear; }
-      37.5%  { left: 0%;   transform: translateX(0);       animation-timing-function: cubic-bezier(0.34, 1.3, 0.55, 1); }
-      50%    { left: 100%; transform: translateX(-100%);   animation-timing-function: linear; }
-      87.5%  { left: 100%; transform: translateX(-100%);   animation-timing-function: cubic-bezier(0.34, 1.3, 0.55, 1); }
-      100%   { left: 0%;   transform: translateX(0); }
+      0%     { transform: translateX(0);                   animation-timing-function: linear; }
+      37.5%  { transform: translateX(0);                   animation-timing-function: cubic-bezier(0.34, 1.3, 0.55, 1); }
+      50%    { transform: translateX(var(--shove-x, 0px)); animation-timing-function: linear; }
+      87.5%  { transform: translateX(var(--shove-x, 0px)); animation-timing-function: cubic-bezier(0.34, 1.3, 0.55, 1); }
+      100%   { transform: translateX(0); }
     }
 
     /* ── Meta grid ── */
@@ -1829,6 +1843,44 @@
       .stagger-row .stagger-figure        { align-self: flex-start; }
       .stagger-row.right .stagger-figure  { align-self: flex-end; }
       .stagger-row.indent .stagger-figure { align-self: center; }
+
+      /* Phones follow unify2d's phone treatment rather than the silver-panel
+         stagger above: there a single mockup renders at ~77% of a 390px column
+         (--phone-h 640px x the 0.47 visible-width ratio), centred, not hung off
+         an edge. The PAIR takes the same 78% so its side gutters match a single
+         screen's instead of it running edge to edge. */
+      .stagger-figure.phone,
+      .stagger-figure.duo { width: 78%; }
+      .stagger-row .stagger-figure.phone,
+      .stagger-row.right .stagger-figure.phone,
+      .stagger-row .stagger-figure.duo,
+      .stagger-row.right .stagger-figure.duo { align-self: center; }
+
+      /* The Live mark is the section's own illustration, not a screenshot —
+         centred rather than hung off the left edge with the panels. */
+      .stagger-row .stagger-figure:not(.phone):not(.duo) { align-self: center; }
+
+      /* Retro vs modern stacks on a phone: side by side, one of them is always
+         a collapsed stub next to a full cluster, and the pair cannot both be
+         legible in 350px. Stacked they get the full column each, offset to
+         opposite edges so the comparison still reads as two sides. */
+      /* Full width, or align-self has nothing to align against: .icons-compare
+         is shrink-to-fit and centred inside .ic-sticky, so as a column it was
+         only as wide as its widest child and both sides landed on the same
+         axis regardless of align-self. */
+      .icons-compare { flex-direction: column; width: 100%; }
+      .ic-side--left  { align-self: flex-start; margin-left: 6%; }
+      .ic-side--right { align-self: flex-end;  margin-right: 6%; }
+      /* --push shoves the closed side toward its EDGE, which is a horizontal
+         move that only means anything in the side-by-side layout. Stacked, the
+         offsets above do that job. */
+      .icons-compare[data-ic] .ic-side { transform: none; }
+      /* Two boxes tall now, so the pinned box and its spacer follow. */
+      .ic-sticky {
+        height: calc(var(--ic-w) * 2 + 8px);
+        top: max(12px, calc((100vh - (var(--ic-w) * 2 + 8px)) / 2));
+      }
+      .ic-scrolly { height: calc(var(--ic-w) * 2 + 8px + 70vh); }
     }
     /* Mobile: neumorphic shadow spread/radius reduced 35% (offsets & blur ×0.65),
        matching the nav's 2D/3D toggle segment. Redefining only the tokens keeps
@@ -2129,7 +2181,7 @@
                core at 42% of the diameter, the same construction as
                .live__mark further down. aria-label carries the real word, so
                the heading still reads as "morrow" to a screen reader. -->
-          <h1 class="project-title" aria-label="morrow">m<span class="live o-live" aria-hidden="true"><span class="live__bloom"></span><span class="live__trough"></span><span class="live__contour"></span><span class="live__glass"><span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span><span class="live__relief"></span><span class="live__glow"></span><span class="live__rim"></span></span><span class="live__mark"></span></span>rr<span class="live o-live" aria-hidden="true"><span class="live__bloom"></span><span class="live__trough"></span><span class="live__contour"></span><span class="live__glass"><span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span><span class="live__relief"></span><span class="live__glow"></span><span class="live__rim"></span></span><span class="live__mark"></span></span>w</h1>
+          <h1 class="project-title" aria-label="morrow">m<span class="live o-live" aria-hidden="true"><span class="live__glass"><span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span><span class="live__relief"></span><span class="live__glow"></span><span class="live__rim"></span></span><span class="live__mark"></span></span>rr<span class="live o-live" aria-hidden="true"><span class="live__glass"><span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span><span class="live__relief"></span><span class="live__glow"></span><span class="live__rim"></span></span><span class="live__mark"></span></span>w</h1>
         </div>
         <div class="dot-divider"></div>
       </div>
@@ -3136,6 +3188,27 @@
 
 
   <script>
+    // How far the title glides: the header column's content width minus the
+    // word's own width. Measured rather than expressed as left: 0% -> 100%
+    // with a matching translateX(-100%), which needed no measuring but
+    // animated a LAYOUT property — see the @keyframes comment.
+    (function () {
+      var row = document.querySelector('.morrow-shove');
+      if (!row) return;
+      var col = row.parentElement;
+      function size() {
+        var cs = getComputedStyle(col);
+        var inner = col.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        var d = Math.max(0, Math.round(inner - row.offsetWidth));
+        row.style.setProperty('--shove-x', d + 'px');
+      }
+      size();
+      window.addEventListener('resize', size);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
+    })();
+  </script>
+
+  <script>
     // Size the title's two Live marks.
     //
     // .live is driven by --n, which is UNITLESS on purpose (it is multiplied by
@@ -3145,9 +3218,9 @@
     // alone, so it is measured here — the same measure-then-set approach the
     // dot dividers and the wrapper's bottom padding already use on this page.
     //
-    // 0.4193 = 0.618 / 1.474: the mark's outer box is disc x 1.474, and 0.618em
-    // is the advance of one OCR-A-BT glyph, so the button occupies exactly one
-    // character cell and the word keeps its spacing.
+    // 0.618em is the advance of one OCR-A-BT glyph. With --pad: 0 the bubble's
+    // box IS --disc, so --n is that advance in px and each o occupies exactly
+    // one character cell — the word keeps its spacing.
     (function () {
       var h = document.querySelector('.project-title');
       if (!h) return;
@@ -3156,7 +3229,7 @@
       function size() {
         var fs = parseFloat(getComputedStyle(h).fontSize);
         if (!fs) return;
-        var n = (fs * 0.4193).toFixed(2);
+        var n = (fs * 0.618).toFixed(2);
         for (var i = 0; i < marks.length; i++) marks[i].style.setProperty('--n', n);
       }
       size();
