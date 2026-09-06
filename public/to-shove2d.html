@@ -775,9 +775,9 @@
 
     .icons-compare {
       --push: clamp(16px, 4vw, 60px);
-      /* Doubled again from the +30% pass — every stop scaled by the same
-         factor so the composition grows as one piece. */
-      --ic-w: clamp(390px, 57.2vw, 598px);   /* the orbit box at full size */
+      /* --ic-w is declared on .ic-scrolly (below), not here: .ic-sticky needs
+         the same number to size itself, and it is not a descendant of this
+         element. It inherits down to here unchanged. */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -866,11 +866,31 @@
     /* The sticky pin: while the two sides trade places the page holds
        still, so the comparison stays centred instead of sliding off the
        top mid-swap. Same idiom as .fan-scrolly below. */
-    .ic-scrolly { position: relative; height: 230vh; }
+    .ic-scrolly {
+      position: relative;
+      /* Spacer = the pinned box plus the scroll room the states need, not a
+         round number of viewports. At 230vh the pin ran for ~1450px, which is
+         most of a section spent with nothing on screen but the icons; this is
+         the content height plus 85vh, so the pin is about half as long and the
+         paragraphs either side are on screen for most of the block. */
+      height: calc(var(--ic-w) + 85vh);
+      /* Doubled from the +30% pass — every stop scaled by the same factor so
+         the composition grows as one piece. Lives here rather than on
+         .icons-compare so .ic-sticky can size itself from it as well. */
+      --ic-w: clamp(390px, 57.2vw, 598px);   /* the orbit box at full size */
+    }
+
+    /* The sticky box is the height of its CONTENT, not of the viewport, and is
+       pinned at whatever offset centres it. A 100vh sticky child is why a
+       pinned section reads as "the rest of the page goes blank": the box
+       covers the screen edge to edge, so there is nowhere for the paragraph
+       above or below to be. Nothing about position: sticky requires that —
+       it is purely the height. max() keeps the offset off the top edge on a
+       viewport too short to centre in. */
     .ic-sticky {
       position: sticky;
-      top: 0;
-      height: 100vh;
+      top: max(12px, calc((100vh - var(--ic-w)) / 2));
+      height: var(--ic-w);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -916,30 +936,41 @@
        opened and stayed open. A tall spacer with a sticky child gives the
        animation a guaranteed range regardless of how long the page is,
        the same idiom kaffeemaschine2d uses for its turntable. */
-    .fan-scrolly { position: relative; height: 220vh; }
+    .fan-scrolly {
+      position: relative;
+      /* Same shape as .ic-scrolly's: the pinned height plus the scroll room
+         the open/close needs. */
+      height: calc(var(--card-w) * (1600 / 792) * 1.18 + 85vh);
+      /* 15% down from the phone width used elsewhere on the page — this
+         group reads as a composition rather than as more UI to inspect,
+         so it does not need to match the single phones. Declared here, on the
+         ancestor, so .fan-sticky can size itself from it as well as .color-fan.
+         Slightly tighter than the card is wide, so the scattered cards overlap
+         the way they do in the reference instead of sitting apart; --step is
+         scaled by the same 0.85 as --card-w so the overlap ratio holds. */
+      --card-w: clamp(107px, 17.28vw, 197px);
+      --step: clamp(100px, 15.98vw, 182px);
+    }
 
+    /* Same as .ic-sticky above: content-height, centred, so the paragraph
+       above the fan and the section below it stay on screen while it plays. */
     .fan-sticky {
+      --fan-h: calc(var(--card-w) * (1600 / 792) * 1.18);
       position: sticky;
-      top: 0;
-      height: 100vh;
+      top: max(12px, calc((100vh - var(--fan-h)) / 2));
+      height: var(--fan-h);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .color-fan {
-      /* 15% down from the phone width used elsewhere on the page — this
-         group reads as a composition rather than as more UI to inspect,
-         so it does not need to match the single phones. */
-      --card-w: clamp(107px, 17.28vw, 197px);
-      /* Slightly tighter than the card is wide, so the scattered cards
-         overlap the way they do in the reference instead of sitting apart.
-         Scaled by the same 0.85 as --card-w so the overlap ratio holds. */
-      --step: clamp(100px, 15.98vw, 182px);
       position: relative;
       /* Room for the tallest card once it is scaled up and pushed down. */
       height: calc(var(--card-w) * (1600 / 792) * 1.18);
-      margin-top: clamp(24px, 4vw, 40px);
+      /* No margin here any more: .fan-sticky is now exactly this tall, so a
+         top margin would push the fan out of its own pinned box. The air above
+         the block belongs to .fan-scrolly's spacer instead. */
     }
 
     /* Two elements, one card, because they own two transforms that must
@@ -1088,14 +1119,15 @@
       /* Four across has to fit a 350px column, so the cards shrink here:
          18vw + 3 x 22.5vw = 333px at 390px wide. They read as colour
          swatches at this size, which is the point of the section. */
-      .color-fan { --card-w: 15.3vw; --step: 14.3vw; }
-      .fan-scrolly { height: 190vh; }
+      .fan-scrolly { --card-w: 15.3vw; --step: 14.3vw; }
+      .fan-scrolly { height: calc(var(--card-w) * (1600 / 792) * 1.18 + 70vh); }
       /* +30% would put the two open clusters at ~400px across a 350px
          column. Only one side is open at a time, so the binding case is
          actually reduced motion, which opens both — this stop keeps that
          inside the column too. */
-      .icons-compare { gap: 8px; --ic-w: clamp(180px, 55vw, 280px); }
-      .ic-scrolly { height: 190vh; }
+      .icons-compare { gap: 8px; }
+      .ic-scrolly { --ic-w: clamp(180px, 55vw, 280px); }
+      .ic-scrolly { height: calc(var(--ic-w) + 70vh); }
       .live { --n: 57; }
     }
 
@@ -2782,9 +2814,16 @@
         var r = el.getBoundingClientRect();
         return (r.top + r.height / 2) / window.innerHeight;
       }
+      // Progress through the pin. The sticky child is content-height rather
+      // than 100vh (that is what keeps the surrounding text on screen), so the
+      // travel is the spacer minus the child and its top offset — measuring it
+      // against the viewport would finish early and hold the last state.
       function pin(scrolly) {
         if (!scrolly) return 0;
-        var travel = scrolly.offsetHeight - window.innerHeight;
+        var child = scrolly.firstElementChild;
+        var used = child ? child.offsetHeight + (parseFloat(getComputedStyle(child).top) || 0)
+                         : window.innerHeight;
+        var travel = scrolly.offsetHeight - used;
         if (travel <= 0) return 0;
         var t = -scrolly.getBoundingClientRect().top / travel;
         return Math.max(0, Math.min(1, t));
