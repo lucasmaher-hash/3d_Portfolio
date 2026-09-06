@@ -1848,12 +1848,42 @@
       .stagger-row.indent .stagger-figure { align-self: center; }
 
       /* Phones follow unify2d's phone treatment rather than the silver-panel
-         stagger above: there a single mockup renders at ~77% of a 390px column
-         (--phone-h 640px x the 0.47 visible-width ratio), centred, not hung off
-         an edge. The PAIR takes the same 78% so its side gutters match a single
-         screen's instead of it running edge to edge. */
-      .stagger-figure.phone,
-      .stagger-figure.duo { width: 78%; }
+         stagger above, and they are matched to it NUMERICALLY, not by eye.
+
+         Unify sizes its mockups by HEIGHT — --phone-h is clamp(445px, 83.5vh,
+         640px) — and its captions are set to the VISIBLE phone width, which is
+         --phone-h x 0.47 (the element box is wider; the grey around the phone
+         is clipped away). Matching a percentage width against that would only
+         agree at one viewport, because one is height-driven and the other
+         width-driven, so these are height-driven too.
+
+         Morrow's frames are their own file rather than a clipped recording:
+         measured off swipe.mp4, the phone spans x 5..786 of 792, i.e. 98.74%
+         of the frame, on the full 1600 of height. So its visible width is
+         height x (792/1600) x 0.9874 = height x 0.48875, and the height that
+         reproduces Unify's visible width is --phone-h x 0.47 / 0.48875 =
+         --phone-h x 0.9617 — every stop of the clamp scaled by that. */
+      .stagger-figure.phone { width: auto; }
+      .stagger-figure.phone video {
+        width: auto;
+        height: clamp(428px, 80.3vh, 615px);
+        margin-inline: auto;
+      }
+      /* The pair is one file of two phones; height-driving it would make it
+         twice as wide. It takes a single screen's footprint instead, so its
+         side gutters match. 0.495 = 792/1600, the single frame's aspect. */
+      .stagger-figure.duo { width: calc(clamp(428px, 80.3vh, 615px) * 0.495); }
+
+      /* The caption goes to the visible phone width and centres under it,
+         exactly as unify2d's does — Unify's own --phone-w, not a re-derivation
+         of morrow's, because the two phones are now the same visible size. */
+      .stagger-row:has(.stagger-figure.phone) .stagger-body,
+      .stagger-row:has(.stagger-figure.duo) .stagger-body {
+        width: calc(clamp(445px, 83.5vh, 640px) * 0.47);
+        max-width: 100%;
+        margin-inline: auto;
+      }
+
       .stagger-row .stagger-figure.phone,
       .stagger-row.right .stagger-figure.phone,
       .stagger-row .stagger-figure.duo,
