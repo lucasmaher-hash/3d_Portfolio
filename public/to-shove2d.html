@@ -774,7 +774,7 @@
     @property --ic-r { syntax: "<length>"; inherits: true; initial-value: 0px; }
 
     .icons-compare {
-      --push: clamp(16px, 4vw, 60px);
+      --push: clamp(8px, 2vw, 30px);
       /* --ic-w is declared on .ic-scrolly (below), not here: .ic-sticky needs
          the same number to size itself, and it is not a descendant of this
          element. It inherits down to here unchanged. */
@@ -796,7 +796,7 @@
        never moves or grows, so it reads as the thing the icons belong to
        rather than another element in the dance. */
     .icons-compare .ic-side {
-      --z: 2.6;
+      --z: 2.34;
       position: relative;
       width: calc(var(--ic-w) * 0.42);
       height: var(--ic-w);
@@ -877,7 +877,7 @@
       /* Doubled from the +30% pass — every stop scaled by the same factor so
          the composition grows as one piece. Lives here rather than on
          .icons-compare so .ic-sticky can size itself from it as well. */
-      --ic-w: clamp(390px, 57.2vw, 598px);   /* the orbit box at full size */
+      --ic-w: clamp(351px, 51.5vw, 538px);   /* the orbit box at full size */
     }
 
     /* The sticky box is the height of its CONTENT, not of the viewport, and is
@@ -1126,7 +1126,7 @@
          actually reduced motion, which opens both — this stop keeps that
          inside the column too. */
       .icons-compare { gap: 8px; }
-      .ic-scrolly { --ic-w: clamp(180px, 55vw, 280px); }
+      .ic-scrolly { --ic-w: clamp(162px, 49.5vw, 252px); }
       .ic-scrolly { height: calc(var(--ic-w) + 70vh); }
       .live { --n: 57; }
     }
@@ -1172,7 +1172,7 @@
          which is below the size at which the pixel UI is legible. 2x2
          keeps the composition and roughly doubles each phone. */
       .win-devices-inner { grid-template-columns: repeat(2, 1fr); width: 88%; gap: 6%; row-gap: 18px; }
-      .icons-compare .ic-side { --z: 1.85; }
+      .icons-compare .ic-side { --z: 1.665; }
       .meta-grid { grid-template-columns: 1fr 1fr; }
     }
 
@@ -1197,7 +1197,7 @@
     @media (max-width: 640px) {
       /* Deliberately down here, AFTER the 860px block: both queries match a
          phone, so the narrower step only wins on source order. */
-      .icons-compare .ic-side { --z: 0.95; }
+      .icons-compare .ic-side { --z: 0.855; }
       #top-bar { height: 140px; }
       #top-bar.hide { transform: translateY(-90px); }
       .section { padding: 24px 20px; }
