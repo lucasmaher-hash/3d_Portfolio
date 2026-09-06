@@ -509,7 +509,7 @@
          like 5.3px * var(--s) become px², which is invalid and silently
          drops the whole declaration: the layer just vanishes with no
          error. Stepped rather than clamp()ed for the same reason. */
-      --n: 112;
+      --n: 90;                             /* 20% down from the authored 112 */
       --disc: calc(var(--n) * 1px);
       --k: calc(var(--n) / 104.54);          /* glass reference pill */
       --s: calc(var(--n) / 34.6);            /* design size */
@@ -1053,7 +1053,7 @@
          inside the column too. */
       .icons-compare { gap: 8px; --ic-w: clamp(180px, 55vw, 280px); }
       .ic-scrolly { height: 190vh; }
-      .live { --n: 71; }
+      .live { --n: 57; }
     }
 
     /* Breakout image — same horizontal padding as every other section */
@@ -1143,6 +1143,25 @@
     }
 
     /* ── Project nav ──────────────────────────────────────── */
+    /* Badge left, one line of status beside it. The badge is capped rather
+       than fluid: Apple's guidelines set a minimum size, and past ~230px it
+       starts to read as a call to action rather than a status note. */
+    .appstore-row {
+      display: flex;
+      align-items: center;
+      gap: clamp(20px, 3vw, 40px);
+      flex-wrap: wrap;
+    }
+
+    .appstore-badge {
+      width: clamp(150px, 18vw, 220px);
+      height: auto;
+      display: block;
+      flex: none;
+    }
+
+    .appstore-copy { max-width: 520px; margin: 0; }
+
     .project-nav {
       display: flex;
       border-top: 1px solid var(--border-color);
@@ -1470,7 +1489,8 @@
     @media (max-width: 860px) {
       .stagger-row,
       .stagger-row.right,
-      .stagger-row.indent {
+      .stagger-row.indent,
+      .dna-row {
         margin-left: 0; max-width: none; flex-direction: row;
       }
       .stagger-figure { width: clamp(160px, 34vw, 240px); }
@@ -1481,7 +1501,8 @@
     @media (max-width: 640px) {
       .stagger-row,
       .stagger-row.right,
-      .stagger-row.indent { flex-direction: column; align-items: flex-start; gap: 18px; }
+      .stagger-row.indent,
+      .dna-row { flex-direction: column; align-items: flex-start; gap: 18px; }
       .stagger-figure { width: clamp(180px, 60vw, 280px); }
       .result-image-pair { grid-template-columns: 1fr; }
     }
@@ -1768,6 +1789,26 @@
     .dna { --ink-muted: #6A6F77; --ink-faint: #8A9099; }
 
     .dna-list { margin-top: clamp(28px, 4vw, 52px); }
+
+    /* One text, three demos — not three captioned sections. The stack's own
+       gap is a fifth of .stagger-list's clamp(56px, 8vw, 120px): the three
+       controls are one exhibit, so they sit as a group rather than reading
+       as three separate rows with air between them. */
+    .dna-row {
+      display: flex;
+      align-items: center;
+      gap: clamp(28px, 5vw, 72px);
+      margin-left: auto;
+      max-width: 860px;
+    }
+
+    .dna-copy { max-width: 520px; }
+
+    .dna-stack {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(11px, 1.6vw, 24px);
+    }
 
     /* The stage is a fixed box so the three demos line up on one column
        edge no matter how wide each control actually is. */
@@ -2221,49 +2262,31 @@
            All markup is namespaced .dna-* plus the SkeuKit classes added
            at the end of the stylesheet; the loops live in one IIFE at the
            bottom of the page and pause when the block is off screen. -->
-      <div class="stagger-list dna-list dna">
-
-        <div class="stagger-row" style="margin-left: auto;">
-          <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="dna-1-title">Erhabene Kante</h3>
-            <p class="stagger-copy" data-i18n-html="dna-1-text">Alles, was man drücken kann, liegt auf der Fläche auf: heller Rand oben, Schatten darunter, Licht statt Umrandung. Beim Druck wölbt es sich nach außen, statt einzusinken — ein weicher Gegenstand gibt nicht nach, er drückt zurück. Damit ist die Frage „ist das ein Knopf?“ überall in der App ohne Beschriftung beantwortet.</p>
-          </div>
-          <div class="dna-stage sk" style="--z: 1.35;">
-            <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
-              <span>Personal</span>
-              <svg viewBox="0 0 12 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.4 6 5.8 11 1.4"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="stagger-row" style="margin-left: auto;">
-          <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="dna-2-title">Vertiefte Mulde</h3>
-            <p class="stagger-copy" data-i18n-html="dna-2-text">Die Umkehrung: ein Loch in der Fläche, mit Schatten oben und einer schmalen Kante als Schnittrand. Eine Mulde ist kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört. Deshalb steht nie ein Knopf darin: Was man anfassen kann, steht daneben, sonst wäre es in das Loch hineingelegt statt darauf.</p>
-          </div>
-          <div class="dna-stage sk" style="--z: 1.35;">
-            <div class="dna-fieldwrap">
-              <div class="sk-field sk-trough"><div class="sk-field__input"><span class="dna-type"></span><i class="dna-caret"></i></div></div>
+      <div class="dna-list dna">
+        <div class="dna-row">
+          <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die erhabene Kante liegt auf der Fläche auf: heller Rand oben, Schatten darunter, Licht statt Umrandung. Beim Druck wölbt sie sich nach außen, statt einzusinken — ein weicher Gegenstand gibt nicht nach, er drückt zurück. Die vertiefte Mulde ist ihre Umkehrung: ein Loch in der Fläche, mit Schatten oben und einer schmalen Kante als Schnittrand. Sie ist kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide Formen zusammen ergeben die dritte, die Glasblase: eine Linse, die in einer Mulde liegt und die aktuelle Auswahl markiert. Sie gleitet dorthin, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen — der Weg ist es, der zeigt, was sich geändert hat, und die kleine Dehnung beim Ankommen gibt ihm ein Ende. Damit ist überall in der App ohne Beschriftung beantwortet, was man drücken kann, was einem gehört und wo man gerade ist.</p>
+          <div class="dna-stack">
+            <div class="dna-stage sk" style="--z: 1.35;">
+              <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
+                <span>Personal</span>
+                <svg viewBox="0 0 12 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1.4 6 5.8 11 1.4"/></svg>
+              </button>
+            </div>
+            <div class="dna-stage sk" style="--z: 1.35;">
+              <div class="dna-fieldwrap">
+                <div class="sk-field sk-trough"><span class="dna-type"></span><i class="dna-caret"></i></div>
+              </div>
+            </div>
+            <div class="dna-stage sk" style="--z: 1.1;">
+              <div class="sk-seg sk-trough dna-seg" style="width: 100%;">
+                <span class="dna-segpill sk-glass" style="--i: 0"></span>
+                <span class="sk-seg__opt is-on"><span>Heute</span></span>
+                <span class="sk-seg__opt"><span>Morgen</span></span>
+                <span class="sk-seg__opt"><span>Bald</span></span>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="stagger-row" style="margin-left: auto;">
-          <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="dna-3-title">Glasblase</h3>
-            <p class="stagger-copy" data-i18n-html="dna-3-text">Beide Formen zusammen ergeben die dritte: eine Glaslinse, die in einer Mulde liegt und die aktuelle Auswahl markiert. Sie gleitet dorthin, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen — der Weg ist es, der zeigt, was sich geändert hat, und die kleine Dehnung beim Ankommen gibt ihm ein Ende. Die Beschriftungen bleiben unverändert stehen; die Auswahl liegt im Glas, nicht in der Schrift.</p>
-          </div>
-          <div class="dna-stage sk" style="--z: 1.1;">
-            <div class="sk-seg sk-trough dna-seg" style="width: 100%;">
-              <span class="sk-trough__bloom"></span>
-              <span class="dna-segpill sk-glass" style="--i: 0"></span>
-              <span class="sk-seg__opt is-on"><span>Heute</span></span>
-              <span class="sk-seg__opt"><span>Morgen</span></span>
-              <span class="sk-seg__opt"><span>Bald</span></span>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <p class="guide-text" style="margin-top: clamp(24px, 4vw, 40px);" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.</p>
@@ -2297,6 +2320,19 @@
         </span>
       </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Status, at the very end of the case study. The badge is a plain
+         <img>, deliberately NOT a link and not a <button>: the app is not on
+         the store yet, so anything that looks clickable would promise a
+         download that does not exist. Apple's badge guidelines also forbid
+         altering the artwork, so it is scaled and nothing else. -->
+    <div class="guide-section appstore-section">
+      <div class="appstore-row">
+        <img class="appstore-badge" src="/images/morrow/appstore-badge.webp" width="760" height="225" loading="lazy"
+             alt="Download on the App Store" />
+        <p class="guide-text appstore-copy" data-i18n-html="appstore-text">morrow liegt derzeit bei Apple im Prüfverfahren und erscheint im App&nbsp;Store, sobald die Review abgeschlossen ist.</p>
       </div>
     </div>
 
@@ -2498,13 +2534,9 @@
         'pivot-1': 'Die erste Version war eine vollständige Windows-95-Oberfläche im doppelten Pixelmaßstab: Taskleiste, abgeschrägte Ränder, Statuszeile, Pixelschrift. Sie war fertig, nicht bloß eine Stimmung — und musste trotzdem weg. Der Witz war lauter als die App. Eine originalgetreue Oberfläche von 1995 ist ein Kostüm: Sie macht ein tägliches Werkzeug anstrengend, kämpft gegen jede iOS-Konvention, und das Publikum, dem sie schmeichelt, ist nicht das Publikum, das morgens damit arbeitet.',
         'pivot-2': 'An ihre Stelle kam SkeuKit: ein weich-skeuomorphes System aus Tokens, vier Themes in Hell und Dunkel. Tiefe entsteht dort aus Licht statt aus Textur — Mulden für Vertieftes, Glas für Bedienelemente, einfacher Text auf der Fläche für Inhalt. Ein Druckverhalten für jedes Element der App. Die Pixelschrift ist geblieben, aber als optionaler Retro-Modus, der nur die Rahmen betrifft; der Aufgabentext bleibt in der Systemschrift. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.',
         'icons-text': 'Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).',
+        'appstore-text': 'morrow liegt derzeit bei Apple im Prüfverfahren und erscheint im App&nbsp;Store, sobald die Review abgeschlossen ist.',
+        'dna-forms': 'Die erhabene Kante liegt auf der Fläche auf: heller Rand oben, Schatten darunter, Licht statt Umrandung. Beim Druck wölbt sie sich nach außen, statt einzusinken — ein weicher Gegenstand gibt nicht nach, er drückt zurück. Die vertiefte Mulde ist ihre Umkehrung: ein Loch in der Fläche, mit Schatten oben und einer schmalen Kante als Schnittrand. Sie ist kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide Formen zusammen ergeben die dritte, die Glasblase: eine Linse, die in einer Mulde liegt und die aktuelle Auswahl markiert. Sie gleitet dorthin, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen — der Weg ist es, der zeigt, was sich geändert hat, und die kleine Dehnung beim Ankommen gibt ihm ein Ende. Damit ist überall in der App ohne Beschriftung beantwortet, was man drücken kann, was einem gehört und wo man gerade ist.',
         'dna-intro': 'Unter der Oberfläche besteht SkeuKit aus drei Formen, und mehr sind es bewusst nicht. Jede beantwortet eine einzige Frage, die man sonst ausprobieren müsste: Kann ich das drücken? Gehört das mir? Wo bin ich gerade? Weil es nur drei sind, lernt man sie einmal — und danach ist jede neue Ansicht der App schon erklärt.',
-        'dna-1-title': 'Erhabene Kante',
-        'dna-1-text': 'Alles, was man drücken kann, liegt auf der Fläche auf: heller Rand oben, Schatten darunter, Licht statt Umrandung. Beim Druck wölbt es sich nach außen, statt einzusinken — ein weicher Gegenstand gibt nicht nach, er drückt zurück. Damit ist die Frage „ist das ein Knopf?“ überall in der App ohne Beschriftung beantwortet.',
-        'dna-2-title': 'Vertiefte Mulde',
-        'dna-2-text': 'Die Umkehrung: ein Loch in der Fläche, mit Schatten oben und einer schmalen Kante als Schnittrand. Eine Mulde ist kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört. Deshalb steht nie ein Knopf darin: Was man anfassen kann, steht daneben, sonst wäre es in das Loch hineingelegt statt darauf.',
-        'dna-3-title': 'Glasblase',
-        'dna-3-text': 'Beide Formen zusammen ergeben die dritte: eine Glaslinse, die in einer Mulde liegt und die aktuelle Auswahl markiert. Sie gleitet dorthin, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen — der Weg ist es, der zeigt, was sich geändert hat, und die kleine Dehnung beim Ankommen gibt ihm ein Ende. Die Beschriftungen bleiben unverändert stehen; die Auswahl liegt im Glas, nicht in der Schrift.',
         'color-text': 'Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.',
         'placeholder': '[ Platzhalter ]',
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',

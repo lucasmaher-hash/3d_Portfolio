@@ -433,6 +433,41 @@
     @media (max-width: 1100px) { .morrow-live-tile .live { --n: 150; } }
     @media (max-width: 640px)  { .morrow-live-tile .live { --n: 118; } }
 
+    /* The control IS the artwork here, so it sits straight on the page —
+       the tile's raised neumorphic plate underneath it read as a second,
+       competing object. The card keeps its size and its link, and loses
+       only its own surface. */
+    .project-tile.morrow-live-tile { background: transparent; box-shadow: none; }
+
+    /* The four tweaks below are scoped to this tile ON PURPOSE, so the ported
+       block above stays byte-identical to to-shove2d.html's copy and the two
+       cannot silently drift. At --n 190 the button is nearly twice the size
+       it was authored for, and three of its layers scale their BLUR with the
+       disc — so the same values that read as crisp at 112 read as washed out
+       here. These pull them back. */
+
+    /* Halved reach and blur: the outer bloom was spreading ~29px past the
+       disc with a 10px feather, which at this size dissolved the silhouette
+       into the page instead of seating it on it. */
+    .morrow-live-tile .live__bloom {
+      inset: calc(-2.6px * var(--s));
+      filter: blur(calc(0.9px * var(--s)));
+    }
+
+    /* The glass pill's own rim — the thin light edge just inside the dark
+       lip. Half the thickness. */
+    .morrow-live-tile .live__rim { padding: calc(2.971px * var(--k) * 0.675); }
+
+    /* Deeper channel: same four inset shadows, same geometry, ~50% more
+       opacity each, so the recess still reads as cut in at this scale. */
+    .morrow-live-tile .live__trough {
+      box-shadow:
+        inset 0 calc(17.828px * var(--c)) calc(23.77px * var(--c))   color-mix(in srgb, var(--shadow) 34%, transparent),
+        inset 0 calc(-11.885px * var(--c)) calc(32px * var(--c))     color-mix(in srgb, var(--shadow) 29%, transparent),
+        inset calc(8.217px * var(--c)) calc(12.326px * var(--c)) calc(16.434px * var(--c)) color-mix(in srgb, var(--shadow) 31%, transparent),
+        inset calc(-8.247px * var(--c)) calc(-2.062px * var(--c)) calc(16.494px * var(--c)) color-mix(in srgb, var(--shadow) 31%, transparent);
+    }
+
 
     @media (max-width: 640px) {
       /* Grow the section so its bottom border lands at the fold instead of
