@@ -207,8 +207,9 @@
        read as a second, competing object. The card keeps its size and link. */
     .project-tile.morrow-icon-tile { background: transparent; box-shadow: none; }
 
-    /* +30% on every stop of the previous clamp(118px, 16vw, 220px). */
-    .morrow-icon-tile .app-icon { width: clamp(153px, 20.8vw, 286px); }
+    /* +30%, then a further +15%, on every stop of the original
+       clamp(118px, 16vw, 220px). */
+    .morrow-icon-tile .app-icon { width: clamp(176px, 23.9vw, 329px); }
 
     /* Two stacked images, cross-fading between the light and dark artwork.
        Not a JS swap: only the light one is in flow, so it sets the box and
