@@ -907,57 +907,62 @@
       letter-spacing: 0.05em;
     }
 
-    /* Typography cards */
+    /* Typography cards. Every stop of the desktop treatment is 30% down from
+       where it started (card 160 -> 112px tall, preview 72 -> 50px, and so on
+       through the padding, gaps and labels), so the three pills scale as one
+       piece. The <=640px block further down re-specs these cards for phones —
+       it hides the preview and sizes the label itself — so mobile is
+       untouched by this. */
     .typography-grid {
       display: flex;
       flex-direction: column;
-      gap: clamp(16px, 2vw, 24px);
+      gap: clamp(11px, 1.4vw, 17px);
     }
 
     .typography-card {
       background: var(--bg-surface);
       border-radius: 9999px;
       box-shadow: var(--shadow-raised);
-      padding: 0 clamp(32px, 5vw, 56px);
-      min-height: clamp(120px, 14vw, 160px);
+      padding: 0 clamp(22px, 3.5vw, 39px);
+      min-height: clamp(84px, 9.8vw, 112px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: clamp(32px, 6vw, 60px);
+      gap: clamp(22px, 4.2vw, 42px);
     }
 
     .typography-info {
       display: flex;
       flex-direction: row;
       align-items: baseline;
-      gap: 12px;
+      gap: 8px;
       flex-shrink: 0;
     }
 
     .typography-label {
       font-family: 'Roboto', sans-serif;
-      font-size: clamp(16px, 2vw, 20px);
+      font-size: clamp(11px, 1.4vw, 14px);
       font-weight: 500;
       color: var(--text-primary);
     }
 
     .typography-spec {
       font-family: 'Roboto', sans-serif;
-      font-size: clamp(16px, 2vw, 20px);
+      font-size: clamp(11px, 1.4vw, 14px);
       font-weight: 500;
       color: var(--text-secondary);
     }
 
     .typography-spec::before {
       content: '·';
-      margin-right: 12px;
+      margin-right: 8px;
       color: var(--text-secondary);
     }
 
     .typography-preview {
       flex: 1;
       font-family: 'Nunito', sans-serif;
-      font-size: clamp(36px, 6vw, 72px);
+      font-size: clamp(25px, 4.2vw, 50px);
       font-weight: 700;
       color: var(--text-primary);
       text-align: right;
@@ -1615,14 +1620,14 @@
             <span class="typography-label" data-i18n="typography-label-header">Header</span>
             <span class="typography-spec" data-i18n="typography-spec-header">72px  ·  bold</span>
           </div>
-          <div class="typography-preview" style="font-size: clamp(36px, 6vw, 72px); font-weight: 800;" data-i18n="typography-preview-header">soccer match</div>
+          <div class="typography-preview" style="font-size: clamp(25px, 4.2vw, 50px); font-weight: 800;" data-i18n="typography-preview-header">soccer match</div>
         </div>
         <div class="typography-card">
           <div class="typography-info">
             <span class="typography-label" data-i18n="typography-label-body">Body text</span>
             <span class="typography-spec" data-i18n="typography-spec-body">48px  ·  bold</span>
           </div>
-          <div class="typography-preview" style="font-size: clamp(28px, 4vw, 48px); font-weight: 700;" data-i18n="typography-preview-body">bring all your friends</div>
+          <div class="typography-preview" style="font-size: clamp(20px, 2.8vw, 34px); font-weight: 700;" data-i18n="typography-preview-body">bring all your friends</div>
         </div>
         <div class="typography-card">
           <div class="typography-info">

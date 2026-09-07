@@ -1225,9 +1225,13 @@
          what makes the loop seamless. */
       .win-devices-inner {
         display: flex;
-        width: 100%;
+        /* Full bleed: .guide-section holds a 20px gutter, so the track breaks
+           out of it rather than starting inside it — the screens should run
+           off both edges, not sit in a padded box. */
+        width: calc(100% + 40px);
+        margin-inline: -20px;
         gap: 4vw;
-        padding: 0 4vw;
+        padding: 0;
         overflow-x: auto;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
@@ -1269,6 +1273,11 @@
       .morrow-devices-inner { display: none; }
       .morrow-devices .hero-icon { display: block; width: min(62vw, 300px); margin-inline: auto; }
 
+      /* The Live mark sat 20px off the paragraph under it — the same gap the
+         column uses between unrelated blocks, so it read as attached to the
+         wrong thing. It is an illustration with air around it, not a bullet. */
+      .stagger-row .stagger-figure:not(.phone):not(.duo) { margin-bottom: 22px; }
+
       /* The three primitives read as a centred group on a phone; docked left
          they looked like a column that had lost its second column. */
       .dna-list .dna-stack .dna-stage { justify-items: center; }
@@ -1307,7 +1316,7 @@
          a square, so equal widths meant a 185px-tall icon beside a 55px-tall
          badge. Equal height is what "the same size" means for these two
          shapes, and it is how Apple sets a badge beside an icon. */
-      --appstore-h: clamp(52px, 9.4vw, 136px);
+      --appstore-h: clamp(68px, 9.4vw, 136px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1984,17 +1993,22 @@
       /* The pair is one file of two phones; height-driving it would make it
          twice as wide. It takes a single screen's footprint instead, so its
          side gutters match. 0.495 = 792/1600, the single frame's aspect. */
-      .stagger-figure.duo { width: calc(clamp(428px, 80.3vh, 615px) * 0.495); }
+      /* The pair takes the FULL column, unlike the single screens: two phones
+         at a single screen's footprint were 150px each. At full width its
+         edges land on the same 20px gutter as the headings and body text
+         around it, which is what the eye reads as "the same margin". */
+      .stagger-figure.duo { width: 100%; }
 
       /* The caption goes to the visible phone width and centres under it,
          exactly as unify2d's does — Unify's own --phone-w, not a re-derivation
          of morrow's, because the two phones are now the same visible size. */
-      .stagger-row:has(.stagger-figure.phone) .stagger-body,
-      .stagger-row:has(.stagger-figure.duo) .stagger-body {
+      .stagger-row:has(.stagger-figure.phone) .stagger-body {
         width: calc(clamp(445px, 83.5vh, 640px) * 0.47);
         max-width: 100%;
         margin-inline: auto;
       }
+      /* The pair's caption follows the pair, not the single-screen rule. */
+      .stagger-row:has(.stagger-figure.duo) .stagger-body { width: 100%; }
 
       .stagger-row .stagger-figure.phone,
       .stagger-row.right .stagger-figure.phone,
@@ -3429,7 +3443,7 @@
       if (!track) return;
       var mq = window.matchMedia('(max-width: 640px)');
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-      var raf = 0, setW = 0, held = 0, cloned = false;
+      var raf = 0, setW = 0, touching = false, cloned = false;
 
       function clone() {
         if (cloned) return;
@@ -3455,16 +3469,25 @@
       // back as the same integer every frame and the pan never moves at all.
       // Measured: scrollLeft sat at 0 across two seconds of ticking rAF.
       var pos = 0;
-      var SPEED = 0.45;                        // px per frame at 60fps, deliberately slow
+      var SPEED = 0.54;                        // px per frame at 60fps, deliberately slow
+      var vel = SPEED;                         // eases from a swipe's speed back to SPEED
+      var lastX = 0;
       function step() {
         raf = requestAnimationFrame(step);
-        if (held) { pos = track.scrollLeft; return; }   // the finger is authoritative
-        pos += SPEED;
+        if (touching) {                        // the finger is authoritative
+          vel = track.scrollLeft - lastX;      // remember how fast it was thrown
+          lastX = pos = track.scrollLeft;
+          return;
+        }
+        // Ease the swipe out INTO the constant pan rather than cutting to it:
+        // an exponential approach, so a hard flick decays over ~1s and a gentle
+        // one is indistinguishable from the idle speed.
+        vel += (SPEED - vel) * 0.045;
+        pos += vel;
         if (setW && pos >= setW) pos -= setW;
-        track.scrollLeft = pos;
+        if (setW && pos < 0) pos += setW;
+        track.scrollLeft = lastX = pos;
       }
-      function hold() { held++; }
-      function release() { held = Math.max(0, held - 1); }
 
       function start() {
         clone(); measure();
@@ -3474,19 +3497,27 @@
 
       // A finger on the track pauses it; it resumes a beat after release so
       // the pan does not fight the tail of a flick.
+      //
+      // A BOOLEAN, not a counter. It used to be `held++` on both pointerdown
+      // and touchstart — two increments per gesture — while the four release
+      // events each cleared the previous timeout, so only ONE decrement ever
+      // ran. held therefore climbed by 1 per swipe and never came back to 0,
+      // which is why the pan stopped for good after the first manual scroll.
       var resume;
       ['pointerdown', 'touchstart'].forEach(function (e) {
-        track.addEventListener(e, function () { clearTimeout(resume); hold(); }, { passive: true });
+        track.addEventListener(e, function () {
+          clearTimeout(resume); touching = true; lastX = track.scrollLeft;
+        }, { passive: true });
       });
       ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(function (e) {
         track.addEventListener(e, function () {
           clearTimeout(resume);
-          resume = setTimeout(release, 900);
+          resume = setTimeout(function () { touching = false; }, 700);
         }, { passive: true });
       });
       // Wrap on manual scrolling too, or a flick can run off the end.
       track.addEventListener('scroll', function () {
-        if (!setW || !held) return;
+        if (!setW || !touching) return;
         if (track.scrollLeft >= setW * 2 - 2) track.scrollLeft -= setW;
         else if (track.scrollLeft <= 0) track.scrollLeft += setW;
         pos = track.scrollLeft;
