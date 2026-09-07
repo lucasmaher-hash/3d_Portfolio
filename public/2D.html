@@ -219,15 +219,27 @@
     .morrow-icon-tile .app-icon {
       position: relative;
       display: block;
+      /* drop-shadow, not box-shadow: the icon is a transparent squircle, so
+         this follows its rounded silhouette instead of drawing a rectangle
+         around it. Same tint as the design system's own shadow.
+
+         It lives on the WRAPPER, not on each <img>. Per-image it painted TWICE
+         during the cross-fade — the light one's shadow always renders, and the
+         dark one's is added on top at its current opacity, because the shadow
+         falls outside the icon where nothing covers it. Measured just past the
+         left edge: 210 with the dark image hidden, 206 mid-fade, 202 with it
+         fully in, against a 221 page. That darker band hugging the sides is
+         what read as the icon sitting in a frame, and why it looked fine right
+         after a reload: the animation restarts on the light image alone. Both
+         silhouettes are identical (verified: the two alpha channels are
+         byte-for-byte equal), so one shadow off the union is correct at every
+         point in the fade. */
+      filter: drop-shadow(0 14px 26px rgba(174, 174, 192, 0.55));
     }
     .morrow-icon-tile .app-icon img {
       width: 100%;
       height: auto;
       display: block;
-      /* drop-shadow, not box-shadow: the icon is a transparent squircle, so
-         this follows its rounded silhouette instead of drawing a rectangle
-         around it. Same tint as the design system's own shadow. */
-      filter: drop-shadow(0 14px 26px rgba(174, 174, 192, 0.55));
     }
     .morrow-icon-tile .app-icon-dark {
       position: absolute;

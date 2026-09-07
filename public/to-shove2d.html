@@ -1236,14 +1236,17 @@
       display: block;
       flex: none;
       width: clamp(96px, 12vw, 150px);
+      /* drop-shadow, not box-shadow: the icon is a transparent squircle, so
+         this follows its silhouette instead of boxing it. On the WRAPPER
+         rather than on each <img>, or it paints twice through the cross-fade
+         and the doubled band reads as a frame around the icon — see the fuller
+         note on .morrow-icon-tile .app-icon in 2D.html. */
+      filter: drop-shadow(0 12px 22px rgba(174, 174, 192, 0.5));
     }
     .app-icon img {
       width: 100%;
       height: auto;
       display: block;
-      /* drop-shadow, not box-shadow: the icon is a transparent squircle, so
-         this follows its silhouette instead of boxing it. */
-      filter: drop-shadow(0 12px 22px rgba(174, 174, 192, 0.5));
     }
     .app-icon-dark {
       position: absolute;
