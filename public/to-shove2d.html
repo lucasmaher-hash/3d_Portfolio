@@ -147,49 +147,6 @@
       letter-spacing: -0.04em;
     }
 
-    /* Sized in em so it tracks the title's own clamp() at every width, and
-       nudged onto the x-height rather than the baseline — an inline-block
-       sits on the baseline by default, which would leave it floating a
-       descender's worth too high next to the lowercase letters. */
-    /* The two o's in the title are the Live control itself — trough, contour,
-       glass and mark, the same component as .live below, not a hand-drawn
-       ring. Only three things change for use inside a text run:
-
-       · inline-grid and no auto margins, so it sits in the line;
-       · the glass is always on (elsewhere that means "selected"; here it is
-         an illustration, and the o should always look like the real button);
-       · vertical-align puts it on the x-height. Centring the 0.618em box on
-         the glyph's ink band (OCR-A-BT's 'o' at 96px runs baseline-42.8 to
-         baseline+5.5) puts its bottom 0.115em BELOW the baseline — but the
-         bubble is the full 0.618em where the glyph's ink is only 0.5em, so
-         its extra mass hangs below and it read as sitting low. Lifted 15px
-         at the 96px desktop size, in em so it stays proportional as the
-         title's clamp() shrinks: -0.115 + 15/96 = 0.041em.
-
-       SIZE IS SET FROM JS, not CSS. --n is unitless by design (the SkeuKit
-       trap: it is multiplied by px literals, so as a length every derived
-       value becomes px² and the declaration is silently dropped), which means
-       it cannot be an em value and cannot follow the title's clamp() on its
-       own. The script near the bottom of this file measures the rendered font
-       size and writes it. The value here is the 96px default, so the mark is
-       right even if that script never runs. */
-    .project-title .o-live {
-      --n: 59.33;                  /* 0.618 x 96px; JS keeps it in step */
-      /* No trough, no contour, no outer bloom — the glass bubble only, with
-         the ring and core sitting in it. --pad is the gap .live leaves between
-         its trough and its glass; with the trough gone the glass fills the box,
-         so the bubble is exactly one glyph cell wide. */
-      --pad: 0px;
-      display: inline-grid;
-      margin-inline: 0;
-      vertical-align: 0.041em;
-      /* .project-title carries letter-spacing: -0.04em, and Blink does not
-         apply it to an atomic inline the way it does to a letter — measured,
-         each mark was pushing the rest of the word 3.84px right. */
-      margin-right: -0.04em;
-    }
-    .project-title .o-live .live__glass { opacity: 1; }
-
     @keyframes blink {
       0%, 49% { opacity: 1; }
       50%, 100% { opacity: 0; }
@@ -2214,7 +2171,7 @@
                core at 42% of the diameter, the same construction as
                .live__mark further down. aria-label carries the real word, so
                the heading still reads as "morrow" to a screen reader. -->
-          <h1 class="project-title" aria-label="morrow">m<span class="live o-live" aria-hidden="true"><span class="live__glass"><span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span><span class="live__relief"></span><span class="live__glow"></span><span class="live__rim"></span></span><span class="live__mark"></span></span>rr<span class="live o-live" aria-hidden="true"><span class="live__glass"><span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span><span class="live__relief"></span><span class="live__glow"></span><span class="live__rim"></span></span><span class="live__mark"></span></span>w</h1>
+          <h1 class="project-title">morrow</h1>
         </div>
         <div class="dot-divider"></div>
       </div>
@@ -3234,36 +3191,6 @@
         var inner = col.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
         var d = Math.max(0, Math.round(inner - row.offsetWidth));
         row.style.setProperty('--shove-x', d + 'px');
-      }
-      size();
-      window.addEventListener('resize', size);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
-    })();
-  </script>
-
-  <script>
-    // Size the title's two Live marks.
-    //
-    // .live is driven by --n, which is UNITLESS on purpose (it is multiplied by
-    // px literals throughout, so as a length every derived value would become
-    // px² and the declaration would be dropped with no error). That means it
-    // cannot be written in em and cannot track .project-title's clamp() in CSS
-    // alone, so it is measured here — the same measure-then-set approach the
-    // dot dividers and the wrapper's bottom padding already use on this page.
-    //
-    // 0.618em is the advance of one OCR-A-BT glyph. With --pad: 0 the bubble's
-    // box IS --disc, so --n is that advance in px and each o occupies exactly
-    // one character cell — the word keeps its spacing.
-    (function () {
-      var h = document.querySelector('.project-title');
-      if (!h) return;
-      var marks = h.querySelectorAll('.o-live');
-      if (!marks.length) return;
-      function size() {
-        var fs = parseFloat(getComputedStyle(h).fontSize);
-        if (!fs) return;
-        var n = (fs * 0.618).toFixed(2);
-        for (var i = 0; i < marks.length; i++) marks[i].style.setProperty('--n', n);
       }
       size();
       window.addEventListener('resize', size);
