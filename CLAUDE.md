@@ -100,8 +100,40 @@ and closes correctly at 1440 and at 390, in both scroll directions, and still re
 fold-shut threshold before the document bottom (62px of margin at 1440, 31px at 390 — if a
 lot of content below the fan is ever removed, re-check that).
 
-**`.ic-scrolly` was unpinned the same way, and both icon clusters now open at once**
-(`data-ic="3"`, a state added for this). It used to be pinned precisely because the two
+**The icon block is a 2x2 STAGGER on desktop** (2026-09-07, from Lucas's sketch): copy left /
+retro cluster right, then modern cluster left / copy right — the same rhythm as the
+`.stagger-row` blocks earlier on the page, instead of the old single row of two clusters with
+their captions somewhere else. It is a **grid**, not two flex rows, so the clusters share a
+column axis and cannot drift out of line; cells are assigned explicitly
+(`.ic-side--left` → 1/2, `.ic-copy--retro` → 1/1, `.ic-side--right` → 2/1,
+`.ic-copy--modern` → 2/2) so the DOM order can stay cluster-then-its-copy, which is both the
+screen-reader order and the phone stacking order. `--ic-w` is therefore sized against ONE
+grid cell now (`clamp(240px, 34vw, 470px)`, ~500px cell at 1440), not against the pair.
+**The phone layout restates `display: flex`** — the base rule is a grid, and the mobile
+block's `flex-direction: column` would do nothing without it, and `.ic-copy--retro` takes
+`order: -1` there so the section's heading leads the block instead of turning up under the
+first cluster.
+
+**The section's heading and copy live INSIDE the grid**, not stacked above it: `icons-title`
+plus the first half of `icons-text` sit beside the retro cluster, the second half
+(`icons-text-2`, a new key) beside the modern one. The paragraph was split at its own
+sentence boundary and **no new claims were written** — it is the existing wording
+rearranged, so the half describing the pixel set sits with the pixel set. The old
+"Links … rechts …" phrasing had to go regardless: this layout puts retro top-right and
+modern bottom-left, so it reads "Oben … darunter …" now.
+
+**`.ic-scrolly` was unpinned the same way, and both icon clusters now open on one trigger**
+(`data-ic="3"`, a state added for this) — **staggered, not simultaneous**: the modern half
+(side + orbit + caption) carries `transition-delay: 260ms`, well inside the 700ms the
+movement takes, so it starts while the retro half is still opening and the two are open
+together. **That delay rule must stay after the `transition:` shorthands on
+`.icons-compare .ic-side` and `.ic-orbitwrap`** — it matches the side at equal specificity,
+and a shorthand resets `transition-delay` to 0, so declared earlier only the orbit (higher
+specificity) lagged and the side's width opened on time: half a cluster in step, half of it
+late. Each **caption also sits inboard while closed** (`--ic-copy-shift`, `translateX`
+toward its own cluster, ~48px at 1440) and travels back out to its docked position as the
+cluster opens, so the open state is the designed layout and the closed one is the offset.
+Zeroed below 640px, where the caption is under its cluster rather than beside it. It used to be pinned precisely because the two
 sides *traded* places partway through the pin, and a swap needs the page held still or it
 slides off the top mid-swap — with both open there is no swap left to protect. States `1`
 and `2` survive as the CLICK states: a label isolates its own side, clicking it again
@@ -138,8 +170,100 @@ capped at 300px on a phone) because `.app-icon` sizes itself from `--appstore-h`
 that only exists inside `.appstore-row`. The **icon beside the App Store badge at the foot
 of the page is gone too** — it was the same artwork as the hero and only cost width — so
 `.appstore-row` is the badge alone. A **second copy of the badge now sits above At a
-Glance**, same class and therefore the same size and bounce, with `.appstore-row--top`
-docking it left so it lines up with the heading instead of centring.
+Glance**, docked left by `.appstore-row--top` so it lines up with the heading instead of
+centring, and scaled to **72% of the foot badge** by overriding `--appstore-h` (the token is
+declared on `.appstore-row`, so the smaller one is `calc(<the same clamp> * 0.72)` and the
+two cannot drift apart; it started at 0.6 and went back up 20%). **Both badges pulsate** —
+`badge-pulse`, a 2.6s scale to 1.04 and back. It sits on the `<img class="appstore-badge">`,
+NOT on the `<a>`: the link owns a `:hover` transform, and an animation on the same element
+outranks it and suppresses its transition in Safari (the `animation`-vs-`:hover` trap in
+"Known Patterns & Gotchas"). Turned off under `prefers-reduced-motion`.
+
+**The hero icon rides the title's shove**, at every width: same `morrow-shove` keyframes,
+same 8s loop, so icon and word travel together. It is docked left (`margin-inline: 0`), not
+centred — centred, the glide would start from the middle and end past the right edge — and
+the script at the bottom of the file now measures `--shove-x` **per element** against its
+own parent (the icon's is `.morrow-devices`, the title's is the header column), because the
+two have different widths and different gutters. Measured: at 1440 both land flush left at
+191 and flush right at ~1250; at 390 the icon travels 108px and the title 228px, in phase.
+
+**The icon's light↔dark transition is a plain opacity cross-fade of the WHOLE square**
+(`icon-fade`), and it runs **while the icon is travelling**. Two directional versions were
+built and rejected on the way — a `clip-path` cut (read as a seam across the artwork) and a
+soft gradient mask slid across via `mask-position` — so do not reintroduce a sideways
+reveal. The loop is **8s, matching the shove's period**, and the fades are timed to the
+shove's GLIDES (37.5–50% and 87.5–100%), not its holds: the icon changes colour while it
+moves and is a settled colour whenever it is parked. Those numbers come from
+`@keyframes morrow-shove` — change that timing and these have to follow. Verified by
+sampling opacity and the icon's `left` together over a full loop. **This page only** —
+`2D.html`'s landing tile still cross-fades with its own `icon-swap`.
+
+**Icon and title are the same width, measured in JS, at every width.** `.project-title`'s
+clamp went up ~4% (`clamp(42px, 7.3vw, 100px)`, and the phone ramp went up 25% to
+`clamp(40px, 11.25vw, 70px)` — which is also how the phone ICON was made a quarter taller,
+since it is sized from the word) and the same script that writes `--shove-x`
+sets the icon's inline `width` to the title row's `offsetWidth` first — no pair of CSS
+values keeps an OCR-A-BT word and a vw-capped square equal across viewports, so it is
+measured. 347px each at 1440, 218px at 861, **152px each at 390** (phones were excluded at
+first, on the theory that matching a small title would shrink the hero to a thumbnail;
+Lucas asked for the match there too, and the pair lands at the same ~33% of its column
+either way, so the phone hero is the desktop one scaled down). The CSS widths
+(`min(38vw, 360px)`, `min(62vw, 300px)` on a phone) remain as the pre-JS fallback. Equal
+widths also mean an identical `--shove-x`, so icon and word travel in exact lockstep.
+
+**The gap between the icon and the title is `.header-section`**, a class on the header
+`.section` — `padding-top: clamp(10px, 1.4vw, 20px)`, about a third of `.section`'s own
+padding, because this block follows a picture of the thing the title names rather than a
+divider. It is **restated inside the LAST `@media (max-width: 640px)` block**, the one
+holding `.section { padding: 32px 20px }`: an earlier mobile block sets `.section` padding
+too, and the first attempt at this override sat before that later rule and lost on source
+order — measured 32px where it had asked for 10. Same trap as the one below.
+
+**No breadcrumb on this page** (dropped 2026-09-07), unlike the other five project pages:
+with the icon hero directly above it, the `PORTFOLIO / PROJEKTE / MORROW` trail sat between
+the icon and the title and held the two apart. The element, its `.breadcrumb` rules and both
+`breadcrumb` translation keys are gone; **no spacing was changed** — the 56px that remains
+is `.section`'s own padding.
+
+**"Drei Formen" (`.dna-row`) is a centred column: heading, copy, then the three demos in a
+ROW under it** (2026-09-07; it was copy-left / three-demos-stacked-right before). Source
+order is the visual order — the demos sat between heading and copy via `order` for one round
+and that was dropped again, so text-above-media now matches the Farbe block below it. The
+block is
+`width: min(700px, 100%); margin-inline: auto` — deliberately narrower than the content
+column, and the copy and the demo row share the same two edges because they are siblings in
+it. It started at 820 with the controls at 75% of their stage, which left the demos visibly
+narrower than the text; they met in the middle instead — the block came in to 700, the
+controls went to **100%** of their stage, and every demo scales up by **1.18** to match that
+same ratio so they grow in proportion rather than stretching. That scale is why the stages
+carry TWO variables: `--z0` is the authored size (inline, per stage) and `--z` is what the
+SkeuKit metrics read (`calc(var(--z0) * 1.18)` in the row layout, plain `var(--z0)` again
+below 640px, where the stack is vertical and each demo already has the column to itself).
+Gap between the three is `clamp(8px, 1.1vw, 16px)` — it was wider than the gaps inside the
+controls before. `.dna-row`
+had to be **removed from the ≤860px rule** that flips the
+stagger rows back to `flex-direction: row` — it is a column at every width now. Below 640px
+the demos go back to a vertical stack (three across a phone column would be ~100px each),
+which also restores the definite width to `.dna-stack`. **The definite-width chain is
+load-bearing either way**: in the row layout the stages are `flex: 1 1 0` — basis ZERO, not
+auto — so each resolves from `.dna-stack`'s definite width and the troughs' percentage
+widths have something to size against; with `auto` the chain is circular and the troughs
+silently collapse.
+
+**A closing "Fazit und Ausblick" section** sits between the colour screens and the App Store
+badge (2026-09-07): three paragraphs, `section-conclusion` / `conclusion-1..3` in
+`TRANSLATIONS`, **no step badge** — it is the look back at the process, not a fourth step of
+it, which is the reflection convention the stylesheet already describes. The copy is a first
+draft written to Lucas's brief (reflection on the pivot and on cutting scope, then widgets
+first and a desktop version after) and is his to rewrite.
+
+**The Live mark on a phone** (the CSS-built Live button under "Die App") is `--n: 71` in the
+≤640px block, 25% up from 57, with 70px of air above it and under its paragraph (also 25%
+up, from 56). `--n` must stay a bare **number**: as a length the factors derived from it
+become px², which is invalid, and the whole layer vanishes with no error. The gap under the
+text is set with a sibling selector (`.stagger-figure:not(.phone):not(.duo) + .stagger-body`)
+rather than `:has()`, and lives in the LAST mobile block that touches `.stagger-figure` so
+nothing later overrides it.
 
 Two traps this page has already sprung, both also in "Known Patterns & Gotchas": source
 **order beats specificity** — the file has several `@media (max-width: 640px)` blocks at

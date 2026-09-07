@@ -129,19 +129,21 @@
     /* ── Header ── */
     .project-header { display: flex; flex-direction: column; gap: 16px; }
 
-    .breadcrumb {
-      font-family: 'VT323', monospace;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
+    /* The icon hero sits directly on top of this header, and .section's own
+       padding is written for a block that follows a divider, not one that
+       follows a picture of the thing the title names. Roughly a third of it
+       here, so the word reads as belonging to the icon above it. Only the top
+       is touched; the sides and the bottom stay on the shared rhythm. */
+    .header-section { padding-top: clamp(10px, 1.4vw, 20px); }
 
     .title-row { display: flex; align-items: baseline; gap: 12px; }
 
     .project-title {
       font-family: 'OCR-A-BT', monospace;
-      font-size: clamp(40px, 7vw, 96px);
+      /* ~4% up on every stop, so the word and the hero icon above it come out
+         the same width — see the script that measures them at the bottom of
+         this file, which sizes the icon FROM this. */
+      font-size: clamp(42px, 7.3vw, 100px);
       line-height: 1.05;
       color: var(--text-primary);
       letter-spacing: -0.04em;
@@ -184,10 +186,10 @@
        its raised shadow from the first frame, which is exactly what it
        does when a page has no .hero at all. */
     .morrow-devices {
-      /* Horizontal padding matches .section, so at full width the outer
-         two phones would line up with the breadcrumb/title/divider below.
-         The top padding clears the fixed nav: the pill's bottom edge sits
-         at ~88px and its neumorphic shadow needs ~17px more below that. */
+      /* Horizontal padding matches .section, so the icon's travel runs
+         between the same edges as the title and divider below it. The top
+         padding clears the fixed nav: the pill's bottom edge sits at ~88px
+         and its neumorphic shadow needs ~17px more below that. */
       padding: clamp(116px, 11vw, 150px) clamp(40px, 8vw, 80px) 0;
     }
 
@@ -221,8 +223,21 @@
        inside .appstore-row, so the width has to be stated here. */
     .morrow-devices .hero-icon {
       display: block;
+      /* Pre-JS fallback only: the script at the bottom of the file overwrites
+         this with the measured width of the title, at every width, so icon and
+         word are exactly as wide as each other. */
       width: min(38vw, 360px);
-      margin-inline: auto;
+      /* Docked left, not centred, because it now travels: it runs the same
+         8s loop as the title below it, flush left to flush right and back,
+         so the icon and the word shove together, at EVERY width. Its
+         --shove-x is measured against .morrow-devices the same way the
+         title's is measured against the header column — same script, one
+         entry per element, so each travels its own column's width minus its
+         own. Centred, the glide would start from the middle and end past the
+         right edge. */
+      margin-inline: 0;
+      will-change: transform;
+      animation: morrow-shove 8s infinite;
     }
 
     /* .guide-section is a flex column with one gap for everything, so the
@@ -785,17 +800,71 @@
        silently wins. */
     @property --ic-r { syntax: "<length>"; inherits: true; initial-value: 0px; }
 
+    /* Two rows, staggered, like the .stagger-row blocks earlier on the page:
+       copy left / retro right, then modern left / copy right. It was a single
+       row of two clusters before, which put both captions somewhere else
+       entirely; each cluster now has its text beside it and the section reads
+       down the page instead of across it.
+       A 2x2 GRID rather than two flex rows, so the two clusters share one
+       column axis and cannot drift out of line with each other. The DOM order
+       is cluster, its copy, cluster, its copy — which is both the reading
+       order for a screen reader and the stacking order on a phone, where this
+       goes back to a flex column. */
     .icons-compare {
       --push: clamp(8px, 2vw, 30px);
       /* --ic-w is declared on .ic-scrolly (below), not here: .ic-sticky needs
          the same number to size itself, and it is not a descendant of this
          element. It inherits down to here unchanged. */
-      display: flex;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       align-items: center;
-      gap: clamp(8px, 1.6vw, 22px);
+      justify-items: center;
+      column-gap: clamp(16px, 3vw, 56px);
+      row-gap: clamp(28px, 4vw, 64px);
       margin-top: clamp(20px, 3vw, 36px);
     }
+
+    /* Explicit cells, so the source order stays the sensible one. */
+    .icons-compare .ic-side--left  { grid-area: 1 / 2; }  /* retro,  top right */
+    .icons-compare .ic-copy--retro  { grid-area: 1 / 1; }
+    .icons-compare .ic-side--right { grid-area: 2 / 1; }  /* modern, lower left */
+    .icons-compare .ic-copy--modern { grid-area: 2 / 2; }
+
+    .ic-copy {
+      /* A measure, not a column: the grid cell is half the section and a full
+         line across it would read as a paragraph that happens to sit beside a
+         picture rather than as its caption. */
+      max-width: 42ch;
+      /* Docked to the start of its own cell, so the upper text sits at the
+         section's left edge and the lower one begins right beside the modern
+         cluster — the arrangement in Lucas's sketch. Centred, a short caption
+         would float in the middle of its half with air on both sides. */
+      justify-self: start;
+    }
+
+    /* The heading unit's own rhythm, since this block is not a .guide-section
+       flex column and inherits no gap from one. */
+    .ic-copy .feature-title + .guide-text { margin-top: clamp(12px, 1.6vw, 20px); }
+
+    /* Closed, each caption sits INBOARD — pulled toward its own cluster, so
+       the pair reads as one tight unit while the icons are still behind their
+       bubble. Opening pushes it back out to its docked position, which is the
+       layout the section is designed at: the open state is the end state, the
+       closed one is the offset. Same curve and duration as the clusters, so
+       text and icons travel as one movement. */
+    .ic-copy {
+      --ic-copy-shift: clamp(16px, 3vw, 48px);
+      transform: translateX(var(--ic-copy-x, 0px));
+      transition: transform 700ms cubic-bezier(.2, .8, .3, 1);
+    }
+    /* Toward the cluster: the retro copy's is to its right, the modern one's
+       to its left. */
+    .ic-copy--retro  { --ic-copy-x: var(--ic-copy-shift); }
+    .ic-copy--modern { --ic-copy-x: calc(var(--ic-copy-shift) * -1); }
+    .icons-compare[data-ic="3"] .ic-copy,
+    .icons-compare[data-ic="1"] .ic-copy--retro,
+    .icons-compare[data-ic="2"] .ic-copy--modern { --ic-copy-x: 0px; }
+
 
     /* The side's WIDTH is animated as well as its transform. A scale()
        does not change layout, so with a fixed-width box the two collapsed
@@ -830,6 +899,21 @@
                   --ic-r   700ms cubic-bezier(.2, .8, .3, 1),
                   opacity  340ms ease;
     }
+
+    /* One after the other, not together — and deliberately OVERLAPPING: the
+       delay is well inside the 700ms the movement itself takes, so the modern
+       half starts while the retro one is still opening. Retro leads because it
+       is the upper row. Applied to the side, its orbit and its caption, so the
+       whole half moves as a unit, and in both directions, so they fold in the
+       order they opened.
+       MUST stay after the two `transition:` shorthands above: this matches
+       `.icons-compare .ic-side` at the same specificity, and a shorthand
+       resets transition-delay to 0 — declared earlier, the side's delay was
+       silently wiped while the orbit's (higher specificity) still worked, so
+       only half the cluster lagged. */
+    .icons-compare .ic-side--right,
+    .icons-compare .ic-side--right .ic-orbitwrap,
+    .icons-compare .ic-copy--modern { transition-delay: 260ms; }
 
     .ic-orbit {
       position: absolute; inset: 0;
@@ -887,14 +971,13 @@
       /* Content height: the clusters and nothing else. No spacer, because
          nothing is pinned inside it any more. */
       height: auto;
-      /* The orbit box at full size. Sized so TWO of them fit side by side
-         now that both open together: the pair is 2 x 1.02 x --ic-w plus the
-         flex gap, against a content column that is the viewport minus the
-         page padding and the wrapper border. 42vw leaves that pair inside the
-         column from ~640px up, and the 538px cap is the old full size, which
-         still fits a 1440 column. Lives here rather than on .icons-compare
+      /* The orbit box at full size. The clusters no longer sit side by side,
+         so this is sized against ONE grid cell — half the content column minus
+         half the column gap — rather than against the pair. At 1440 that cell
+         is ~500px and an open cluster is 1.02 x --ic-w, so the 470px cap
+         leaves ~20px inside it. Lives here rather than on .icons-compare
          because .ic-sticky is not a descendant of that element. */
-      --ic-w: clamp(240px, 42vw, 538px);
+      --ic-w: clamp(240px, 34vw, 470px);
     }
 
     /* Kept as the centring wrapper only — the name is historical, it no
@@ -1200,7 +1283,10 @@
          pair. */
       .icons-compare { gap: 8px; }
       .ic-scrolly { --ic-w: clamp(162px, 49.5vw, 252px); }
-      .live { --n: 57; }
+      /* +25%, and it has to stay a bare NUMBER — see the note on --n in the
+         base .live rule: as a length the derived factors become px² and the
+         whole layer silently disappears. */
+      .live { --n: 71; }
     }
 
     /* Breakout image — same horizontal padding as every other section */
@@ -1294,8 +1380,9 @@
          phone, so the narrower step only wins on source order. */
       .icons-compare .ic-side { --z: 0.855; }
 
-      /* The icon hero: big enough to be the page's opening statement, with
-         the same gutter as everything else in the column. */
+      /* Pre-JS fallback again — the script matches this to the title as soon
+         as it runs. The icon shoves here too; the push is just shorter than on
+         a wide screen. Docking and animation are the base rule's. */
       .morrow-devices .hero-icon { width: min(62vw, 300px); }
 
       /* The Live mark sat 20px off the paragraph under it — the same gap the
@@ -1313,7 +1400,10 @@
       /* match .section's tighter mobile gutter so the phones stay aligned
          with the header below them */
       .morrow-devices { padding-left: 20px; padding-right: 20px; }
-      .project-title { font-size: clamp(32px, 9vw, 56px); }
+      /* +25% on every stop. The hero icon is sized FROM this word (see the
+         script at the bottom of the file), so this is also what makes the icon
+         a quarter taller on a phone — the two cannot be changed apart. */
+      .project-title { font-size: clamp(40px, 11.25vw, 70px); }
       .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
       .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
       .meta-inset { padding: 8px 10px; }
@@ -1343,6 +1433,12 @@
        left with the column instead of centred, and with air under it so the
        heading below reads as a new block rather than a caption. */
     .appstore-row--top {
+      /* Smaller than the badge at the foot of the page: this one is a way in,
+         not the closing statement, and at full size it dwarfed the heading it
+         sits above. 0.72 = the original 0.6, put back up by 20%. Scaling the
+         row's own token keeps the two tied together — change the size below
+         and this follows. */
+      --appstore-h: calc(clamp(68px, 9.4vw, 136px) * 0.72);
       justify-content: flex-start;
       margin-bottom: clamp(22px, 3.4vw, 40px);
     }
@@ -1361,16 +1457,37 @@
       height: var(--appstore-h);
       width: auto;
       display: block;
+      /* Breathing, so the badge reads as the live thing on a page of stills.
+         Deliberately on the IMG and not on the <a>: the link owns a :hover
+         transform, and an animation on the same element outranks it in the
+         cascade and suppresses its transition in Safari — the trap written up
+         under "Known Patterns & Gotchas" in CLAUDE.md. Two elements, two
+         transforms, neither contested. */
+      animation: badge-pulse 2.6s ease-in-out infinite;
+      transform-origin: center;
     }
 
-    /* ── The app icon, cross-fading between its light and dark artwork ──
-       Two stacked images rather than one image swapped in JS: only the light
-       one is in flow, so it sets the box and nothing reflows at the swap, and
-       the whole thing is a single composited opacity animation.
+    @keyframes badge-pulse {
+      0%, 100% { transform: scale(1);    }
+      50%      { transform: scale(1.04); }
+    }
 
-       6s cycle = 3s per side. The holds are 42% and 42% with 8% (~0.5s) of
-       fade at each end, which is what makes it read as a soft dissolve rather
-       than a cut. */
+    /* ── The app icon, WIPING between its light and dark artwork ──
+       Two stacked images rather than one image swapped in JS: only the light
+       one is in flow, so it sets the box and nothing reflows at the swap.
+
+       The dark layer fades in over the WHOLE square — one opacity on one
+       element, revealing the light artwork underneath. Two sideways versions
+       were built and rejected first (a clip-path cut, then a soft gradient
+       mask sliding across): a directional reveal is not what this wants, and
+       the hard one read as a seam across the artwork.
+
+       8 seconds, NOT the 6 it started at: that is the shove's period, so the
+       two loops stay in phase — and the fades are timed to the shove's
+       GLIDES, 37.5-50% and 87.5-100%, not to its holds. The icon changes
+       colour while it is travelling and is a settled colour whenever it is
+       parked, so the two motions read as one gesture. Both numbers come from
+       @keyframes morrow-shove; if that timing changes, change these with it. */
     .app-icon {
       position: relative;
       display: block;
@@ -1392,12 +1509,14 @@
     .app-icon-dark {
       position: absolute;
       inset: 0;
-      animation: icon-swap 6s ease-in-out infinite;
+      animation: icon-fade 8s ease-in-out infinite;
     }
-    @keyframes icon-swap {
-      0%, 42%  { opacity: 0; }
-      50%, 92% { opacity: 1; }
-      100%     { opacity: 0; }
+    @keyframes icon-fade {
+      /* Parked left, light -> fades to dark across the push right -> parked
+         right, dark -> fades back to light across the push home. */
+      0%, 37.5% { opacity: 0; }
+      50%, 87.5% { opacity: 1; }
+      100%      { opacity: 0; }
     }
 
     .project-nav {
@@ -1725,10 +1844,11 @@
     }
 
     @media (max-width: 860px) {
+      /* .dna-row is deliberately NOT in this list any more: it is a centred
+         column at every width now, and this rule would flip it back to a row. */
       .stagger-row,
       .stagger-row.right,
-      .stagger-row.indent,
-      .dna-row {
+      .stagger-row.indent {
         margin-left: 0; max-width: none; flex-direction: row;
       }
       .stagger-figure { width: clamp(160px, 34vw, 240px); }
@@ -1772,8 +1892,10 @@
       .fan-sticky, .ic-sticky { position: static !important; height: auto !important; }
       .color-card { animation: none !important; }
       .app-icon-dark { animation: none !important; opacity: 0; }
+      .appstore-badge { animation: none !important; transform: none !important; }
       .appstore-link:hover, .appstore-link:active { transform: none; }
-      .morrow-shove {
+      .morrow-shove,
+      .morrow-devices .hero-icon {
         animation: none !important;
         left: 0 !important;
         transform: none !important;
@@ -1812,9 +1934,6 @@
       .stagger-copy { font-size: 16px; }
       /* short but real content, kept below body size */
       .meta-inset { font-size: 15px; }
-      /* VT323 UI labels */
-      .breadcrumb { font-size: 16px; }
-
       /* Project nav — mobile only. The project TITLE under the label is hidden, so
          the footer reads just "NEXT >>" / "<< PREVIOUS" and the number. It is dropped
          rather than shrunk because the destination is already named by the big title
@@ -1953,6 +2072,13 @@
       .guide-section { padding: 52px 20px; }
       /* Header/glance/meta blocks: slighter bump, they are shorter units. */
       .section { padding: 32px 20px; }
+      /* …except the header, which follows the icon hero rather than a border,
+         and wants to read as belonging to it. Restated HERE, not in the
+         earlier 640px block: this .section rule is the same specificity and
+         later in the file, so an earlier override loses on source order —
+         which is exactly how the first attempt at this failed, measuring 32px
+         when it had asked for 10. */
+      .header-section { padding-top: 10px; }
 
       /* The heading + divider stay one tight unit (20px); the air goes below
          the divider, before the body. */
@@ -2042,6 +2168,18 @@
          centred rather than hung off the left edge with the panels. */
       .stagger-row .stagger-figure:not(.phone):not(.duo) { align-self: center; }
 
+      /* …and it gets more air than the rest of the column, above the mark and
+         under the paragraph that belongs to it, so the pair reads as one
+         exhibit rather than as another row in the stack. Both gaps were 56px
+         and go up by the same 25% as the mark itself.
+         The gap UNDER the text is reached with a sibling selector rather than
+         :has(): .stagger-figure and .stagger-body are siblings, and at this
+         width the row is a flex COLUMN, so the body's bottom margin is the
+         space below the paragraph. Placed in this block, the last one that
+         touches .stagger-figure, so nothing later overrides it. */
+      .stagger-row .stagger-figure:not(.phone):not(.duo) { margin-top: 14px; }
+      .stagger-row .stagger-figure:not(.phone):not(.duo) + .stagger-body { margin-bottom: 14px; }
+
       /* Retro vs modern stacks on a phone: side by side, one of them is always
          a collapsed stub next to a full cluster, and the pair cannot both be
          legible in 350px. Stacked they get the full column each, offset to
@@ -2050,7 +2188,18 @@
          is shrink-to-fit and centred inside .ic-sticky, so as a column it was
          only as wide as its widest child and both sides landed on the same
          axis regardless of align-self. */
-      .icons-compare { flex-direction: column; width: 100%; }
+      /* display: flex restated on purpose — the base rule is a grid now, and
+         flex-direction would do nothing to it. */
+      .icons-compare { display: flex; flex-direction: column; width: 100%; }
+      /* Each caption keeps the column's full width under its own cluster. */
+      .ic-copy { max-width: none; width: 100%; }
+      /* No inboard offset here: stacked, the caption is under its cluster, not
+         beside it, so sliding it sideways would be movement toward nothing. */
+      .ic-copy { --ic-copy-shift: 0px; }
+      /* …except that the half carrying the section's HEADING leads the block
+         here, rather than turning up under the first cluster. The other half
+         still follows its own cluster. */
+      .ic-copy--retro { order: -1; }
       .ic-side--left  { align-self: flex-start; margin-left: 6%; }
       .ic-side--right { align-self: flex-end;  margin-right: 6%; }
       /* --push shoves the closed side toward its EDGE, which is a horizontal
@@ -2120,15 +2269,29 @@
        gap is a fifth of .stagger-list's clamp(56px, 8vw, 120px): the three
        controls are one exhibit, so they sit as a group rather than reading
        as three separate rows with air between them. */
+    /* Heading, copy, then the three demos side by side under it — one centred
+       column rather than text beside a stack of three. Source order IS the
+       visual order here (an `order` override put the demos in the middle for
+       one round and was dropped again), so the copy reads straight on from the
+       heading it belongs to. Its width
+       is deliberately NOT the content column's: 820px keeps the paragraphs at
+       a readable measure and still gives each demo ~250px, and the text and
+       the demos share those same two edges because they are siblings in it. */
     .dna-row {
       display: flex;
-      align-items: center;
-      gap: clamp(28px, 5vw, 72px);
-      margin-left: auto;
-      max-width: 860px;
+      flex-direction: column;
+      gap: clamp(22px, 3vw, 40px);
+      /* 700, not the 820 this started at: the copy and the demo row are meant
+         to read as one column of the same width, and they met in the middle —
+         the text came in, the demos went out (see --z and the 100% widths
+         below). */
+      width: min(700px, 100%);
+      margin-inline: auto;
     }
 
-    .dna-copy { max-width: 520px; }
+    /* Full width of that block, so the copy's edges are the demos' edges. */
+    .dna-copy { max-width: none; }
+
 
     /* A heading belongs to the text under it, so it sits close to it — the
        section's own 28px gap would read as two separate blocks. */
@@ -2145,25 +2308,35 @@
 
     .dna-stack {
       display: flex;
-      flex-direction: column;
-      gap: clamp(13.75px, 2vw, 30px);
-      /* The definite width lives HERE, not on .dna-stage: the stages size
-         from it, and the troughs' own percentage widths size from those. Put
-         it on the stage instead and below 860px (where the stage is 100%) the
-         chain resolves against a shrink-to-fit flex item — circular, and the
-         troughs silently collapse to a third of their width. */
-      width: clamp(218px, 30.9vw, 328px);
+      flex-direction: row;
+      align-items: center;
+      /* Tight: the three are one exhibit, and at the old clamp(14, 2.4vw, 40)
+         the air between them was wider than the gaps inside the controls. */
+      gap: clamp(8px, 1.1vw, 16px);
+      /* The definite width still lives HERE, not on .dna-stage: the stages
+         size from it and the troughs' percentage widths size from those. In
+         this row layout the stages are flex: 1 1 0 — a basis of ZERO, not
+         auto, so each stage resolves from this definite width rather than
+         from its own content. With auto the chain would be circular and the
+         troughs would silently collapse, the same trap as before. */
+      width: 100%;
       flex: none;
     }
 
     /* The stage is a fixed box so the three demos line up on one column
        edge no matter how wide each control actually is. */
     .dna-stage {
-      flex: 0 0 auto;
-      width: 100%;
+      flex: 1 1 0;
+      min-width: 0;
       display: grid;
       place-items: center;
-      --z: 1;
+      /* --z0 is the authored size of each demo (inline, per stage); --z is
+         what the SkeuKit metrics actually read. Keeping them separate is what
+         lets the row layout scale all three by one number without touching
+         the markup — and lets the phone put them back to 1:1 further down.
+         1.18 pairs with the 75% -> 100% widths below: same ratio, so the
+         controls grow in proportion instead of stretching. */
+      --z: calc(var(--z0, 1) * 1.18);
     }
 
     /* ── Trough: the hole in the surface ─────────────────────────────────
@@ -2238,13 +2411,13 @@
       font-size: calc(19.7px * var(--z) * var(--fs));
       line-height: 1;
     }
-    /* The lip is the only shrink-to-fit control in the stack; the two bars
-       below are full width. Centring it left it floating over their middle,
-       so this stage alone aligns to the start and all three share one edge. */
-    .dna-stack .dna-stage { justify-items: start; }
+    /* Side by side, each demo is centred in its own third — the shared left
+       edge that made them line up as a column is meaningless in a row. */
+    .dna-stack .dna-stage { justify-items: center; }
 
     /* ── Row 2 — indented panel ──────────────────────────────────────── */
-    .dna-fieldwrap { width: 75%; display: grid; gap: calc(10px * var(--z)); }
+    .dna-fieldwrap { width: 100%; display: grid; gap: calc(10px * var(--z)); }
+    .dna-seg { width: 100%; }
     .sk-field {
       --h: 51;
       display: block; width: 100%; box-sizing: border-box;
@@ -2326,15 +2499,28 @@
     }
 
     @media (max-width: 860px) {
-      /* Still a definite width, not a percentage: the row is side by side down
-         to 640px, and 100% here would take the whole row and leave the copy
-         nothing. */
-      .dna-stack { width: clamp(182px, 30.9vw, 309px); }
+      /* Full width of the block here too — the demos are a row of three
+         across it, not a column beside the copy. */
+      .dna-stack { width: 100%; }
     }
 
     @media (max-width: 640px) {
-      /* Below here .dna-row is a column, so a full-width stack is correct. */
-      .dna-stack { width: 100%; max-width: 309px; }
+      /* Three across a phone column would be ~100px each, so below 640 the
+         demos go back to a stack — which also puts the definite width back on
+         .dna-stack, where the troughs' percentages need it. */
+      .dna-stack {
+        flex-direction: column;
+        width: 100%;
+        max-width: 309px;
+        margin-inline: auto;
+      }
+      .dna-stack .dna-stage { flex: none; width: 100%; }
+      /* Stacked, each demo already has the column to itself — the row's
+         scale-up and its full-width controls would only make them crowd the
+         gutter, so this is the authored size again. */
+      .dna-stack .dna-stage { --z: var(--z0, 1); }
+      .dna-fieldwrap { width: 75%; }
+      .dna-seg { width: 75%; }
     }
   </style>
 </head>
@@ -2377,9 +2563,12 @@
     <!-- Header. Note there is deliberately no element with class "hero" on
          this page — see the .morrow-devices comment in the stylesheet for
          why that matters to the nav bar's shadow. -->
-    <div class="section" style="border-bottom: none;">
+    <div class="section header-section" style="border-bottom: none;">
+      <!-- No breadcrumb here (dropped 2026-09-07), unlike the other project
+           pages: with the icon hero directly above it, the trail sat between
+           the icon and the title and held the two apart. Removing it is what
+           closes that gap — no spacing was touched. -->
       <div class="project-header">
-        <p class="breadcrumb" data-i18n-html="breadcrumb">Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;morrow</p>
         <!-- .title-row is left exactly as the other pages have it; the
              movement is layered on with one extra class, so the header's
              own geometry stays identical to theirs. No .accent-dot here —
@@ -2589,9 +2778,6 @@
         </div>
       </div>
 
-      <h3 class="feature-title media-copy" style="margin-top: var(--block-gap);" data-i18n="icons-title">Schrift und Icons</h3>
-      <p class="guide-text media-copy" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).</p>
-
       <!-- A labelled bubble stands still on each side; the icons expand out
            from behind it. The bubble carries its own face — W95FA on the
            left, the system face on the right — so the two type systems are
@@ -2617,6 +2803,15 @@
           </div></div>
           <span class="ic-bubble sk-pill sk-glass sk-chrome">retro</span>
         </div>
+        <!-- The section's own heading and copy, in the layout rather than
+             stacked above it. The paragraph is the original text split at its
+             own sentence boundary — the half that describes the pixel set
+             here, the half that describes today's beside the modern cluster
+             below. No new claims: the wording is the existing one rearranged. -->
+        <div class="ic-copy ic-copy--retro">
+          <h3 class="feature-title" data-i18n="icons-title">Schrift und Icons</h3>
+          <p class="guide-text" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Oben die Pixelwelt der ersten Version. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).</p>
+        </div>
         <div class="ic-side ic-side--right sk">
           <div class="ic-orbitwrap"><div class="ic-orbit">
             <span class="ic-item" style="--a: 0deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="6.3" stroke-width="1.8"/><circle cx="12" cy="12" r="2.5" stroke-width="1.5"/><path stroke-width="2.1" d="M18.3 12.0L20.6 12.0M16.5 16.5L18.1 18.1M12.0 18.3L12.0 20.6M7.5 16.5L5.9 18.1M5.7 12.0L3.4 12.0M7.5 7.5L5.9 5.9M12.0 5.7L12.0 3.4M16.5 7.5L18.1 5.9"/></svg></span></span></span>
@@ -2626,6 +2821,9 @@
             <span class="ic-item" style="--a: 288deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10a2.4 2.4 0 0 0-3.4-3.4L4.6 16.6z"/><path d="M13.6 7.4l3 3"/></svg></span></span></span>
           </div></div>
           <span class="ic-bubble sk-pill sk-glass sk-chrome">modern</span>
+        </div>
+        <div class="ic-copy ic-copy--modern">
+          <p class="guide-text" data-i18n-html="icons-text-2">Darunter die heutige — dieselben Funktionen, zwei Haltungen.</p>
         </div>
       </div>
         </div>
@@ -2646,18 +2844,18 @@
            bottom of the page and pause when the block is off screen. -->
       <div class="dna-list dna">
         <div class="dna-row">
+          <h3 class="feature-title" data-i18n="dna-title">Drei Formen</h3>
           <div class="dna-body">
-            <h3 class="feature-title" data-i18n="dna-title">Drei Formen</h3>
             <p class="stagger-copy dna-copy" data-i18n-html="dna-intro">Unter der Oberfläche besteht SkeuKit aus drei Formen, und mehr sind es bewusst nicht. Jede beantwortet eine einzige Frage, die man sonst ausprobieren müsste: Kann ich das drücken? Gehört das mir? Wo bin ich gerade? Weil es nur drei sind, lernt man sie einmal — und danach ist jede neue Ansicht der App schon erklärt.</p>
             <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.</p>
           </div>
           <div class="dna-stack">
-            <div class="dna-stage sk" style="--z: 0.764;">
+            <div class="dna-stage sk" style="--z0: 0.764;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
                 <span>Personal</span>
               </button>
             </div>
-            <div class="dna-stage sk" style="--z: 1.229;">
+            <div class="dna-stage sk" style="--z0: 1.229;">
               <div class="dna-fieldwrap">
                 <!-- .sk-field__input is not decoration: .sk-trough's fill and
                      lip are ::before/::after, i.e. POSITIONED descendants, so
@@ -2667,8 +2865,8 @@
                 <div class="sk-field sk-trough"><span class="sk-field__input"><span class="dna-type"></span><i class="dna-caret"></i></span></div>
               </div>
             </div>
-            <div class="dna-stage sk" style="--z: 1.001;">
-              <div class="sk-seg sk-trough dna-seg" style="width: 75%;">
+            <div class="dna-stage sk" style="--z0: 1.001;">
+              <div class="sk-seg sk-trough dna-seg">
                 <!-- The outer bevel. A segmented trough is furniture sitting in
                      the surface, and without this it reads as a channel with
                      nothing around it — see .sk-trough__bloom. -->
@@ -2681,6 +2879,9 @@
           </div>
         </div>
       </div>
+
+      <h3 class="feature-title media-copy" style="margin-top: var(--block-gap);" data-i18n="color-title">Farbe</h3>
+      <p class="guide-text media-copy" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.</p>
 
       <!-- Stacked dead centre, scattering into the arrangement Lucas
            specified: alternating tilt, staggered heights, varied scale —
@@ -2720,9 +2921,23 @@
         </div>
       </div>
 
-      <h3 class="feature-title media-copy" style="margin-top: var(--block-gap);" data-i18n="color-title">Farbe</h3>
-      <p class="guide-text media-copy" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.</p>
     </div>
+
+    <!-- Closing section: no step badge, per the reflection convention in the
+         stylesheet — it is not a fourth step of the process, it is the look
+         back at it. Text only, so it reads as the page settling down after
+         the colour screens. -->
+    <div class="guide-section">
+      <div class="section-heading-row">
+        <h2 class="section-title" data-i18n="section-conclusion">Fazit und Ausblick</h2>
+      </div>
+      <div class="dot-divider"></div>
+
+      <p class="guide-text media-copy" data-i18n-html="conclusion-1">Rückblickend war die unangenehmste Entscheidung des Projekts die wichtigste: die fertige Windows-95-Oberfläche wegzuwerfen. Sie hat mir beigebracht, den Reiz einer Idee von ihrem Nutzen zu trennen. Eine Oberfläche, die als Screenshot funktioniert, funktioniert noch lange nicht, wenn man morgens um sieben eine Aufgabe um einen Tag verschiebt.</p>
+      <p class="guide-text media-copy" data-i18n-html="conclusion-2">Der Rest der Arbeit war Weglassen. Drei Listen, drei Formen, eine Geste — jede neue Idee musste sich gegen dieselbe Frage behaupten: Ist die App danach schneller zu bedienen, oder kann sie nur mehr? Die meisten haben das nicht überstanden. Was übrig geblieben ist, ist kleiner als geplant, und genau deshalb ist es ein Werkzeug geblieben statt einer Demo.</p>
+      <p class="guide-text media-copy" data-i18n-html="conclusion-3">Weitergehen soll es an zwei Stellen. Zuerst Widgets: Die Heute-Liste gehört auf den Home- und den Sperrbildschirm, damit Abhaken und Verschieben auch ohne geöffnete App möglich sind — die Live Activity ist dafür die halbe Strecke. Danach eine Desktop-Version: dasselbe Datenmodell, dieselben drei Listen, aber mit Tastatur, mehreren Fenstern und Platz für eine Wochenansicht, die auf einem Telefon keinen Sinn ergibt. Beides ist für später gedacht, nicht für die nächste Woche.</p>
+    </div>
+
     <!-- The app is live, so the badge is a real link now. Apple's guidelines
          forbid altering the artwork, so it is only scaled; the bounce lives on
          the <a>, not on the image. -->
@@ -2893,7 +3108,6 @@
     const TRANSLATIONS = {
       en: {
         'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;morrow',
         'section-glance': 'At a Glance',
         'placeholder': '[ Placeholder ]',
         'nav-prev': '<< PREVIOUS', 'nav-next': 'NEXT >>',
@@ -2901,7 +3115,6 @@
       },
       de: {
         'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;morrow',
         'section-glance': 'Auf einen Blick',
         'glance-lead': 'In jeder To-do-App ist eine Aufgabe schnell angelegt und mühsam verschoben: öffnen, Datumsauswahl suchen, Datum wählen, speichern. Also lässt man es — und die Heute-Liste stimmt schon am Vormittag nicht mehr. morrow macht das Verschieben zur wichtigsten Geste: drei Listen — Heute, Morgen, Bald —, jede Aufgabe liegt in genau einer, ein Wisch nach rechts schiebt sie weiter, einer nach links zurück.',
         'label-timeline': 'Zeitraum', 'label-role': 'Rolle', 'label-team': 'Team', 'label-platform': 'Plattform',
@@ -2933,12 +3146,17 @@
         'section-design': 'Design-Prozess',
         'pivot-1': 'Die erste Version war eine vollständige Windows-95-Oberfläche im doppelten Pixelmaßstab: Taskleiste, abgeschrägte Ränder, Statuszeile, Pixelschrift. Sie war fertig, nicht bloß eine Stimmung — und musste trotzdem weg. Der Witz war lauter als die App. Eine originalgetreue Oberfläche von 1995 ist ein Kostüm: Sie macht ein tägliches Werkzeug anstrengend, kämpft gegen jede iOS-Konvention, und das Publikum, dem sie schmeichelt, ist nicht das Publikum, das morgens damit arbeitet.',
         'pivot-2': 'An ihre Stelle kam SkeuKit: ein weich-skeuomorphes System aus Tokens, vier Themes in Hell und Dunkel. Tiefe entsteht dort aus Licht statt aus Textur — Mulden für Vertieftes, Glas für Bedienelemente, einfacher Text auf der Fläche für Inhalt. Ein Druckverhalten für jedes Element der App. Die Pixelschrift ist geblieben, aber als optionaler Retro-Modus, der nur die Rahmen betrifft; der Aufgabentext bleibt in der Systemschrift. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.',
-        'icons-text': 'Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).',
+        'icons-text': 'Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Oben die Pixelwelt der ersten Version. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).',
+        'icons-text-2': 'Darunter die heutige — dieselben Funktionen, zwei Haltungen.',
         'icons-title': 'Schrift und Icons',
         'dna-title': 'Drei Formen',
         'color-title': 'Farbe',
         'dna-forms': 'Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.',
         'dna-intro': 'Unter der Oberfläche besteht SkeuKit aus drei Formen, und mehr sind es bewusst nicht. Jede beantwortet eine einzige Frage, die man sonst ausprobieren müsste: Kann ich das drücken? Gehört das mir? Wo bin ich gerade? Weil es nur drei sind, lernt man sie einmal — und danach ist jede neue Ansicht der App schon erklärt.',
+        'section-conclusion': 'Fazit und Ausblick',
+        'conclusion-1': 'Rückblickend war die unangenehmste Entscheidung des Projekts die wichtigste: die fertige Windows-95-Oberfläche wegzuwerfen. Sie hat mir beigebracht, den Reiz einer Idee von ihrem Nutzen zu trennen. Eine Oberfläche, die als Screenshot funktioniert, funktioniert noch lange nicht, wenn man morgens um sieben eine Aufgabe um einen Tag verschiebt.',
+        'conclusion-2': 'Der Rest der Arbeit war Weglassen. Drei Listen, drei Formen, eine Geste — jede neue Idee musste sich gegen dieselbe Frage behaupten: Ist die App danach schneller zu bedienen, oder kann sie nur mehr? Die meisten haben das nicht überstanden. Was übrig geblieben ist, ist kleiner als geplant, und genau deshalb ist es ein Werkzeug geblieben statt einer Demo.',
+        'conclusion-3': 'Weitergehen soll es an zwei Stellen. Zuerst Widgets: Die Heute-Liste gehört auf den Home- und den Sperrbildschirm, damit Abhaken und Verschieben auch ohne geöffnete App möglich sind — die Live Activity ist dafür die halbe Strecke. Danach eine Desktop-Version: dasselbe Datenmodell, dieselben drei Listen, aber mit Tastatur, mehreren Fenstern und Platz für eine Wochenansicht, die auf einem Telefon keinen Sinn ergibt. Beides ist für später gedacht, nicht für die nächste Woche.',
         'color-text': 'Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.',
         'placeholder': '[ Platzhalter ]',
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
@@ -3414,15 +3632,30 @@
     // word's own width. Measured rather than expressed as left: 0% -> 100%
     // with a matching translateX(-100%), which needed no measuring but
     // animated a LAYOUT property — see the @keyframes comment.
+    // The hero icon rides the same keyframes, so it is measured the same way
+    // — against its own parent, which is a different element with a different
+    // gutter. One entry each rather than one shared number.
     (function () {
-      var row = document.querySelector('.morrow-shove');
-      if (!row) return;
-      var col = row.parentElement;
+      var els = [document.querySelector('.morrow-shove'),
+                 document.querySelector('.morrow-devices .hero-icon')].filter(Boolean);
+      if (!els.length) return;
+      var title = els[0], icon = els[1];
       function size() {
-        var cs = getComputedStyle(col);
-        var inner = col.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-        var d = Math.max(0, Math.round(inner - row.offsetWidth));
-        row.style.setProperty('--shove-x', d + 'px');
+        // Same width, measured rather than guessed: the word is OCR-A-BT at a
+        // clamp() size and the icon is a vw-capped square, so no pair of CSS
+        // values keeps them equal at every viewport. Set BEFORE the travel is
+        // measured below — the icon's own width is half of that sum.
+        // Every width, phones included: the pair comes out at the same share
+        // of its column either way (~33%), so the phone hero is the desktop
+        // one scaled down rather than a different composition.
+        if (icon && title) icon.style.width = title.offsetWidth + 'px';
+        els.forEach(function (el) {
+          var col = el.parentElement;
+          var cs = getComputedStyle(col);
+          var inner = col.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+          var d = Math.max(0, Math.round(inner - el.offsetWidth));
+          el.style.setProperty('--shove-x', d + 'px');
+        });
       }
       size();
       window.addEventListener('resize', size);
