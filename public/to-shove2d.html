@@ -222,7 +222,18 @@
        and 3 gaps at the same 5% gap ratio give phone = row x 0.2125, so
        row = 17.955 / 21.25 = 84.5%. Change the gap and this number has to
        be re-solved, exactly as on .morrow-devices-inner. */
-    .win-devices { margin-top: clamp(8px, 1.5vw, 16px); }
+    /* unify2d's within-section rhythm is 28px between text blocks and ~76px
+       where text meets a media block. Morrow had grown eight different values
+       for that second case (44, 60, 68, 76, 80, 92), so it is one token now
+       and every media block on the page uses it.
+
+       The token is what gets ADDED on top of .guide-section's own 28px flex
+       gap, not the total — margin and gap stack. 48 + 28 = 76 at 1440, which
+       is Unify's figure. Setting it to 76 outright put every media gap at
+       104px, which is how this was caught. */
+    :root { --block-gap: clamp(24px, 3.3vw, 48px); }
+
+    .win-devices { margin-top: var(--block-gap); }
 
     /* .guide-section is a flex column with one gap for everything, so the
        heading, its divider and the body all sit the same distance apart. This
@@ -428,7 +439,9 @@
       color: var(--text-secondary);
     }
 
-    .guide-text + .guide-text { margin-top: -8px; }
+    /* Was -8px, which pulled consecutive paragraphs to 20px against
+       unify2d's 28px. The section's own gap is the right value. */
+    .guide-text + .guide-text { margin-top: 0; }
 
     /* ── At a glance ── */
     .glance-list {
@@ -880,6 +893,7 @@
        top mid-swap. Same idiom as .fan-scrolly below. */
     .ic-scrolly {
       position: relative;
+      margin-top: var(--block-gap);
       /* Spacer = the pinned box plus the scroll room the states need, not a
          round number of viewports. At 230vh the pin ran for ~1450px, which is
          most of a section spent with nothing on screen but the icons; this is
@@ -952,8 +966,8 @@
       position: relative;
       /* The colour screens are their own exhibit — more air above them than
          the section's own rhythm gives, so they do not read as belonging to
-         the paragraph before them. */
-      margin-top: clamp(28px, 5vw, 64px);
+         the block before them. */
+      margin-top: var(--block-gap);
       /* Same shape as .ic-scrolly's: the pinned height plus the scroll room
          the open/close needs. */
       height: calc(var(--card-w) * (1600 / 792) * 1.18 + 85vh);
@@ -2006,7 +2020,7 @@
        added to .sk, so the existing icon section keeps its exact cascade. */
     .dna { --ink-muted: #6A6F77; --ink-faint: #8A9099; }
 
-    .dna-list { margin-top: clamp(28px, 4vw, 52px); }
+    .dna-list { margin-top: var(--block-gap); }
 
     /* One text, three demos — not three captioned sections. The stack's own
        gap is a fifth of .stagger-list's clamp(56px, 8vw, 120px): the three
@@ -2458,7 +2472,7 @@
         </div>
       </div>
 
-      <p class="guide-text media-copy" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).</p>
+      <p class="guide-text media-copy" style="margin-top: var(--block-gap);" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).</p>
 
       <!-- A labelled bubble stands still on each side; the icons expand out
            from behind it. The bubble carries its own face — W95FA on the
@@ -2580,7 +2594,7 @@
         </div>
       </div>
 
-      <p class="guide-text media-copy" style="margin-top: clamp(24px, 4vw, 40px);" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.</p>
+      <p class="guide-text media-copy" style="margin-top: var(--block-gap);" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.</p>
     </div>
     <!-- The app is live, so the badge is a real link now. Apple's guidelines
          forbid altering the artwork, so it is only scaled; the bounce lives on
