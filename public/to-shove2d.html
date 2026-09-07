@@ -235,6 +235,11 @@
 
     .win-devices { margin-top: var(--block-gap); }
 
+    /* Desktop shows the row of three; the icon hero is a phone-only swap.
+       Scoped to .morrow-devices because .app-icon sets display: block further
+       down the file and would otherwise win on source order. */
+    .morrow-devices .hero-icon { display: none; }
+
     /* .guide-section is a flex column with one gap for everything, so the
        heading, its divider and the body all sit the same distance apart. This
        is the only place that wants more: the divider is part of the heading
@@ -1149,8 +1154,19 @@
       /* Four across has to fit a 350px column, so the cards shrink here:
          18vw + 3 x 22.5vw = 333px at 390px wide. They read as colour
          swatches at this size, which is the point of the section. */
-      .fan-scrolly { --card-w: 15.3vw; --step: 14.3vw; }
-      .fan-scrolly { height: calc(var(--card-w) * (1600 / 792) * 1.18 + 70vh); }
+      /* Phone: the fan is not pinned, it just plays in place as it passes.
+         Sized so the spread fills the screen with a minimal gutter — the group
+         spans 3.12 steps plus one card, so 3.12 x 22.8 + 24.8 = 96vw. */
+      .fan-scrolly {
+        --card-w: 24.8vw;
+        --step: 22.8vw;
+        height: auto;
+      }
+      .fan-sticky {
+        position: static;
+        height: auto;
+        top: auto;
+      }
       /* +30% would put the two open clusters at ~400px across a 350px
          column. Only one side is open at a time, so the binding case is
          actually reduced motion, which opens both — this stop keeps that
@@ -1201,7 +1217,25 @@
       /* Four 792px-wide frames across this column render at ~112px each,
          which is below the size at which the pixel UI is legible. 2x2
          keeps the composition and roughly doubles each phone. */
-      .win-devices-inner { grid-template-columns: repeat(2, 1fr); width: 88%; gap: 6%; row-gap: 18px; }
+      /* A phone cannot show four 792px frames at a legible size, so they pan
+         instead of tiling. A real scroll container, not a transform marquee:
+         that way the finger drives it natively and the auto-pan is just
+         scrollLeft being nudged, so the two can never fight. The set is
+         duplicated in JS and the offset wraps by one set's width, which is
+         what makes the loop seamless. */
+      .win-devices-inner {
+        display: flex;
+        width: 100%;
+        gap: 4vw;
+        padding: 0 4vw;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+      }
+      .win-devices-inner::-webkit-scrollbar { display: none; }
+      /* ~2 screens in view at a time, gaps included. */
+      .win-devices-inner img { flex: 0 0 42vw; width: 42vw; }
       .media-copy { width: 100%; margin-inline: 0; }
       .icons-compare .ic-side { --z: 1.665; }
       .meta-grid { grid-template-columns: 1fr 1fr; }
@@ -1229,6 +1263,20 @@
       /* Deliberately down here, AFTER the 860px block: both queries match a
          phone, so the narrower step only wins on source order. */
       .icons-compare .ic-side { --z: 0.855; }
+
+      /* The icon hero: big enough to be the page's opening statement, with
+         the same gutter as everything else in the column. */
+      .morrow-devices-inner { display: none; }
+      .morrow-devices .hero-icon { display: block; width: min(62vw, 300px); margin-inline: auto; }
+
+      /* The three primitives read as a centred group on a phone; docked left
+         they looked like a column that had lost its second column. */
+      .dna-list .dna-stack .dna-stage { justify-items: center; }
+
+      /* The badge carries the whole message on a phone — the icon beside it is
+         the same artwork as the hero above it and only costs width here. */
+      .appstore-row .app-icon { display: none; }
+
       #top-bar { height: 140px; }
       #top-bar.hide { transform: translateY(-90px); }
       .section { padding: 24px 20px; }
@@ -1253,11 +1301,13 @@
        than fluid: Apple's guidelines set a minimum size, and past ~230px it
        starts to read as a call to action rather than a status note. */
     .appstore-row {
-      /* One token for both, so the icon and the badge cannot drift apart:
-         the badge came down from 220 and the icon went up from 150 to meet
-         at the same width. They are different shapes — a square against a
-         3.38:1 bar — so matching WIDTH is what makes them read as a pair. */
-      --appstore-w: clamp(120px, 15vw, 185px);
+      /* One token for both, so they cannot drift apart — and it is HEIGHT,
+         not width. Matching width was the earlier attempt and it made the
+         mismatch worse, not better: the badge is a 3.38:1 bar and the icon is
+         a square, so equal widths meant a 185px-tall icon beside a 55px-tall
+         badge. Equal height is what "the same size" means for these two
+         shapes, and it is how Apple sets a badge beside an icon. */
+      --appstore-h: clamp(52px, 4.7vw, 68px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1276,8 +1326,8 @@
     .appstore-link:active { transform: translateY(0) scale(.985);    transition: transform 90ms ease-out; }
 
     .appstore-badge {
-      width: var(--appstore-w);
-      height: auto;
+      height: var(--appstore-h);
+      width: auto;
       display: block;
     }
 
@@ -1293,7 +1343,8 @@
       position: relative;
       display: block;
       flex: none;
-      width: var(--appstore-w);
+      /* square, so its width IS its height */
+      width: var(--appstore-h);
       /* drop-shadow, not box-shadow: the icon is a transparent squircle, so
          this follows its silhouette instead of boxing it. On the WRAPPER
          rather than on each <img>, or it paints twice through the cross-fade
@@ -2031,9 +2082,7 @@
       align-items: center;
       gap: clamp(28px, 5vw, 72px);
       margin-left: auto;
-      /* 860 + the 108px the stack just gained, so the copy column is not the
-         thing that pays for the bigger controls. */
-      max-width: 968px;
+      max-width: 860px;
     }
 
     .dna-copy { max-width: 520px; }
@@ -2056,7 +2105,7 @@
          it on the stage instead and below 860px (where the stage is 100%) the
          chain resolves against a shrink-to-fit flex item — circular, and the
          troughs silently collapse to a third of their width. */
-      width: clamp(312px, 44.2vw, 468px);
+      width: clamp(218px, 30.9vw, 328px);
       flex: none;
     }
 
@@ -2228,12 +2277,12 @@
       /* Still a definite width, not a percentage: the row is side by side down
          to 640px, and 100% here would take the whole row and leave the copy
          nothing. */
-      .dna-stack { width: clamp(260px, 44.2vw, 442px); }
+      .dna-stack { width: clamp(182px, 30.9vw, 309px); }
     }
 
     @media (max-width: 640px) {
       /* Below here .dna-row is a column, so a full-width stack is correct. */
-      .dna-stack { width: 100%; max-width: 442px; }
+      .dna-stack { width: 100%; max-width: 309px; }
     }
   </style>
 </head>
@@ -2263,6 +2312,14 @@
          land and nothing below it jumps. Not lazy-loaded — this is the
          top of the page. -->
     <div class="morrow-devices">
+      <!-- Phone hero. Three 300px-wide mockups down a 350px column is a stack
+           of thumbnails, not a hero, so the app's own icon carries it instead —
+           the same artwork, and the same light/dark cross-fade, as the landing
+           tile. Hidden on desktop, where the row of three is the point. -->
+      <span class="app-icon hero-icon" role="img" aria-label="Das App-Icon von morrow">
+        <img src="/images/morrow/app-icon-light.webp" width="640" height="640" alt="" />
+        <img class="app-icon-dark" src="/images/morrow/app-icon-dark.webp" width="640" height="640" alt="" />
+      </span>
       <div class="morrow-devices-inner">
         <img src="/images/morrow/screen1.webp" width="700" height="1444" alt="morrow im Hellmodus: eine Aufgabe mit Live-Schaltfläche, darunter die Reiter Today, Tomorrow und Soon" />
         <img src="/images/morrow/screen2.webp" width="700" height="1444" alt="Der Sperrbildschirm mit der laufenden Aufgabe als Live Activity" />
@@ -2533,12 +2590,12 @@
             <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.</p>
           </div>
           <div class="dna-stack">
-            <div class="dna-stage sk" style="--z: 1.092;">
+            <div class="dna-stage sk" style="--z: 0.764;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
                 <span>Personal</span>
               </button>
             </div>
-            <div class="dna-stage sk" style="--z: 1.755;">
+            <div class="dna-stage sk" style="--z: 1.229;">
               <div class="dna-fieldwrap">
                 <!-- .sk-field__input is not decoration: .sk-trough's fill and
                      lip are ::before/::after, i.e. POSITIONED descendants, so
@@ -2548,7 +2605,7 @@
                 <div class="sk-field sk-trough"><span class="sk-field__input"><span class="dna-type"></span><i class="dna-caret"></i></span></div>
               </div>
             </div>
-            <div class="dna-stage sk" style="--z: 1.43;">
+            <div class="dna-stage sk" style="--z: 1.001;">
               <div class="sk-seg sk-trough dna-seg" style="width: 75%;">
                 <!-- The outer bevel. A segmented trough is furniture sitting in
                      the surface, and without this it reads as a channel with
@@ -2981,6 +3038,7 @@
       // flickering; t is only used INSIDE that window, to decide which of
       // the icon sides is the open one.
       var OPEN_AT = 0.72, SHUT_AT = 0.30;
+      var phone = window.matchMedia('(max-width: 640px)');
 
       function centre(el) {
         var r = el.getBoundingClientRect();
@@ -3017,8 +3075,18 @@
         }
 
         if (fanInner) {
-          var cf = centre(fanInner);
-          var open = (cf <= OPEN_AT && cf >= SHUT_AT) ? '1' : '0';
+          var open;
+          if (phone.matches) {
+            // Not pinned here, so "centred in the viewport" is the wrong test —
+            // the block simply travels past. It opens once half of it has come
+            // up from the bottom and folds once half of it has left past the
+            // top, which is the window where it is actually being looked at.
+            var fr = fanInner.getBoundingClientRect();
+            open = (fr.top < window.innerHeight - fr.height * 0.5 && fr.top > -fr.height * 0.5) ? '1' : '0';
+          } else {
+            var cf = centre(fanInner);
+            open = (cf <= OPEN_AT && cf >= SHUT_AT) ? '1' : '0';
+          }
           if (fan.dataset.open !== open) {
             fan.dataset.open = open;
             fan.querySelectorAll('.color-slot').forEach(function (el) {
@@ -3314,6 +3382,95 @@
       size();
       window.addEventListener('resize', size);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
+    })();
+  </script>
+
+  <script>
+    // Phone only: pan the four v1 screens, looping, without taking the finger
+    // away from the reader.
+    //
+    // The track is a real overflow-x container, so touch scrolling is the
+    // browser's own — this only nudges scrollLeft between frames. Two
+    // consequences worth keeping: a drag simply wins (the pan is suspended
+    // while a pointer is down and for a moment after), and the wrap is a
+    // scrollLeft subtraction rather than an animation restart, so it cannot
+    // stutter mid-gesture.
+    //
+    // The set is duplicated here rather than in the markup: the loop needs a
+    // second copy to scroll into, but a screen reader should be offered each
+    // screenshot once, and the duplicates are aria-hidden for that reason.
+    (function () {
+      var track = document.querySelector('.win-devices-inner');
+      if (!track) return;
+      var mq = window.matchMedia('(max-width: 640px)');
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+      var raf = 0, setW = 0, held = 0, cloned = false;
+
+      function clone() {
+        if (cloned) return;
+        var originals = Array.prototype.slice.call(track.children);
+        originals.forEach(function (n) {
+          var c = n.cloneNode(true);
+          c.setAttribute('aria-hidden', 'true');
+          c.setAttribute('alt', '');
+          track.appendChild(c);
+        });
+        cloned = true;
+      }
+      function measure() {
+        var kids = Array.prototype.slice.call(track.children);
+        var half = kids.slice(0, kids.length / 2);
+        if (!half.length) return 0;
+        var gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+        setW = half.reduce(function (t, n) { return t + n.getBoundingClientRect().width + gap; }, 0);
+        return setW;
+      }
+      // A float we own, assigned to scrollLeft — NOT `scrollLeft += SPEED`.
+      // The getter hands back a rounded value, so a sub-pixel increment reads
+      // back as the same integer every frame and the pan never moves at all.
+      // Measured: scrollLeft sat at 0 across two seconds of ticking rAF.
+      var pos = 0;
+      var SPEED = 0.45;                        // px per frame at 60fps, deliberately slow
+      function step() {
+        raf = requestAnimationFrame(step);
+        if (held) { pos = track.scrollLeft; return; }   // the finger is authoritative
+        pos += SPEED;
+        if (setW && pos >= setW) pos -= setW;
+        track.scrollLeft = pos;
+      }
+      function hold() { held++; }
+      function release() { held = Math.max(0, held - 1); }
+
+      function start() {
+        clone(); measure();
+        if (!raf && !reduce.matches) raf = requestAnimationFrame(step);
+      }
+      function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
+      // A finger on the track pauses it; it resumes a beat after release so
+      // the pan does not fight the tail of a flick.
+      var resume;
+      ['pointerdown', 'touchstart'].forEach(function (e) {
+        track.addEventListener(e, function () { clearTimeout(resume); hold(); }, { passive: true });
+      });
+      ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(function (e) {
+        track.addEventListener(e, function () {
+          clearTimeout(resume);
+          resume = setTimeout(release, 900);
+        }, { passive: true });
+      });
+      // Wrap on manual scrolling too, or a flick can run off the end.
+      track.addEventListener('scroll', function () {
+        if (!setW || !held) return;
+        if (track.scrollLeft >= setW * 2 - 2) track.scrollLeft -= setW;
+        else if (track.scrollLeft <= 0) track.scrollLeft += setW;
+        pos = track.scrollLeft;
+      }, { passive: true });
+
+      function sync() { if (mq.matches) start(); else stop(); }
+      sync();
+      window.addEventListener('resize', function () { measure(); sync(); });
+      if (mq.addEventListener) mq.addEventListener('change', sync);
     })();
   </script>
 
