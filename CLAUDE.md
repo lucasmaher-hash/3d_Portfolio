@@ -73,7 +73,81 @@ When resuming work in a new session:
 | `public/kaffeemaschine2d.html` | Project page — Cybercoffee (03) |
 | `public/mac-lamp2d.html` | Project page — Mac-Lamp (04) |
 | `public/vaccine2d.html` | Project page — Double Packaging (05) |
+| `public/to-shove2d.html` | Project page — morrow (the iOS app). See "morrow page" below. |
 | `public/top_row_permanent_V3.html` | Nav bar — loaded as an iframe on every 2D page |
+
+## morrow page (`public/to-shove2d.html`)
+
+The newest project page (the iOS app), German copy, built after the five older project
+pages and therefore **not** covered by most of the layout-pattern notes above. Assets live
+in `/public/images/morrow/`; it self-hosts W95FA (`/fonts/W95FA.otf`, SIL OFL — the
+attribution in the caption under the icon block is a licence CONDITION, not a courtesy) and
+carries a trimmed copy of the SkeuKit component CSS inline rather than linking it.
+
+**Two scroll blocks, both TRIGGERED rather than scrubbed** (`.fan-scrolly` = the colour
+screens, `.ic-scrolly` = the icon comparison). The scroll handler only picks a state and
+writes a custom property — `--pe` 0 or 1 for the fan — and a CSS transition does the rest,
+so the motion keeps running while the reader sits still.
+
+**The fan is not pinned at any width (2026-09-07).** It used to be a tall spacer with a
+sticky child (the kaffeemaschine turntable idiom) on desktop, opening and closing on where
+the block's *centre* sat in the viewport — which needed the spacer, because a block near the
+end of the page could not otherwise travel far enough to fold shut. Both are gone:
+`.fan-scrolly` is now content-height, `.fan-sticky` is a plain centring wrapper (the name is
+historical), and one test runs at every width — open once half the block has come up from
+the bottom, fold once half of it has left past the top. Measured after the change: it opens
+and closes correctly at 1440 and at 390, in both scroll directions, and still reaches the
+fold-shut threshold before the document bottom (62px of margin at 1440, 31px at 390 — if a
+lot of content below the fan is ever removed, re-check that).
+
+**`.ic-scrolly` was unpinned the same way, and both icon clusters now open at once**
+(`data-ic="3"`, a state added for this). It used to be pinned precisely because the two
+sides *traded* places partway through the pin, and a swap needs the page held still or it
+slides off the top mid-swap — with both open there is no swap left to protect. States `1`
+and `2` survive as the CLICK states: a label isolates its own side, clicking it again
+returns to `3` (never to `0` — that is the off-screen state and showing it under the
+reader's cursor looks broken), and `icLock` still hands control back to scroll once the
+block leaves the window. **`--ic-w` is now sized for a PAIR** — `clamp(240px, 42vw, 538px)`
+instead of `51.5vw` — because two open clusters have to fit the column that used to hold
+one; the 538px cap is unchanged, so 1440 looks exactly as it did and only narrower windows
+scale down. Verified 1440/1200/1024/900/861/390: opens and closes in both directions, no
+horizontal overflow at any of them, and below 640px the pair stacks (that column layout
+predates this change).
+
+**The fan's geometry is data, not code.** Each card is a `<span class="color-slot">` (holds
+the fan transform) wrapping an `<img class="color-card">` (holds the idle sway) — two
+elements because one element cannot carry two competing transforms. Desktop reads five
+inline variables per card (`--slot --rot --sc --dy --lag`); **mobile has its own layout and
+its own variables** (`--m-x --m-y --m-rot --m-sc`, distances in multiples of `--card-w`,
+assigned per `:nth-child` in the ≤640px block) plus `--m-x0`/`--m-y0` for where the closed
+stack sits. Mobile deliberately uses *different* variable names rather than `!important`
+overrides: the desktop values are inline styles, which a stylesheet can only beat with
+`!important`, and a second transform rule reading different names is cleaner.
+
+Mobile (2026-09-07) is the scattered five-phone cluster from Lucas's reference, not a wide
+row: one large centre card with four around it, `--card-w: min(36.4vw, 168px)`, the group
+96vw across and 4.26 card-widths tall. **The fifth card is a decorative repeat** of an
+existing theme (`.color-slot--extra`, `aria-hidden`, empty `alt`) — `display: none` above
+640px, so the desktop fan is still the four themes the `aria-label` names.
+
+**Hero and App Store badge (2026-09-07).** The hero is the app's own icon at every width —
+the row of three screen mockups (`.morrow-devices-inner`) is gone, markup and CSS, and
+`/images/morrow/screen1–3.webp` are now **orphaned on disk** (nothing on the site references
+them). `.morrow-devices .hero-icon` has to state its own `width` (`min(38vw, 360px)`, 62vw
+capped at 300px on a phone) because `.app-icon` sizes itself from `--appstore-h`, a token
+that only exists inside `.appstore-row`. The **icon beside the App Store badge at the foot
+of the page is gone too** — it was the same artwork as the hero and only cost width — so
+`.appstore-row` is the badge alone. A **second copy of the badge now sits above At a
+Glance**, same class and therefore the same size and bounce, with `.appstore-row--top`
+docking it left so it lines up with the heading instead of centring.
+
+Two traps this page has already sprung, both also in "Known Patterns & Gotchas": source
+**order beats specificity** — the file has several `@media (max-width: 640px)` blocks at
+different points, so a mobile rule of equal specificity placed before the base rule loses
+silently; and `.color-fan` measures **0 wide** because it is a flex item whose children are
+all absolutely positioned. That is harmless here (everything positions from `left: 50%`,
+and the flex centring still puts that at the container centre) but do not measure the group
+off it.
 
 ## Nav bar iframe
 
