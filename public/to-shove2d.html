@@ -1307,7 +1307,7 @@
          a square, so equal widths meant a 185px-tall icon beside a 55px-tall
          badge. Equal height is what "the same size" means for these two
          shapes, and it is how Apple sets a badge beside an icon. */
-      --appstore-h: clamp(52px, 4.7vw, 68px);
+      --appstore-h: clamp(52px, 9.4vw, 136px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2060,6 +2060,16 @@
       .vid-press.is-pressed { transition: none; transform: none; }
     }
 
+    /* Phone: keep the replay-on-tap, drop the swell. The swell scales the
+       video's PARENT, and on a phone the first move of a scroll starts as a
+       touch on the video — so it fired mid-gesture and fought the scroll.
+       This block has to sit here, after the rules it overrides: an
+       equal-specificity rule earlier in the file loses on source order. */
+    @media (max-width: 640px) {
+      .vid-press,
+      .vid-press.is-pressed { transition: none; transform: none; }
+    }
+
     /* ── Three design elements: raised lip, indented panel, glass bubble ──
        Each row is one primitive doing the ONE job it exists for, animated
        so the job is visible rather than described. All names are namespaced
@@ -2086,6 +2096,10 @@
     }
 
     .dna-copy { max-width: 520px; }
+
+    /* A heading belongs to the text under it, so it sits close to it — the
+       section's own 28px gap would read as two separate blocks. */
+    .feature-title + .guide-text { margin-top: -16px; }
 
     /* The intro and the body are one block now: same width, same edges, one
        blank line between them. They were two separate elements at two
@@ -2257,8 +2271,13 @@
       width: calc((100% - 16.4px * var(--z) - 3px * var(--z)) / 2);
       border-radius: 999px; pointer-events: none;
       transform: translateX(calc(var(--i, 0) * (100% + 3px * var(--z))));
+      /* The scale is FAST and the glide is not. They shared 400ms, which is
+         why the swell read as lagging: added at 380ms it had 190ms to travel a
+         400ms transition, so it never reached 1.055 and what you saw was the
+         tail of it arriving after the pill had already stopped. 150ms in,
+         started 250ms into the glide, puts the peak exactly on arrival. */
       transition: transform 400ms cubic-bezier(.2, .8, .3, 1),
-                  scale    400ms cubic-bezier(.2, .8, .3, 1);
+                  scale    150ms cubic-bezier(.34, 1.56, .64, 1);
     }
     /* the swell on arrival: the glide alone reads as the whole event, so
        landing is what gives the journey an end */
@@ -2529,7 +2548,8 @@
         </div>
       </div>
 
-      <p class="guide-text media-copy" style="margin-top: var(--block-gap);" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).</p>
+      <h3 class="feature-title media-copy" style="margin-top: var(--block-gap);" data-i18n="icons-title">Schrift und Icons</h3>
+      <p class="guide-text media-copy" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).</p>
 
       <!-- A labelled bubble stands still on each side; the icons expand out
            from behind it. The bubble carries its own face — W95FA on the
@@ -2586,6 +2606,7 @@
       <div class="dna-list dna">
         <div class="dna-row">
           <div class="dna-body">
+            <h3 class="feature-title" data-i18n="dna-title">Drei Formen</h3>
             <p class="stagger-copy dna-copy" data-i18n-html="dna-intro">Unter der Oberfläche besteht SkeuKit aus drei Formen, und mehr sind es bewusst nicht. Jede beantwortet eine einzige Frage, die man sonst ausprobieren müsste: Kann ich das drücken? Gehört das mir? Wo bin ich gerade? Weil es nur drei sind, lernt man sie einmal — und danach ist jede neue Ansicht der App schon erklärt.</p>
             <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.</p>
           </div>
@@ -2651,7 +2672,8 @@
         </div>
       </div>
 
-      <p class="guide-text media-copy" style="margin-top: var(--block-gap);" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.</p>
+      <h3 class="feature-title media-copy" style="margin-top: var(--block-gap);" data-i18n="color-title">Farbe</h3>
+      <p class="guide-text media-copy" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.</p>
     </div>
     <!-- The app is live, so the badge is a real link now. Apple's guidelines
          forbid altering the artwork, so it is only scaled; the bounce lives on
@@ -2868,6 +2890,9 @@
         'pivot-1': 'Die erste Version war eine vollständige Windows-95-Oberfläche im doppelten Pixelmaßstab: Taskleiste, abgeschrägte Ränder, Statuszeile, Pixelschrift. Sie war fertig, nicht bloß eine Stimmung — und musste trotzdem weg. Der Witz war lauter als die App. Eine originalgetreue Oberfläche von 1995 ist ein Kostüm: Sie macht ein tägliches Werkzeug anstrengend, kämpft gegen jede iOS-Konvention, und das Publikum, dem sie schmeichelt, ist nicht das Publikum, das morgens damit arbeitet.',
         'pivot-2': 'An ihre Stelle kam SkeuKit: ein weich-skeuomorphes System aus Tokens, vier Themes in Hell und Dunkel. Tiefe entsteht dort aus Licht statt aus Textur — Mulden für Vertieftes, Glas für Bedienelemente, einfacher Text auf der Fläche für Inhalt. Ein Druckverhalten für jedes Element der App. Die Pixelschrift ist geblieben, aber als optionaler Retro-Modus, der nur die Rahmen betrifft; der Aufgabentext bleibt in der Systemschrift. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.',
         'icons-text': 'Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).',
+        'icons-title': 'Schrift und Icons',
+        'dna-title': 'Drei Formen',
+        'color-title': 'Farbe',
         'dna-forms': 'Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.',
         'dna-intro': 'Unter der Oberfläche besteht SkeuKit aus drei Formen, und mehr sind es bewusst nicht. Jede beantwortet eine einzige Frage, die man sonst ausprobieren müsste: Kann ich das drücken? Gehört das mir? Wo bin ich gerade? Weil es nur drei sind, lernt man sie einmal — und danach ist jede neue Ansicht der App schon erklärt.',
         'color-text': 'Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.',
@@ -3574,12 +3599,13 @@
         si = (si + 1) % opts.length;
         pill.style.setProperty('--i', si);
         for (var i = 0; i < opts.length; i++) opts[i].classList.toggle('is-on', i === si);
-        // The swell lands WITH the pill, not with the departure: same
-        // 400ms as the glide, then back off over the transition's own tail.
+        // The swell peaks WITH the pill. The glide is 400ms and the scale is
+        // 150ms, so it starts at 250ms — earlier or later and the button
+        // appears to be pressed before or after it gets where it is going.
         timers.push(setTimeout(function () {
           pill.classList.add('is-landing');
-          timers.push(setTimeout(function () { pill.classList.remove('is-landing'); }, 190));
-        }, 380));
+          timers.push(setTimeout(function () { pill.classList.remove('is-landing'); }, 150));
+        }, 250));
       }
 
       // Each loop reschedules itself, so the typewriter can vary its own
