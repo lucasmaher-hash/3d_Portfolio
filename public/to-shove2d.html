@@ -1206,14 +1206,54 @@
       flex-wrap: wrap;
     }
 
+    .appstore-link {
+      flex: none;
+      display: block;
+      /* Springy rather than linear: the overshoot in the curve is the whole
+         "bounce", so it stays a 3% scale and reads as a nudge, not a jump. */
+      transition: transform 320ms cubic-bezier(.34, 1.4, .5, 1);
+    }
+    .appstore-link:hover  { transform: translateY(-2px) scale(1.03); transition: transform 220ms cubic-bezier(.34, 1.56, .64, 1); }
+    .appstore-link:active { transform: translateY(0) scale(.985);    transition: transform 90ms ease-out; }
+
     .appstore-badge {
       width: clamp(150px, 18vw, 220px);
       height: auto;
       display: block;
-      flex: none;
     }
 
-    .appstore-copy { max-width: 520px; margin: 0; }
+    /* ── The app icon, cross-fading between its light and dark artwork ──
+       Two stacked images rather than one image swapped in JS: only the light
+       one is in flow, so it sets the box and nothing reflows at the swap, and
+       the whole thing is a single composited opacity animation.
+
+       6s cycle = 3s per side. The holds are 42% and 42% with 8% (~0.5s) of
+       fade at each end, which is what makes it read as a soft dissolve rather
+       than a cut. */
+    .app-icon {
+      position: relative;
+      display: block;
+      flex: none;
+      width: clamp(96px, 12vw, 150px);
+    }
+    .app-icon img {
+      width: 100%;
+      height: auto;
+      display: block;
+      /* drop-shadow, not box-shadow: the icon is a transparent squircle, so
+         this follows its silhouette instead of boxing it. */
+      filter: drop-shadow(0 12px 22px rgba(174, 174, 192, 0.5));
+    }
+    .app-icon-dark {
+      position: absolute;
+      inset: 0;
+      animation: icon-swap 6s ease-in-out infinite;
+    }
+    @keyframes icon-swap {
+      0%, 42%  { opacity: 0; }
+      50%, 92% { opacity: 1; }
+      100%     { opacity: 0; }
+    }
 
     .project-nav {
       display: flex;
@@ -1586,6 +1626,8 @@
       .fan-scrolly, .ic-scrolly { height: auto !important; }
       .fan-sticky, .ic-sticky { position: static !important; height: auto !important; }
       .color-card { animation: none !important; }
+      .app-icon-dark { animation: none !important; opacity: 0; }
+      .appstore-link:hover, .appstore-link:active { transform: none; }
       .morrow-shove {
         animation: none !important;
         left: 0 !important;
@@ -2480,16 +2522,20 @@
       </div>
     </div>
 
-    <!-- Status, at the very end of the case study. The badge is a plain
-         <img>, deliberately NOT a link and not a <button>: the app is not on
-         the store yet, so anything that looks clickable would promise a
-         download that does not exist. Apple's badge guidelines also forbid
-         altering the artwork, so it is scaled and nothing else. -->
+    <!-- The app is live, so the badge is a real link now. Apple's guidelines
+         forbid altering the artwork, so it is only scaled; the bounce lives on
+         the <a>, not on the image. -->
     <div class="guide-section appstore-section">
       <div class="appstore-row">
-        <img class="appstore-badge" src="/images/morrow/appstore-badge.webp" width="760" height="225" loading="lazy"
-             alt="Download on the App Store" />
-        <p class="guide-text appstore-copy" data-i18n-html="appstore-text">morrow liegt derzeit bei Apple im Prüfverfahren und erscheint im App&nbsp;Store, sobald die Review abgeschlossen ist.</p>
+        <span class="app-icon" aria-label="Das App-Icon von morrow" role="img">
+          <img src="/images/morrow/app-icon-light.webp" width="640" height="640" alt="" />
+          <img class="app-icon-dark" src="/images/morrow/app-icon-dark.webp" width="640" height="640" alt="" />
+        </span>
+        <a class="appstore-link" href="https://apps.apple.com/app/id6798337661"
+           target="_blank" rel="noopener noreferrer">
+          <img class="appstore-badge" src="/images/morrow/appstore-badge.webp" width="760" height="225" loading="lazy"
+               alt="Im App Store laden" />
+        </a>
       </div>
     </div>
 
@@ -2691,7 +2737,6 @@
         'pivot-1': 'Die erste Version war eine vollständige Windows-95-Oberfläche im doppelten Pixelmaßstab: Taskleiste, abgeschrägte Ränder, Statuszeile, Pixelschrift. Sie war fertig, nicht bloß eine Stimmung — und musste trotzdem weg. Der Witz war lauter als die App. Eine originalgetreue Oberfläche von 1995 ist ein Kostüm: Sie macht ein tägliches Werkzeug anstrengend, kämpft gegen jede iOS-Konvention, und das Publikum, dem sie schmeichelt, ist nicht das Publikum, das morgens damit arbeitet.',
         'pivot-2': 'An ihre Stelle kam SkeuKit: ein weich-skeuomorphes System aus Tokens, vier Themes in Hell und Dunkel. Tiefe entsteht dort aus Licht statt aus Textur — Mulden für Vertieftes, Glas für Bedienelemente, einfacher Text auf der Fläche für Inhalt. Ein Druckverhalten für jedes Element der App. Die Pixelschrift ist geblieben, aber als optionaler Retro-Modus, der nur die Rahmen betrifft; der Aufgabentext bleibt in der Systemschrift. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.',
         'icons-text': 'Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).',
-        'appstore-text': 'morrow liegt derzeit bei Apple im Prüfverfahren und erscheint im App&nbsp;Store, sobald die Review abgeschlossen ist.',
         'dna-forms': 'Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.',
         'dna-intro': 'Unter der Oberfläche besteht SkeuKit aus drei Formen, und mehr sind es bewusst nicht. Jede beantwortet eine einzige Frage, die man sonst ausprobieren müsste: Kann ich das drücken? Gehört das mir? Wo bin ich gerade? Weil es nur drei sind, lernt man sie einmal — und danach ist jede neue Ansicht der App schon erklärt.',
         'color-text': 'Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.',

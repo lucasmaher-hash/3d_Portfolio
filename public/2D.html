@@ -207,14 +207,39 @@
        read as a second, competing object. The card keeps its size and link. */
     .project-tile.morrow-icon-tile { background: transparent; box-shadow: none; }
 
-    .morrow-icon-tile img {
-      width: clamp(118px, 16vw, 220px);
+    /* +30% on every stop of the previous clamp(118px, 16vw, 220px). */
+    .morrow-icon-tile .app-icon { width: clamp(153px, 20.8vw, 286px); }
+
+    /* Two stacked images, cross-fading between the light and dark artwork.
+       Not a JS swap: only the light one is in flow, so it sets the box and
+       nothing reflows at the change, and the swap is one composited opacity
+       animation. 6s cycle = 3s a side, with 8% (~0.5s) of fade at each end,
+       which is what makes it dissolve rather than cut. */
+    .morrow-icon-tile .app-icon {
+      position: relative;
+      display: block;
+    }
+    .morrow-icon-tile .app-icon img {
+      width: 100%;
       height: auto;
       display: block;
       /* drop-shadow, not box-shadow: the icon is a transparent squircle, so
          this follows its rounded silhouette instead of drawing a rectangle
          around it. Same tint as the design system's own shadow. */
       filter: drop-shadow(0 14px 26px rgba(174, 174, 192, 0.55));
+    }
+    .morrow-icon-tile .app-icon-dark {
+      position: absolute;
+      inset: 0;
+      animation: icon-swap 6s ease-in-out infinite;
+    }
+    @keyframes icon-swap {
+      0%, 42%  { opacity: 0; }
+      50%, 92% { opacity: 1; }
+      100%     { opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .morrow-icon-tile .app-icon-dark { animation: none; opacity: 0; }
     }
 
     /* ── Mobile only: hero fills the screen, blob + title centred ──────── */
@@ -1166,7 +1191,10 @@
       </div>
       <a href="/to-shove2d.html" style="display:block;">
         <div class="project-tile morrow-icon-tile" style="display: flex; align-items: center; justify-content: center; cursor: pointer;">
-          <img src="/images/morrow/app-icon-light.webp" width="640" height="640" alt="Das App-Icon von morrow" />
+          <span class="app-icon" role="img" aria-label="Das App-Icon von morrow">
+            <img src="/images/morrow/app-icon-light.webp" width="640" height="640" alt="" />
+            <img class="app-icon-dark" src="/images/morrow/app-icon-dark.webp" width="640" height="640" alt="" />
+          </span>
         </div>
       </a>
     </div>
