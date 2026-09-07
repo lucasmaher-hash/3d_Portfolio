@@ -224,6 +224,13 @@
        be re-solved, exactly as on .morrow-devices-inner. */
     .win-devices { margin-top: clamp(8px, 1.5vw, 16px); }
 
+    /* .guide-section is a flex column with one gap for everything, so the
+       heading, its divider and the body all sit the same distance apart. This
+       is the only place that wants more: the divider is part of the heading
+       unit, and the body should read as a separate block. Margin adds to the
+       flex gap rather than replacing it. */
+    .dot-divider + .win-copy { margin-top: clamp(14px, 2.4vw, 30px); }
+
     /* The copy either side of that row shares its column: same 84.5% width and
        the same centring, so the text's edges line up with the outer two phones
        instead of running the full section. Desktop only — below 860px the row
@@ -243,21 +250,37 @@
       margin-inline: auto;
     }
 
+    /* Same construction and the same fix as the hero row above. */
+    .win-devices-inner {
+      filter: drop-shadow(0 10px 16px rgba(174, 174, 192, 0.40));
+    }
+
     .win-devices-inner img {
       width: 100%;
       height: auto;
       display: block;
-      filter: drop-shadow(0 16px 28px rgba(174, 174, 192, 0.5));
+    }
+
+    /* drop-shadow, not box-shadow: the frames are transparent, so this follows
+       the phone silhouettes instead of drawing rectangles. Tint is the design
+       system's own shadow colour.
+
+       On the ROW, not on each <img>, for the same reason as the app icon's:
+       one paint instead of one per phone. And tightened — at 0 16px 28px the
+       shadow's horizontal reach was 28px into a 35px gap from BOTH sides, so
+       the page colour never came back between the phones. Measured across the
+       row at 1440: the gap centres sat at 211 against a 222 page, a continuous
+       darker band down each gap, which is what read as the phones sitting in a
+       frame. At 0 10px 16px / 0.40 the gaps recover to 219 while the edges
+       still shade to 215, so each phone is still seated. */
+    .morrow-devices-inner {
+      filter: drop-shadow(0 10px 16px rgba(174, 174, 192, 0.40));
     }
 
     .morrow-devices img {
       width: 100%;
       height: auto;
       display: block;
-      /* drop-shadow, not box-shadow: the frames are transparent, so this
-         follows the phone silhouette instead of drawing a rectangle.
-         Tint is the design system's own shadow colour. */
-      filter: drop-shadow(0 16px 28px rgba(174, 174, 192, 0.5));
     }
 
     /* ── Hero: "morrow" shoves itself across the header column ──────────
@@ -926,6 +949,10 @@
        the same idiom kaffeemaschine2d uses for its turntable. */
     .fan-scrolly {
       position: relative;
+      /* The colour screens are their own exhibit — more air above them than
+         the section's own rhythm gives, so they do not read as belonging to
+         the paragraph before them. */
+      margin-top: clamp(28px, 5vw, 64px);
       /* Same shape as .ic-scrolly's: the pinned height plus the scroll room
          the open/close needs. */
       height: calc(var(--card-w) * (1600 / 792) * 1.18 + 85vh);
@@ -1984,7 +2011,9 @@
       align-items: center;
       gap: clamp(28px, 5vw, 72px);
       margin-left: auto;
-      max-width: 860px;
+      /* 860 + the 108px the stack just gained, so the copy column is not the
+         thing that pays for the bigger controls. */
+      max-width: 968px;
     }
 
     .dna-copy { max-width: 520px; }
@@ -1998,7 +2027,7 @@
          it on the stage instead and below 860px (where the stage is 100%) the
          chain resolves against a shrink-to-fit flex item — circular, and the
          troughs silently collapse to a third of their width. */
-      width: clamp(240px, 34vw, 360px);
+      width: clamp(312px, 44.2vw, 468px);
       flex: none;
     }
 
@@ -2170,12 +2199,12 @@
       /* Still a definite width, not a percentage: the row is side by side down
          to 640px, and 100% here would take the whole row and leave the copy
          nothing. */
-      .dna-stack { width: clamp(200px, 34vw, 340px); }
+      .dna-stack { width: clamp(260px, 44.2vw, 442px); }
     }
 
     @media (max-width: 640px) {
       /* Below here .dna-row is a column, so a full-width stack is correct. */
-      .dna-stack { width: 100%; max-width: 340px; }
+      .dna-stack { width: 100%; max-width: 442px; }
     }
   </style>
 </head>
@@ -2473,12 +2502,12 @@
         <div class="dna-row">
           <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.</p>
           <div class="dna-stack">
-            <div class="dna-stage sk" style="--z: 0.84;">
+            <div class="dna-stage sk" style="--z: 1.092;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
                 <span>Personal</span>
               </button>
             </div>
-            <div class="dna-stage sk" style="--z: 1.35;">
+            <div class="dna-stage sk" style="--z: 1.755;">
               <div class="dna-fieldwrap">
                 <!-- .sk-field__input is not decoration: .sk-trough's fill and
                      lip are ::before/::after, i.e. POSITIONED descendants, so
@@ -2488,7 +2517,7 @@
                 <div class="sk-field sk-trough"><span class="sk-field__input"><span class="dna-type"></span><i class="dna-caret"></i></span></div>
               </div>
             </div>
-            <div class="dna-stage sk" style="--z: 1.1;">
+            <div class="dna-stage sk" style="--z: 1.43;">
               <div class="sk-seg sk-trough dna-seg" style="width: 75%;">
                 <!-- The outer bevel. A segmented trough is furniture sitting in
                      the surface, and without this it reads as a channel with
