@@ -224,6 +224,16 @@
        be re-solved, exactly as on .morrow-devices-inner. */
     .win-devices { margin-top: clamp(8px, 1.5vw, 16px); }
 
+    /* The copy either side of that row shares its column: same 84.5% width and
+       the same centring, so the text's edges line up with the outer two phones
+       instead of running the full section. Desktop only — below 860px the row
+       becomes a 2x2 at its own width and the paragraphs keep the section's
+       gutter, as every other paragraph on the page does. */
+    .win-copy {
+      width: 84.5%;
+      margin-inline: auto;
+    }
+
     .win-devices-inner {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1150,6 +1160,7 @@
          which is below the size at which the pixel UI is legible. 2x2
          keeps the composition and roughly doubles each phone. */
       .win-devices-inner { grid-template-columns: repeat(2, 1fr); width: 88%; gap: 6%; row-gap: 18px; }
+      .win-copy { width: 100%; margin-inline: 0; }
       .icons-compare .ic-side { --z: 1.665; }
       .meta-grid { grid-template-columns: 1fr 1fr; }
     }
@@ -2383,8 +2394,8 @@
       </div>
       <div class="dot-divider"></div>
 
-      <p class="guide-text" data-i18n-html="pivot-1">Die erste Version war eine vollständige Windows-95-Oberfläche im doppelten Pixelmaßstab: Taskleiste, abgeschrägte Ränder, Statuszeile, Pixelschrift. Sie war fertig, nicht bloß eine Stimmung — und musste trotzdem weg. Der Witz war lauter als die App. Eine originalgetreue Oberfläche von 1995 ist ein Kostüm: Sie macht ein tägliches Werkzeug anstrengend, kämpft gegen jede iOS-Konvention, und das Publikum, dem sie schmeichelt, ist nicht das Publikum, das morgens damit arbeitet.</p>
-      <p class="guide-text" data-i18n-html="pivot-2">An ihre Stelle kam SkeuKit: ein weich-skeuomorphes System aus Tokens, vier Themes in Hell und Dunkel. Tiefe entsteht dort aus Licht statt aus Textur — Mulden für Vertieftes, Glas für Bedienelemente, einfacher Text auf der Fläche für Inhalt. Ein Druckverhalten für jedes Element der App. Die Pixelschrift ist geblieben, aber als optionaler Retro-Modus, der nur die Rahmen betrifft; der Aufgabentext bleibt in der Systemschrift. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
+      <p class="guide-text win-copy" data-i18n-html="pivot-1">Die erste Version war eine vollständige Windows-95-Oberfläche im doppelten Pixelmaßstab: Taskleiste, abgeschrägte Ränder, Statuszeile, Pixelschrift. Sie war fertig, nicht bloß eine Stimmung — und musste trotzdem weg. Der Witz war lauter als die App. Eine originalgetreue Oberfläche von 1995 ist ein Kostüm: Sie macht ein tägliches Werkzeug anstrengend, kämpft gegen jede iOS-Konvention, und das Publikum, dem sie schmeichelt, ist nicht das Publikum, das morgens damit arbeitet.</p>
+      <p class="guide-text win-copy" data-i18n-html="pivot-2">An ihre Stelle kam SkeuKit: ein weich-skeuomorphes System aus Tokens, vier Themes in Hell und Dunkel. Tiefe entsteht dort aus Licht statt aus Textur — Mulden für Vertieftes, Glas für Bedienelemente, einfacher Text auf der Fläche für Inhalt. Ein Druckverhalten für jedes Element der App. Die Pixelschrift ist geblieben, aber als optionaler Retro-Modus, der nur die Rahmen betrifft; der Aufgabentext bleibt in der Systemschrift. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
 
       <!-- The version that was thrown away. Not in the layout brief, but
            the pivot is the strongest thing on this page and it does not
@@ -2403,7 +2414,7 @@
         </div>
       </div>
 
-      <p class="guide-text" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).</p>
+      <p class="guide-text win-copy" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n-html="icons-text">Schrift und Icons sind die Stelle, an der die beiden Welten am deutlichsten aufeinandertreffen. Links die Pixelwelt der ersten Version, rechts die heutige — dieselben Funktionen, zwei Haltungen. Die Pixelschrift ist W95FA von Alina Sava (SIL Open Font License).</p>
 
       <!-- A labelled bubble stands still on each side; the icons expand out
            from behind it. The bubble carries its own face — W95FA on the
