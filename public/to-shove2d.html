@@ -140,10 +140,11 @@
 
     .project-title {
       font-family: 'OCR-A-BT', monospace;
-      /* ~4% up on every stop, so the word and the hero icon above it come out
-         the same width — see the script that measures them at the bottom of
-         this file, which sizes the icon FROM this. */
-      font-size: clamp(42px, 7.3vw, 100px);
+      /* Every stop 10% down from clamp(42px, 7.3vw, 100px). The hero icon is
+         measured FROM this word (see the script at the bottom of the file), so
+         this one line shrinks the pair together — 100 -> 90px of type, 347 ->
+         ~312px of icon. Desktop only: the ≤640px block sets its own ramp. */
+      font-size: clamp(37.8px, 6.57vw, 90px);
       line-height: 1.05;
       color: var(--text-primary);
       letter-spacing: -0.04em;
@@ -883,23 +884,37 @@
       margin-top: clamp(20px, 3vw, 36px);
     }
 
-    /* The two halves sit 40px closer together than their boxes would put them
-       (2026-09-08). It cannot come out of row-gap: that is only ~20px at 1440
-       and there is no negative gap, so half of the 40 would be all there is.
-       It comes out of the boxes instead — .ic-side is --ic-w tall (470px at
-       1440) around a bubble of 89px, so each row carries ~190px of empty space
-       above and below its own content, and pulling 20px off the inside edge of
-       each row is invisible except as the tighter gap it is meant to be.
-       One margin on each row rather than a symmetric margin-block on both:
-       that way only the INSIDE edges move. Nothing overhangs the block (a
-       symmetric pull would push the retro cluster 20px above its own top edge
-       and the modern one 20px below), and the block keeps its top edge — it
-       simply ends 40px earlier, which is exactly the 40px taken out.
-       Measured at 1440: bubble-to-bubble 490px -> 450px, block height
-       960px -> 920px, top edge unchanged at 6297. */
-    .icons-compare { --ic-row-pull: 20px; }
-    .ic-side--left  { margin-bottom: calc(var(--ic-row-pull) * -1); }
-    .ic-side--right { margin-top:    calc(var(--ic-row-pull) * -1); }
+    /* The modern half sits 40px closer to the retro one (2026-09-08).
+       It cannot come out of row-gap: that is ~20px at 1440 and there is no
+       negative gap, so half of the 40 would be all there is.
+
+       First attempt was a negative margin on the inside edge of each row, and
+       it moved the CLUSTERS 40px but the CAPTIONS only 20 — the copy is
+       centred in its row area (align-items: center), so shrinking a row by 20
+       moves its own copy up by 10, and the two halves' errors partly cancel.
+       Negative margins and centre alignment do not compose; do not go back to
+       them here.
+
+       A relative offset does, and predictably: `top` on a position: relative
+       element moves it visually and changes no layout at all, so both row-2
+       items travel by exactly the number written, and the retro half cannot
+       shift by a fraction of it. .ic-side is already position: relative for
+       its orbit, which is inset: 0 against the padding box and so rides along.
+       The block then keeps the 40px it no longer uses at the bottom, so
+       .icons-compare gives it back with a negative margin — without that, the
+       whole section below would sit 40px further from the modern half than it
+       does now. Measured at 1440: the retro bubble and caption do not move,
+       the modern bubble and caption both move up exactly 40, block height
+       960 -> 920. */
+    .icons-compare {
+      --ic-row-pull: 40px;
+      margin-bottom: calc(var(--ic-row-pull) * -1);
+    }
+    .ic-side--right,
+    .ic-copy--modern {
+      position: relative;
+      top: calc(var(--ic-row-pull) * -1);
+    }
 
     /* Explicit cells, so the source order stays the sensible one. */
     .icons-compare .ic-side--left  { grid-area: 1 / 2; }  /* retro,  top right */
@@ -2400,17 +2415,17 @@
     /* The stage is a fixed box so the three demos line up on one column
        edge no matter how wide each control actually is. */
     .dna-stage {
-      /* 2:1:2, not three equal stages (2026-09-08). The outer two demos fill
-         their stage edge to edge; the middle one is content-sized and was
-         sitting in a 223px stage at 110px wide, i.e. ~113px of the row was
-         empty air around ONE button. Weighting the stages 2:1:2 hands that
-         slack to the two that use it, so at 1440 the outer demos go 223 →
-         267px (+20%) and the middle keeps ~134px for its 132px button — all
-         inside the same 700px block, so the group's left and right edges
-         still line up with the copy. The basis stays ZERO: with auto the
-         troughs' percentage widths would have nothing definite to size
-         against and would silently collapse. */
-      flex: 2 1 0;
+      /* The two outer stages share whatever the middle one does not use
+         (2026-09-08). All three stages used to be equal, and the middle demo
+         is content-sized — it sat in a 223px stage at 110px wide, i.e. ~113px
+         of the row was empty air around ONE button. Handing that slack to the
+         two that fill their stage edge to edge is what pays for the +20%
+         below WITHOUT widening the block: at 1440 the outer demos go 223 →
+         268px, and the group's left and right edges still line up with the
+         copy. The basis stays ZERO here: with auto the troughs' percentage
+         widths would have nothing definite to size against and would silently
+         collapse. */
+      flex: 1 1 0;
       min-width: 0;
       display: grid;
       place-items: center;
@@ -2418,16 +2433,24 @@
          what the SkeuKit metrics actually read. Keeping them separate is what
          lets the row layout scale all three by one number without touching
          the markup — and lets the phone put them back to 1:1 further down.
-         1.416 is the old 1.18 plus 20% (2026-09-08), matched by the 2:1:2
-         stage weights above: the outer demos gain the same 20% in WIDTH that
-         this gains them in height, so all three grow in proportion instead of
-         just getting taller. */
-      --z: calc(var(--z0, 1) * 1.416);
+         1.30 is the old 1.18 plus 10% (2026-09-08 — it went to 1.416, +20%,
+         and came back down: at that size the three read as the loudest thing
+         in the section). Paid for in width by the stage flex above, so the
+         outer demos gain the same ~10% in WIDTH that this gains them in
+         height and all three grow in proportion instead of just getting
+         taller. */
+      --z: calc(var(--z0, 1) * 1.30);
     }
 
-    /* The content-sized middle demo needs only enough room for itself; see
-       the 2:1:2 note above. */
-    .dna-stack .dna-stage:nth-child(2) { flex: 1 1 0; }
+    /* The middle demo is the exception: it is CONTENT-sized (a button, not a
+       percentage-width trough), so it takes its own width as its basis and
+       neither grows nor shrinks — the two outer stages then split whatever is
+       left. A fixed weight was wrong here: the button's width comes from --z
+       in px, so on a 641-860px row a 1/5 share fell to ~105px and the 132px
+       button spilled out of its own stage into the gaps. Basis auto is safe
+       on THIS stage only, because its child's width does not depend on the
+       stage's — which is exactly what would make the outer two circular. */
+    .dna-stack .dna-stage:nth-child(2) { flex: 0 0 auto; }
 
     /* ── Trough: the hole in the surface ─────────────────────────────────
        The fill and inner shadows live on ::before rather than on the element
@@ -2523,7 +2546,13 @@
       width: 100%; height: 100%; box-sizing: border-box;
       padding: 0 calc(20px * var(--z));
       border-radius: inherit; color: var(--ink);
-      font-size: calc(12.22px * var(--z) * var(--fs));   /* levels with .sk-seg__opt: 12.22 x 1.35 = 15 x 1.1 */
+      /* Same 15px ramp as .sk-seg__opt, and both stages carry the same --z0,
+         so the typed value comes out at exactly the segmented control's size
+         (~19.5px at 1440) and within a hair of the glass button's 19.7 ramp.
+         It used to be 12.22px, "levelled" against the seg by a 1.35/1.1 pair
+         of factors that belonged to the component's original metrics — here
+         it just rendered the value ~4px smaller than the other two demos. */
+      font-size: calc(15px * var(--z) * var(--fs));
       line-height: 1;
     }
     /* A caret drawn in CSS, not a real <input>: the row is a diagram of the
@@ -2604,8 +2633,8 @@
         max-width: 309px;
         margin-inline: auto;
       }
-      /* :nth-child(2) as well, or the base 2:1:2 weight rule (which is one
-         class more specific) keeps the middle stage flexing here. */
+      /* :nth-child(2) as well, or the base rule for the middle stage (which
+         is one class more specific) keeps its auto basis here. */
       .dna-stack .dna-stage,
       .dna-stack .dna-stage:nth-child(2) { flex: none; width: 100%; }
       /* Stacked, each demo already has the column to itself — the row's
