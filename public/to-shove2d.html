@@ -884,7 +884,8 @@
       margin-top: clamp(20px, 3vw, 36px);
     }
 
-    /* The modern half sits 40px closer to the retro one (2026-09-08).
+    /* The modern half sits 120px closer to the retro one (2026-09-08).
+       It was 40px first; that worked but read as subtle, so another 80 went on.
        It cannot come out of row-gap: that is ~20px at 1440 and there is no
        negative gap, so half of the 40 would be all there is.
 
@@ -904,10 +905,10 @@
        .icons-compare gives it back with a negative margin — without that, the
        whole section below would sit 40px further from the modern half than it
        does now. Measured at 1440: the retro bubble and caption do not move,
-       the modern bubble and caption both move up exactly 40, block height
-       960 -> 920. */
+       the modern bubble and caption both move up by exactly the number below.
+       At 40px: block height 960 -> 920, modern bubble 6978 -> 6938. */
     .icons-compare {
-      --ic-row-pull: 40px;
+      --ic-row-pull: 120px;
       margin-bottom: calc(var(--ic-row-pull) * -1);
     }
     .ic-side--right,
@@ -3025,7 +3026,7 @@
         </div>
       </div>
 
-      <h3 class="feature-title media-copy" style="margin-top: calc(var(--block-gap) + 25px);" data-i18n="color-title">Farbe</h3>
+      <h3 class="feature-title media-copy" style="margin-top: calc(var(--block-gap) + 50px);" data-i18n="color-title">Farbe</h3>
       <p class="guide-text media-copy" data-i18n-html="color-text">Zuletzt die Farbe: vier Themes — Slate, Cream, Moss und Rose —, jedes in Hell und Dunkel und jedes aus einer einzigen Saatfarbe abgeleitet statt von Hand zusammengestellt. Die Farbe verändert nur Akzente; Struktur, Kontrast und Lesbarkeit der Listen bleiben in jeder Variante gleich.</p>
 
       <!-- Stacked dead centre, scattering into the arrangement Lucas

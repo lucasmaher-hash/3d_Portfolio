@@ -167,7 +167,7 @@ still and only the bubbles should open, so it is parked at **half** the old
 `--ic-copy-shift` — the midpoint of the travel it used to make — with no transition and no
 `will-change`. Still zeroed below 640px, where the caption is under its cluster.
 
-**The modern half sits 40px closer to the retro one** (2026-09-08, `--ic-row-pull: 40px` on
+**The modern half sits 120px closer to the retro one** (2026-09-08, `--ic-row-pull: 120px` on
 `.icons-compare`). It cannot come out of `row-gap` — that is ~20px at 1440 and there is no
 negative gap.
 
