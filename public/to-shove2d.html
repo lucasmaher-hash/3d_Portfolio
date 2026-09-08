@@ -921,12 +921,17 @@
       /* One easing system for the whole block: symmetric in-and-out, never an
          ease-out. The old cubic-bezier(.2, .8, .3, 1) threw the cluster open at
          full speed and let it drift into place, which is what read as a bounce.
-         Same two speeds as the captions — this is the CLOSING one (a transition
-         uses the properties of the state it moves into, and the base state is
-         closed); the opening one is in the [data-retro]/[data-modern] rules. */
+         A transition uses the properties of the state it moves INTO, and the
+         base state is closed, so this is the CLOSING one — and since 2026-09-08
+         it is identical to the opening: 900ms on the same curve. The fold used
+         to take 1300ms on a gentler easeInOutSine, on the theory that the
+         return happens while the reader is already scrolling away; per Lucas it
+         simply read as slow next to the opening. The [data-retro] /
+         [data-modern] rules therefore no longer restate either value — one
+         speed, both directions. */
       transition-property: transform, width;
-      transition-duration: 1300ms;
-      transition-timing-function: cubic-bezier(.37, 0, .63, 1);
+      transition-duration: 900ms;
+      transition-timing-function: cubic-bezier(.65, 0, .35, 1);
     }
 
     /* Collapsed the icons sit at radius 0, stacked dead centre and scaled
@@ -937,11 +942,11 @@
       display: grid; place-items: center;
       --ic-r: 0px;
       transform: scale(.45);
-      /* Closing, same curve and duration as the side around it, so the icons
-         and the box they sit in fold as one movement. */
+      /* Same curve and duration as the side around it, so the icons and the box
+         they sit in move as one — in both directions now (see .ic-side). */
       transition-property: transform, --ic-r, opacity;
-      transition-duration: 1300ms;
-      transition-timing-function: cubic-bezier(.37, 0, .63, 1);
+      transition-duration: 900ms;
+      transition-timing-function: cubic-bezier(.65, 0, .35, 1);
     }
 
 
@@ -1060,12 +1065,9 @@
        stagger; that is gone with them. */
     .icons-compare[data-retro="1"]  .ic-side--left,
     .icons-compare[data-modern="1"] .ic-side--right {
+      /* Nothing but the width here: opening and closing share one duration and
+         one curve, both declared on the base rule above. */
       width: calc(var(--ic-w) * 1.02);
-      /* Opening: shorter and firmer than the return, still eased at both
-         ends. Longhands, so nothing here can reset a delay or a property
-         list set elsewhere. */
-      transition-duration: 900ms;
-      transition-timing-function: cubic-bezier(.65, 0, .35, 1);
     }
 
     .icons-compare[data-retro="1"]  .ic-side--left  .ic-orbitwrap,
@@ -1074,8 +1076,6 @@
       pointer-events: auto;
       transform: scale(1);
       --ic-r: calc(var(--ic-w) * 0.321);
-      transition-duration: 900ms;
-      transition-timing-function: cubic-bezier(.65, 0, .35, 1);
     }
 
     .icons-compare[data-retro="1"]  .ic-side--left  .ic-orbit,

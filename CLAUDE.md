@@ -179,24 +179,23 @@ a phone both clusters are `align-self: center` with no margin — they used to h
 edges, which is the same sideways push in a column.
 
 
-**One easing system for the whole block, symmetric in and out, no ease-out anywhere.** The
-sides, their orbits and their captions all run **900ms `cubic-bezier(.65, 0, .35, 1)`
-opening** and **1300ms `cubic-bezier(.37, 0, .63, 1)` closing** (an easeInOutSine — the
-return happens while the reader is already scrolling away, and at the opening's speed it
-read as a snap). The hover swell on the icons and the labels moved to the same family. The
-old `cubic-bezier(.2, .8, .3, 1)` threw everything open at full speed and let it drift into
-place, which is what read as a bounce. **A transition uses the properties of the state it
-moves INTO**, so the slow pair lives on the base (closed) rules and the fast pair in the
-`[data-retro]` / `[data-modern]` rules — and both are set with **longhands**
+**One easing system for the whole block, symmetric in and out, no ease-out anywhere, and
+ONE speed in both directions.** The sides and their orbits run **900ms
+`cubic-bezier(.65, 0, .35, 1)` opening and closing alike** (2026-09-08). The fold used to
+take 1300ms on a gentler easeInOutSine, on the theory that the return happens while the
+reader is already scrolling away — per Lucas it simply read as slow next to the opening, so
+it was sped up to match. The hover swell on the icons and the labels is in the same family.
+The old `cubic-bezier(.2, .8, .3, 1)` threw everything open at full speed and let it drift
+into place, which is what read as a bounce.
+
+**A transition uses the properties of the state it moves INTO**, so the pair lives on the
+base (closed) rules — `.icons-compare .ic-side` and `.ic-orbitwrap` — and the
+`[data-retro]` / `[data-modern]` rules **no longer restate it at all**; they carry only the
+open geometry. If the two directions are ever split again, set them with **longhands**
 (`transition-duration` / `-timing-function`), never the `transition` shorthand, which resets
 `transition-delay` and the property list from higher specificity.
 
-Each **caption also sits inboard while closed** (`--ic-copy-shift`, `translateX` toward its
-own cluster, ~48px at 1440) and travels back out to its docked position as the cluster
-opens, so the open state is the designed layout and the closed one is the offset. Zeroed
-below 640px, where the caption is under its cluster rather than beside it. It carries
-`will-change: transform`: without that layer promotion the paragraph repainted every frame
-while the page was also scrolling, which was the stutter.
+The captions do not animate any more — see the static-caption note above.
 
 **`--ic-w` is `clamp(240px, 34vw, 470px)`** — sized against one grid cell of the 2x2, not
 against a side-by-side pair. Verified over CDP at 1440 and 390: each half opens and closes on
