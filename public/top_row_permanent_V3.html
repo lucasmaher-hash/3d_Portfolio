@@ -605,11 +605,22 @@
       // this beats the iframe-vs-parent race that used to leave the shadow
       // stuck (missing, or wrongly on over the hero) until a manual refresh.
       if (is2DView) {
-        // ── Mobile: test what is actually PAINTED behind the bar ──────────────
-        // The hero rule below is not enough on a phone: the bar is fixed at the
-        // top of a narrow column, so a process shot or a project video scrolls
-        // under it constantly, and there the shadow reads as a halo exactly the
-        // way it did over the hero. Same mechanism as the 3D Exit pill.
+        // ── Test what is actually PAINTED behind the bar ──────────────────────
+        // The hero rule below only knows about ONE picture per page, the
+        // full-bleed one at the top. Everything else that scrolls under the bar
+        // — a process shot, a project video, the to.morrow row of phone screens
+        // — got the raised pill over it, and there the shadow reads as a halo
+        // exactly the way it did over the hero. This samples what is really
+        // behind the bar instead. Same mechanism as the 3D Exit pill.
+        //
+        // Runs at EVERY width as of 2026-09-08 (it was ≤640px only). Measured
+        // at 1440 across all eight 2D pages and seven scroll positions each:
+        // the pages with no large media under the bar are untouched — coverage
+        // reads 0 of 9 nearly everywhere — and the only places it now unshades
+        // are genuine ones, the to.morrow phone strip plus a process shot each
+        // on vaccine2d, kaffeemaschine2d and virtual_cooking2d. Over the strip
+        // it reads 9 of 9 while the phones are behind the bar and drops back to
+        // page colour a frame before they leave it.
         //
         // Two things make this different from the Exit pill's version. The hit
         // test has to run against window.top.document, because inside this
@@ -654,10 +665,18 @@
 
         function updateNavShadow() {
           var doc = window.top.document;
+          // The paint test is the first word at every width, and it can only
+          // ever take the shadow OFF — a page that is correct today cannot
+          // gain one from this. It also already covers the hero, since a hero
+          // is just another picture behind the bar.
+          if (navOverPicture()) {
+            navIsland.classList.remove('is-2d-mode');
+            return;
+          }
           if (navPaintMQ.matches) {
-            // Mobile owns the whole decision — the paint test already covers the
-            // hero, since a hero is just another picture behind the bar.
-            navIsland.classList.toggle('is-2d-mode', !navOverPicture());
+            // Mobile owns the rest of the decision too: nothing is behind the
+            // bar, so the pill is on.
+            navIsland.classList.add('is-2d-mode');
             return;
           }
           var hero = doc.querySelector('.hero');
@@ -682,9 +701,10 @@
           // call settle it. Deliberately NOT treated as "no hero": adding the shadow here
           // would flash it on over a hero image and then toggle it back off.
         }
-        // rAF-throttled on scroll: the mobile branch runs nine hit tests plus a
+        // rAF-throttled on scroll: the paint test runs nine hit tests plus a
         // getComputedStyle walk per sample, which must not happen more than once
-        // per frame. The desktop branch is cheap either way.
+        // per frame. That applied to the mobile branch alone before; the test is
+        // shared now, so the throttle matters at every width.
         var navTick = false;
         function requestNavShadow() {
           if (navTick) return;
