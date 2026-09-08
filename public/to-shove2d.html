@@ -1395,10 +1395,12 @@
          binding constraint is one cluster against the column width, not the
          pair. */
       .icons-compare { gap: 8px; }
-      /* Half the column, not the whole of it: the caption sits beside the
-         cluster at this width too, so an open cluster (1.02 x --ic-w) has to
-         fit one cell of the 2x2. 42vw = 164px at 390, against a 169px cell. */
-      .ic-scrolly { --ic-w: clamp(120px, 42vw, 190px); }
+      /* +60% (2026-09-08): the clusters have the column to themselves again
+         — the captions sit above and below them, not beside — so the frame is
+         sized against the whole column rather than half of it. Every stop is
+         the old clamp(120px, 42vw, 190px) x 1.6, and --z above is scaled by
+         the same factor so frame, orbit, bubble and icons grow together. */
+      .ic-scrolly { --ic-w: clamp(192px, 67.2vw, 304px); }
       /* +25%, and it has to stay a bare NUMBER — see the note on --n in the
          base .live rule: as a length the derived factors become px² and the
          whole layer silently disappears. */
@@ -1477,7 +1479,10 @@
     @media (max-width: 640px) {
       /* Deliberately down here, AFTER the 860px block: both queries match a
          phone, so the narrower step only wins on source order. */
-      .icons-compare .ic-side { --z: 0.855; }
+      /* +60% together with --ic-w below: --z is what sizes the bubble and the
+         icons, --ic-w the frame and the orbit radius, so scaling only one of
+         them would spread the icons without growing them. 0.855 x 1.6. */
+      .icons-compare .ic-side { --z: 1.368; }
 
       /* Pre-JS fallback again — the script matches this to the title as soon
          as it runs. The icon shoves here too; the push is just shorter than on
@@ -2295,23 +2300,43 @@
       .stagger-row .stagger-figure:not(.phone):not(.duo) { margin-top: 14px; }
       .stagger-row .stagger-figure:not(.phone):not(.duo) + .stagger-body { margin-bottom: 14px; }
 
-      /* Beside, not above and below (2026-09-08). This used to stack into a
-         column here on the argument that neither half would be legible in
-         175px; per Lucas the text belongs next to its cluster at every width,
-         the way every other figure on this page is laid out. So the base 2x2
-         grid simply stays — text left / retro right, then modern left / text
-         right — and only the measurements change: full column width, tighter
-         gaps, and clusters sized against HALF the column (see --ic-w in the
-         640px block above, which is what keeps an open cluster inside its own
-         cell instead of running over the caption).
-         The caption's inboard offset is deliberately NOT zeroed any more: it
-         is beside its cluster again, so the travel means something. */
+      /* Stacked, and interleaved: heading, retro, its text, modern, its text
+         (2026-09-08). Beside-the-cluster was tried at this width and the
+         captions came out ~169px wide; the clusters are 60% bigger now and
+         want the whole column, so the text goes above and below them instead.
+         The heading is INSIDE .ic-copy--retro, so that wrapper is dissolved
+         with display: contents and its two children become flex items of the
+         column — otherwise the heading could not be separated from the
+         paragraph that follows its cluster. Every item then needs an explicit
+         `order`: the default 0 would tie them and DOM order puts both clusters
+         before their text.
+         The clusters alternate edges rather than sitting centred: retro right,
+         modern left, which is the desktop stagger read down a single column. */
       .icons-compare {
+        display: flex;
+        flex-direction: column;
+        /* stretch, not the base rule's centre: as a column that would make
+           every item shrink-to-fit, and the heading came out 191px wide and
+           floating in the middle of the column. The two clusters opt back out
+           with their own align-self below. */
+        align-items: stretch;
         width: 100%;
-        column-gap: 12px;
-        row-gap: 18px;
+        gap: 18px;
+        /* Zeroed here: --ic-row-pull lifts the modern half into the retro
+           half's row on desktop, and in a column that just drags it up into
+           the paragraph above it. It also cancels the negative margin-bottom
+           that pull pays back. */
+        --ic-row-pull: 0px;
       }
-      .ic-copy { max-width: none; }
+      .ic-copy--retro { display: contents; }
+      .ic-copy--retro .feature-title { order: 1; }
+      .ic-side--left                 { order: 2; align-self: flex-end; }
+      .ic-copy--retro .guide-text    { order: 3; }
+      .ic-side--right                { order: 4; align-self: flex-start; }
+      .ic-copy--modern               { order: 5; }
+      /* No inboard travel in a column — the caption is above or below its
+         cluster, so sliding it sideways would be movement toward nothing. */
+      .ic-copy { max-width: none; width: 100%; --ic-copy-shift: 0px; }
 
       /* Centred is a desktop-width luxury: in a 350px column a centred
          paragraph's ragged left edge stops lining up with anything, and this
@@ -2541,11 +2566,36 @@
     .sk-press.is-pressed { transform: scale(1.115); }
 
     /* ── Row 1 — raised lip ──────────────────────────────────────────── */
+    /* The ring-and-core mark from the app's own live control, built the same
+       way as .live__mark further up (a stroked circle with a core at 42% of
+       its diameter) — see the frame of live-pair.mp4 this was measured from:
+       mark, a gap, then the label, in one glass pill. currentColor, so it
+       inherits whatever the pill's ink is. */
+    .dna-ws__mark {
+      position: relative;
+      flex: none;
+      width:  calc(19px * var(--z));
+      height: calc(19px * var(--z));
+      border-radius: 999px;
+      border: calc(1.7px * var(--z)) solid currentColor;
+      box-sizing: border-box;
+    }
+    .dna-ws__mark::after {
+      content: ""; position: absolute; inset: 0; margin: auto;
+      width: 42%; height: 42%;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
     .dna-ws {
       --h: 46;
-      display: inline-flex; align-items: center; gap: calc(14px * var(--z));
+      /* Same idea as --seg-pad: the width of this pill is its label plus these
+         two, and the phone row shrinks them rather than the type. */
+      --ws-pad-x: 22px;
+      --ws-gap: 10px;
+      display: inline-flex; align-items: center; gap: calc(var(--ws-gap) * var(--z));
       height: calc(var(--h) * var(--z) * 1px);
-      padding: 0 calc(22px * var(--z));
+      padding: 0 calc(var(--ws-pad-x) * var(--z));
       border-radius: 999px; border: 0; background: none; cursor: default;
       color: var(--ink);
       font-size: calc(19.7px * var(--z) * var(--fs));
@@ -2554,6 +2604,20 @@
     /* Side by side, each demo is centred in its own third — the shared left
        edge that made them line up as a column is meaningless in a row. */
     .dna-stack .dna-stage { justify-items: center; }
+
+    /* 20px more air on each side of the middle demo (2026-09-08), taken out of
+       the two OUTER controls' WIDTH — not out of the row, not out of anyone's
+       height or type. They dock outward so the whole 20px lands in the gap
+       beside the middle one and the block's own edges do not move; centred,
+       half of it would leak to the outside instead.
+       min-width, so it cannot reach the phone row below, where the three are
+       already as narrow as they go. */
+    @media (min-width: 641px) {
+      .dna-stack .dna-stage:first-child { justify-items: start; }
+      .dna-stack .dna-stage:last-child  { justify-items: end; }
+      .dna-stack .dna-stage:first-child .dna-fieldwrap,
+      .dna-stack .dna-stage:last-child  .dna-seg { width: calc(100% - 20px); }
+    }
 
     /* ── Row 2 — indented panel ──────────────────────────────────────── */
     .dna-fieldwrap { width: 100%; display: grid; gap: calc(10px * var(--z)); }
@@ -2597,16 +2661,26 @@
     /* ── Row 3 — glass bubble ────────────────────────────────────────── */
     .sk-seg {
       --h: 51;
+      /* The trough's own inset, as a variable: .dna-segpill's geometry below
+         is written against the SAME number (its offsets and its width), so a
+         phone can slim the control down without the pill drifting out of its
+         well. Change it here and the pill follows. */
+      --seg-pad: 8.2px;
       position: relative;
       display: flex; gap: calc(3px * var(--z));
       height: calc(var(--h) * var(--z) * 1px);
-      padding: 0 calc(8.2px * var(--z));
+      padding: 0 calc(var(--seg-pad) * var(--z));
       border-radius: 999px;
     }
     .sk-seg__opt {
       --h: 34.6;
       position: relative; flex: 1; display: grid; place-items: center;
-      border: 0; background: none; padding: calc(8.2px * var(--z)) calc(7.6px * var(--z));
+      border: 0; background: none;
+      /* Horizontal half is a variable for the same reason as --seg-pad: on a
+         phone the three demos stand side by side and the only way to make them
+         narrower without touching height or type is the padding. */
+      --opt-pad-x: 7.6px;
+      padding: calc(8.2px * var(--z)) calc(var(--opt-pad-x) * var(--z));
       color: var(--ink-muted); border-radius: 999px;
       font-size: calc(15px * var(--z) * var(--fs)); line-height: 1;
       transition: color 300ms ease;
@@ -2618,9 +2692,9 @@
     .dna-segpill {
       --h: 34.6;
       position: absolute; z-index: 0;
-      top: calc(8.2px * var(--z)); bottom: calc(8.2px * var(--z));
-      left: calc(8.2px * var(--z));
-      width: calc((100% - 16.4px * var(--z) - 3px * var(--z)) / 2);
+      top: calc(var(--seg-pad) * var(--z)); bottom: calc(var(--seg-pad) * var(--z));
+      left: calc(var(--seg-pad) * var(--z));
+      width: calc((100% - var(--seg-pad) * 2 * var(--z) - 3px * var(--z)) / 2);
       border-radius: 999px; pointer-events: none;
       transform: translateX(calc(var(--i, 0) * (100% + 3px * var(--z))));
       /* The scale is FAST and the glide is not. They shared 400ms, which is
@@ -2651,25 +2725,33 @@
     }
 
     @media (max-width: 640px) {
-      /* Three across a phone column would be ~100px each, so below 640 the
-         demos go back to a stack — which also puts the definite width back on
-         .dna-stack, where the troughs' percentages need it. */
+      /* Three ACROSS on a phone too (2026-09-08). They stacked here before,
+         on the arithmetic that a third of 350px is ~110px; what makes three
+         fit is that the two troughs and the pill are mostly padding, and the
+         padding is the only thing that shrinks — height, type size and the
+         authored --z are all untouched, so each control keeps its proportions
+         and only loses the air inside it. --seg-pad / --opt-pad-x / --ws-pad-x
+         exist for exactly this; the segmented pill's own geometry is written
+         against --seg-pad, so it follows without a second edit. */
       .dna-stack {
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
         width: 100%;
-        max-width: 309px;
-        margin-inline: auto;
+        max-width: none;
+        margin-inline: 0;
+        gap: 6px;
       }
       /* :nth-child(2) as well, or the base rule for the middle stage (which
          is one class more specific) keeps its auto basis here. */
       .dna-stack .dna-stage,
-      .dna-stack .dna-stage:nth-child(2) { flex: none; width: 100%; }
-      /* Stacked, each demo already has the column to itself — the row's
-         scale-up and its full-width controls would only make them crowd the
-         gutter, so this is the authored size again. */
+      .dna-stack .dna-stage:nth-child(2) { flex: 1 1 0; width: auto; min-width: 0; }
+      /* The authored size: the row layout's 1.18 scale-up is a desktop move. */
       .dna-stack .dna-stage { --z: var(--z0, 1); }
-      .dna-fieldwrap { width: 75%; }
-      .dna-seg { width: 75%; }
+      .dna-fieldwrap { width: 100%; }
+      .dna-seg { width: 100%; }
+      .dna-ws  { --ws-pad-x: 7px; --ws-gap: 5px; }
+      .dna-seg { --seg-pad: 3px; }
+      .dna-seg .sk-seg__opt { --opt-pad-x: 1px; }
 
       /* The demos-between-the-paragraphs order lives in the base rules now
          (it applies at every width) — nothing to restate here. */
@@ -3034,7 +3116,7 @@
             </div>
             <div class="dna-stage sk" style="--z0: 0.764;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
-                <span>Personal</span>
+                <span class="dna-ws__mark"></span><span>Off air</span>
               </button>
             </div>
             <div class="dna-stage sk" style="--z0: 1.001;">
