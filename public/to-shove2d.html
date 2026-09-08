@@ -243,7 +243,7 @@
          moves. An infinite animation's delay applies once, so only the first
          loop waits and every later one follows straight on. The icon's
          cross-fade carries the same delay, or the two fall out of phase. */
-      animation: morrow-shove 8s 0.7s infinite;
+      animation: morrow-shove 8s 0.7s infinite backwards;
     }
 
     /* .guide-section is a flex column with one gap for everything, so the
@@ -348,7 +348,7 @@
          moves. An infinite animation's delay applies once, so only the first
          loop waits and every later one follows straight on. The icon's
          cross-fade carries the same delay, or the two fall out of phase. */
-      animation: morrow-shove 8s 0.7s infinite;
+      animation: morrow-shove 8s 0.7s infinite backwards;
     }
 
     /* 8s loop: hold 3s (37.5%), glide 1s (12.5%), hold 3s, glide 1s.
@@ -1598,8 +1598,20 @@
     .app-icon-dark {
       position: absolute;
       inset: 0;
+      /* The dark layer is HIDDEN at rest, and that has to be said twice.
+         During an animation's DELAY the element renders in its own base style,
+         not in the first keyframe — and this rule declared no opacity, so for
+         the first 0.7s the dark icon sat at the initial opacity: 1, fully
+         covering the light one, and then snapped to transparent the instant
+         the animation started. That snap is the flicker between the two
+         colours on first load; it only appeared once the 0.7s delay was added,
+         because with no delay there is no window for the base style to show.
+         `backwards` fills the delay with the 0% keyframe, which is the actual
+         fix; the explicit opacity: 0 is the belt to its braces, and it matches
+         what the reduced-motion block already forces. */
+      opacity: 0;
       /* Same 0.7s hold as the shove this is timed against. */
-      animation: icon-fade 8s 0.7s ease-in-out infinite;
+      animation: icon-fade 8s 0.7s ease-in-out infinite backwards;
     }
     @keyframes icon-fade {
       /* Parked left, light -> fades to dark across the push right -> parked

@@ -350,6 +350,20 @@ infinite` on both the title and the hero icon, and the **same 0.7s on `icon-fade
 cross-fade falls out of phase with the travel. An infinite animation's delay applies once, so
 only the first loop waits.
 
+**That delay caused a real bug, and it is worth knowing the shape of it.** During an
+animation's DELAY the element renders in its own **base style, not the first keyframe**.
+`.app-icon-dark` declared no `opacity`, so for the first 0.7s the dark icon sat at the
+initial `opacity: 1` — fully covering the light one — and then snapped transparent the
+instant the animation started. That snap is what read as the icon flickering between its two
+colours on first load, and it could not appear before the delay existed, because with no
+delay there is no window for the base style to show. Fixed with **`animation-fill-mode:
+backwards`** (which fills the delay with the 0% keyframe) plus an explicit `opacity: 0` on
+the base rule as belt and braces — it also matches what the reduced-motion block already
+forces. Both `morrow-shove` declarations carry `backwards` too: their 0% happens to equal
+the base style so there was nothing to see, but it is the same trap.
+**Rule: any animation with a `delay` needs `backwards` unless its 0% keyframe is already the
+element's resting style.**
+
 **Videos play only while on screen** (2026-09-08). One `IntersectionObserver` at the bottom of
 the file turns `video.autoplay` **off**, pauses everything once, then plays/pauses on
 visibility (`rootMargin: '10% 0px'`). The `autoplay` ATTRIBUTE stays in the markup on purpose
