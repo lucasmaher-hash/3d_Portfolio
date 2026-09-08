@@ -140,10 +140,11 @@
 
     .project-title {
       font-family: 'OCR-A-BT', monospace;
-      /* Every stop 10% down from clamp(42px, 7.3vw, 100px). The hero icon is
-         measured FROM this word (see the script at the bottom of the file), so
-         this one line shrinks the pair together — 100 -> 90px of type, 347 ->
-         ~312px of icon. Desktop only: the ≤640px block sets its own ramp. */
+      /* Every stop 10% down from clamp(42px, 7.3vw, 100px): 100 -> 90px at
+         1440. That is the WORD only — a further 15% went on the hero icon
+         alone (see ICON_TO_TITLE_DESKTOP in the script at the bottom of this
+         file), so do not read the icon's size off this line. Desktop only: the
+         ≤640px block sets its own ramp. */
       font-size: clamp(37.8px, 6.57vw, 90px);
       line-height: 1.05;
       color: var(--text-primary);
@@ -3833,22 +3834,38 @@
                  document.querySelector('.morrow-devices .hero-icon')].filter(Boolean);
       if (!els.length) return;
       var title = els[0], icon = els[1];
+      var phone = window.matchMedia('(max-width: 640px)');
+      // The icon is measured FROM the word rather than given its own clamp: the
+      // word is OCR-A-BT at a clamp() size and the icon is a square, so no pair
+      // of CSS values keeps them in proportion at every viewport. On a desktop
+      // it is 85% of the word (Lucas's ratio — at 1:1 the pair read too heavy
+      // once the title became the nine-character "to.morrow"); on a phone it
+      // stays 1:1, where the word is small and the icon carries the hero.
+      var ICON_TO_TITLE_DESKTOP = 0.85;
+
       function size() {
-        // Same width, measured rather than guessed: the word is OCR-A-BT at a
-        // clamp() size and the icon is a vw-capped square, so no pair of CSS
-        // values keeps them equal at every viewport. Set BEFORE the travel is
-        // measured below — the icon's own width is half of that sum.
-        // Every width, phones included: the pair comes out at the same share
-        // of its column either way (~33%), so the phone hero is the desktop
-        // one scaled down rather than a different composition.
-        if (icon && title) icon.style.width = title.offsetWidth + 'px';
-        els.forEach(function (el) {
-          var col = el.parentElement;
-          var cs = getComputedStyle(col);
-          var inner = col.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-          var d = Math.max(0, Math.round(inner - el.offsetWidth));
-          el.style.setProperty('--shove-x', d + 'px');
-        });
+        if (icon && title) {
+          var scale = phone.matches ? 1 : ICON_TO_TITLE_DESKTOP;
+          icon.style.width = Math.round(title.offsetWidth * scale) + 'px';
+          // CENTRED ON THE WORD, not docked to the same left edge: the two are
+          // different widths now, so the icon needs half the difference as a
+          // left margin. Both columns (.morrow-devices and the header .section)
+          // carry the same horizontal padding, so their content boxes start at
+          // the same x and half the difference is all it takes.
+          icon.style.marginLeft =
+            Math.max(0, Math.round((title.offsetWidth - icon.offsetWidth) / 2)) + 'px';
+        }
+        // ONE travel distance for both, measured on the TITLE's column: equal
+        // distances are what keep the two centres locked together for the whole
+        // shove. Give the icon its own (inner - iconWidth) and it would travel
+        // further than the word and arrive off-centre — the wider the gap
+        // between their widths, the worse. The icon therefore stops short of
+        // the right edge by exactly the same half-difference it starts with.
+        var col = title.parentElement;
+        var cs = getComputedStyle(col);
+        var inner = col.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        var d = Math.max(0, Math.round(inner - title.offsetWidth));
+        els.forEach(function (el) { el.style.setProperty('--shove-x', d + 'px'); });
       }
       size();
       window.addEventListener('resize', size);
