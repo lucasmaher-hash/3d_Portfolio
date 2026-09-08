@@ -109,7 +109,9 @@
       max-width: 1286px;   /* 1306 − 20: 10px narrower each side on MacBook-aspect (wide-aspect overrides to 1330 below) */
       margin: 0 auto;
       /* stretch within the gutter track */
-      overflow: visible;
+      /* Clip every child's shadow/highlight to the bar's own rounded
+         silhouette — see the note under .is-2d-mode below. */
+      overflow: hidden;
 
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -125,15 +127,22 @@
       box-shadow: var(--shadow-raised-sm);
     }
 
-    /* 3D view only: clip child hover shadows (.logo, .pill) to the island's
-       own rounded silhouette. The blur on those hover shadows always extends
-       a bit past the child's own box — invisible in 2D because the page
-       background is the exact same flat colour as the island's own
-       background, but visible in 3D as a smudge past the rounded edge over
-       the busy scene behind it. is-3d-view is added by JS below. */
-    .nav-island.is-3d-view {
-      overflow: hidden;
-    }
+    /* Why .nav-island is overflow: hidden (base rule above, EVERY view).
+       .logo and .pill carry big neumorphic shadows — ~24px of blur at 11px
+       offset on hover — which always spill well past their own box and past
+       the island's 10px padding. It used to be clipped in 3D only
+       (.is-3d-view) on the theory that on a 2D page the bleed lands on a
+       background the exact same colour as the island, so nobody sees it.
+       That is only true for the dark half: the -8px -8px 20px pure-WHITE
+       highlight is brighter than #DCDCE3 and reads as a glow escaping the
+       bar's top-left, and the dark half is visible too wherever the bar
+       passes over a hero image. Clipping unconditionally keeps every child's
+       shading inside the rim.
+       The island's OWN raised shadow (.is-2d-mode) is unaffected — overflow
+       clips descendants, never the element's own box-shadow. The Craft
+       dropdown is a fixed-position sibling of <header>, not a child, so it
+       is not clipped either. .is-3d-view is still set by the JS below (it is
+       now a no-op for overflow, kept as the view marker). */
 
     .nav-island>.nav-left {
       justify-self: start;
@@ -502,7 +511,7 @@
   <div id="craft-dropdown" class="craft-dropdown">
     <span class="craft-dropdown-item" onclick="window.top.location.href='/unify2d.html'">Unify</span>
     <span class="craft-dropdown-item" onclick="window.top.location.href='/virtual_cooking2d.html'">Virtual Cooking</span>
-    <span class="craft-dropdown-item" onclick="window.top.location.href='/to-shove2d.html'">morrow</span>
+    <span class="craft-dropdown-item" onclick="window.top.location.href='/to-shove2d.html'">to.morrow</span>
     <span class="craft-dropdown-item" onclick="window.top.location.href='/kaffeemaschine2d.html'">Cybercoffee</span>
     <span class="craft-dropdown-item" onclick="window.top.location.href='/mac-lamp2d.html'">Mac-Lamp</span>
     <span class="craft-dropdown-item" onclick="window.top.location.href='/vaccine2d.html'">Double Packaging</span>

@@ -237,7 +237,11 @@
          right edge. */
       margin-inline: 0;
       will-change: transform;
-      animation: morrow-shove 8s infinite;
+      /* 0.7s before the first shove, so the page settles and THEN the title
+         moves. An infinite animation's delay applies once, so only the first
+         loop waits and every later one follows straight on. The icon's
+         cross-fade carries the same delay, or the two fall out of phase. */
+      animation: morrow-shove 8s 0.7s infinite;
     }
 
     /* .guide-section is a flex column with one gap for everything, so the
@@ -297,7 +301,7 @@
       display: block;
     }
 
-    /* ── Hero: "morrow" shoves itself across the header column ──────────
+    /* ── Hero: "to.morrow" shoves itself across the header column ──────────
        Snaps flush left, holds 3s, glides ~1s to flush right with a small
        bounce, holds 3s, comes back — the app's own core gesture (a task
        pushed to tomorrow, pulled back again) as the page's title. */
@@ -309,7 +313,11 @@
       width: fit-content;
       position: relative;
       will-change: transform;
-      animation: morrow-shove 8s infinite;
+      /* 0.7s before the first shove, so the page settles and THEN the title
+         moves. An infinite animation's delay applies once, so only the first
+         loop waits and every later one follows straight on. The icon's
+         cross-fade carries the same delay, or the two fall out of phase. */
+      animation: morrow-shove 8s 0.7s infinite;
     }
 
     /* 8s loop: hold 3s (37.5%), glide 1s (12.5%), hold 3s, glide 1s.
@@ -815,7 +823,24 @@
          the same number to size itself, and it is not a descendant of this
          element. It inherits down to here unchanged. */
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      /* Definite width, not shrink-to-fit. .ic-sticky is a centring flex box,
+         so with an auto width this grid sized itself from its own content —
+         and an opening cluster is 282px wider than a closed one, so the whole
+         block grew and re-centred and every part of it slid sideways. The
+         --ic-w cap already assumes this width (half the content column), so
+         100% is also the size the section was measured at. */
+      width: 100%;
+      /* minmax(0, 1fr), not a bare 1fr: 1fr floors at the track's AUTO minimum,
+         so once an opening cluster is wider than half the block the two tracks
+         stop being equal — the columns resize under the animation and both
+         clusters (and both captions) slide sideways as they open. Measured at
+         1440 before this: each cluster's centre travelled 50px outward and the
+         retro caption 100px. With the floor at 0 the tracks are locked to half
+         each, the cluster is centred in its own track, and it can only grow
+         outward from its own middle, which is what the section asks for. The
+         extra width overflows the track harmlessly — the orbit around it is
+         empty air. */
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: center;
       justify-items: center;
       column-gap: clamp(16px, 3vw, 56px);
@@ -847,46 +872,24 @@
        flex column and inherits no gap from one. */
     .ic-copy .feature-title + .guide-text { margin-top: clamp(12px, 1.6vw, 20px); }
 
-    /* Closed, each caption sits INBOARD — pulled toward its own cluster, so
-       the pair reads as one tight unit while the icons are still behind their
-       bubble. Opening pushes it back out to its docked position, which is the
-       layout the section is designed at: the open state is the end state, the
-       closed one is the offset. Same curve and duration as the clusters, so
-       text and icons travel as one movement. */
+    /* The caption does NOT move (2026-09-08). It used to sit inboard while its
+       cluster was closed and travel back out to its docked position as the
+       cluster opened; per Lucas the text beside the bubbles should simply
+       stand still, and only the bubbles themselves should open.
+       It is parked HALFWAY between the two positions it used to travel
+       between — the docked outer one and the inboard one — so what you see is
+       neither end of the old travel: the pair still reads as one tight unit,
+       and the caption still sits clear of its own cell's edge.
+       No transition and no will-change left: nothing here animates any more,
+       so a layer promotion would only cost memory. */
     .ic-copy {
       --ic-copy-shift: clamp(16px, 3vw, 48px);
       transform: translateX(var(--ic-copy-x, 0px));
-      /* Eased at BOTH ends, not the clusters' ease-out: the caption is a block
-         of text, and starting it at full speed is what read as a jerk rather
-         than a glide.
-         The two directions are NOT the same. This is the CLOSING one (a
-         transition uses the properties of the state it is moving into, and the
-         base state is closed): 1300ms on an easeInOutSine, the gentlest S there
-         is, because the return happens while the reader is scrolling away and
-         anything faster reads as a snap. Opening keeps the shorter, firmer
-         curve in the [data-retro] / [data-modern] rule below.
-         LONGHANDS, not the `transition` shorthand: the shorthand resets
-         transition-delay to 0, and the modern caption's 450ms stagger is set
-         further down at lower specificity — it would be silently wiped.
-         will-change promotes it to its own layer, so the travel composites
-         instead of repainting the paragraph every frame while the page is
-         also scrolling; that repaint was the stutter. */
-      transition-property: transform;
-      transition-duration: 1300ms;
-      transition-timing-function: cubic-bezier(.37, 0, .63, 1);
-      will-change: transform;
     }
-    /* Toward the cluster: the retro copy's is to its right, the modern one's
-       to its left. */
-    .ic-copy--retro  { --ic-copy-x: var(--ic-copy-shift); }
-    .ic-copy--modern { --ic-copy-x: calc(var(--ic-copy-shift) * -1); }
-    .icons-compare[data-retro="1"]  .ic-copy--retro,
-    .icons-compare[data-modern="1"] .ic-copy--modern {
-      --ic-copy-x: 0px;
-      /* Opening: shorter and firmer than the return above. */
-      transition-duration: 900ms;
-      transition-timing-function: cubic-bezier(.65, 0, .35, 1);
-    }
+    /* Toward the cluster, half as far as the old closed state: the retro
+       copy's offset is to its right, the modern one's to its left. */
+    .ic-copy--retro  { --ic-copy-x: calc(var(--ic-copy-shift) * 0.5); }
+    .ic-copy--modern { --ic-copy-x: calc(var(--ic-copy-shift) * -0.5); }
 
 
     /* The side's WIDTH is animated as well as its transform. A scale()
@@ -1541,7 +1544,8 @@
     .app-icon-dark {
       position: absolute;
       inset: 0;
-      animation: icon-fade 8s ease-in-out infinite;
+      /* Same 0.7s hold as the shove this is timed against. */
+      animation: icon-fade 8s 0.7s ease-in-out infinite;
     }
     @keyframes icon-fade {
       /* Parked left, light -> fades to dark across the push right -> parked
@@ -2182,7 +2186,7 @@
 
       /* The caption goes to the visible phone width and centres under it,
          exactly as unify2d's does — Unify's own --phone-w, not a re-derivation
-         of morrow's, because the two phones are now the same visible size. */
+         of to.morrow's, because the two phones are now the same visible size. */
       .stagger-row:has(.stagger-figure.phone) .stagger-body {
         width: calc(clamp(445px, 83.5vh, 640px) * 0.47);
         max-width: 100%;
@@ -2214,8 +2218,7 @@
 
       /* Retro vs modern stacks on a phone: side by side, one of them is always
          a collapsed stub next to a full cluster, and the pair cannot both be
-         legible in 350px. Stacked they get the full column each, offset to
-         opposite edges so the comparison still reads as two sides. */
+         legible in 350px. Stacked they get the full column each. */
       /* Full width, or align-self has nothing to align against: .icons-compare
          is shrink-to-fit and centred inside .ic-sticky, so as a column it was
          only as wide as its widest child and both sides landed on the same
@@ -2232,8 +2235,13 @@
          here, rather than turning up under the first cluster. The other half
          still follows its own cluster. */
       .ic-copy--retro { order: -1; }
-      .ic-side--left  { align-self: flex-start; margin-left: 6%; }
-      .ic-side--right { align-self: flex-end;  margin-right: 6%; }
+      /* Centred, both of them (2026-09-08). They used to hang off opposite
+         edges of the column, which meant an opening cluster grew away from
+         its own middle and read as being pushed toward the gutter. A cluster
+         only ever expands outward from its centre now — the same thing the
+         2x2 grid's justify-items: center does on desktop. */
+      .ic-side--left,
+      .ic-side--right { align-self: center; margin-left: 0; margin-right: 0; }
       /* Nothing to size here any more: neither box is pinned, so both take
          their height from the two stacked clusters. */
     }
@@ -2549,6 +2557,22 @@
       .dna-stack .dna-stage { --z: var(--z0, 1); }
       .dna-fieldwrap { width: 75%; }
       .dna-seg { width: 75%; }
+
+      /* The demos move BETWEEN the two paragraphs here (2026-09-08). Stacked,
+         the three controls are as tall as the copy above them, and running the
+         whole text and then the whole exhibit made the block read as a wall
+         followed by a gallery.
+         display: contents on .dna-body so its two paragraphs become direct
+         children of .dna-row's flex column — they cannot be reordered against
+         .dna-stack while they are still wrapped in a box of their own. Every
+         item then needs an explicit order, since the default 0 would leave the
+         heading and the stack tied. The gap between the paragraphs becomes
+         .dna-row's own 18px, which the rest of that column already uses. */
+      .dna-body { display: contents; }
+      .dna-row > .feature-title { order: 1; }
+      .dna-body > .dna-copy:nth-child(1) { order: 2; }
+      .dna-row > .dna-stack { order: 3; }
+      .dna-body > .dna-copy:nth-child(2) { order: 4; }
     }
   </style>
 </head>
@@ -2582,9 +2606,9 @@
     <div class="morrow-devices">
       <!-- The same artwork, and the same light/dark cross-fade, as the
            landing tile. -->
-      <span class="app-icon hero-icon" role="img" aria-label="Das App-Icon von morrow">
-        <img src="/images/morrow/app-icon-light.webp" width="640" height="640" alt="" />
-        <img class="app-icon-dark" src="/images/morrow/app-icon-dark.webp" width="640" height="640" alt="" />
+      <span class="app-icon hero-icon" role="img" aria-label="Das App-Icon von to.morrow">
+        <img src="/images/to.morrow/app-icon-light.webp" width="640" height="640" alt="" />
+        <img class="app-icon-dark" src="/images/to.morrow/app-icon-dark.webp" width="640" height="640" alt="" />
       </span>
     </div>
 
@@ -2606,8 +2630,8 @@
           <!-- The two o's are the Live mark itself — a stroked ring with a
                core at 42% of the diameter, the same construction as
                .live__mark further down. aria-label carries the real word, so
-               the heading still reads as "morrow" to a screen reader. -->
-          <h1 class="project-title">morrow</h1>
+               the heading still reads as "to.morrow" to a screen reader. -->
+          <h1 class="project-title">to.morrow</h1>
         </div>
         <div class="dot-divider"></div>
       </div>
@@ -2629,12 +2653,12 @@
       <div class="appstore-row appstore-row--top">
         <a class="appstore-link" href="https://apps.apple.com/app/id6798337661"
            target="_blank" rel="noopener noreferrer">
-          <img class="appstore-badge" src="/images/morrow/appstore-badge.webp" width="760" height="225"
+          <img class="appstore-badge" src="/images/to.morrow/appstore-badge.webp" width="760" height="225"
                alt="Im App Store laden" />
         </a>
       </div>
       <h2 class="section-title" data-i18n="section-glance">Auf einen Blick</h2>
-      <p class="glance-lead" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n-html="glance-lead">In jeder To-do-App ist eine Aufgabe schnell angelegt und mühsam verschoben: öffnen, Datumsauswahl suchen, Datum wählen, speichern. Also lässt man es — und die Heute-Liste stimmt schon am Vormittag nicht mehr. morrow macht das Verschieben zur wichtigsten Geste: drei Listen — Heute, Morgen, Bald —, jede Aufgabe liegt in genau einer, ein Wisch nach rechts schiebt sie weiter, einer nach links zurück.</p>
+      <p class="glance-lead" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n-html="glance-lead">In jeder To-do-App ist eine Aufgabe schnell angelegt und mühsam verschoben: öffnen, Datumsauswahl suchen, Datum wählen, speichern. Also lässt man es — und die Heute-Liste stimmt schon am Vormittag nicht mehr. to.morrow macht das Verschieben zur wichtigsten Geste: drei Listen — Heute, Morgen, Bald —, jede Aufgabe liegt in genau einer, ein Wisch nach rechts schiebt sie weiter, einer nach links zurück.</p>
     </div>
 
     <!-- Meta grid — same position as every other project page: directly
@@ -2670,7 +2694,7 @@
       <p class="guide-text" data-i18n-html="problem-1">Eine To-do-App ist die einzige App, die man möglichst wenig benutzen möchte. Sie soll nicht unterhalten und keine Aufmerksamkeit binden — sie soll den Kopf freiräumen und danach wieder verschwinden. Genau daran scheitern die meisten: Sie sammeln Ansichten, Felder und Einstellungen, bis das Pflegen der Liste selbst zur Aufgabe wird.</p>
       <p class="guide-text" data-i18n-html="problem-2">Dazu kommt eine Schieflage, die fast alle teilen: Eine Aufgabe anzulegen ist billig, sie zu verschieben ist teuer. Von heute auf morgen heißt öffnen, Datumsauswahl suchen, Datum wählen, speichern — vier Schritte für eine Entscheidung, die im Kopf längst gefallen ist. Also verschiebt man nicht, und alles sammelt sich in einer einzigen Heute-Liste, die ab dem späten Vormittag nicht mehr stimmt.</p>
       <p class="guide-text" data-i18n-html="problem-3">Diese Beobachtung stammt aus keiner Studie, sondern aus meinem eigenen Arbeitsablauf — über Jahre und über Reminders, Things, Todoist, Notizen und Papier hinweg. Das ist n=1, und das sage ich bewusst so: als Ausgangspunkt reicht es, als Nutzungsforschung nicht.</p>
-      <p class="guide-text" data-i18n-html="problem-4">morrow antwortet darauf mit zwei Funktionen statt mit Funktionsumfang. Die eine bringt die Aufgabe, an der gerade gearbeitet wird, auf den Sperrbildschirm — sichtbar, ohne die App zu öffnen. Die andere macht das Verschieben zur Hauptgeste. Alles Weitere im Entwurf musste sich daran messen lassen, ob es diese beiden Dinge stützt oder nur von ihnen ablenkt.</p>
+      <p class="guide-text" data-i18n-html="problem-4">to.morrow antwortet darauf mit zwei Funktionen statt mit Funktionsumfang. Die eine bringt die Aufgabe, an der gerade gearbeitet wird, auf den Sperrbildschirm — sichtbar, ohne die App zu öffnen. Die andere macht das Verschieben zur Hauptgeste. Alles Weitere im Entwurf musste sich daran messen lassen, ob es diese beiden Dinge stützt oder nur von ihnen ablenkt.</p>
     </div>
 
     <!-- ══ 2. Die App ════════════════════════════════════════════════ -->
@@ -2694,7 +2718,7 @@
                  control that does nothing would be worse for keyboard and
                  screen-reader users than an image that says what it is. -->
             <div class="live" role="img" aria-selected="true" data-onair="true"
-                 aria-label="Der Live-Knopf aus morrow: ausgewählt und auf Sendung">
+                 aria-label="Der Live-Knopf aus to.morrow: ausgewählt und auf Sendung">
               <span class="live__bloom"></span>
               <span class="live__trough"></span>
               <span class="live__contour"></span>
@@ -2713,16 +2737,20 @@
           </div>
         </div>
 
-        <!-- 2.1b the same feature in the app: copy left, two screens right -->
-        <div class="stagger-row right">
+        <!-- 2.1b the same feature in the app: copy left, two screens right.
+             The extra 15px is inline, not a class: .stagger-list's flex gap is
+             the only thing separating these rows and both later mobile blocks
+             restate .stagger-row, so a stylesheet rule of equal specificity
+             placed before them would lose on source order. -->
+        <div class="stagger-row right" style="margin-top: 15px;">
           <div class="stagger-figure duo">
             <!-- Both phones are ONE file, not two <video> elements side by
                  side: the right-hand screen has to stay exactly 5.24s behind
                  the left, and two independently looping videos drift apart
                  within a few cycles. Baked together, the offset can never
                  slip. -->
-            <video autoplay loop muted playsinline width="1636" height="1600" aria-label="Links wird in morrow eine Aufgabe als Live Activity aktiviert, rechts erscheint sie daraufhin auf dem Sperrbildschirm">
-              <source src="/videos/morrow/live-pair.mp4" type="video/mp4" />
+            <video autoplay loop muted playsinline width="1636" height="1600" aria-label="Links wird in to.morrow eine Aufgabe als Live Activity aktiviert, rechts erscheint sie daraufhin auf dem Sperrbildschirm">
+              <source src="/videos/to.morrow/live-pair.mp4" type="video/mp4" />
             </video>
           </div>
           <div class="stagger-body">
@@ -2740,7 +2768,7 @@
         <div class="stagger-row">
           <div class="stagger-figure phone">
             <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben">
-              <source src="/videos/morrow/swipe.mp4" type="video/mp4" />
+              <source src="/videos/to.morrow/swipe.mp4" type="video/mp4" />
             </video>
           </div>
           <div class="stagger-body">
@@ -2753,7 +2781,7 @@
         <div class="stagger-row right">
           <div class="stagger-figure phone">
             <video autoplay loop muted playsinline width="792" height="1600" aria-label="Workspaces wechseln, Aufgaben abhaken, löschen und neu anordnen">
-              <source src="/videos/morrow/restfeatures.mp4" type="video/mp4" />
+              <source src="/videos/to.morrow/restfeatures.mp4" type="video/mp4" />
             </video>
           </div>
           <div class="stagger-body">
@@ -2765,8 +2793,8 @@
         <!-- 2.4 Einstellungen: recording left, copy right -->
         <div class="stagger-row">
           <div class="stagger-figure phone">
-            <video autoplay loop muted playsinline width="792" height="1600" aria-label="Die Einstellungen von morrow: Themes, Hell- und Dunkelmodus, Schrift und Tab-Namen">
-              <source src="/videos/morrow/settings.mp4" type="video/mp4" />
+            <video autoplay loop muted playsinline width="792" height="1600" aria-label="Die Einstellungen von to.morrow: Themes, Hell- und Dunkelmodus, Schrift und Tab-Namen">
+              <source src="/videos/to.morrow/settings.mp4" type="video/mp4" />
             </video>
           </div>
           <div class="stagger-body">
@@ -2799,10 +2827,15 @@
            interface differs. -->
       <div class="win-devices">
         <div class="win-devices-inner">
-          <img src="/images/morrow/windows1.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon mit aufklappbaren Gruppen" />
-          <img src="/images/morrow/windows2.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Aufgaben des heutigen Tages" />
-          <img src="/images/morrow/windows3.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Einstellungen mit Pixelrahmen" />
-          <img src="/images/morrow/windows4.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: ein anderes Farbthema derselben Oberfläche" />
+          <img src="/images/to.morrow/windows1.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon mit aufklappbaren Gruppen" />
+          <img src="/images/to.morrow/windows2.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Aufgaben des heutigen Tages" />
+          <img src="/images/to.morrow/windows3.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Einstellungen mit Pixelrahmen" />
+          <img src="/images/to.morrow/windows4.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: ein anderes Farbthema derselben Oberfläche" />
+          <img src="/images/to.morrow/windows5.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon in einem violetten Farbthema" />
+          <img src="/images/to.morrow/windows6.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Heute-Liste in einem dunkelbraunen Farbthema" />
+          <img src="/images/to.morrow/windows7.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: das geöffnete Workspace-Menü mit Personal, Work und Design" />
+          <img src="/images/to.morrow/windows8.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: der Live-Bereich mit Eingabefeld und Live-Schalter" />
+          <img src="/images/to.morrow/windows9.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" />
         </div>
       </div>
 
@@ -2878,16 +2911,17 @@
             <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die erhabene Kante liegt auf der Fläche auf und wölbt sich beim Druck nach außen, statt einzusinken. Die vertiefte Mulde ist ihre Umkehrung: kein Bedienelement, sondern ein Ort — hier liegt etwas, das dir gehört, und deshalb steht nie ein Knopf darin. Beide zusammen ergeben die dritte Form, die Glasblase: eine Linse, die in einer Mulde liegt, die aktuelle Auswahl markiert und dorthin gleitet, statt an einer Stelle zu verschwinden und an der nächsten aufzutauchen.</p>
           </div>
           <div class="dna-stack">
-            <div class="dna-stage sk" style="--z0: 0.764;">
-              <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
-                <span>Personal</span>
-              </button>
-            </div>
-            <!-- Same --z0 as the segmented control on its right, so the two
-                 troughs are the same 60px tall. It was 1.229, which matched the
-                 seg's height INCLUDING its outer bevel (.sk-trough__bloom sits
-                 at inset -5.3px * --z, i.e. ~6px proud top and bottom) — that
-                 shading is not the control, so it does not count. -->
+            <!-- The two troughs — this field and the segmented control at the
+                 end of the row — carry the same --z0, so both come out 60px
+                 tall. It was 1.229, which matched the seg's height INCLUDING
+                 its outer bevel (.sk-trough__bloom sits at inset -5.3px * --z,
+                 i.e. ~6px proud top and bottom) — that shading is not the
+                 control, so it does not count.
+                 The raised button sits BETWEEN the two troughs (2026-09-08,
+                 Lucas): it is the smallest of the three, and with it leading
+                 the row the block stepped up in size from left to right
+                 instead of reading as balanced. On a phone the same source
+                 order puts the small one in the middle of the stack. -->
             <div class="dna-stage sk" style="--z0: 1.001;">
               <div class="dna-fieldwrap">
                 <!-- .sk-field__input is not decoration: .sk-trough's fill and
@@ -2897,6 +2931,11 @@
                      behind its own trough. -->
                 <div class="sk-field sk-trough"><span class="sk-field__input"><span class="dna-type"></span><i class="dna-caret"></i></span></div>
               </div>
+            </div>
+            <div class="dna-stage sk" style="--z0: 0.764;">
+              <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
+                <span>Personal</span>
+              </button>
             </div>
             <div class="dna-stage sk" style="--z0: 1.001;">
               <div class="sk-seg sk-trough dna-seg">
@@ -2930,25 +2969,27 @@
            that arrives first. -->
       <div class="fan-scrolly">
         <div class="fan-sticky">
-          <div class="color-fan" aria-label="Die vier Farbthemen von morrow im Hellmodus: Slate, Cream, Moss und Rose">
+          <div class="color-fan" aria-label="Die vier Farbthemen von to.morrow im Hellmodus: Slate, Cream, Moss und Rose">
         <span class="color-slot" style="--slot: -1.5; --rot: -11; --sc: 0.80; --dy:  47px; --lag: 0.12; z-index: 1; --sw-d: 6.2s; --sw-l: -0.9s; --sw-a: 1.1deg; --sw-y: 5px;">
-          <img class="color-card" src="/images/morrow/theme-pink.webp"  width="792" height="1600" alt="morrow im Farbthema Rose" />
+          <img class="color-card" src="/images/to.morrow/theme-pink.webp"  width="792" height="1600" alt="to.morrow im Farbthema Rose" />
         </span>
         <span class="color-slot" style="--slot: -0.5; --rot:  -8; --sc: 0.97; --dy: -26px; --lag: 0.06; z-index: 2; --sw-d: 7.4s; --sw-l: -2.6s; --sw-a: -0.9deg; --sw-y: 7px;">
-          <img class="color-card" src="/images/morrow/theme-green.webp" width="792" height="1600" alt="morrow im Farbthema Moss" />
+          <img class="color-card" src="/images/to.morrow/theme-green.webp" width="792" height="1600" alt="to.morrow im Farbthema Moss" />
         </span>
         <span class="color-slot" style="--slot:  0.5; --rot:   5; --sc: 1.05; --dy:  21px; --lag: 0.00; z-index: 4; --sw-d: 8.1s; --sw-l: -4.1s; --sw-a: 0.8deg; --sw-y: 6px;">
-          <img class="color-card" src="/images/morrow/theme-grey.webp"  width="792" height="1600" alt="morrow im Farbthema Slate" />
+          <img class="color-card" src="/images/to.morrow/theme-grey.webp"  width="792" height="1600" alt="to.morrow im Farbthema Slate" />
         </span>
         <span class="color-slot" style="--slot:  1.62; --rot:   9; --sc: 0.78; --dy: -32px; --lag: 0.10; z-index: 3; --sw-d: 6.8s; --sw-l: -1.7s; --sw-a: -1.2deg; --sw-y: 8px;">
-          <img class="color-card" src="/images/morrow/theme-beige.webp" width="792" height="1600" alt="morrow im Farbthema Cream" />
+          <img class="color-card" src="/images/to.morrow/theme-beige.webp" width="792" height="1600" alt="to.morrow im Farbthema Cream" />
         </span>
         <!-- Mobile only (display:none above 640px): the cluster in the
-             reference is five screens, not four, so one theme repeats. It
-             carries no information the other four don't, hence aria-hidden
-             and an empty alt — the label on .color-fan still says four. -->
-        <span class="color-slot color-slot--extra" aria-hidden="true" style="--slot: -2.6; --rot: -14; --sc: 0.72; --dy: 8px; --lag: 0.14; z-index: 0; --sw-d: 7.9s; --sw-l: -3.3s; --sw-a: 1.0deg; --sw-y: 6px;">
-          <img class="color-card" src="/images/morrow/theme-pink.webp" width="792" height="1600" alt="" />
+             reference is five screens, not four. It used to be a repeat of
+             Rose; it is the dark mode now, so it carries something the other
+             four don't and gets a real alt. No aria-hidden is needed to keep
+             desktop honest — display:none already takes it out of the tree
+             there, which is the width whose label names four themes. -->
+        <span class="color-slot color-slot--extra" style="--slot: -2.6; --rot: -14; --sc: 0.72; --dy: 8px; --lag: 0.14; z-index: 0; --sw-d: 7.9s; --sw-l: -3.3s; --sw-a: 1.0deg; --sw-y: 6px;">
+          <img class="color-card" src="/images/to.morrow/theme-dark.webp" width="792" height="1600" alt="to.morrow im Dunkelmodus" />
         </span>
       </div>
         </div>
@@ -2980,7 +3021,7 @@
       <div class="appstore-row">
         <a class="appstore-link" href="https://apps.apple.com/app/id6798337661"
            target="_blank" rel="noopener noreferrer">
-          <img class="appstore-badge" src="/images/morrow/appstore-badge.webp" width="760" height="225" loading="lazy"
+          <img class="appstore-badge" src="/images/to.morrow/appstore-badge.webp" width="760" height="225" loading="lazy"
                alt="Im App Store laden" />
         </a>
       </div>
@@ -3151,7 +3192,7 @@
       de: {
         'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
         'section-glance': 'Auf einen Blick',
-        'glance-lead': 'In jeder To-do-App ist eine Aufgabe schnell angelegt und mühsam verschoben: öffnen, Datumsauswahl suchen, Datum wählen, speichern. Also lässt man es — und die Heute-Liste stimmt schon am Vormittag nicht mehr. morrow macht das Verschieben zur wichtigsten Geste: drei Listen — Heute, Morgen, Bald —, jede Aufgabe liegt in genau einer, ein Wisch nach rechts schiebt sie weiter, einer nach links zurück.',
+        'glance-lead': 'In jeder To-do-App ist eine Aufgabe schnell angelegt und mühsam verschoben: öffnen, Datumsauswahl suchen, Datum wählen, speichern. Also lässt man es — und die Heute-Liste stimmt schon am Vormittag nicht mehr. to.morrow macht das Verschieben zur wichtigsten Geste: drei Listen — Heute, Morgen, Bald —, jede Aufgabe liegt in genau einer, ein Wisch nach rechts schiebt sie weiter, einer nach links zurück.',
         'label-timeline': 'Zeitraum', 'label-role': 'Rolle', 'label-team': 'Team', 'label-platform': 'Plattform',
         'val-timeline': 'Aug. 2026 —<br>laufend',
         'val-role': 'Konzept, Design,<br>Design-System,<br>Umsetzung',
@@ -3162,7 +3203,7 @@
         'problem-1': 'Eine To-do-App ist die einzige App, die man möglichst wenig benutzen möchte. Sie soll nicht unterhalten und keine Aufmerksamkeit binden — sie soll den Kopf freiräumen und danach wieder verschwinden. Genau daran scheitern die meisten: Sie sammeln Ansichten, Felder und Einstellungen, bis das Pflegen der Liste selbst zur Aufgabe wird.',
         'problem-2': 'Dazu kommt eine Schieflage, die fast alle teilen: Eine Aufgabe anzulegen ist billig, sie zu verschieben ist teuer. Von heute auf morgen heißt öffnen, Datumsauswahl suchen, Datum wählen, speichern — vier Schritte für eine Entscheidung, die im Kopf längst gefallen ist. Also verschiebt man nicht, und alles sammelt sich in einer einzigen Heute-Liste, die ab dem späten Vormittag nicht mehr stimmt.',
         'problem-3': 'Diese Beobachtung stammt aus keiner Studie, sondern aus meinem eigenen Arbeitsablauf — über Jahre und über Reminders, Things, Todoist, Notizen und Papier hinweg. Das ist n=1, und das sage ich bewusst so: als Ausgangspunkt reicht es, als Nutzungsforschung nicht.',
-        'problem-4': 'morrow antwortet darauf mit zwei Funktionen statt mit Funktionsumfang. Die eine bringt die Aufgabe, an der gerade gearbeitet wird, auf den Sperrbildschirm — sichtbar, ohne die App zu öffnen. Die andere macht das Verschieben zur Hauptgeste. Alles Weitere im Entwurf musste sich daran messen lassen, ob es diese beiden Dinge stützt oder nur von ihnen ablenkt.',
+        'problem-4': 'to.morrow antwortet darauf mit zwei Funktionen statt mit Funktionsumfang. Die eine bringt die Aufgabe, an der gerade gearbeitet wird, auf den Sperrbildschirm — sichtbar, ohne die App zu öffnen. Die andere macht das Verschieben zur Hauptgeste. Alles Weitere im Entwurf musste sich daran messen lassen, ob es diese beiden Dinge stützt oder nur von ihnen ablenkt.',
 
         'section-app': 'Die App',
         'f1-title': 'Live-Benachrichtigungen',
@@ -3979,6 +4020,39 @@
       var onPref = function () { reduce.matches ? stop() : start(); };
       reduce.addEventListener ? reduce.addEventListener('change', onPref)
                               : reduce.addListener(onPref);
+    })();
+  </script>
+
+
+  <script>
+    // Videos play only while they are on screen (2026-09-08). Every clip on
+    // this page is autoplay/loop/muted, so without this the four of them run
+    // from first paint and keep running far below the fold — battery and
+    // decode work for something nobody is looking at.
+    //
+    // The autoplay ATTRIBUTE stays in the markup on purpose: it is the
+    // no-JavaScript fallback, and a reader without IntersectionObserver still
+    // gets moving video. Where the observer does exist it turns the property
+    // off and pauses everything once, then hands playback to visibility.
+    //
+    // play() returns a promise that rejects if the element is paused again
+    // before it resolves (scrolling quickly past), which is not an error worth
+    // reporting — hence the empty catch.
+    (function () {
+      var vids = document.querySelectorAll('video');
+      if (!vids.length || !('IntersectionObserver' in window)) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          var v = e.target;
+          if (e.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+          else v.pause();
+        });
+      }, { rootMargin: '10% 0px' });
+      Array.prototype.forEach.call(vids, function (v) {
+        v.autoplay = false;
+        v.pause();
+        io.observe(v);
+      });
     })();
   </script>
 </body>

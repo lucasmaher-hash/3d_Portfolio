@@ -76,7 +76,18 @@ When resuming work in a new session:
 | `public/to-shove2d.html` | Project page — morrow (the iOS app). See "morrow page" below. |
 | `public/top_row_permanent_V3.html` | Nav bar — loaded as an iframe on every 2D page |
 
-## morrow page (`public/to-shove2d.html`)
+## to.morrow page (`public/to-shove2d.html`)
+
+**The project is called `to.morrow`, not `morrow` (2026-09-08).** Every user-visible name
+changed — the `<h1>`, `2D.html`'s landing tile, the Craft dropdown, the two neighbouring
+project pages' prev/next titles, every `aria-label`, and the German copy in `glance-lead` and
+`problem-4` (markup AND the `TRANSLATIONS` values). The asset folders moved with it:
+`public/images/to.morrow/` and `public/videos/to.morrow/`. **The CSS class and keyframe names
+did NOT change** (`.morrow-shove`, `.morrow-devices`, `.morrow-icon-tile`,
+`@keyframes morrow-shove`) — a dot needs escaping in a selector, and they are internal. The
+rename was `perl -pi -e 's/\bmorrow\b(?!-)/to.morrow/g'`: the `(?!-)` is what spares those
+class names, and `\b` is what spares the word "tomorrow".
+
 
 The newest project page (the iOS app), German copy, built after the five older project
 pages and therefore **not** covered by most of the layout-pattern notes above. Assets live
@@ -140,6 +151,24 @@ its opening. If a stagger is ever wanted again, offset the *trigger*, not the tr
 Gone with it: the `--push` sideways shove of the closed side (meaningful side by side,
 meaningless in the 2x2 stagger). Clicking a label toggles **its own half only** and locks it
 until that side scrolls out of its own window (`retroLock` / `modernLock`).
+
+**The caption beside each cluster is STATIC (2026-09-08).** It used to sit inboard while its
+cluster was closed and travel back out as it opened. Per Lucas the text should simply stand
+still and only the bubbles should open, so it is parked at **half** the old
+`--ic-copy-shift` — the midpoint of the travel it used to make — with no transition and no
+`will-change`. Still zeroed below 640px, where the caption is under its cluster.
+
+**A cluster only ever grows outward from its own centre**, and two separate things had to be
+fixed to make that true. `.icons-compare` was **shrink-to-fit** (a grid with `width: auto`
+inside the centring flex box `.ic-sticky`), so an opening cluster made the whole block wider
+and re-centred it; and its tracks were a bare `1fr 1fr`, which floors at the track's AUTO
+minimum, so once a cluster was wider than half the block the two columns stopped being equal.
+Now `width: 100%` and `minmax(0, 1fr) minmax(0, 1fr)`. Measured at 1440 before the fix, each
+cluster's centre travelled 50px outward and the retro caption 100px; after it, cluster centres
+and caption positions are **identical** in the open and closed states at 1440 / 900 / 390. On
+a phone both clusters are `align-self: center` with no margin — they used to hang off opposite
+edges, which is the same sideways push in a column.
+
 
 **One easing system for the whole block, symmetric in and out, no ease-out anywhere.** The
 sides, their orbits and their captions all run **900ms `cubic-bezier(.65, 0, .35, 1)`
@@ -271,6 +300,28 @@ load-bearing either way**: in the row layout the stages are `flex: 1 1 0` — ba
 auto — so each resolves from `.dna-stack`'s definite width and the troughs' percentage
 widths have something to size against; with `auto` the chain is circular and the troughs
 silently collapse.
+
+**The three primitives are ordered trough / raised button / segmented trough** (2026-09-08).
+The small `.dna-ws` button led the row before, which stepped the block up in size from left to
+right; in the middle the row reads balanced, and because source order IS the visual order at
+every width, that one swap also puts the small one in the middle of the phone stack.
+**Below 640px the demos sit BETWEEN the two paragraphs** rather than after both: `.dna-body`
+becomes `display: contents` so its two `<p>`s are direct children of `.dna-row`'s flex column,
+and all four items then need an explicit `order` (1/2/3/4) — the default 0 would tie the
+heading and the stack. The gap between the paragraphs becomes `.dna-row`'s own 18px.
+
+**The hero waits 0.7s before its first shove** (2026-09-08) — `animation: morrow-shove 8s 0.7s
+infinite` on both the title and the hero icon, and the **same 0.7s on `icon-fade`**, or the
+cross-fade falls out of phase with the travel. An infinite animation's delay applies once, so
+only the first loop waits.
+
+**Videos play only while on screen** (2026-09-08). One `IntersectionObserver` at the bottom of
+the file turns `video.autoplay` **off**, pauses everything once, then plays/pauses on
+visibility (`rootMargin: '10% 0px'`). The `autoplay` ATTRIBUTE stays in the markup on purpose
+— it is the no-JS fallback, and the observer only overrides it where it exists. `play()`
+rejects if the element is paused again before the promise settles (scrolling quickly past),
+hence the empty catch.
+
 
 **A closing "Fazit und Ausblick" section** sits between the colour screens and the App Store
 badge (2026-09-07): three paragraphs at the section's own full width (**no `.media-copy`** —

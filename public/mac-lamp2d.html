@@ -1130,6 +1130,14 @@
         display: block;
       }
 
+      /* While a finger is down the track follows it 1:1, so the easing that
+         makes a released swipe glide has to be off — with it, every move
+         event would chase a 460ms animation and the image would lag the
+         finger by a fixed distance. It is also what makes the seamless
+         wrap possible: the jump back onto the real slide is done inside
+         this class so it cannot animate. */
+      .gallery-track.dragging { transition: none; }
+
       @media (prefers-reduced-motion: reduce) {
         .gallery-track { transition: none; }
       }
@@ -1740,7 +1748,51 @@
       const activeVideo = document.getElementById('gallery-active-video');
       let current = 0;
 
-      function goTo(idx, isInit) {
+      // ── The mobile track is a LOOP, and that is what `phys` is for ───────
+      // It holds N+2 slides: a clone of the last one, the N real ones, then a
+      // clone of the first. `phys` is which of those N+2 is showing (1..N maps
+      // to current 0..N-1); the two clones exist only so a swipe off either
+      // end has a real neighbouring image to travel onto instead of hitting a
+      // wall. As soon as that animation finishes, the track jumps — inside
+      // .dragging, so the jump cannot animate — onto the identical real slide,
+      // and the reader never sees it. Wrapping this way rather than snapping
+      // straight from the last image to the first is the whole difference
+      // between "it loops" and "it rewound".
+      let phys = 1;
+
+      function trackTo(dragPx) {
+        trackEl.style.transform =
+          'translateX(calc(' + (-phys * 100) + '% + ' + (dragPx || 0) + 'px))';
+      }
+      // animate=false leaves .dragging ON — it is the whole gesture's state,
+      // not a per-move one. Toggling it each touchmove would mean a forced
+      // reflow sixty times a second for no gain.
+      function applyTrack(animate, dragPx) {
+        trackEl.classList.toggle('dragging', !animate);
+        trackTo(dragPx);
+      }
+      // Reposition with no animation and re-arm the transition afterwards.
+      // The reflow between the two is what stops the browser from collapsing
+      // both into one style pass and animating the jump anyway.
+      function jumpTrack() {
+        trackEl.classList.add('dragging');
+        trackTo(0);
+        void trackEl.offsetWidth;
+        trackEl.classList.remove('dragging');
+      }
+
+      // After a wrapping swipe has finished travelling onto a clone, put the
+      // track on the real slide with the same picture on it.
+      trackEl.addEventListener('transitionend', e => {
+        if (e.propertyName !== 'transform') return;
+        if (phys === current + 1) return;
+        phys = current + 1;
+        jumpTrack();
+      });
+
+      // physHint: which physical slide to travel to, when it isn't simply the
+      // one holding this index — i.e. a swipe or arrow that ran off an end.
+      function goTo(idx, isInit, physHint) {
         current = (idx + ITEMS.length) % ITEMS.length;
         const item = ITEMS[current];
 
@@ -1750,7 +1802,8 @@
         // Mobile slide. Set before the fade path below so the movement starts on
         // this frame rather than after the 180ms timer — the track is the only
         // visible layer on a phone, and it must not wait on the desktop swap.
-        trackEl.style.transform = 'translateX(' + (-current * 100) + '%)';
+        phys = (physHint === undefined) ? current + 1 : physHint;
+        applyTrack(true);
 
         mainEl.classList.add('fading');
         setTimeout(() => {
@@ -1793,18 +1846,30 @@
       // Build the mobile track first so every frame exists before any navigation
       // happens. Images only — the gallery has no video items; if one is ever
       // added, give it a <video> here or it will slide in as a gap.
-      ITEMS.forEach((item, i) => {
-        if (item.type === 'video') return;
+      //
+      // Order is [clone of last] [0 … N-1] [clone of first] — see the note on
+      // `phys` above. The two clones are aria-hidden with an empty alt: they
+      // are the same picture twice and a screen reader should be offered each
+      // one once.
+      function trackImg(item, i, isClone) {
         const im = document.createElement('img');
         im.src = item.src;
-        im.alt = 'Mac-Lamp ' + (i + 1);
+        if (isClone) { im.alt = ''; im.setAttribute('aria-hidden', 'true'); }
+        else im.alt = 'Mac-Lamp ' + (i + 1);
         im.style.objectFit = item.contain ? 'contain' : 'cover';
         im.style.objectPosition = item.pos || 'center center';
         // Not lazy: a lazy image one slide away is still undecoded when it
         // slides in, which reintroduces exactly the flicker this replaces.
         im.decoding = 'async';
-        trackEl.appendChild(im);
+        return im;
+      }
+      const last = ITEMS.length - 1;
+      trackEl.appendChild(trackImg(ITEMS[last], last, true));
+      ITEMS.forEach((item, i) => {
+        if (item.type === 'video') return;
+        trackEl.appendChild(trackImg(item, i, false));
       });
+      trackEl.appendChild(trackImg(ITEMS[0], 0, true));
 
       ITEMS.forEach((item, i) => {
         const wrap = document.createElement('div');
@@ -1851,44 +1916,73 @@
       // That decision REQUIRES touchmove to be non-passive ({ passive: false }) —
       // a passive listener silently ignores preventDefault, which would leave the
       // page scrolling diagonally while the image tracked the same finger.
+      //
+      // The image travels WITH the finger rather than waiting for the gesture
+      // to end: every touchmove writes the raw pixel offset onto the track,
+      // and only the release decides whether that offset becomes a page turn
+      // or springs back. So the two commits — release past the threshold, or
+      // release short of it — both start from wherever the reader had already
+      // dragged the picture to, which is what makes it feel attached.
       (function initGallerySwipe() {
-        const SWIPE_MIN  = 45;   // px of travel before it counts as a swipe
-        const AXIS_LOCK  = 10;   // px before committing to an axis
+        const AXIS_LOCK = 10;    // px before committing to an axis
+        // A fraction of the slide, floored: on a phone a fixed 45px was a
+        // twelfth of the width, so a nudge turned the page. A quarter is the
+        // usual "did you mean it" distance for a carousel this size.
+        const COMMIT_FRAC = 0.25, COMMIT_MIN = 40;
+        // Below this the release is treated as a flick and turns the page
+        // whatever the distance — a fast short swipe means the same thing as
+        // a slow long one.
+        const FLICK_PXMS = 0.5;
         let startX = 0, startY = 0, axis = null, active = false;
+        let lastX = 0, lastT = 0, vx = 0;
 
         mainEl.addEventListener('touchstart', e => {
           if (e.touches.length !== 1) { active = false; return; }
-          active = true; axis = null;
-          startX = e.touches[0].clientX;
+          active = true; axis = null; vx = 0;
+          startX = lastX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
+          lastT = e.timeStamp;
         }, { passive: true });
 
         mainEl.addEventListener('touchmove', e => {
           if (!active || e.touches.length !== 1) return;
-          const dx = e.touches[0].clientX - startX;
+          const x = e.touches[0].clientX;
+          const dx = x - startX;
           const dy = e.touches[0].clientY - startY;
           if (!axis && Math.hypot(dx, dy) > AXIS_LOCK) {
             axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
           }
-          if (axis === 'x') e.preventDefault();
+          if (axis !== 'x') return;
+          e.preventDefault();
+          const dt = e.timeStamp - lastT;
+          if (dt > 0) vx = (x - lastX) / dt;
+          lastX = x; lastT = e.timeStamp;
+          applyTrack(false, dx);          // untransitioned: the finger IS the animation
         }, { passive: false });
 
-        mainEl.addEventListener('touchend', e => {
+        function release(e) {
           if (!active) return;
           active = false;
           if (axis !== 'x') return;
           const dx = e.changedTouches[0].clientX - startX;
-          if (Math.abs(dx) < SWIPE_MIN) return;
-          // Clamped, not wrapped: with a pager showing exactly where you are,
-          // jumping from the last image back to the first reads as a glitch.
-          const next = Math.min(ITEMS.length - 1, Math.max(0, current + (dx < 0 ? 1 : -1)));
-          if (next !== current) goTo(next);
-        }, { passive: true });
+          const width = mainEl.clientWidth || 1;
+          const far   = Math.abs(dx) >= Math.max(COMMIT_MIN, width * COMMIT_FRAC);
+          const flick = Math.abs(vx) >= FLICK_PXMS && Math.sign(vx) === Math.sign(dx);
+          if (!dx || (!far && !flick)) { applyTrack(true); return; }   // spring back
+          // Wrapped, not clamped: swiping on past the last image comes round
+          // to the first. It travels onto the clone sitting there and the
+          // transitionend handler above swaps it for the real slide, so the
+          // pager stays truthful and nothing rewinds on screen.
+          const dir = dx < 0 ? 1 : -1;
+          goTo(current + dir, false, phys + dir);
+        }
+        mainEl.addEventListener('touchend', release, { passive: true });
+        mainEl.addEventListener('touchcancel', release, { passive: true });
       })();
 
       document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft')  goTo(current - 1);
-        if (e.key === 'ArrowRight') goTo(current + 1);
+        if (e.key === 'ArrowLeft')  goTo(current - 1, false, phys - 1);
+        if (e.key === 'ArrowRight') goTo(current + 1, false, phys + 1);
       });
 
       goTo(0, true);
