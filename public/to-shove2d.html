@@ -294,6 +294,14 @@
       display: block;
     }
 
+    /* Phone only. Desktop lays this row out as repeat(4, 1fr) — a fixed four
+       columns — so a fifth screen doesn't extend the row, it starts a second
+       one. The strip below 640px is a scroll container with no such count, so
+       that is the only width where more than four screens is a longer row
+       rather than a broken grid. Turned back on in the ≤640px block, which is
+       further down the file and therefore wins on source order. */
+    .win-devices-inner img.win-phone-only { display: none; }
+
     /* The hero icon's own images; the icon's shadow comes from .app-icon. */
     .morrow-devices img {
       width: 100%;
@@ -1387,6 +1395,7 @@
       .win-devices-inner::-webkit-scrollbar { display: none; }
       /* ~2 screens in view at a time, gaps included. */
       .win-devices-inner img { flex: 0 0 42vw; width: 42vw; }
+      .win-devices-inner img.win-phone-only { display: block; }
       .media-copy { width: 100%; margin-inline: 0; }
       .icons-compare .ic-side { --z: 1.665; }
       .meta-grid { grid-template-columns: 1fr 1fr; }
@@ -2831,11 +2840,11 @@
           <img src="/images/to.morrow/windows2.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Aufgaben des heutigen Tages" />
           <img src="/images/to.morrow/windows3.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Einstellungen mit Pixelrahmen" />
           <img src="/images/to.morrow/windows4.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: ein anderes Farbthema derselben Oberfläche" />
-          <img src="/images/to.morrow/windows5.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon in einem violetten Farbthema" />
-          <img src="/images/to.morrow/windows6.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Heute-Liste in einem dunkelbraunen Farbthema" />
-          <img src="/images/to.morrow/windows7.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: das geöffnete Workspace-Menü mit Personal, Work und Design" />
-          <img src="/images/to.morrow/windows8.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: der Live-Bereich mit Eingabefeld und Live-Schalter" />
-          <img src="/images/to.morrow/windows9.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" />
+          <img src="/images/to.morrow/windows5.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon in einem violetten Farbthema" />
+          <img src="/images/to.morrow/windows6.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Heute-Liste in einem dunkelbraunen Farbthema" />
+          <img src="/images/to.morrow/windows7.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: das geöffnete Workspace-Menü mit Personal, Work und Design" />
+          <img src="/images/to.morrow/windows8.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: der Live-Bereich mit Eingabefeld und Live-Schalter" />
+          <img src="/images/to.morrow/windows9.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" />
         </div>
       </div>
 
@@ -3810,6 +3819,12 @@
           var c = n.cloneNode(true);
           c.setAttribute('aria-hidden', 'true');
           c.setAttribute('alt', '');
+          // The clones exist for the phone strip only, and they are never
+          // removed once made. Without this, rotating a phone to landscape
+          // (844px — past the 640px strip) drops the row back into its
+          // repeat(4, 1fr) grid with eight visible children, i.e. two rows of
+          // duplicates. Reuses the same class the extra screens carry.
+          c.classList.add('win-phone-only');
           track.appendChild(c);
         });
         cloned = true;

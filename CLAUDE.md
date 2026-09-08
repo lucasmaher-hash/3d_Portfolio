@@ -136,9 +136,18 @@ modern bottom-left, so it reads "Oben … darunter …" now.
 **Each icon cluster is driven INDEPENDENTLY, by its own box** (2026-09-08). `.icons-compare`
 carries two flags, `data-retro` and `data-modern`, and each is set from that side's own
 geometry by one rule — the same rule for both, in `sideWantsOpen()`: **open while the
-cluster's CENTRE is inside a window running from the bottom of the viewport up to the top
-third**, i.e. two thirds of the window tall, widened 10% around its own midpoint by
-`OPEN_SPAN = 1.10` (so 5% at each end). Centre, not top edge: a cluster is ~480px tall, so a
+cluster's CENTRE is inside a window two thirds of the viewport tall**, widened 10% around its
+own midpoint by `OPEN_SPAN = 1.10` (so 5% at each end) and slid **down the page** by
+`OPEN_LATE = 0.12` of the viewport height (2026-09-08, Lucas: it opened a touch early and
+folded a touch soon). Both ends move by that same amount, so the open window is exactly as
+long as it was — the cluster simply has to travel further up before either end fires. The
+centre coordinate counts DOWN from the viewport top as the reader scrolls, so **a later
+trigger is a smaller threshold, i.e. a subtraction**. On a 900px window the open window is
+now centre 822 → 162 (it was 933 → 267): a ~480px cluster opens with ~320px of itself on
+screen instead of ~200px, and folds while its lower half is still up there to be seen.
+Measured over a scroll sweep at 1440×900, both clusters are open together across ~200px of
+scroll. **When measuring this over CDP, wait ~400ms after each `scrollTo`** — at 90ms the
+state read lags the rect read and every threshold looks ~370px late. Centre, not top edge: a cluster is ~480px tall, so a
 top-edge test fires while it still fills the screen. The stagger between the two is
 **geometric** — modern sits ~490px below retro and so reaches every threshold later — and
 there is no `transition-delay` anywhere.
