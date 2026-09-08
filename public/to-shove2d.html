@@ -239,11 +239,21 @@
          right edge. */
       margin-inline: 0;
       will-change: transform;
-      /* 0.7s before the first shove, so the page settles and THEN the title
-         moves. An infinite animation's delay applies once, so only the first
-         loop waits and every later one follows straight on. The icon's
-         cross-fade carries the same delay, or the two fall out of phase. */
-      animation: morrow-shove 8s 0.7s infinite backwards;
+      /* The first shove happens 0.7s after the page opens.
+         The delay is NEGATIVE, and that is the whole trick. A POSITIVE 0.7s
+         was tried first and does the opposite of what it reads like: the
+         keyframes already hold at 0% for their first 3s (37.5% of 8s), so
+         waiting another 0.7s on top pushed the first glide out to 3.7s and
+         nothing whatsoever happened at 0.7 — the delay was invisible, because
+         a hold looks the same as a wait.
+         -2.3s starts the loop already 2.3s in, which leaves 0.7s of that hold
+         still to run: the page opens parked, and 0.7s later the word glides.
+         3.0s (the glide's own offset) minus 0.7s is where the number comes
+         from — if @keyframes morrow-shove is ever retimed, recompute it.
+         Only the first cycle is short; every loop after it runs whole.
+         The icon and its cross-fade carry the same number or they drift out
+         of phase with the travel. */
+      animation: morrow-shove 8s -2.3s infinite backwards;
     }
 
     /* .guide-section is a flex column with one gap for everything, so the
@@ -348,7 +358,7 @@
          moves. An infinite animation's delay applies once, so only the first
          loop waits and every later one follows straight on. The icon's
          cross-fade carries the same delay, or the two fall out of phase. */
-      animation: morrow-shove 8s 0.7s infinite backwards;
+      animation: morrow-shove 8s -2.3s infinite backwards;
     }
 
     /* 8s loop: hold 3s (37.5%), glide 1s (12.5%), hold 3s, glide 1s.
@@ -1610,8 +1620,11 @@
          fix; the explicit opacity: 0 is the belt to its braces, and it matches
          what the reduced-motion block already forces. */
       opacity: 0;
-      /* Same 0.7s hold as the shove this is timed against. */
-      animation: icon-fade 8s 0.7s ease-in-out infinite backwards;
+      /* Same negative offset as the shove this is timed against — see the
+         note on .morrow-shove. The fade runs 37.5%-50%, i.e. 3.0s-4.0s of the
+         raw loop, so at -2.3s it plays 0.7s-1.7s after the page opens: exactly
+         across the first glide. */
+      animation: icon-fade 8s -2.3s ease-in-out infinite backwards;
     }
     @keyframes icon-fade {
       /* Parked left, light -> fades to dark across the push right -> parked

@@ -345,24 +345,31 @@ becomes `display: contents` so its two `<p>`s are direct children of `.dna-row`'
 and all four items then need an explicit `order` (1/2/3/4) — the default 0 would tie the
 heading and the stack. The gap between the paragraphs becomes `.dna-row`'s own 18px.
 
-**The hero waits 0.7s before its first shove** (2026-09-08) — `animation: morrow-shove 8s 0.7s
-infinite` on both the title and the hero icon, and the **same 0.7s on `icon-fade`**, or the
-cross-fade falls out of phase with the travel. An infinite animation's delay applies once, so
-only the first loop waits.
+**The first shove happens 0.7s after the page opens, and the delay that does it is NEGATIVE**
+(2026-09-08): `animation: morrow-shove 8s -2.3s infinite backwards` on both the title and the
+hero icon, and the same `-2.3s` on `icon-fade`, or the cross-fade drifts out of phase with the
+travel.
 
-**That delay caused a real bug, and it is worth knowing the shape of it.** During an
+**A POSITIVE 0.7s was tried first and does the opposite of what it reads like.** The keyframes
+already hold at 0% for their first 3s (37.5% of 8s), so waiting another 0.7s on top pushed the
+first glide out to **3.7s** and nothing whatsoever happened at 0.7 — a hold and a wait look
+identical, so the delay was invisible. `-2.3s` starts the loop already 2.3s in, leaving 0.7s of
+that hold still to run: the page opens parked, and 0.7s later the word glides. The number is
+`3.0s` (the glide's own offset) minus `0.7s` — **if `@keyframes morrow-shove` is ever retimed,
+recompute it.** `icon-fade` runs 37.5–50%, i.e. 3.0–4.0s raw, so at `-2.3s` it plays 0.7–1.7s
+after load: exactly across the first glide. Only the first cycle is short; every loop after it
+runs whole.
+
+**The positive delay also caused a real flicker, and the lesson outlives it.** During an
 animation's DELAY the element renders in its own **base style, not the first keyframe**.
-`.app-icon-dark` declared no `opacity`, so for the first 0.7s the dark icon sat at the
-initial `opacity: 1` — fully covering the light one — and then snapped transparent the
-instant the animation started. That snap is what read as the icon flickering between its two
-colours on first load, and it could not appear before the delay existed, because with no
-delay there is no window for the base style to show. Fixed with **`animation-fill-mode:
-backwards`** (which fills the delay with the 0% keyframe) plus an explicit `opacity: 0` on
-the base rule as belt and braces — it also matches what the reduced-motion block already
-forces. Both `morrow-shove` declarations carry `backwards` too: their 0% happens to equal
-the base style so there was nothing to see, but it is the same trap.
-**Rule: any animation with a `delay` needs `backwards` unless its 0% keyframe is already the
-element's resting style.**
+`.app-icon-dark` declared no `opacity`, so for the first 0.7s the dark icon sat at the initial
+`opacity: 1` — fully covering the light one — and then snapped transparent the instant the
+animation started. Fixed with **`animation-fill-mode: backwards`** plus an explicit `opacity: 0`
+on the base rule; both are still in place and still correct, though a negative delay has no
+delay window for the base style to show through, so the flicker cannot recur while the offset
+stays negative.
+**Rule: any animation with a POSITIVE `delay` needs `backwards` unless its 0% keyframe is
+already the element's resting style.**
 
 **Videos play only while on screen** (2026-09-08). One `IntersectionObserver` at the bottom of
 the file turns `video.autoplay` **off**, pauses everything once, then plays/pauses on
