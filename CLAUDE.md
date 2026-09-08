@@ -167,6 +167,20 @@ still and only the bubbles should open, so it is parked at **half** the old
 `--ic-copy-shift` — the midpoint of the travel it used to make — with no transition and no
 `will-change`. Still zeroed below 640px, where the caption is under its cluster.
 
+**The two halves sit 40px closer than their boxes would put them** (2026-09-08,
+`--ic-row-pull: 20px` on `.icons-compare`). It cannot come out of `row-gap` — that is only
+~20px at 1440 and there is no negative gap — so it comes out of the boxes: `.ic-side` is
+`--ic-w` tall (470px at 1440) around an 89px bubble, i.e. ~190px of empty space above and
+below its own content, and 20px off the inside edge of each row is invisible except as the
+tighter gap it is meant to be. **One margin on each row** (`margin-bottom` on
+`.ic-side--left`, `margin-top` on `.ic-side--right`), not a symmetric `margin-block` on
+both: only the inside edges move, so nothing overhangs the block and its top edge does not
+shift — the block simply ends 40px earlier, which is exactly the 40px removed. Measured at
+1440: bubble-to-bubble 490 → 450, block height 960 → 920, top edge unchanged. At 390 it
+lands on the flex column instead (the `row-gap` there is 18px, so the boxes overlap 22px) —
+bubble-to-bubble 182 → 142, with ~66px of empty box either side of a 32px bubble, so nothing
+collides.
+
 **A cluster only ever grows outward from its own centre**, and two separate things had to be
 fixed to make that true. `.icons-compare` was **shrink-to-fit** (a grid with `width: auto`
 inside the centring flex box `.ic-sticky`), so an opening cluster made the whole block wider
