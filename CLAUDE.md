@@ -167,19 +167,25 @@ still and only the bubbles should open, so it is parked at **half** the old
 `--ic-copy-shift` — the midpoint of the travel it used to make — with no transition and no
 `will-change`. Still zeroed below 640px, where the caption is under its cluster.
 
-**The two halves sit 40px closer than their boxes would put them** (2026-09-08,
-`--ic-row-pull: 20px` on `.icons-compare`). It cannot come out of `row-gap` — that is only
-~20px at 1440 and there is no negative gap — so it comes out of the boxes: `.ic-side` is
-`--ic-w` tall (470px at 1440) around an 89px bubble, i.e. ~190px of empty space above and
-below its own content, and 20px off the inside edge of each row is invisible except as the
-tighter gap it is meant to be. **One margin on each row** (`margin-bottom` on
-`.ic-side--left`, `margin-top` on `.ic-side--right`), not a symmetric `margin-block` on
-both: only the inside edges move, so nothing overhangs the block and its top edge does not
-shift — the block simply ends 40px earlier, which is exactly the 40px removed. Measured at
-1440: bubble-to-bubble 490 → 450, block height 960 → 920, top edge unchanged. At 390 it
-lands on the flex column instead (the `row-gap` there is 18px, so the boxes overlap 22px) —
-bubble-to-bubble 182 → 142, with ~66px of empty box either side of a 32px bubble, so nothing
-collides.
+**The modern half sits 40px closer to the retro one** (2026-09-08, `--ic-row-pull: 40px` on
+`.icons-compare`). It cannot come out of `row-gap` — that is ~20px at 1440 and there is no
+negative gap.
+
+**A negative margin on the inside edge of each row was tried first and is the wrong tool
+here.** It moved the CLUSTERS by 40px but the CAPTIONS by only 20: the copy is centred in its
+row area (`align-items: center`), so shrinking a row by 20 moves its own copy up by 10, and
+the two rows' errors partly cancel. Lucas reported the gap as unchanged, which it nearly was
+where he was looking. **Negative margins and centre alignment do not compose — do not go back
+to them.**
+
+What works is a **relative offset**: `position: relative; top: -40px` on `.ic-side--right`
+and `.ic-copy--modern`. It moves them visually and changes no layout, so both travel by
+exactly the number written and the retro half cannot shift by a fraction of it. `.ic-side` is
+already `position: relative` for its orbit, which is `inset: 0` against the padding box and
+rides along. `.icons-compare` then gives back the 40px it no longer uses with
+`margin-bottom: calc(var(--ic-row-pull) * -1)`, or everything below would sit 40px further
+from the modern half than it does now. Measured at 1440: retro bubble and caption unmoved at
+6488 / 6459, modern bubble and caption both up exactly 40 (6978 → 6938, 6998 → 6958).
 
 **A cluster only ever grows outward from its own centre**, and two separate things had to be
 fixed to make that true. `.icons-compare` was **shrink-to-fit** (a grid with `width: auto`
