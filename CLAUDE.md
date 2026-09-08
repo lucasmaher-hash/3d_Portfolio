@@ -217,12 +217,19 @@ open geometry. If the two directions are ever split again, set them with **longh
 
 The captions do not animate any more — see the static-caption note above.
 
-**The 2x2 grid holds on a phone too** (2026-09-08): text left / retro right, then modern
-left / text right, the same principle as the stagger rows — it stacked into a column at
-first, on the argument that neither half would be legible in 175px. Only the measurements
-change below 640px: full column width, 12/18px gaps, and `--ic-w: clamp(120px, 42vw, 190px)`
-so an open cluster (1.02 x `--ic-w`, 164px at 390) fits one cell of ~169px. The caption's
-inboard offset is live there again, since it is beside its cluster rather than under it.
+**On a phone the two halves are a single INTERLEAVED column** (2026-09-08, superseding the
+beside-the-cluster layout that briefly ran at this width): heading, retro cluster, its text,
+modern cluster, its text. The heading lives INSIDE `.ic-copy--retro`, so that wrapper is
+dissolved with `display: contents` and all five items carry an explicit `order` — the
+default 0 would tie them and DOM order puts both clusters ahead of their text. The clusters
+alternate edges instead of centring (`align-self: flex-end` / `flex-start`), which is the
+desktop stagger read down one column, and they are **60% bigger**: `--ic-w:
+clamp(192px, 67.2vw, 304px)` **and** `--z: 1.368` (0.855 x 1.6) — `--ic-w` sizes the frame
+and the orbit radius while `--z` sizes the bubble and the icons, so scaling one without the
+other spreads the icons apart without growing them. `--ic-row-pull` is zeroed here: it lifts
+the modern half into the retro half's ROW on desktop, and in a column it just drags it up
+into the paragraph above. The caption's inboard travel is off again (nothing to travel
+toward when the text is above or below its cluster).
 
 **`--ic-w` is `clamp(240px, 34vw, 470px)` on desktop** — sized against one grid cell of the
 2x2, not against a side-by-side pair. Verified over CDP at 1440 and 390: each half opens and closes on
@@ -323,7 +330,26 @@ carry TWO variables: `--z0` is the authored size (inline, per stage) and `--z` i
 SkeuKit metrics read (`calc(var(--z0) * 1.18)` in the row layout, plain `var(--z0)` again
 below 640px, where the stack is vertical and each demo already has the column to itself).
 Gap between the three is `clamp(8px, 1.1vw, 16px)` — it was wider than the gaps inside the
-controls before. The middle demo's `--z0` is **1.001, the same as the segmented control on
+controls before. **Desktop adds 20px of air on each side of the middle demo** by taking it
+out of the two OUTER controls' width (`width: calc(100% - 20px)`) and docking them outward
+(`justify-items: start` / `end`), so all of it lands in the two gaps rather than half of it
+leaking to the block's edges; the row, the heights and the type are untouched. Those rules
+sit in a `@media (min-width: 641px)` block so they cannot reach the phone row.
+
+**The three demos stand side by side on a phone too** (2026-09-08). They stacked before, on
+the arithmetic that a third of 350px is ~110px. What makes three fit is that these controls
+are mostly padding, and **the padding is now the only thing that shrinks** — height, type
+size and the authored `--z` are all untouched. `--seg-pad` (the segmented trough's inset),
+`--opt-pad-x` (its options' horizontal padding) and `--ws-pad-x` / `--ws-gap` (the pill's)
+exist for exactly this; **`.dna-segpill`'s own geometry is written against `--seg-pad`**, so
+the sliding pill follows the slimmer trough without a second edit. Phone values: 3px / 1px /
+7px / 5px, against 8.2 / 7.6 / 22 / 10.
+
+**The middle demo is the app's live control, not a workspace pill** (2026-09-08): the
+ring-and-core mark (`.dna-ws__mark`, the same construction as `.live__mark` — a stroked
+circle with a core at 42% of its diameter) plus the label **"Off air"**, measured off a frame
+of `live-pair.mp4` where the app draws exactly that inside one glass pill. It was
+"Personal". The middle demo's `--z0` is **1.001, the same as the segmented control on
 its right**, so both troughs are 60px: at 1.229 it matched the seg's height *including*
 `.sk-trough__bloom`, the outer bevel that sits ~6px proud top and bottom — shading, not
 control, so it does not count. `.dna-row`
@@ -666,6 +692,38 @@ sticky box).
 Static renders for this page live alongside the frames: `01_hero_3q_duo.png`,
 `02_straight_on_widescreen.png`, `03_low_hero_egg_focus.png`, `07_custom_view.png`.
 
+## Media pipeline: what compresses and what does not
+
+**`ffmpeg`, `ffprobe`, `jpegtran` and `avconvert` are all installed.**
+
+**Video (2026-09-08).** 13 of the 17 clips were re-encoded to x264 `-crf 26 -preset slow
+-pix_fmt yuv420p -movflags +faststart -an`, keeping every filename, container, dimension and
+frame rate — so nothing in the markup changed. `public/videos/` went 39 MB → 27 MB. Two
+things worth repeating:
+- **Pick the CRF by measuring, not by eye.** Every file was encoded at CRF 23/26/29 and
+  scored against its own source with `ffmpeg -i orig -i new -lavfi "[0:v][1:v]ssim" -f null -`
+  (note: that summary is printed at INFO level — with `-v error` it is silent, which is why an
+  earlier pass came back with an empty SSIM column). Shipped set: **SSIM 0.975–0.997**.
+- **A lower CRF is not automatically smaller.** These files were already compressed once, so
+  CRF 20 came out BIGGER than the source on 14 of 17. The four `to.morrow` clips gained only
+  1–3% even at CRF 26 and were deliberately left alone rather than spent on another
+  generation of re-encode. The three Mac-Lamp clips use **CRF 23**: 60fps handheld grain is
+  what costs the bits there, and 26 started eating it (SSIM 0.975 vs 0.985).
+- Side effect worth knowing: `kaffeemaschine/coffeemachine_interface_video.mov` was **HEVC**,
+  which Firefox and older Chrome cannot decode at all. It is H.264 now.
+
+**A lossless JPEG rotation leaves a wrapped strip unless the dimensions are multiples of 16.**
+Mac-Lamp's `5/6/7.jpg` each carried a 10px band along the bottom and an 8px band down the
+right that were **copies of their own top and left edges**, with a hard step where the real
+picture ended (measured: row-to-row difference 80/90/52 at the seam against ~3 in the
+interior). 1482 mod 16 = **10**, 1976 mod 16 = **8** — the partial-MCU remainder a
+`jpegtran -rotate 180` leaves behind without `-trim`. It is baked into the files; no CSS
+change can hide it. Fixed by cropping the bands off **from the top-left origin**
+(`jpegtran -copy all -crop 1968x1472+0+0`), which keeps the DCT grid aligned so the crop is
+lossless — sizes moved less than 1%. The pixels under the bands were destroyed by the
+original rotation and cannot be recovered. **Diagnostic:** compare each edge strip against
+the opposite edge; if they match and there is a hard step behind them, it is this.
+
 ## 2D page layout patterns
 
 **Standard pattern** (kaffeemaschine — vaccine and mac-lamp have since diverged, see below; portfolio2d.html, the page this pattern was originally shared with, was removed — see "Recent Changes"):
@@ -743,7 +801,7 @@ Organized by project for clarity:
 **Images** (`/public/images/`):
 - `about/` — About page hero
 - `cybercoffee/` — Cybercoffee renders: `01_hero_3q_duo.png`, `02_straight_on_widescreen.png`, `03_low_hero_egg_focus.png`, `07_custom_view.png`, plus `spin/frame_001.webp`–`frame_056.webp` (~1.4 MB), the 56-frame turntable driving the sticky scroll-spin — see "Cybercoffee project". Frames are **640 × 619**, i.e. nearly square, which is what limits how large the machine can render on a phone.
-- `mac-lamp/` — Mac-Lamp project images & diashow frames. Diashow items are `5.jpg`–`9.jpg` (converted from `.HEIC` this session — HEIC only renders in Safari, so gallery images must be JPG/PNG; the original `5.HEIC`–`8.HEIC` are still on disk but unused). Process-section stills: `1.png` (CAD render) + videos `2.MOV`/`3.MOV`/`4.MOV` in `videos/mac-lamp/`
+- `mac-lamp/` — Mac-Lamp project images & diashow frames. Diashow items are `5.jpg`–`9.jpg` (converted from `.HEIC` this session — HEIC only renders in Safari, so gallery images must be JPG/PNG; the original `5.HEIC`–`8.HEIC` are still on disk but unused). **5/6/7.jpg are 1968×1472, the other two 1976×1482/1535** — see the wrap-strip note below. Process-section stills: `1.png` (CAD render) + videos `2.MOV`/`3.MOV`/`4.MOV` in `videos/mac-lamp/`
 - `portfolio/` — **orphaned.** Was "This Website" project screenshots; the page (`portfolio2d.html`) was removed this session (see "Recent Changes"). The image files are still on disk but nothing references them — safe to delete, left in place in case any of the removal was meant to be revisited.
 - `vaccine/` — Double Packaging renders & process steps
 - `vr-cookbook/` — Virtual Cooking assets: `side_v1_final_V1.png` (hero + card), `back_final_V2.jpg`, `timer_click_V1.jpg`, silver panel renders `Panel_Left.png` / `Panel_Right.png` / `Stopwatch.png` (transparent bg), and process screenshots `blender-modeling.png` + `app-preview.png` (⚠️ renamed from Figma exports that had spaces in the filename — keep filenames URL-safe)
@@ -2004,7 +2062,10 @@ visible. If the clip-paths are ever re-measured, redo this table.
 sides are equal, so a naive parser reads a corner radius as an inset. Split on `round` and drop
 the radii before parsing, or the measured "visible width" will be badly wrong.
 
-**Transparent video files are NOT worth it for this site.** `.mov`/H.264 can't carry an alpha channel; real transparency needs WebM/VP9 (Chrome/Firefox) *plus* HEVC-with-alpha (Safari) — 12 files to replace 6, with quality loss. Only go there if the videos are needed outside the website. Requires `ffmpeg`, which is **not installed** on this machine.
+**Transparent video files are NOT worth it for this site.** `.mov`/H.264 can't carry an alpha channel; real transparency needs WebM/VP9 (Chrome/Firefox) *plus* HEVC-with-alpha (Safari) — 12 files to replace 6, with quality loss. Only go there if the videos are needed outside the website.
+
+**`ffmpeg` IS installed** (`/opt/homebrew/bin/ffmpeg`, plus `ffprobe`, `jpegtran` and
+`avconvert`) — an older note here said it was not.
 
 ## Deployment
 
