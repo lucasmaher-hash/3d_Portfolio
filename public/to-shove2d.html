@@ -3890,17 +3890,43 @@
       // ran. held therefore climbed by 1 per swipe and never came back to 0,
       // which is why the pan stopped for good after the first manual scroll.
       var resume;
+      function hold() {
+        clearTimeout(resume); touching = true; lastX = track.scrollLeft;
+      }
       ['pointerdown', 'touchstart'].forEach(function (e) {
-        track.addEventListener(e, function () {
-          clearTimeout(resume); touching = true; lastX = track.scrollLeft;
-        }, { passive: true });
+        track.addEventListener(e, hold, { passive: true });
       });
+
+      // Trackpad: a two-finger horizontal swipe already scrolls an
+      // overflow-x container natively — but the pan writes scrollLeft on
+      // every frame, so without this it would overwrite the gesture as fast
+      // as the trackpad produced it and the strip would sit there twitching.
+      // Holding it hands the strip over; step() re-reads scrollLeft while
+      // held, so the pan picks up from wherever the fingers left it and
+      // wrapScroll can loop it like any other manual scroll.
+      //
+      // Horizontal intent only. A plain vertical page scroll passing over the
+      // strip also fires wheel events here, and pausing on those would stop
+      // the pan every time the section went by. Passive: this never calls
+      // preventDefault, so vertical scrolling stays the browser's.
+      track.addEventListener('wheel', function (e) {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+        hold();
+      }, { passive: true });
+      function letGo() {
+        clearTimeout(resume);
+        resume = setTimeout(function () { touching = false; }, 700);
+      }
       ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(function (e) {
-        track.addEventListener(e, function () {
-          clearTimeout(resume);
-          resume = setTimeout(function () { touching = false; }, 700);
-        }, { passive: true });
+        track.addEventListener(e, letGo, { passive: true });
       });
+      // A wheel gesture has no release event of its own — momentum simply
+      // stops arriving — so every wheel also arms the same timer, and the last
+      // one to fire is the one that hands the strip back.
+      track.addEventListener('wheel', function (e) {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+        letGo();
+      }, { passive: true });
       // Mouse drag. A finger scrolls a horizontal overflow container by
       // itself and a mouse does not, so on desktop the drag has to be built:
       // pointerdown remembers where the strip was, pointermove writes the
@@ -3940,13 +3966,33 @@
       // native image drag halfway through.
       track.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
-      // Wrap on manual scrolling too, or a flick can run off the end.
-      track.addEventListener('scroll', function () {
+      // Wrap on manual scrolling too, or a drag can run off the end and stop
+      // dead against it.
+      //
+      // The threshold is setW, ONE set — not the `setW * 2 - 2` this used to
+      // test, which no scroll position can ever reach: the furthest scrollLeft
+      // goes is scrollWidth - clientWidth, i.e. two sets MINUS the visible
+      // width, always short of two. Measured at 1440: max 3705 against a
+      // 4962 target, so the forward wrap never once fired and the strip simply
+      // hit its end. Everything past one set is the clone of the first, so
+      // subtracting one set there lands on the identical frame and nothing
+      // moves on screen.
+      //
+      // A wrap during a mouse drag has to take the drag's anchor with it —
+      // pointermove writes an absolute scrollLeft from where the grab started,
+      // so leaving grabScroll behind would re-apply the old position on the
+      // very next move and undo the wrap.
+      function wrapScroll() {
         if (!setW || !touching) return;
-        if (track.scrollLeft >= setW * 2 - 2) track.scrollLeft -= setW;
-        else if (track.scrollLeft <= 0) track.scrollLeft += setW;
+        var d = 0;
+        if (track.scrollLeft >= setW) d = -setW;
+        else if (track.scrollLeft <= 0) d = setW;
+        if (!d) return;
+        track.scrollLeft += d;
+        if (dragging) grabScroll += d;
         pos = track.scrollLeft;
-      }, { passive: true });
+      }
+      track.addEventListener('scroll', wrapScroll, { passive: true });
 
       // No width gate any more: the strip is the layout at every width, so
       // the pan is too. stop() survives for prefers-reduced-motion, which
