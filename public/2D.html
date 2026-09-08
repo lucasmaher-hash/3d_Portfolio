@@ -1041,6 +1041,16 @@
         --shadow-raised: 5.2px 5.2px 11.7px rgba(174,174,192,0.65), -5.2px -5.2px 11.7px rgba(255,255,255,1);
         --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
       }
+
+      /* to.morrow's tile is the app icon itself rather than a screenshot, so it
+         reads smaller than the other tiles at the same box size — 15% up on the
+         176px the base clamp floors at down here. Last 640px block in the file
+         on purpose: the .project-tile rules further up are the same specificity
+         and would otherwise win on source order. */
+      .morrow-icon-tile .app-icon { width: 202px; }
+      /* …and a little more air under it than the section's own 16px flex gap,
+         so the icon is not sitting on the word. */
+      .morrow-icon-tile { margin-bottom: 14px; }
     }
   </style>
 </head>

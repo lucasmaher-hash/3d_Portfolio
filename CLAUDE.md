@@ -197,8 +197,15 @@ open geometry. If the two directions are ever split again, set them with **longh
 
 The captions do not animate any more — see the static-caption note above.
 
-**`--ic-w` is `clamp(240px, 34vw, 470px)`** — sized against one grid cell of the 2x2, not
-against a side-by-side pair. Verified over CDP at 1440 and 390: each half opens and closes on
+**The 2x2 grid holds on a phone too** (2026-09-08): text left / retro right, then modern
+left / text right, the same principle as the stagger rows — it stacked into a column at
+first, on the argument that neither half would be legible in 175px. Only the measurements
+change below 640px: full column width, 12/18px gaps, and `--ic-w: clamp(120px, 42vw, 190px)`
+so an open cluster (1.02 x `--ic-w`, 164px at 390) fits one cell of ~169px. The caption's
+inboard offset is live there again, since it is beside its cluster rather than under it.
+
+**`--ic-w` is `clamp(240px, 34vw, 470px)` on desktop** — sized against one grid cell of the
+2x2, not against a side-by-side pair. Verified over CDP at 1440 and 390: each half opens and closes on
 its own centre, both are open together through the overlap, the click toggles each half
 alone, and no horizontal overflow at either width.
 
@@ -330,6 +337,13 @@ visibility (`rootMargin: '10% 0px'`). The `autoplay` ATTRIBUTE stays in the mark
 rejects if the element is paused again before the promise settles (scrolling quickly past),
 hence the empty catch.
 
+
+**Two small mobile rules that are easy to lose:** `.centered-note` (the "Verschieben statt
+verwalten" block) is `text-align: left` below 640px — centred text under a left-docked
+heading has no edge to line up with in a 350px column — and on `2D.html` the to.morrow tile
+is the app icon itself rather than a screenshot, so it gets `width: 202px` (15% over the
+176px its base clamp floors at) plus 14px of extra margin under it, **in the last 640px
+block of that file**, since the `.project-tile` rules further up are equal specificity.
 
 **A closing "Fazit und Ausblick" section** sits between the colour screens and the App Store
 badge (2026-09-07): three paragraphs at the section's own full width (**no `.media-copy`** —

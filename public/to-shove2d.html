@@ -251,25 +251,44 @@
        flex gap rather than replacing it. */
     .dot-divider + .media-copy { margin-top: clamp(14px, 2.4vw, 30px); }
 
-    /* The copy either side of that row shares its column: same 84.5% width and
-       the same centring, so the text's edges line up with the outer two phones
-       instead of running the full section. The closing colour paragraph uses
-       it too, which is why the class is not named after the Windows row.
-       Desktop only — below 860px that row becomes a 2x2 at its own width and
+    /* An inset column for the copy either side of that row. It was originally
+       84.5% so its edges met the outer two phones of the four-column grid;
+       that grid is gone (the row is a full-bleed strip now) and the width
+       stays because the measure it gives the paragraphs is worth keeping on
+       its own. The closing colour paragraph uses it too, which is why the
+       class is not named after the Windows row. Desktop only — below 860px
        the paragraphs keep the section's gutter, like every other paragraph. */
     .media-copy {
       width: 84.5%;
       margin-inline: auto;
     }
 
+    /* ONE behaviour at every width (2026-09-08). This used to be a
+       repeat(4, 1fr) grid on desktop and a panning scroll strip only below
+       860px, which is why a fifth screen started a second row up there. It is
+       the strip everywhere now: nine screens, the same auto-pan, and a
+       drag that works with a mouse as well as a finger.
+
+       Full bleed to the page-wrapper's own border lines: --pad-x is
+       .guide-section's gutter, declared next to the padding that spends it so
+       the two can never drift, and the row spends it back. The wrapper is
+       overflow: clip, so nothing here can reach past those borders. */
     .win-devices-inner {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 5%;
+      display: flex;
       align-items: start;
-      width: 84.5%;
-      margin-inline: auto;
+      gap: clamp(16px, 2.2vw, 40px);
+      width: calc(100% + 2 * var(--pad-x));
+      margin-inline: calc(-1 * var(--pad-x));
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      /* A mouse cannot scroll a horizontal overflow container by itself, so
+         the strip advertises the drag the script adds. */
+      cursor: grab;
     }
+    .win-devices-inner.is-dragging { cursor: grabbing; }
+    .win-devices-inner::-webkit-scrollbar { display: none; }
 
     /* drop-shadow, not box-shadow: the frames are transparent, so this follows
        the phone silhouettes instead of drawing rectangles. Tint is the design
@@ -288,20 +307,21 @@
       filter: drop-shadow(0 10px 16px rgba(174, 174, 192, 0.40));
     }
 
+    /* A PERCENTAGE of the strip, not a vw: the page-wrapper caps at 1440, so
+       a viewport-based width would keep growing on a 2560 monitor and leave
+       three screens filling a row that has room for five. 20% is ~288px at
+       the cap, close to the four-column grid's old 243px. */
     .win-devices-inner img {
-      width: 100%;
+      flex: 0 0 20%;
+      width: 20%;
       height: auto;
       display: block;
+      /* Dragging the strip must not start the browser's own image drag, and
+         must not paint a text selection across the row on the way. */
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
     }
-
-    /* Phone only. Above 860px this row is repeat(4, 1fr) — a fixed four
-       columns — so a fifth screen doesn't extend the row, it starts a second
-       one. At 860px and below the row becomes the panning scroll strip, which
-       has no column count, so that is the only place where more than four
-       screens reads as a longer row rather than a broken grid. Turned back on
-       in the ≤860px block that builds the strip — further down the file, so it
-       wins on source order at equal specificity. */
-    .win-devices-inner img.win-phone-only { display: none; }
 
     /* The hero icon's own images; the icon's shadow comes from .app-icon. */
     .morrow-devices img {
@@ -409,7 +429,11 @@
        page (meta grid, header) so widths line up, as a single track
        instead of the multi-column grids the other pages use. */
     .guide-section {
-      padding: clamp(32px, 5vw, 56px) clamp(40px, 8vw, 80px);
+      /* The horizontal gutter is a variable because .win-devices-inner spends
+         it back as a negative margin to run edge to edge. Every override of
+         this padding must restate --pad-x with it. */
+      --pad-x: clamp(40px, 8vw, 80px);
+      padding: clamp(32px, 5vw, 56px) var(--pad-x);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
@@ -858,6 +882,22 @@
       row-gap: clamp(10px, 1.4vw, 22px);
       margin-top: clamp(20px, 3vw, 36px);
     }
+
+    /* The two halves sit 40px closer together than their boxes would put them
+       (2026-09-08). It cannot come out of row-gap: that is only ~20px at 1440
+       and there is no negative gap, so half of the 40 would be all there is.
+       It comes out of the boxes instead — .ic-side is --ic-w tall (470px at
+       1440) around a bubble of 89px, so each row carries ~190px of empty space
+       above and below its own content, and pulling 20px off the inside edge of
+       each row is invisible except as the tighter gap it is meant to be.
+       One margin on each side rather than a symmetric margin-block on both:
+       this way only the INSIDE edges move, so the block's own top and bottom
+       are exactly where they were and the sections above and below it keep
+       their spacing. Measured at 1440: bubble-to-bubble 490px -> 450px, block
+       height 960px -> 920px, outer edges unchanged. */
+    .icons-compare { --ic-row-pull: 20px; }
+    .ic-side--left  { margin-bottom: calc(var(--ic-row-pull) * -1); }
+    .ic-side--right { margin-top:    calc(var(--ic-row-pull) * -1); }
 
     /* Explicit cells, so the source order stays the sensible one. */
     .icons-compare .ic-side--left  { grid-area: 1 / 2; }  /* retro,  top right */
@@ -1326,7 +1366,10 @@
          binding constraint is one cluster against the column width, not the
          pair. */
       .icons-compare { gap: 8px; }
-      .ic-scrolly { --ic-w: clamp(162px, 49.5vw, 252px); }
+      /* Half the column, not the whole of it: the caption sits beside the
+         cluster at this width too, so an open cluster (1.02 x --ic-w) has to
+         fit one cell of the 2x2. 42vw = 164px at 390, against a 169px cell. */
+      .ic-scrolly { --ic-w: clamp(120px, 42vw, 190px); }
       /* +25%, and it has to stay a bare NUMBER — see the note on --n in the
          base .live rule: as a length the derived factors become px² and the
          whole layer silently disappears. */
@@ -1373,30 +1416,12 @@
       /* Four 792px-wide frames across this column render at ~112px each,
          which is below the size at which the pixel UI is legible. 2x2
          keeps the composition and roughly doubles each phone. */
-      /* A phone cannot show four 792px frames at a legible size, so they pan
-         instead of tiling. A real scroll container, not a transform marquee:
-         that way the finger drives it natively and the auto-pan is just
-         scrollLeft being nudged, so the two can never fight. The set is
-         duplicated in JS and the offset wraps by one set's width, which is
-         what makes the loop seamless. */
-      .win-devices-inner {
-        display: flex;
-        /* Full bleed: .guide-section holds a 20px gutter, so the track breaks
-           out of it rather than starting inside it — the screens should run
-           off both edges, not sit in a padded box. */
-        width: calc(100% + 40px);
-        margin-inline: -20px;
-        gap: 4vw;
-        padding: 0;
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-x: contain;
-      }
-      .win-devices-inner::-webkit-scrollbar { display: none; }
-      /* ~2 screens in view at a time, gaps included. */
+      /* The strip itself is now the base rule — full bleed included, since
+         --pad-x is 20px at this width and the row spends it back. All that is
+         left here is the phone's own screen size: ~2 in view at a time, gaps
+         included, against the base rule's 20%. */
+      .win-devices-inner { gap: 4vw; }
       .win-devices-inner img { flex: 0 0 42vw; width: 42vw; }
-      .win-devices-inner img.win-phone-only { display: block; }
       .media-copy { width: 100%; margin-inline: 0; }
       .icons-compare .ic-side { --z: 1.665; }
       .meta-grid { grid-template-columns: 1fr 1fr; }
@@ -1452,7 +1477,7 @@
       .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
       .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
       .meta-inset { padding: 8px 10px; }
-      .guide-section { padding: 32px 20px; }
+      .guide-section { --pad-x: 20px; padding: 32px var(--pad-x); }
     }
 
     /* ── Project nav ──────────────────────────────────────── */
@@ -2115,7 +2140,7 @@
        paragraphs sat 12px apart, divider→body 20px. */
     @media (max-width: 640px) {
       /* Section rhythm: 64px → 104px border-to-border. */
-      .guide-section { padding: 52px 20px; }
+      .guide-section { --pad-x: 20px; padding: 52px var(--pad-x); }
       /* Header/glance/meta blocks: slighter bump, they are shorter units. */
       .section { padding: 32px 20px; }
       /* …except the header, which follows the icon hero rather than a border,
@@ -2226,34 +2251,28 @@
       .stagger-row .stagger-figure:not(.phone):not(.duo) { margin-top: 14px; }
       .stagger-row .stagger-figure:not(.phone):not(.duo) + .stagger-body { margin-bottom: 14px; }
 
-      /* Retro vs modern stacks on a phone: side by side, one of them is always
-         a collapsed stub next to a full cluster, and the pair cannot both be
-         legible in 350px. Stacked they get the full column each. */
-      /* Full width, or align-self has nothing to align against: .icons-compare
-         is shrink-to-fit and centred inside .ic-sticky, so as a column it was
-         only as wide as its widest child and both sides landed on the same
-         axis regardless of align-self. */
-      /* display: flex restated on purpose — the base rule is a grid now, and
-         flex-direction would do nothing to it. */
-      .icons-compare { display: flex; flex-direction: column; width: 100%; }
-      /* Each caption keeps the column's full width under its own cluster. */
-      .ic-copy { max-width: none; width: 100%; }
-      /* No inboard offset here: stacked, the caption is under its cluster, not
-         beside it, so sliding it sideways would be movement toward nothing. */
-      .ic-copy { --ic-copy-shift: 0px; }
-      /* …except that the half carrying the section's HEADING leads the block
-         here, rather than turning up under the first cluster. The other half
-         still follows its own cluster. */
-      .ic-copy--retro { order: -1; }
-      /* Centred, both of them (2026-09-08). They used to hang off opposite
-         edges of the column, which meant an opening cluster grew away from
-         its own middle and read as being pushed toward the gutter. A cluster
-         only ever expands outward from its centre now — the same thing the
-         2x2 grid's justify-items: center does on desktop. */
-      .ic-side--left,
-      .ic-side--right { align-self: center; margin-left: 0; margin-right: 0; }
-      /* Nothing to size here any more: neither box is pinned, so both take
-         their height from the two stacked clusters. */
+      /* Beside, not above and below (2026-09-08). This used to stack into a
+         column here on the argument that neither half would be legible in
+         175px; per Lucas the text belongs next to its cluster at every width,
+         the way every other figure on this page is laid out. So the base 2x2
+         grid simply stays — text left / retro right, then modern left / text
+         right — and only the measurements change: full column width, tighter
+         gaps, and clusters sized against HALF the column (see --ic-w in the
+         640px block above, which is what keeps an open cluster inside its own
+         cell instead of running over the caption).
+         The caption's inboard offset is deliberately NOT zeroed any more: it
+         is beside its cluster again, so the travel means something. */
+      .icons-compare {
+        width: 100%;
+        column-gap: 12px;
+        row-gap: 18px;
+      }
+      .ic-copy { max-width: none; }
+
+      /* Centred is a desktop-width luxury: in a 350px column a centred
+         paragraph's ragged left edge stops lining up with anything, and this
+         one sits directly under a left-docked heading. */
+      .centered-note { text-align: left; }
     }
     /* Mobile: neumorphic shadow spread/radius reduced 35% (offsets & blur ×0.65),
        matching the nav's 2D/3D toggle segment. Redefining only the tokens keeps
@@ -2841,11 +2860,11 @@
           <img src="/images/to.morrow/windows2.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Aufgaben des heutigen Tages" />
           <img src="/images/to.morrow/windows3.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Einstellungen mit Pixelrahmen" />
           <img src="/images/to.morrow/windows4.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: ein anderes Farbthema derselben Oberfläche" />
-          <img src="/images/to.morrow/windows5.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon in einem violetten Farbthema" />
-          <img src="/images/to.morrow/windows6.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Heute-Liste in einem dunkelbraunen Farbthema" />
-          <img src="/images/to.morrow/windows7.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: das geöffnete Workspace-Menü mit Personal, Work und Design" />
-          <img src="/images/to.morrow/windows8.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: der Live-Bereich mit Eingabefeld und Live-Schalter" />
-          <img src="/images/to.morrow/windows9.webp" width="792" height="1600" class="win-phone-only" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" />
+          <img src="/images/to.morrow/windows5.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon in einem violetten Farbthema" />
+          <img src="/images/to.morrow/windows6.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Heute-Liste in einem dunkelbraunen Farbthema" />
+          <img src="/images/to.morrow/windows7.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: das geöffnete Workspace-Menü mit Personal, Work und Design" />
+          <img src="/images/to.morrow/windows8.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: der Live-Bereich mit Eingabefeld und Live-Schalter" />
+          <img src="/images/to.morrow/windows9.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" />
         </div>
       </div>
 
@@ -3793,8 +3812,8 @@
   </script>
 
   <script>
-    // Phone only: pan the four v1 screens, looping, without taking the finger
-    // away from the reader.
+    // Pan the nine v1 screens at every width, looping, without taking the
+    // finger — or the cursor — away from the reader.
     //
     // The track is a real overflow-x container, so touch scrolling is the
     // browser's own — this only nudges scrollLeft between frames. Two
@@ -3809,7 +3828,6 @@
     (function () {
       var track = document.querySelector('.win-devices-inner');
       if (!track) return;
-      var mq = window.matchMedia('(max-width: 640px)');
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
       var raf = 0, setW = 0, touching = false, cloned = false;
 
@@ -3820,12 +3838,6 @@
           var c = n.cloneNode(true);
           c.setAttribute('aria-hidden', 'true');
           c.setAttribute('alt', '');
-          // The clones exist for the strip only, and they are never removed
-          // once made. Without this, widening past 860px afterwards drops the
-          // row back into its repeat(4, 1fr) grid still holding both sets —
-          // eight visible children, i.e. two rows of duplicates. Reuses the
-          // same class the extra screens carry.
-          c.classList.add('win-phone-only');
           track.appendChild(c);
         });
         cloned = true;
@@ -3889,6 +3901,45 @@
           resume = setTimeout(function () { touching = false; }, 700);
         }, { passive: true });
       });
+      // Mouse drag. A finger scrolls a horizontal overflow container by
+      // itself and a mouse does not, so on desktop the drag has to be built:
+      // pointerdown remembers where the strip was, pointermove writes the
+      // difference straight to scrollLeft. Pointer CAPTURE is what keeps the
+      // drag alive once the cursor leaves the strip — without it, letting go
+      // anywhere else would leave it stuck mid-grab.
+      //
+      // Mouse only. Touch already has native scrolling here, and a second
+      // handler writing scrollLeft underneath it fights the browser's own
+      // momentum. The pause/resume above is shared: it listens on pointerdown,
+      // so a mouse drag suspends the auto-pan exactly like a swipe does, and
+      // step() reads the drag's own speed back out of scrollLeft, so releasing
+      // a throw eases out into the pan instead of stopping dead.
+      var dragging = false, grabX = 0, grabScroll = 0;
+      track.addEventListener('pointerdown', function (e) {
+        if (e.pointerType !== 'mouse' || e.button !== 0) return;
+        dragging = true;
+        grabX = e.clientX; grabScroll = track.scrollLeft;
+        track.classList.add('is-dragging');
+        try { track.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+      track.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        e.preventDefault();
+        track.scrollLeft = grabScroll - (e.clientX - grabX);
+      });
+      ['pointerup', 'pointercancel'].forEach(function (n) {
+        track.addEventListener(n, function (e) {
+          if (!dragging) return;
+          dragging = false;
+          track.classList.remove('is-dragging');
+          try { track.releasePointerCapture(e.pointerId); } catch (_) {}
+        });
+      });
+      // Belt and braces beside -webkit-user-drag: Firefox has no such
+      // property, so without this a slow drag rips the screenshot out as a
+      // native image drag halfway through.
+      track.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
       // Wrap on manual scrolling too, or a flick can run off the end.
       track.addEventListener('scroll', function () {
         if (!setW || !touching) return;
@@ -3897,10 +3948,11 @@
         pos = track.scrollLeft;
       }, { passive: true });
 
-      function sync() { if (mq.matches) start(); else stop(); }
-      sync();
-      window.addEventListener('resize', function () { measure(); sync(); });
-      if (mq.addEventListener) mq.addEventListener('change', sync);
+      // No width gate any more: the strip is the layout at every width, so
+      // the pan is too. stop() survives for prefers-reduced-motion, which
+      // start() already honours.
+      start();
+      window.addEventListener('resize', function () { measure(); });
     })();
   </script>
 
