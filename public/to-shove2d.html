@@ -294,12 +294,13 @@
       display: block;
     }
 
-    /* Phone only. Desktop lays this row out as repeat(4, 1fr) — a fixed four
+    /* Phone only. Above 860px this row is repeat(4, 1fr) — a fixed four
        columns — so a fifth screen doesn't extend the row, it starts a second
-       one. The strip below 640px is a scroll container with no such count, so
-       that is the only width where more than four screens is a longer row
-       rather than a broken grid. Turned back on in the ≤640px block, which is
-       further down the file and therefore wins on source order. */
+       one. At 860px and below the row becomes the panning scroll strip, which
+       has no column count, so that is the only place where more than four
+       screens reads as a longer row rather than a broken grid. Turned back on
+       in the ≤860px block that builds the strip — further down the file, so it
+       wins on source order at equal specificity. */
     .win-devices-inner img.win-phone-only { display: none; }
 
     /* The hero icon's own images; the icon's shadow comes from .app-icon. */
@@ -3819,11 +3820,11 @@
           var c = n.cloneNode(true);
           c.setAttribute('aria-hidden', 'true');
           c.setAttribute('alt', '');
-          // The clones exist for the phone strip only, and they are never
-          // removed once made. Without this, rotating a phone to landscape
-          // (844px — past the 640px strip) drops the row back into its
-          // repeat(4, 1fr) grid with eight visible children, i.e. two rows of
-          // duplicates. Reuses the same class the extra screens carry.
+          // The clones exist for the strip only, and they are never removed
+          // once made. Without this, widening past 860px afterwards drops the
+          // row back into its repeat(4, 1fr) grid still holding both sets —
+          // eight visible children, i.e. two rows of duplicates. Reuses the
+          // same class the extra screens carry.
           c.classList.add('win-phone-only');
           track.appendChild(c);
         });
