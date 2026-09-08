@@ -811,7 +811,6 @@
        order for a screen reader and the stacking order on a phone, where this
        goes back to a flex column. */
     .icons-compare {
-      --push: clamp(8px, 2vw, 30px);
       /* --ic-w is declared on .ic-scrolly (below), not here: .ic-sticky needs
          the same number to size itself, and it is not a descendant of this
          element. It inherits down to here unchanged. */
@@ -820,7 +819,9 @@
       align-items: center;
       justify-items: center;
       column-gap: clamp(16px, 3vw, 56px);
-      row-gap: clamp(28px, 4vw, 64px);
+      /* Tight: the two halves are one comparison, and the clusters' orbits
+         already carry air of their own past the edges of their cells. */
+      row-gap: clamp(10px, 1.4vw, 22px);
       margin-top: clamp(20px, 3vw, 36px);
     }
 
@@ -855,15 +856,37 @@
     .ic-copy {
       --ic-copy-shift: clamp(16px, 3vw, 48px);
       transform: translateX(var(--ic-copy-x, 0px));
-      transition: transform 700ms cubic-bezier(.2, .8, .3, 1);
+      /* Eased at BOTH ends, not the clusters' ease-out: the caption is a block
+         of text, and starting it at full speed is what read as a jerk rather
+         than a glide.
+         The two directions are NOT the same. This is the CLOSING one (a
+         transition uses the properties of the state it is moving into, and the
+         base state is closed): 1300ms on an easeInOutSine, the gentlest S there
+         is, because the return happens while the reader is scrolling away and
+         anything faster reads as a snap. Opening keeps the shorter, firmer
+         curve in the [data-retro] / [data-modern] rule below.
+         LONGHANDS, not the `transition` shorthand: the shorthand resets
+         transition-delay to 0, and the modern caption's 450ms stagger is set
+         further down at lower specificity — it would be silently wiped.
+         will-change promotes it to its own layer, so the travel composites
+         instead of repainting the paragraph every frame while the page is
+         also scrolling; that repaint was the stutter. */
+      transition-property: transform;
+      transition-duration: 1300ms;
+      transition-timing-function: cubic-bezier(.37, 0, .63, 1);
+      will-change: transform;
     }
     /* Toward the cluster: the retro copy's is to its right, the modern one's
        to its left. */
     .ic-copy--retro  { --ic-copy-x: var(--ic-copy-shift); }
     .ic-copy--modern { --ic-copy-x: calc(var(--ic-copy-shift) * -1); }
-    .icons-compare[data-ic="3"] .ic-copy,
-    .icons-compare[data-ic="1"] .ic-copy--retro,
-    .icons-compare[data-ic="2"] .ic-copy--modern { --ic-copy-x: 0px; }
+    .icons-compare[data-retro="1"]  .ic-copy--retro,
+    .icons-compare[data-modern="1"] .ic-copy--modern {
+      --ic-copy-x: 0px;
+      /* Opening: shorter and firmer than the return above. */
+      transition-duration: 900ms;
+      transition-timing-function: cubic-bezier(.65, 0, .35, 1);
+    }
 
 
     /* The side's WIDTH is animated as well as its transform. A scale()
@@ -883,8 +906,15 @@
       height: var(--ic-w);
       display: grid;
       place-items: center;
-      transition: transform 700ms cubic-bezier(.2, .8, .3, 1),
-                  width     700ms cubic-bezier(.2, .8, .3, 1);
+      /* One easing system for the whole block: symmetric in-and-out, never an
+         ease-out. The old cubic-bezier(.2, .8, .3, 1) threw the cluster open at
+         full speed and let it drift into place, which is what read as a bounce.
+         Same two speeds as the captions — this is the CLOSING one (a transition
+         uses the properties of the state it moves into, and the base state is
+         closed); the opening one is in the [data-retro]/[data-modern] rules. */
+      transition-property: transform, width;
+      transition-duration: 1300ms;
+      transition-timing-function: cubic-bezier(.37, 0, .63, 1);
     }
 
     /* Collapsed the icons sit at radius 0, stacked dead centre and scaled
@@ -895,25 +925,13 @@
       display: grid; place-items: center;
       --ic-r: 0px;
       transform: scale(.45);
-      transition: transform 700ms cubic-bezier(.2, .8, .3, 1),
-                  --ic-r   700ms cubic-bezier(.2, .8, .3, 1),
-                  opacity  340ms ease;
+      /* Closing, same curve and duration as the side around it, so the icons
+         and the box they sit in fold as one movement. */
+      transition-property: transform, --ic-r, opacity;
+      transition-duration: 1300ms;
+      transition-timing-function: cubic-bezier(.37, 0, .63, 1);
     }
 
-    /* One after the other, not together — and deliberately OVERLAPPING: the
-       delay is well inside the 700ms the movement itself takes, so the modern
-       half starts while the retro one is still opening. Retro leads because it
-       is the upper row. Applied to the side, its orbit and its caption, so the
-       whole half moves as a unit, and in both directions, so they fold in the
-       order they opened.
-       MUST stay after the two `transition:` shorthands above: this matches
-       `.icons-compare .ic-side` at the same specificity, and a shorthand
-       resets transition-delay to 0 — declared earlier, the side's delay was
-       silently wiped while the orbit's (higher specificity) still worked, so
-       only half the cluster lagged. */
-    .icons-compare .ic-side--right,
-    .icons-compare .ic-side--right .ic-orbitwrap,
-    .icons-compare .ic-copy--modern { transition-delay: 260ms; }
 
     .ic-orbit {
       position: absolute; inset: 0;
@@ -940,24 +958,23 @@
       animation-play-state: paused;
     }
 
-    /* Hover swell. Fast on the way in, slower and softer on the way out,
-       so it eases away rather than snapping back. */
+    /* Hover swell. Fast on the way in, slower on the way out, and both on the
+       same symmetric curve as everything else in this block — the old ease-out
+       pair snapped in and drifted back. */
     .ic-item .sk-round,
     .ic-side .ic-bubble {
-      transition: transform 420ms cubic-bezier(.2, .8, .3, 1);
+      transition: transform 420ms cubic-bezier(.45, 0, .55, 1);
     }
     .ic-item .sk-round:hover,
     .ic-side .ic-bubble:hover {
       transform: scale(1.12);
-      transition: transform 160ms ease-out;
+      transition: transform 200ms cubic-bezier(.45, 0, .55, 1);
     }
 
     /* Collapsed, the cluster is not merely hidden behind the bubble — it
        is not there to be moused over either, or the invisible icons would
        swallow hover and clicks aimed at the label. */
     .ic-orbitwrap { opacity: 0; pointer-events: none; }
-    .icons-compare[data-ic="1"] .ic-side--left  .ic-orbitwrap,
-    .icons-compare[data-ic="2"] .ic-side--right .ic-orbitwrap { opacity: 1; pointer-events: auto; }
 
     /* NOT pinned, at any width (2026-09-07) — same change as the fan below.
        The pin existed because the two sides used to TRADE places partway
@@ -1006,38 +1023,53 @@
       background-color: var(--material);
     }
 
+    /* The two bubbles carry the same pill metrics but two different faces, and
+       the system face sets "modern" 37px wider than W95FA sets "retro" — same
+       box, visibly different pill. The padding absorbs that instead of the
+       height or the type size: 10 against .sk-pill's 17.1, which brings the
+       two within a few px of each other without touching either word. */
+    .ic-side--right .ic-bubble { padding-inline: calc(10px * var(--z)); }
+
     @keyframes ic-orbit   { to { transform: rotate(360deg); } }
     @keyframes ic-counter { to { transform: rotate(-360deg); } }
 
-    /* state 1 — left open, right shoved toward its edge */
-    .icons-compare[data-ic="1"] .ic-side--left  { width: calc(var(--ic-w) * 1.02); }
-    .icons-compare[data-ic="1"] .ic-side--left  .ic-orbitwrap { transform: scale(1); --ic-r: calc(var(--ic-w) * 0.321); }
-    .icons-compare[data-ic="1"] .ic-side--right { transform: translateX(var(--push)); }
-    .icons-compare[data-ic="1"] .ic-side--left  .ic-orbit,
-    .icons-compare[data-ic="1"] .ic-side--left  .ic-item > .ic-spin { animation-play-state: running; }
+    /* OPEN, and the two halves are INDEPENDENT (2026-09-07).
+       Each side carries its own flag — data-retro / data-modern on
+       .icons-compare — set from that side's own position on screen, so modern
+       opens when modern arrives and closes when modern leaves. It used to be
+       one shared state (data-ic 0/1/2/3) with a 450ms transition-delay faking
+       "later" on the modern half, and that coupling is exactly what broke it:
+       a delayed transition that gets its state pulled back before the delay
+       elapses never runs at all, so once the shared close fired early the
+       modern cluster simply skipped its opening. There is no delay left here;
+       the stagger is geometric, because one cluster is 490px below the other.
+       The old states also shoved the closed side sideways with --push, which
+       meant something when the two sat side by side and nothing in the 2x2
+       stagger; that is gone with them. */
+    .icons-compare[data-retro="1"]  .ic-side--left,
+    .icons-compare[data-modern="1"] .ic-side--right {
+      width: calc(var(--ic-w) * 1.02);
+      /* Opening: shorter and firmer than the return, still eased at both
+         ends. Longhands, so nothing here can reset a delay or a property
+         list set elsewhere. */
+      transition-duration: 900ms;
+      transition-timing-function: cubic-bezier(.65, 0, .35, 1);
+    }
 
-    /* state 2 — right open, left collapses back and is shoved the other way */
-    .icons-compare[data-ic="2"] .ic-side--right { width: calc(var(--ic-w) * 1.02); }
-    .icons-compare[data-ic="2"] .ic-side--right .ic-orbitwrap { transform: scale(1); --ic-r: calc(var(--ic-w) * 0.321); }
-    .icons-compare[data-ic="2"] .ic-side--left  { transform: translateX(calc(var(--push) * -1)); }
-    .icons-compare[data-ic="2"] .ic-side--right .ic-orbit,
-    .icons-compare[data-ic="2"] .ic-side--right .ic-item > .ic-spin { animation-play-state: running; }
-
-    /* state 3 — BOTH open, which is what the scroll trigger now uses. States
-       1 and 2 survive as the click states: a label isolates its own side.
-       Nothing is pushed sideways here, because there is no collapsed side
-       left to make room for. This is also why --ic-w is sized for a PAIR
-       (see .ic-scrolly): two open clusters have to fit the column that used
-       to hold one. */
-    .icons-compare[data-ic="3"] .ic-side { width: calc(var(--ic-w) * 1.02); }
-    .icons-compare[data-ic="3"] .ic-orbitwrap {
+    .icons-compare[data-retro="1"]  .ic-side--left  .ic-orbitwrap,
+    .icons-compare[data-modern="1"] .ic-side--right .ic-orbitwrap {
       opacity: 1;
       pointer-events: auto;
       transform: scale(1);
       --ic-r: calc(var(--ic-w) * 0.321);
+      transition-duration: 900ms;
+      transition-timing-function: cubic-bezier(.65, 0, .35, 1);
     }
-    .icons-compare[data-ic="3"] .ic-orbit,
-    .icons-compare[data-ic="3"] .ic-item > .ic-spin { animation-play-state: running; }
+
+    .icons-compare[data-retro="1"]  .ic-side--left  .ic-orbit,
+    .icons-compare[data-retro="1"]  .ic-side--left  .ic-item > .ic-spin,
+    .icons-compare[data-modern="1"] .ic-side--right .ic-orbit,
+    .icons-compare[data-modern="1"] .ic-side--right .ic-item > .ic-spin { animation-play-state: running; }
 
     /* NOT pinned, at any width (2026-09-07). The fan used to be a tall spacer
        with a sticky child, the kaffeemaschine turntable idiom, so that a block
@@ -2202,10 +2234,6 @@
       .ic-copy--retro { order: -1; }
       .ic-side--left  { align-self: flex-start; margin-left: 6%; }
       .ic-side--right { align-self: flex-end;  margin-right: 6%; }
-      /* --push shoves the closed side toward its EDGE, which is a horizontal
-         move that only means anything in the side-by-side layout. Stacked, the
-         offsets above do that job. */
-      .icons-compare[data-ic] .ic-side { transform: none; }
       /* Nothing to size here any more: neither box is pinned, so both take
          their height from the two stacked clusters. */
     }
@@ -2792,7 +2820,7 @@
            sentence above no longer calls this "the" v1 icon set. -->
       <div class="ic-scrolly">
         <div class="ic-sticky">
-      <div class="icons-compare" data-ic="0">
+      <div class="icons-compare" data-retro="0" data-modern="0">
         <div class="ic-side ic-side--left sk retro">
           <div class="ic-orbitwrap"><div class="ic-orbit">
             <span class="ic-item" style="--a: 0deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 12 12" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="2" width="8" height="2"/><rect x="2" y="8" width="8" height="2"/><rect x="2" y="2" width="2" height="8"/><rect x="8" y="2" width="2" height="8"/><rect x="5" y="0" width="2" height="2"/><rect x="5" y="10" width="2" height="2"/><rect x="0" y="5" width="2" height="2"/><rect x="10" y="5" width="2" height="2"/><rect x="1" y="1" width="1" height="1"/><rect x="10" y="1" width="1" height="1"/><rect x="1" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/></svg></span></span></span>
@@ -2855,7 +2883,12 @@
                 <span>Personal</span>
               </button>
             </div>
-            <div class="dna-stage sk" style="--z0: 1.229;">
+            <!-- Same --z0 as the segmented control on its right, so the two
+                 troughs are the same 60px tall. It was 1.229, which matched the
+                 seg's height INCLUDING its outer bevel (.sk-trough__bloom sits
+                 at inset -5.3px * --z, i.e. ~6px proud top and bottom) — that
+                 shading is not the control, so it does not count. -->
+            <div class="dna-stage sk" style="--z0: 1.001;">
               <div class="dna-fieldwrap">
                 <!-- .sk-field__input is not decoration: .sk-trough's fill and
                      lip are ::before/::after, i.e. POSITIONED descendants, so
@@ -2923,19 +2956,21 @@
 
     </div>
 
-    <!-- Closing section: no step badge, per the reflection convention in the
-         stylesheet — it is not a fourth step of the process, it is the look
-         back at it. Text only, so it reads as the page settling down after
-         the colour screens. -->
+    <!-- Closing section. It carries a step badge like the three before it
+         (4, after Problem / App / Design-Prozess) rather than the badgeless
+         reflection treatment the stylesheet describes — per Lucas, the orange
+         circle belongs beside every heading on this page. Text only otherwise,
+         so it reads as the page settling down after the colour screens. -->
     <div class="guide-section">
       <div class="section-heading-row">
         <h2 class="section-title" data-i18n="section-conclusion">Fazit und Ausblick</h2>
+        <span class="step-badge">4</span>
       </div>
       <div class="dot-divider"></div>
 
-      <p class="guide-text media-copy" data-i18n-html="conclusion-1">Rückblickend war die unangenehmste Entscheidung des Projekts die wichtigste: die fertige Windows-95-Oberfläche wegzuwerfen. Sie hat mir beigebracht, den Reiz einer Idee von ihrem Nutzen zu trennen. Eine Oberfläche, die als Screenshot funktioniert, funktioniert noch lange nicht, wenn man morgens um sieben eine Aufgabe um einen Tag verschiebt.</p>
-      <p class="guide-text media-copy" data-i18n-html="conclusion-2">Der Rest der Arbeit war Weglassen. Drei Listen, drei Formen, eine Geste — jede neue Idee musste sich gegen dieselbe Frage behaupten: Ist die App danach schneller zu bedienen, oder kann sie nur mehr? Die meisten haben das nicht überstanden. Was übrig geblieben ist, ist kleiner als geplant, und genau deshalb ist es ein Werkzeug geblieben statt einer Demo.</p>
-      <p class="guide-text media-copy" data-i18n-html="conclusion-3">Weitergehen soll es an zwei Stellen. Zuerst Widgets: Die Heute-Liste gehört auf den Home- und den Sperrbildschirm, damit Abhaken und Verschieben auch ohne geöffnete App möglich sind — die Live Activity ist dafür die halbe Strecke. Danach eine Desktop-Version: dasselbe Datenmodell, dieselben drei Listen, aber mit Tastatur, mehreren Fenstern und Platz für eine Wochenansicht, die auf einem Telefon keinen Sinn ergibt. Beides ist für später gedacht, nicht für die nächste Woche.</p>
+      <p class="guide-text" data-i18n-html="conclusion-1">Rückblickend war die unangenehmste Entscheidung des Projekts die wichtigste: die fertige Windows-95-Oberfläche wegzuwerfen. Sie hat mir beigebracht, den Reiz einer Idee von ihrem Nutzen zu trennen. Eine Oberfläche, die als Screenshot funktioniert, funktioniert noch lange nicht, wenn man morgens um sieben eine Aufgabe um einen Tag verschiebt.</p>
+      <p class="guide-text" data-i18n-html="conclusion-2">Der Rest der Arbeit war Weglassen. Drei Listen, drei Formen, eine Geste — jede neue Idee musste sich gegen dieselbe Frage behaupten: Ist die App danach schneller zu bedienen, oder kann sie nur mehr? Die meisten haben das nicht überstanden. Was übrig geblieben ist, ist kleiner als geplant, und genau deshalb ist es ein Werkzeug geblieben statt einer Demo.</p>
+      <p class="guide-text" data-i18n-html="conclusion-3">Weitergehen soll es an zwei Stellen. Zuerst Widgets: Die Heute-Liste gehört auf den Home- und den Sperrbildschirm, damit Abhaken und Verschieben auch ohne geöffnete App möglich sind — die Live Activity ist dafür die halbe Strecke. Danach eine Desktop-Version: dasselbe Datenmodell, dieselben drei Listen, aber mit Tastatur, mehreren Fenstern und Platz für eine Wochenansicht, die auf einem Telefon keinen Sinn ergibt. Beides ist für später gedacht, nicht für die nächste Woche.</p>
     </div>
 
     <!-- The app is live, so the badge is a real link now. Apple's guidelines
@@ -3326,22 +3361,55 @@
         return r.top < window.innerHeight - r.height * 0.5 && r.top > -r.height * 0.5;
       }
 
-      function update() {
-        if (icons) {
-          // '3' is BOTH clusters open. The block used to be pinned and trade
-          // one side for the other partway through the pin; now it simply
-          // opens both as it comes past and folds them again as it leaves,
-          // so there is no state the reader has to sit still to see.
-          var state = inView(icons) ? '3' : '0';
-          // A click on a label isolates that side ('1'/'2'); clicking it again
-          // goes back to both. Scrolling the block out of the window also
-          // releases the hold, so the reader never has to fight their own
-          // click to get the scroll behaviour back.
-          if (icons.dataset.icLock === '1') {
-            if (state === '0') delete icons.dataset.icLock; else state = icons.dataset.ic;
-          }
-          if (icons.dataset.ic !== state) icons.dataset.ic = state;
+      // The two icon clusters are INDEPENDENT, and each is driven exactly the
+      // way the retro one is: open once IT is half risen from the bottom, fold
+      // once ITS OWN centre reaches the upper third. Neither half reads the
+      // other, and there is no transition-delay left anywhere — the stagger is
+      // geometric, because modern sits ~490px below retro and so reaches every
+      // threshold later.
+      //
+      // This replaced one shared state plus a 450ms delay on the modern half,
+      // and that coupling is what broke the modern opening: the shared close
+      // fired on whichever cluster hit the top third first (always retro), and
+      // a delayed transition whose state is pulled back before the delay
+      // elapses never starts at all.
+      //
+      // Centre, not top edge: a cluster is ~480px tall, so a top-edge test
+      // would fire while it still filled the screen.
+      var retroSide  = icons && icons.querySelector('.ic-side--left');
+      var modernSide = icons && icons.querySelector('.ic-side--right');
+
+      // The window a cluster is open in, expressed on its CENTRE: from the
+      // bottom edge of the viewport up to the top third, i.e. two thirds of the
+      // window tall. OPEN_SPAN widens that by 10% around its own midpoint, so
+      // each end gives 5% — it opens a little before the centre has fully
+      // arrived and folds a little after it would have.
+      var OPEN_SPAN = 1.10;
+      function sideWantsOpen(el) {
+        var r = el.getBoundingClientRect();
+        var centre = r.top + r.height / 2;
+        var mid  = window.innerHeight * (2 / 3);
+        var half = window.innerHeight * (1 / 3) * OPEN_SPAN;
+        return centre < mid + half && centre > mid - half;
+      }
+
+      // A click on a label holds that side in the state it was clicked into;
+      // scrolling that side out of its own window releases the hold, so the
+      // reader never has to fight their own click to get the scroll back.
+      function setSide(el, key, lockKey) {
+        var want = sideWantsOpen(el) ? '1' : '0';
+        if (icons.dataset[lockKey] === '1') {
+          if (want === '0') delete icons.dataset[lockKey];
+          else want = icons.dataset[key];
         }
+        if (icons.dataset[key] !== want) icons.dataset[key] = want;
+      }
+
+      function update() {
+        // Each half decides for itself, from its own box: no shared state and
+        // no delay anywhere. See setSide() above.
+        if (retroSide)  setSide(retroSide,  'retro',  'retroLock');
+        if (modernSide) setSide(modernSide, 'modern', 'modernLock');
 
         if (fanInner) {
           // Same test as the icons: nothing is pinned at any width any more,
@@ -3357,17 +3425,14 @@
         }
       }
 
-      // Click a label to open that side yourself.
+      // Click a label to open or close that side yourself — its own half only,
+      // now that the two are independent.
       if (icons) {
         icons.querySelectorAll('.ic-bubble').forEach(function (b) {
-          var want = b.closest('.ic-side--left') ? '1' : '2';
+          var key = b.closest('.ic-side--left') ? 'retro' : 'modern';
           b.addEventListener('click', function () {
-            // Back to both, not to neither: '0' is the off-screen state and
-            // showing it under the reader's cursor would just look broken.
-            var next = icons.dataset.ic === want ? '3' : want;
-            icons.dataset.ic = next;
-            if (next === '3') delete icons.dataset.icLock;
-            else icons.dataset.icLock = '1';
+            icons.dataset[key] = icons.dataset[key] === '1' ? '0' : '1';
+            icons.dataset[key + 'Lock'] = '1';
           });
         });
       }

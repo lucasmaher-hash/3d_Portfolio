@@ -122,29 +122,48 @@ rearranged, so the half describing the pixel set sits with the pixel set. The ol
 "Links … rechts …" phrasing had to go regardless: this layout puts retro top-right and
 modern bottom-left, so it reads "Oben … darunter …" now.
 
-**`.ic-scrolly` was unpinned the same way, and both icon clusters now open on one trigger**
-(`data-ic="3"`, a state added for this) — **staggered, not simultaneous**: the modern half
-(side + orbit + caption) carries `transition-delay: 260ms`, well inside the 700ms the
-movement takes, so it starts while the retro half is still opening and the two are open
-together. **That delay rule must stay after the `transition:` shorthands on
-`.icons-compare .ic-side` and `.ic-orbitwrap`** — it matches the side at equal specificity,
-and a shorthand resets `transition-delay` to 0, so declared earlier only the orbit (higher
-specificity) lagged and the side's width opened on time: half a cluster in step, half of it
-late. Each **caption also sits inboard while closed** (`--ic-copy-shift`, `translateX`
-toward its own cluster, ~48px at 1440) and travels back out to its docked position as the
-cluster opens, so the open state is the designed layout and the closed one is the offset.
-Zeroed below 640px, where the caption is under its cluster rather than beside it. It used to be pinned precisely because the two
-sides *traded* places partway through the pin, and a swap needs the page held still or it
-slides off the top mid-swap — with both open there is no swap left to protect. States `1`
-and `2` survive as the CLICK states: a label isolates its own side, clicking it again
-returns to `3` (never to `0` — that is the off-screen state and showing it under the
-reader's cursor looks broken), and `icLock` still hands control back to scroll once the
-block leaves the window. **`--ic-w` is now sized for a PAIR** — `clamp(240px, 42vw, 538px)`
-instead of `51.5vw` — because two open clusters have to fit the column that used to hold
-one; the 538px cap is unchanged, so 1440 looks exactly as it did and only narrower windows
-scale down. Verified 1440/1200/1024/900/861/390: opens and closes in both directions, no
-horizontal overflow at any of them, and below 640px the pair stacks (that column layout
-predates this change).
+**Each icon cluster is driven INDEPENDENTLY, by its own box** (2026-09-08). `.icons-compare`
+carries two flags, `data-retro` and `data-modern`, and each is set from that side's own
+geometry by one rule — the same rule for both, in `sideWantsOpen()`: **open while the
+cluster's CENTRE is inside a window running from the bottom of the viewport up to the top
+third**, i.e. two thirds of the window tall, widened 10% around its own midpoint by
+`OPEN_SPAN = 1.10` (so 5% at each end). Centre, not top edge: a cluster is ~480px tall, so a
+top-edge test fires while it still fills the screen. The stagger between the two is
+**geometric** — modern sits ~490px below retro and so reaches every threshold later — and
+there is no `transition-delay` anywhere.
+
+**That replaced a shared state (`data-ic` 0/1/2/3) plus a 450ms delay on the modern half,
+and the coupling is what broke it:** the shared close fired on whichever cluster hit the top
+third first (always retro, being above), and **a delayed transition whose state is pulled
+back before the delay elapses never starts at all** — so the modern cluster silently skipped
+its opening. If a stagger is ever wanted again, offset the *trigger*, not the transition.
+Gone with it: the `--push` sideways shove of the closed side (meaningful side by side,
+meaningless in the 2x2 stagger). Clicking a label toggles **its own half only** and locks it
+until that side scrolls out of its own window (`retroLock` / `modernLock`).
+
+**One easing system for the whole block, symmetric in and out, no ease-out anywhere.** The
+sides, their orbits and their captions all run **900ms `cubic-bezier(.65, 0, .35, 1)`
+opening** and **1300ms `cubic-bezier(.37, 0, .63, 1)` closing** (an easeInOutSine — the
+return happens while the reader is already scrolling away, and at the opening's speed it
+read as a snap). The hover swell on the icons and the labels moved to the same family. The
+old `cubic-bezier(.2, .8, .3, 1)` threw everything open at full speed and let it drift into
+place, which is what read as a bounce. **A transition uses the properties of the state it
+moves INTO**, so the slow pair lives on the base (closed) rules and the fast pair in the
+`[data-retro]` / `[data-modern]` rules — and both are set with **longhands**
+(`transition-duration` / `-timing-function`), never the `transition` shorthand, which resets
+`transition-delay` and the property list from higher specificity.
+
+Each **caption also sits inboard while closed** (`--ic-copy-shift`, `translateX` toward its
+own cluster, ~48px at 1440) and travels back out to its docked position as the cluster
+opens, so the open state is the designed layout and the closed one is the offset. Zeroed
+below 640px, where the caption is under its cluster rather than beside it. It carries
+`will-change: transform`: without that layer promotion the paragraph repainted every frame
+while the page was also scrolling, which was the stutter.
+
+**`--ic-w` is `clamp(240px, 34vw, 470px)`** — sized against one grid cell of the 2x2, not
+against a side-by-side pair. Verified over CDP at 1440 and 390: each half opens and closes on
+its own centre, both are open together through the overlap, the click toggles each half
+alone, and no horizontal overflow at either width.
 
 **The fan's geometry is data, not code.** Each card is a `<span class="color-slot">` (holds
 the fan transform) wrapping an `<img class="color-card">` (holds the idle sway) — two
@@ -240,7 +259,10 @@ carry TWO variables: `--z0` is the authored size (inline, per stage) and `--z` i
 SkeuKit metrics read (`calc(var(--z0) * 1.18)` in the row layout, plain `var(--z0)` again
 below 640px, where the stack is vertical and each demo already has the column to itself).
 Gap between the three is `clamp(8px, 1.1vw, 16px)` — it was wider than the gaps inside the
-controls before. `.dna-row`
+controls before. The middle demo's `--z0` is **1.001, the same as the segmented control on
+its right**, so both troughs are 60px: at 1.229 it matched the seg's height *including*
+`.sk-trough__bloom`, the outer bevel that sits ~6px proud top and bottom — shading, not
+control, so it does not count. `.dna-row`
 had to be **removed from the ≤860px rule** that flips the
 stagger rows back to `flex-direction: row` — it is a column at every width now. Below 640px
 the demos go back to a vertical stack (three across a phone column would be ~100px each),
@@ -251,9 +273,11 @@ widths have something to size against; with `auto` the chain is circular and the
 silently collapse.
 
 **A closing "Fazit und Ausblick" section** sits between the colour screens and the App Store
-badge (2026-09-07): three paragraphs, `section-conclusion` / `conclusion-1..3` in
-`TRANSLATIONS`, **no step badge** — it is the look back at the process, not a fourth step of
-it, which is the reflection convention the stylesheet already describes. The copy is a first
+badge (2026-09-07): three paragraphs at the section's own full width (**no `.media-copy`** —
+they line up with the heading and its divider rather than being inset 84.5%),
+`section-conclusion` / `conclusion-1..3` in `TRANSLATIONS`, and **step badge 4** (after
+Problem / App / Design-Prozess). It went in badgeless first, on the stylesheet's reflection
+convention; per Lucas the orange circle belongs beside every heading on this page. The copy is a first
 draft written to Lucas's brief (reflection on the pivot and on cutting scope, then widgets
 first and a desktop version after) and is his to rewrite.
 
