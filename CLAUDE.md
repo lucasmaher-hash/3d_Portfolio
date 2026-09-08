@@ -405,6 +405,26 @@ rejects if the element is paused again before the promise settles (scrolling qui
 hence the empty catch.
 
 
+**Mobile can have its own, shorter copy: a `'<key>@m'` twin (2026-09-08).** `applyLang` on
+this page runs every key through `pick()`, which prefers `key + '@m'` below 640px and falls
+back to the desktop value when there is no twin — so adding one is a single line and most
+keys have none. Two variants for forty characters is not worth keeping in sync; only the
+eight longest blocks carry one (`glance-lead`, `problem-2`, `f1-text`, `f2b-text`, `f3-text`,
+`pivot-1`, `dna-forms`, `conclusion-4`), in both languages. **The `matchMedia` listener that
+re-applies on a breakpoint change is load-bearing** — without it a rotated phone keeps the
+variant it loaded with until the language is switched. This is the only page with the
+mechanism; the other five have the plain two-line `applyLang`.
+
+**All copy was rewritten 2026-09-08 to Lucas's brief.** Voice is "ich" for decisions and "du"
+for what the app does; blocks run 174–345 characters (they were 201–515). `<b class="kw">`
+keywords are used like every other page — and note what that actually does: **`b.kw` is inert
+on desktop** (`font-weight: inherit; color: inherit`) and only turns to darker grey ink
+`#4a4a52` below 640px, so it is a mobile skim aid, not a visible desktop highlight.
+`.glance-lead` deliberately carries none, on every page. Two structural changes came with the
+rewrite: `pivot-3` (cutting Windows 95 for SkeuKit, so the TestFlight paragraph can stand on
+its own) and `conclusion-4` (the outlook, so the three learnings each get a paragraph). The
+old `problem-3` "n=1" disclaimer is gone — the honesty moved to the TestFlight paragraph.
+
 **Two small mobile rules that are easy to lose:** `.centered-note` (the "Verschieben statt
 verwalten" block) is `text-align: left` below 640px — centred text under a left-docked
 heading has no edge to line up with in a 350px column — and on `2D.html` the to.morrow tile
