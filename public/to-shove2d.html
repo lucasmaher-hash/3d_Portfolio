@@ -2788,7 +2788,18 @@
       .dna-stack .dna-stage { --z: var(--z0, 1); }
       .dna-fieldwrap { width: 100%; }
       .dna-seg { width: 100%; }
-      .dna-ws  { --ws-pad-x: 7px; --ws-gap: 5px; }
+      /* A bigger FRAME on a phone, same type (2026-09-09). The pill was the
+         one control in the row that read as undersized: 35px tall against the
+         two troughs' 51px, because its --h is 46 against their 51 AND it
+         carries the smaller authored --z (0.764 vs 1.001). Height and padding
+         are the only dials touched — --z is deliberately not, since the label
+         and the mark are both sized from it and the type must not grow.
+         The middle stage is flex: 1 1 0 like the other two, so this grows
+         into its own share of the row; at 390 the pill lands at ~85px inside
+         a 112.7px stage. --ws-pad-x went 7 -> 16 rather than the gap doing
+         the work: the gap sits between the mark and the word, and widening
+         that pulls the pair apart instead of adding air around it. */
+      .dna-ws  { --h: 60; --ws-pad-x: 16px; --ws-gap: 6px; }
       .dna-seg { --seg-pad: 3px; }
       .dna-seg .sk-seg__opt { --opt-pad-x: 1px; }
       .dna-seg__long  { display: none; }
