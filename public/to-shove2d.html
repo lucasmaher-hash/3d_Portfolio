@@ -2601,6 +2601,34 @@
       font-size: calc(19.7px * var(--z) * var(--fs));
       line-height: 1;
     }
+
+    /* Both labels sit in ONE grid cell, and the state only cross-fades between
+       them (2026-09-09). Swapping textContent instead would change the pill's
+       width — and the pill is a content-sized flex item whose stage is
+       `flex: 0 0 auto`, so the two troughs either side would re-flex every
+       time it toggled. Stacked, the box is as wide as the LONGER of the two
+       and nothing in the row can move. */
+    .dna-ws__label { display: grid; }
+    .dna-ws__label > span {
+      grid-area: 1 / 1;
+      text-align: center;
+      transition: opacity 160ms ease;
+    }
+    .dna-ws__on { opacity: 0; }
+    .dna-ws[data-onair="true"] .dna-ws__off { opacity: 0; }
+    .dna-ws[data-onair="true"] .dna-ws__on  { opacity: 1; }
+
+    /* The breath is the state — the same motion .live__mark uses further up
+       (slow, shallow, growing and becoming visible as one motion), just on
+       currentColor rather than the registered --core, since this mark takes
+       both its ring and its core from the pill's ink. */
+    @keyframes dna-breathe {
+      from { opacity: .28; transform: scale(.88); }
+      to   { opacity: 1;   transform: scale(1.08); }
+    }
+    .dna-ws[data-onair="true"] .dna-ws__mark {
+      animation: dna-breathe 1s ease-in-out infinite alternate;
+    }
     /* Side by side, each demo is centred in its own third — the shared left
        edge that made them line up as a column is meaningless in a row. */
     .dna-stack .dna-stage { justify-items: center; }
@@ -2709,9 +2737,20 @@
        landing is what gives the journey an end */
     .dna-segpill.is-landing { scale: 1.055; }
     .sk-seg__opt > span { position: relative; z-index: 1; }
+    /* The short pair is the phone's; see the markup comment. */
+    .dna-seg__short { display: none; }
 
     @media (prefers-reduced-motion: reduce) {
       .dna-caret { animation: none; }
+      /* Same rule as .live__mark's: the breath is the only thing saying the
+         switch is on air, so with motion off the mark settles at the large,
+         fully-opaque end — never the faint one. (The demo loop never starts
+         under reduced motion, so this only matters if it is turned on while
+         the button happens to be on air.) */
+      .dna-ws[data-onair="true"] .dna-ws__mark {
+        animation: none; opacity: 1; transform: scale(1.08);
+      }
+      .dna-ws__label > span { transition: none; }
       .sk-press { transition: none; }
       .sk-press.is-pressed { transform: none; }
       .dna-segpill { transition: none; }
@@ -2752,6 +2791,8 @@
       .dna-ws  { --ws-pad-x: 7px; --ws-gap: 5px; }
       .dna-seg { --seg-pad: 3px; }
       .dna-seg .sk-seg__opt { --opt-pad-x: 1px; }
+      .dna-seg__long  { display: none; }
+      .dna-seg__short { display: inline; }
 
       /* The demos-between-the-paragraphs order lives in the base rules now
          (it applies at every width) — nothing to restate here. */
@@ -3117,7 +3158,7 @@
             </div>
             <div class="dna-stage sk" style="--z0: 0.764;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
-                <span class="dna-ws__mark"></span><span>Off air</span>
+                <span class="dna-ws__mark"></span><span class="dna-ws__label"><span class="dna-ws__off">Off air</span><span class="dna-ws__on">On air</span></span>
               </button>
             </div>
             <div class="dna-stage sk" style="--z0: 1.001;">
@@ -3127,8 +3168,14 @@
                      nothing around it — see .sk-trough__bloom. -->
                 <span class="sk-trough__bloom"></span>
                 <span class="dna-segpill sk-glass" style="--i: 0"></span>
-                <span class="sk-seg__opt is-on"><span>Heute</span></span>
-                <span class="sk-seg__opt"><span>Morgen</span></span>
+                <!-- Two labels per option, one shown at a time (2026-09-09):
+                     the phone row fits all three demos across ~350px, and
+                     "Heute"/"Morgen" are the longest strings in it. Below
+                     640px each option falls back to On/Off, which buys the
+                     segmented trough its width back. Markup rather than a
+                     JS text swap so there is nothing to re-run on resize. -->
+                <span class="sk-seg__opt is-on"><span class="dna-seg__long">Heute</span><span class="dna-seg__short">On</span></span>
+                <span class="sk-seg__opt"><span class="dna-seg__long">Morgen</span><span class="dna-seg__short">Off</span></span>
               </div>
             </div>
           </div>
@@ -4328,10 +4375,21 @@
 
       var timers = [];
 
+      // The press TOGGLES the switch: off air -> on air -> off air, label and
+      // breath together, because that is what this control does in the app
+      // (see f1b-text). The state flips at the press itself, not when the
+      // bulge settles, so the label changes on the same frame the button
+      // moves. On air dwells LONGER than off: the breath is a 1s alternate,
+      // and under ~3s it reads as a blink rather than as breathing.
+      var onAir = false;
+      var lipTimer = null;
       function pressLip() {
         if (!lip) return;
         lip.classList.add('is-pressed');
         timers.push(setTimeout(function () { lip.classList.remove('is-pressed'); }, 260));
+        onAir = !onAir;
+        lip.dataset.onair = onAir ? 'true' : 'false';
+        lipTimer = setTimeout(pressLip, onAir ? 3600 : 2200);
       }
 
       function stepType() {
@@ -4372,7 +4430,7 @@
       function start() {
         if (running || reduce.matches) return;
         running = true;
-        timers.push(setInterval(pressLip, 2600));
+        lipTimer = setTimeout(pressLip, 2600);
         timers.push(setInterval(stepSeg, 2050));
         typeLoop();
       }
@@ -4382,7 +4440,10 @@
         for (var i = 0; i < timers.length; i++) { clearTimeout(timers[i]); clearInterval(timers[i]); }
         timers = [];
         clearTimeout(typeTimer);
-        if (lip) lip.classList.remove('is-pressed');
+        clearTimeout(lipTimer);
+        // Back to off air: a CSS animation would otherwise keep breathing off
+        // screen, which is the work this whole observer exists to avoid.
+        if (lip) { lip.classList.remove('is-pressed'); lip.dataset.onair = 'false'; onAir = false; }
         if (pill) pill.classList.remove('is-landing');
       }
 
