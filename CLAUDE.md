@@ -97,9 +97,10 @@ JS errors, overlay removed) and in a Node simulation with a stubbed canvas (384�
 store at dpr 2, zero draws while layout was blocked, amplitude breathing across a 3.7–20.8px
 range at 192px, the two layers separated in every sample).
 
-**A spring-surface version (fluid.js, MIT) was built first and rejected on the look.** It is in
-git history, one commit back. **The original CSS loader: `git checkout loader-css-v1 --
-public/2D.html`.**
+**Two abandoned versions, both only in git history now:** the original CSS one (a div whose
+height was the fill, with the wave faked by a rotating rounded square — one rigid shape, so one
+repeating crest) is reachable with `git checkout loader-css-v1 -- public/2D.html`, and a
+spring-surface version (fluid.js, MIT) sat between the two and was rejected on the look.
 
 **Navigation:**
 - Every 2D page embeds nav as a fixed iframe (`#top-bar` → `/top_row_permanent_V3.html`)

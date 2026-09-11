@@ -984,15 +984,10 @@
       box-shadow: var(--shadow-pressed);
       overflow: hidden;
     }
-    /* The liquid is a <canvas> now (2026-09-11) — see the script in <body>.
-       It used to be a plain div whose height was the fill level, with the wave
-       surface faked by a big rotating rounded square (#load-liquid::before,
-       @keyframes loadWave + loadBobA). That is one RIGID shape: it has a single
-       crest profile that comes round again every revolution, and no amount of
-       extra keyframes gives it travelling ripples or a surface that settles.
-       All of it is gone — the canvas draws a real spring surface instead.
-       The circle's own overflow: hidden + border-radius clip the canvas, so the
-       renderer never has to think about the round shape. */
+    /* The liquid is a <canvas> (2026-09-11) — the surface is drawn by the
+       script in <body>, not by CSS. The circle's own overflow: hidden and
+       border-radius clip it, so the renderer never has to think about the
+       round shape. */
     #load-liquid {
       position: absolute;
       inset: 0;
@@ -1065,11 +1060,8 @@
        which already has the neumorphic pressed shell and the VT323 counter as
        real DOM above it — so this draws the fluid alone, into the circle that
        is already there, and every pixel constant is derived from the ball's
-       measured size instead.
-
-       A spring-surface version (fluid.js, MIT) was built here first and
-       rejected on the look; `git checkout loader-css-v1 -- public/2D.html`
-       still reaches the original CSS one. */
+       measured size instead. Its rising bubbles were built and then dropped:
+       the surface is the whole effect here. */
     (function () {
       var overlay = document.getElementById('load-overlay');
       var seen = false;
