@@ -1054,8 +1054,8 @@
        breathing (`amplitude = max * sin(angle)`), so the crests grow and
        flatten as they travel rather than marching past at a fixed height.
 
-       The model, the layer fields and the bubble behaviour are taken from
-       js-fluid-meter by Angel Arcoraci (MIT) —
+       The model and the layer fields are taken from js-fluid-meter by Angel
+       Arcoraci (MIT) —
        https://github.com/aarcoraci/javascript-fluid-meter — which is written
        for exactly this shape: a percentage as liquid in a circle.
 
@@ -1101,7 +1101,6 @@
       //                                             ^ deliberately NOT 100:
       // equal angular speeds make both layers reach their flat moment together
       // and the whole surface goes still for an instant, once a cycle.
-      var bubbles = [], BUBBLE_N = 9, bubbleR = 0, bubbleV = 0;
 
       var W = 0, H = 0, dpr = 1;
 
@@ -1132,23 +1131,11 @@
         back.maxAmp  = H * 0.042; back.freq  = H * 0.190; back.speed  =  H * 0.78;
         //                                                              ^ the
         // signs are opposite on purpose — that is the whole mechanism.
-        bubbleR = Math.max(0.8, H * 0.011);
-        bubbleV = H * 0.13;
-        for (var i = 0; i < BUBBLE_N; i++) if (!bubbles[i]) bubbles[i] = spawn({});
         return true;
       }
       resize();
       if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
       else window.addEventListener('resize', resize);
-
-      function spawn(b) {
-        b.x = Math.random() * W;
-        b.y = H;                                  // starts at the floor and rises
-        b.r = bubbleR * (0.6 + Math.random() * 0.9);
-        b.v = bubbleV * (0.6 + Math.random() * 0.8);
-        b.sw = Math.random() * Math.PI * 2;       // its own phase, so a row of
-        return b;                                 // them never drifts in step
-      }
 
       // y of a layer's surface at x. `amplitude` is itself a sine of the
       // layer's angle, so the wave breathes between full and flat instead of
@@ -1189,26 +1176,6 @@
 
         ctx.fillStyle = back.fill;  layerPath(back);  ctx.fill();
         ctx.fillStyle = front.fill; layerPath(front); ctx.fill();
-
-        // Bubbles live INSIDE the front layer: clipping to that same path is
-        // what stops one popping out above the surface into the empty ball.
-        ctx.save();
-        layerPath(front);
-        ctx.clip();
-        ctx.lineWidth = Math.max(0.7, H * 0.006);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
-        for (var i = 0; i < BUBBLE_N; i++) {
-          var b = bubbles[i];
-          if (!b) continue;
-          b.y -= b.v * dt;
-          b.sw += dt * 2.2;
-          b.x += Math.cos(b.sw) * H * 0.06 * dt;   // a slight sway, not a drift
-          if (b.y + b.r < surfaceY(front, b.x)) spawn(b);   // reached the top
-          ctx.beginPath();
-          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-        ctx.restore();
       }
 
       var MIN_DURATION = 3000;  // the fill always takes this long — there is no

@@ -63,8 +63,9 @@ a circle. Two sine surfaces travel in **opposite directions** at different ampli
 and frequencies, one drawn over the other; neither is liquid alone, what reads as liquid is
 where they cross, because that meeting point never repeats. Each layer's amplitude is itself a
 sine of its own angle (`amp = maxAmp * sin(angle)`), so crests grow and flatten as they travel
-instead of marching past at a fixed height. Bubbles rise inside, clipped to the front layer's
-path so none pops out above the surface.
+instead of marching past at a fixed height. **The library's rising bubbles were built and then
+removed at Lucas's request (2026-09-11)** — the surface is the whole effect here; with them
+gone the draw is two fills and nothing else, no clip and no strokes.
 
 **What is deliberately NOT taken from it:** it draws its own circle, ring border, background
 disc and percentage text, and hard-codes every pixel around a 300px meter. This ball already
