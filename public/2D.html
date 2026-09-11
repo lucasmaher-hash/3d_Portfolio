@@ -1047,24 +1047,29 @@
   </div>
   <script>
     /* ── The loader's liquid ───────────────────────────────────────────────
-       The surface is a row of SPRINGS, not a shape. Each one is pulled toward
-       its rest height and bleeds velocity into its neighbours every step, so a
-       disturbance anywhere travels outward as a real ripple and then settles.
-       That is the whole reason this replaced the rotating rounded square: a
-       single rigid shape can only ever repeat one crest.
+       TWO sine surfaces travelling in OPPOSITE directions at different
+       amplitudes and speeds, one drawn over the other. Neither is liquid by
+       itself; what reads as liquid is the two crossing, because the place
+       where they meet never repeats — each layer's own amplitude is also
+       breathing (`amplitude = max * sin(angle)`), so the crests grow and
+       flatten as they travel rather than marching past at a fixed height.
 
-       FluidPhysics and the WATER preset below are vendored verbatim from
-       fluid.js by wrksp8 (MIT) — https://github.com/wrksp8/fluid.js — chosen
-       because it is the spring-column model, zero-dependency and ~100 lines.
-       Its own renderer is NOT used: that one sizes its canvas to
-       window.innerWidth/innerHeight and measures the fill from the canvas
-       CENTRE, both of which assume a full-screen background rather than a
-       192px ball, and it has no way to stop its rAF loop once the loader is
-       gone. The renderer here is ours; only the solver is theirs.
+       The model, the layer fields and the bubble behaviour are taken from
+       js-fluid-meter by Angel Arcoraci (MIT) —
+       https://github.com/aarcoraci/javascript-fluid-meter — which is written
+       for exactly this shape: a percentage as liquid in a circle.
 
-       The tilt half of the model (liquidAngle / centrifugal / wallClimb) is
-       inert here — nothing rotates a loading screen — so the life comes from
-       `ambientWave` plus the splashes this file injects. */
+       What is NOT taken from it: it draws its own circle, its own ring border,
+       its own background disc and its own percentage text, and it hard-codes
+       everything in pixels around a 300px meter. None of that suits this ball,
+       which already has the neumorphic pressed shell and the VT323 counter as
+       real DOM above it — so this draws the fluid alone, into the circle that
+       is already there, and every pixel constant is derived from the ball's
+       measured size instead.
+
+       A spring-surface version (fluid.js, MIT) was built here first and
+       rejected on the look; `git checkout loader-css-v1 -- public/2D.html`
+       still reaches the original CSS one. */
     (function () {
       var overlay = document.getElementById('load-overlay');
       var seen = false;
@@ -1080,92 +1085,24 @@
       var ctx    = canvas.getContext('2d');
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // ── vendored solver (fluid.js, MIT) ──────────────────────────────────
-      // Tuned for a ~192px ball, not a viewport: `ambientWave` is a PIXEL
-      // amplitude in the original, where 10px is a ripple on a 900px-tall
-      // screen. Here the whole ball is 192px, so it is expressed as a fraction
-      // of the ball's radius further down and passed in already scaled.
-      var CONF = {
-        tension:   0.014,  // surface stiffness — lower = more waves
-        dampening: 0.020,  // friction — lower = waves last longer
-        spread:    0.22,   // how fast a ripple travels along the surface
-        inertia:   0.96,
-        wallClimb: 2.5,
-        splashFactor: 0.8,
-        ambientWave: 1,    // set for real in resize(), from the ball's size
-        waveSpeed: 0.055,
-        fillEase: 0.13     // how fast the level chases its target (see update())
-      };
+      var ORANGE = '#FF5C00';
+      // The back layer is the SAME orange at part opacity, not a second
+      // colour: two hues in a 192px ball reads as a graphic, and the point of
+      // the layer is to be glimpsed through the front one where the two
+      // surfaces cross.
+      var ORANGE_BACK = 'rgba(255, 92, 0, 0.42)';
 
-      function FluidPhysics(config) {
-        this.conf = config;
-        this.fillPct = 0;
-        this.currentFill = 0;
-        this.liquidAngle = 0;
-        this.liquidVelocity = 0;
-        this.lastVelocity = 0;
-        this.time = 0;
-        this.springs = [];
-        this.numSprings = 60;
-        for (var i = 0; i < this.numSprings; i++) this.springs.push({ p: 0, v: 0 });
-      }
-      FluidPhysics.prototype.update = function (targetAngle, _acc, dt) {
-        dt = dt === undefined ? 1 : dt;
-        this.time += this.conf.waveSpeed * dt;
+      // Every one of these is a fraction of the ball, not a pixel count. The
+      // library's own numbers (maxAmplitude 12, frequency 30, speed ±150) are
+      // authored against a 300px meter; this circle is min(27.6vw, 27.6vh,
+      // 192px) and smaller still on a phone, so they are resolved in resize().
+      var front = { fill: ORANGE,      angle: 0, x: 0, angularSpeed: 100, maxAmp: 0, freq: 0, speed: 0, top: 0, ampScale: 0 };
+      var back  = { fill: ORANGE_BACK, angle: 0, x: 0, angularSpeed:  73, maxAmp: 0, freq: 0, speed: 0, top: 0, ampScale: 0 };
+      //                                             ^ deliberately NOT 100:
+      // equal angular speeds make both layers reach their flat moment together
+      // and the whole surface goes still for an instant, once a cycle.
+      var bubbles = [], BUBBLE_N = 9, bubbleR = 0, bubbleV = 0;
 
-        // The one edit to the vendored solver: this rate was a hard 0.05.
-        // It is the level's own lag behind the target — good, it is half of
-        // why the fill reads as liquid rather than as a bar — but at 0.05 the
-        // settle added ~1.5s and the 3s loader ran 4.5s. Exposed as config.
-        this.currentFill += (this.fillPct - this.currentFill) * this.conf.fillEase;
-
-        var diff = targetAngle - this.liquidAngle;
-        while (diff >  Math.PI) diff -= Math.PI * 2;
-        while (diff < -Math.PI) diff += Math.PI * 2;
-        this.liquidVelocity += diff * 0.005;
-        this.liquidVelocity *= this.conf.inertia;
-        this.liquidVelocity = Math.max(Math.min(this.liquidVelocity, 0.5), -0.5);
-        this.liquidAngle += this.liquidVelocity;
-
-        var centrifugal = Math.max(Math.min(this.liquidVelocity * this.conf.wallClimb * 100, 50), -50);
-        var velocityChange = this.liquidVelocity - this.lastVelocity;
-        var jerk = Math.max(Math.min(velocityChange * this.conf.splashFactor * 300, 50), -50);
-        this.lastVelocity = this.liquidVelocity;
-
-        for (var i = 0; i < this.numSprings; i++) {
-          var spring = this.springs[i];
-          var ratio = (i / (this.numSprings - 1)) * 2 - 1;
-          spring.v += (ratio * centrifugal + ratio * jerk) * 0.02;
-          var targetP = Math.sin(this.time + i * 0.2) * this.conf.ambientWave;
-          var accel = -this.conf.tension * (spring.p - targetP) - this.conf.dampening * spring.v;
-          spring.v += accel;
-          spring.p += spring.v;
-        }
-        this.spreadWaves();
-      };
-      FluidPhysics.prototype.spreadWaves = function () {
-        var n = this.numSprings, left = new Array(n), right = new Array(n), i, j;
-        for (j = 0; j < 8; j++) {
-          for (i = 0; i < n; i++) {
-            if (i > 0)     { left[i]  = this.conf.spread * (this.springs[i].p - this.springs[i - 1].p); this.springs[i - 1].v += left[i]; }
-            if (i < n - 1) { right[i] = this.conf.spread * (this.springs[i].p - this.springs[i + 1].p); this.springs[i + 1].v += right[i]; }
-          }
-          for (i = 0; i < n; i++) {
-            if (i > 0)     this.springs[i - 1].p += left[i];
-            if (i < n - 1) this.springs[i + 1].p += right[i];
-          }
-        }
-      };
-      FluidPhysics.prototype.splash = function (force, at) {
-        // Math.floor on BOTH branches: a caller passing a computed position
-        // hands over a float, and springs[43.7] is undefined, not springs[43].
-        var i = at === undefined ? Math.random() * this.numSprings : at;
-        i = Math.max(0, Math.min(this.numSprings - 1, Math.floor(i)));
-        this.springs[i].v += force;
-      };
-      // ── end vendored solver ──────────────────────────────────────────────
-
-      var phys = new FluidPhysics(CONF);
       var W = 0, H = 0, dpr = 1;
 
       // The canvas backing store is sized in DEVICE pixels and the context is
@@ -1190,100 +1127,122 @@
         canvas.width  = Math.round(W * dpr);
         canvas.height = Math.round(H * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        // ~2.2% of the ball: enough to read as moving water at 192px, and it
-        // scales with the clamp()ed circle instead of being a fixed pixel count.
-        CONF.ambientWave = Math.max(1.4, H * 0.022);
+
+        front.maxAmp = H * 0.055; front.freq = H * 0.155; front.speed = -H * 0.62;
+        back.maxAmp  = H * 0.042; back.freq  = H * 0.190; back.speed  =  H * 0.78;
+        //                                                              ^ the
+        // signs are opposite on purpose — that is the whole mechanism.
+        bubbleR = Math.max(0.8, H * 0.011);
+        bubbleV = H * 0.13;
+        for (var i = 0; i < BUBBLE_N; i++) if (!bubbles[i]) bubbles[i] = spawn({});
         return true;
       }
       resize();
       if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
       else window.addEventListener('resize', resize);
 
-      var MIN_DURATION = 3000;  // the fill always takes this long — there is no
-                                // byte-progress to track here, unlike the old
-                                // GLB-driven loader this animation came from
-      var shown = 0, t0 = performance.now(), raf = 0, acc = 0, last = t0;
-      var STEP = 1000 / 60;     // the solver is written per-frame, so it is
-                                // driven at a FIXED 60Hz and the real frame
-                                // time only decides how many steps to run —
-                                // otherwise a 120Hz display runs it twice as
-                                // fast and a stutter throws a wave across it.
-      var nextBlip = 700;       // a gentle stray ripple now and then, so a
-                                // finished fill never sits perfectly regular
+      function spawn(b) {
+        b.x = Math.random() * W;
+        b.y = H;                                  // starts at the floor and rises
+        b.r = bubbleR * (0.6 + Math.random() * 0.9);
+        b.v = bubbleV * (0.6 + Math.random() * 0.8);
+        b.sw = Math.random() * Math.PI * 2;       // its own phase, so a row of
+        return b;                                 // them never drifts in step
+      }
 
-      function draw() {
-        if (!W) return;
-        ctx.clearRect(0, 0, W, H);
-        var surface = H - phys.currentFill * H;
-        var n = phys.numSprings;
-        var step = W / (n - 1);
+      // y of a layer's surface at x. `amplitude` is itself a sine of the
+      // layer's angle, so the wave breathes between full and flat instead of
+      // running at one height.
+      function surfaceY(layer, x) {
+        var amp = layer.maxAmp * layer.ampScale * Math.sin(layer.angle * Math.PI / 180);
+        return layer.top + amp * Math.sin((x + layer.x) / layer.freq);
+      }
+
+      function layerPath(layer) {
         ctx.beginPath();
-        ctx.moveTo(0, surface + phys.springs[0].p);
-        for (var i = 1; i < n; i++) ctx.lineTo(i * step, surface + phys.springs[i].p);
+        ctx.moveTo(0, surfaceY(layer, 0));
+        for (var x = 1; x <= W; x++) ctx.lineTo(x, surfaceY(layer, x));
         ctx.lineTo(W, H);
         ctx.lineTo(0, H);
         ctx.closePath();
-        ctx.fillStyle = '#FF5C00';
-        ctx.fill();
       }
+
+      function step(layer, dt, level) {
+        layer.angle += layer.angularSpeed * dt;
+        if (layer.angle > 360) layer.angle -= 360;
+        layer.x += layer.speed * dt;
+        layer.top = H - level * H;
+        // The wave grows IN over the first few percent. At full amplitude a
+        // trough on a nearly-empty ball dips below the floor, and the fill
+        // polygon then has nothing to enclose there — a notch of bare ball at
+        // the very bottom. A shallow puddle not carrying a big wave is also
+        // simply what liquid does.
+        layer.ampScale = Math.min(1, level * 11);
+      }
+
+      function draw(dt, level) {
+        if (!W) return;
+        ctx.clearRect(0, 0, W, H);
+
+        step(back, dt, level);
+        step(front, dt, level);
+
+        ctx.fillStyle = back.fill;  layerPath(back);  ctx.fill();
+        ctx.fillStyle = front.fill; layerPath(front); ctx.fill();
+
+        // Bubbles live INSIDE the front layer: clipping to that same path is
+        // what stops one popping out above the surface into the empty ball.
+        ctx.save();
+        layerPath(front);
+        ctx.clip();
+        ctx.lineWidth = Math.max(0.7, H * 0.006);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+        for (var i = 0; i < BUBBLE_N; i++) {
+          var b = bubbles[i];
+          if (!b) continue;
+          b.y -= b.v * dt;
+          b.sw += dt * 2.2;
+          b.x += Math.cos(b.sw) * H * 0.06 * dt;   // a slight sway, not a drift
+          if (b.y + b.r < surfaceY(front, b.x)) spawn(b);   // reached the top
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      var MIN_DURATION = 3000;  // the fill always takes this long — there is no
+                                // byte-progress to track here, unlike the old
+                                // GLB-driven loader this animation came from
+      var shown = 0, t0 = performance.now(), last = t0, raf = 0;
 
       function finish() {
         overlay.classList.add('is-done');
-        // Stop the solver with the fade, not after it: nothing is visible
-        // through a transparent overlay and the page is now the thing that
-        // wants the frames.
+        // Stop drawing with the fade, not after it: nothing is visible through
+        // a transparent overlay and the page now wants the frames.
         cancelAnimationFrame(raf);
         setTimeout(function () { overlay.remove(); }, 1300);
       }
 
-      if (reduce) {
-        // A churning surface is exactly what this preference is about. Fill it
-        // straight, with a flat top, over the same 3s.
-        (function still() {
-          var now = performance.now();
-          if (!W && !resize()) { t0 = now; raf = requestAnimationFrame(still); return; }
-          var t = Math.min(1, (now - t0) / MIN_DURATION);
-          phys.currentFill = t;
-          for (var i = 0; i < phys.numSprings; i++) phys.springs[i].p = 0;
-          draw();
-          count.textContent = Math.round(t * 100) + '%';
-          if (t >= 1) { finish(); return; }
-          raf = requestAnimationFrame(still);
-        })();
-        return;
-      }
-
       function frame(now) {
-        // See resize(): the very first frames can land before the blocking
-        // stylesheets have given the circle a size. Keep asking; draw nothing
+        // See resize(): the first frames can land before the blocking
+        // stylesheets have given the circle a size. Keep asking, draw nothing
         // until it has one, and do not let that dead time count as fill.
         if (!W && !resize()) { t0 = now; last = now; raf = requestAnimationFrame(frame); return; }
 
+        var dt = Math.min((now - last) / 1000, 0.05);  // a backgrounded tab must
+        last = now;                                    // not jump the wave a
+                                                       // whole screen sideways
         var target = Math.min(1, (now - t0) / MIN_DURATION);
-        var before = shown;
         shown += (target - shown) * (target >= 1 ? 0.14 : 0.06);
         if (target - shown < 0.001) shown = target;
-        phys.fillPct = shown;
 
-        // The rising level is what disturbs the surface — a wave pushed out
-        // from a moving point rather than a tremble applied to the whole row,
-        // so the liquid looks like it is being poured in.
-        var rise = shown - before;
-        if (rise > 0) phys.splash(-rise * H * 0.75, (Math.sin(now / 900) * 0.5 + 0.5) * phys.numSprings);
-
-        var elapsed = Math.min(now - last, 100);  // a backgrounded tab must not
-        last = now;                               // dump 200 steps in one frame
-        acc += elapsed;
-        while (acc >= STEP) { phys.update(0, null, 1); acc -= STEP; }
-
-        if (now - t0 > nextBlip) { phys.splash((Math.random() - 0.5) * H * 0.035); nextBlip += 600 + Math.random() * 900; }
-
-        draw();
+        // Reduced motion still fills — it just does not move: the layers are
+        // never stepped, so both surfaces stay flat.
+        draw(reduce ? 0 : dt, shown);
         count.textContent = Math.round(shown * 100) + '%';
-        // Wait for the LEVEL, not the counter: the counter hits 100% while the
-        // liquid is still rising into the last of the ball, and fading then
-        // would cut the fill off half-full.
-        if (shown >= 1 && phys.fillPct - phys.currentFill < 0.004) { finish(); return; }
+
+        if (shown >= 1) { finish(); return; }
         raf = requestAnimationFrame(frame);
       }
       raf = requestAnimationFrame(frame);

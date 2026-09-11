@@ -52,46 +52,53 @@ When resuming work in a new session:
 
 **The orange liquid loading ball is the SITE's entrance animation, not the 3D world's (2026-08-14).** It moved from `index.html` to `2D.html`: markup + self-contained script sit first in `<body>` (so it covers the very first paint), CSS near the end of `<style>` (z-index **10001** — above both the nav iframe at 9999 and `.mobile-menu` at 10000). It plays once per tab on the landing page (`sessionStorage.siteLoaderSeen`, set immediately on load so a mid-fill reload counts as seen) as a pure **3s timed fill + 1.2s fade** — there is no byte progress to track on the 2D page, unlike the old GLB-driven version. `index.html` has **no loader at all** anymore: its first-3D-entry-per-tab intro (`introSeen`) now shows only the welcome/controls screen, whose iframe **reveals itself on its own `load` event** (the old loader used to call `_showIntroControls()` when its fill finished; posting the `intro-controls-show` message before the child's listener exists would silently drop it, so the reveal waits for `load`). `src/main.js` still calls `window._loader` defensively — with no loader defined those are deliberate no-ops; if a 3D-side loader is ever wanted again, defining `window._loader` re-arms them. Verified over CDP (7 checks): fresh visit shows the ball on 2D (count climbing, gone after ~4.2s), reload shows nothing, 3D entry shows the intro with no ball, dismiss works, 3D reload shows neither.
 
-**The loader's liquid is a real spring surface, not a shape (2026-09-11).** `#load-liquid` is a
-`<canvas>` now. It used to be a div whose height was the fill level, with the wave faked by a
-big rotating rounded square (`::before` + `@keyframes loadWave`/`loadBobA`, all removed) — one
-RIGID shape, so it had a single crest profile that came round again every revolution and could
-never ripple or settle however many keyframes were added.
+**The loader's liquid is TWO crossing sine surfaces (2026-09-11).** `#load-liquid` is a
+`<canvas>`. It used to be a div whose height was the fill level, with the wave faked by a big
+rotating rounded square (`::before` + `@keyframes loadWave`/`loadBobA`, all removed) — one
+RIGID shape, so it had a single crest profile that came round again every revolution.
 
-The solver is **`FluidPhysics` + the WATER preset vendored verbatim from
-[fluid.js](https://github.com/wrksp8/fluid.js) (MIT, wrksp8)**, inlined in `2D.html` rather
-than imported: `public/` is static, Vite does not bundle it, and the loader must stay one
-self-contained block that runs before first paint. 60 springs, each pulled toward a rest
-height and bleeding velocity into its neighbours 8 times a step, so a disturbance travels and
-decays. **Its renderer is deliberately NOT used** — that one sizes its canvas to
-`window.innerWidth/innerHeight` and measures fill from the canvas CENTRE (it is written for a
-full-screen background, not a 192px ball) and has no way to stop its rAF loop. The renderer in
-`2D.html` is ours.
+The model is taken from **[js-fluid-meter](https://github.com/aarcoraci/javascript-fluid-meter)
+by Angel Arcoraci (MIT)**, which is written for exactly this shape — a percentage as liquid in
+a circle. Two sine surfaces travel in **opposite directions** at different amplitudes, speeds
+and frequencies, one drawn over the other; neither is liquid alone, what reads as liquid is
+where they cross, because that meeting point never repeats. Each layer's amplitude is itself a
+sine of its own angle (`amp = maxAmp * sin(angle)`), so crests grow and flatten as they travel
+instead of marching past at a fixed height. Bubbles rise inside, clipped to the front layer's
+path so none pops out above the surface.
 
-Three things that had to be fixed or tuned, all of which will bite again if touched:
+**What is deliberately NOT taken from it:** it draws its own circle, ring border, background
+disc and percentage text, and hard-codes every pixel around a 300px meter. This ball already
+has the neumorphic pressed shell and the VT323 counter as real DOM, so only the fluid is drawn,
+into the circle that exists, and **every constant is derived from the measured ball size** —
+`maxAmp` `H*0.055`/`H*0.042`, `freq` `H*0.155`/`H*0.19`, `speed` `∓H*0.62`/`H*0.78`.
+
+Four things that will bite again if touched:
 - **Nothing can be measured synchronously in that inline script.** It sits at the top of
   `<body>`, and the page pulls Google Fonts stylesheets — with a render-blocking stylesheet
   pending, Chrome has no layout to give and `getBoundingClientRect()` returns **zeros** rather
   than forcing a wait. The canvas came out 0 wide and every draw threw `IndexSizeError`. The old
   div loader never hit this because it only set `style.height` in percent and measured nothing.
-  `resize()` now returns a boolean, a `ResizeObserver` watches, and the frame loop retries until
-  a real size arrives — resetting `t0` so the dead time does not count as fill.
-- **`splash(force, at)` must `Math.floor` the index.** The vendored version only floors its
-  random branch; passing a computed float gives `springs[43.7]` → `undefined` → throw. Caught in
-  a Node simulation of the whole script, not in the browser.
-- **`fillEase` is the one edit to the vendored solver** (was a hard `0.05`). It is the level
-  lagging its target, which is half of why the fill reads as liquid — but at 0.05 the settle
-  added ~1.5s and the 3s loader ran 4.5s. At `0.13` it finishes in ~3.6s, i.e. 3s of fill plus a
-  ~0.6s catch-up. The finish test waits on the **level**, not the counter, or the fade would cut
-  in while the ball was still filling.
+  `resize()` returns a boolean, a `ResizeObserver` watches, and the frame loop retries until a
+  real size arrives — resetting `t0` so the dead time does not count as fill.
+- **The wave amplitude ramps in over the first ~9% (`ampScale`).** At full amplitude a trough on
+  a nearly-empty ball dips below the floor, and the fill polygon has nothing to enclose there —
+  a notch of bare ball at the very bottom. Measured after the ramp: deepest trough sits 0.06px
+  *above* the floor across the whole run.
+- **The two angular speeds must differ** (100 and 73). Equal, both layers reach their flat
+  moment together and the whole surface goes still for an instant once a cycle.
+- The back layer is the **same orange at 0.42 alpha**, not a second hue — two colours in a 192px
+  ball reads as a graphic, and the layer's job is to be glimpsed through the front one.
 
-Amplitude is `H * 0.022` so it tracks the `clamp()`ed circle instead of being a fixed pixel
-count, the solver is stepped at a **fixed 60Hz** from an accumulator (it is written per-frame,
-so a 120Hz display would otherwise run it twice as fast), and `prefers-reduced-motion` gets a
-flat fill with no springs. Verified in Chrome (fill 111 → 0 px, ripple 1–12 px, no JS errors,
-overlay removed) and in a Node simulation with a stubbed canvas (384×384 backing store at dpr
-2, zero draws while layout was blocked, ripple present and varying in every sample).
-**Restore point for the old version: `git checkout loader-css-v1 -- public/2D.html`.**
+`dt` is clamped to 50ms so a backgrounded tab cannot jump the wave a screen sideways, and
+`prefers-reduced-motion` passes `dt = 0` so the layers never step and both surfaces stay flat
+while the ball still fills. Verified in Chrome (fill 103 → 0px, wave 4–10px on a 129px ball, no
+JS errors, overlay removed) and in a Node simulation with a stubbed canvas (384×384 backing
+store at dpr 2, zero draws while layout was blocked, amplitude breathing across a 3.7–20.8px
+range at 192px, the two layers separated in every sample).
+
+**A spring-surface version (fluid.js, MIT) was built first and rejected on the look.** It is in
+git history, one commit back. **The original CSS loader: `git checkout loader-css-v1 --
+public/2D.html`.**
 
 **Navigation:**
 - Every 2D page embeds nav as a fixed iframe (`#top-bar` → `/top_row_permanent_V3.html`)
