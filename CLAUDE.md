@@ -447,6 +447,30 @@ stays negative.
 **Rule: any animation with a POSITIVE `delay` needs `backwards` unless its 0% keyframe is
 already the element's resting style.**
 
+**`live-pair.mp4` loops SHORT of its own end** (`data-loop-end="13.3"`, 2026-09-11). The clip is
+14s and ends with **both phones dimming out**, the way a screen recording does when the display
+sleeps — so looping the whole thing flashed a dark frame at the seam, which is what read as
+"the beginning and the end look slightly different".
+
+Measured frame by frame: the right phone holds a mean luminance of **212.1 to 13.50s**, steps to
+202.2 at **13.55**, then falls off a cliff (172 at 13.70, 72 by 13.90); the left follows from
+13.70. **Nothing else is wrong with the clip** — the lock screen is pixel-identical to its own
+first frame from **11.4s** onward (0.07% of sampled pixels differ inside the notification band,
+0.02% outside), and the notification appears at **4.9s** and is gone by **11.15s**. So "appears,
+then disappears, and the rest of the time looks the same" is already what the footage does.
+
+**An overlay patch was NOT needed and would not have worked.** The idea on the table was to
+cover the notification with a background-coloured rectangle during the frames that should not
+show it — but the frames that should not show it already exist and are already clean; the
+defect was the whole screen dimming, which no rectangle over the notification can hide.
+
+The wrap is a generic `video[data-loop-end]` handler at the bottom of the file, driven by
+**`requestVideoFrameCallback`** (per-frame, Safari included) with a `timeupdate` fallback. **13.3
+rather than 13.5** because `timeupdate` fires only ~4×/s, so the fallback path can overshoot by
+250ms and must not land in the fade. It only seeks a video that is actually playing — a seek on
+one the IntersectionObserver has paused off screen would restart it. **`loop` stays on the
+element** as the no-JS fallback. Verified in Chrome: `maxTime 13.286`, one wrap, no JS errors.
+
 **Videos play only while on screen** (2026-09-08). One `IntersectionObserver` at the bottom of
 the file turns `video.autoplay` **off**, pauses everything once, then plays/pauses on
 visibility (`rootMargin: '10% 0px'`). The `autoplay` ATTRIBUTE stays in the markup on purpose

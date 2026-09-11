@@ -2983,7 +2983,7 @@
                  the left, and two independently looping videos drift apart
                  within a few cycles. Baked together, the offset can never
                  slip. -->
-            <video autoplay loop muted playsinline width="1636" height="1600" aria-label="Links wird in to.morrow eine Aufgabe als Live Activity aktiviert, rechts erscheint sie daraufhin auf dem Sperrbildschirm">
+            <video autoplay loop muted playsinline data-loop-end="13.3" width="1636" height="1600" aria-label="Links wird in to.morrow eine Aufgabe als Live Activity aktiviert, rechts erscheint sie daraufhin auf dem Sperrbildschirm">
               <source src="/videos/to.morrow/live-pair.mp4" type="video/mp4" />
             </video>
           </div>
@@ -4471,6 +4471,52 @@
       var onPref = function () { reduce.matches ? stop() : start(); };
       reduce.addEventListener ? reduce.addEventListener('change', onPref)
                               : reduce.addListener(onPref);
+    })();
+  </script>
+
+
+  <script>
+    // ── Loop a video short of its own end (data-loop-end, 2026-09-11) ──────
+    // live-pair.mp4 ends with BOTH phones dimming out, the way a screen
+    // recording does when the display sleeps. Measured frame by frame: the
+    // right phone holds a steady mean luminance of 212.1 all the way to
+    // 13.50s, steps to 202.2 at 13.55 and then falls off a cliff — 172 at
+    // 13.70, 72 by 13.90. The left phone follows from 13.70. Looping the whole
+    // 14s therefore flashes a dark frame at the seam, which is what read as
+    // "the beginning and the end look slightly different".
+    //
+    // Nothing else is wrong with the clip. The lock screen is pixel-identical
+    // to its own first frame from 11.4s onward (measured: 0.07% of sampled
+    // pixels differ inside the notification band, 0.02% outside), so the
+    // notification appearing at 4.9s and gone by 11.15s is already exactly the
+    // "appears, then disappears, and the rest of the time looks the same" this
+    // is meant to be. Wrapping at 13.3 keeps all of it and drops only the
+    // dimming. 13.3 rather than 13.5: `timeupdate` fires about four times a
+    // second, so the wrap can overshoot by up to 250ms and must not land in
+    // the fade.
+    //
+    // `loop` stays on the element as the no-JS fallback — without this script
+    // it behaves exactly as it did before.
+    //
+    // requestVideoFrameCallback is per-FRAME where it exists (Safari included)
+    // and catches the cut within a frame; timeupdate is the fallback.
+    (function () {
+      var vids = document.querySelectorAll('video[data-loop-end]');
+      Array.prototype.forEach.call(vids, function (v) {
+        var end = parseFloat(v.getAttribute('data-loop-end'));
+        if (!(end > 0)) return;
+        var wrap = function () {
+          // A seek while the element is paused off screen would restart it, so
+          // only wrap something that is actually running.
+          if (!v.paused && v.currentTime >= end) v.currentTime = 0;
+        };
+        if (v.requestVideoFrameCallback) {
+          var tick = function () { wrap(); v.requestVideoFrameCallback(tick); };
+          v.requestVideoFrameCallback(tick);
+        } else {
+          v.addEventListener('timeupdate', wrap);
+        }
+      });
     })();
   </script>
 
