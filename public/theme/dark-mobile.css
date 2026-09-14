@@ -121,7 +121,41 @@
   [data-theme="dark"] .dna-ws,
   [data-theme="dark"] .ic-item .sk-round { background-color: var(--material); }
 
+  /* to-shove2d.html screen recordings. All four clips have the LIGHT page grey
+     (rgb 219,220,227 — i.e. #DCDCE3) baked in around the phone frame, so that on
+     the light page the frame sits on nothing; on Slate that grey shows as a pale
+     box with rounded-out corners. Clip each video to its own bezel instead,
+     the Unify technique. Measured on the frames themselves: the bezel starts
+     5px in from both sides of each 792px-wide phone and runs the full 1600px
+     height (it is cut by the top and bottom edges), corners ~125px, which is
+     15.8% of the phone's width and 7.8% of its height — two radii, or the
+     corners stretch into ellipses. 0.69% is 5.5px: half a pixel inside the
+     first anti-aliased bezel column, so no grey fringe survives. */
+  [data-theme="dark"] .stagger-figure.phone video {
+    clip-path: inset(0 0.69% 0 0.69% round 15.8% / 7.8%);
+  }
+  /* live-pair.mp4 is TWO phones in one 1636x1600 frame (left phone x 5-787,
+     right phone x 849-1631, grey gutter between), which one inset() cannot
+     describe. An SVG mask in the video's own pixel coordinates does, and with
+     preserveAspectRatio="none" at 100% 100% it scales with the element, whose
+     box keeps the frame's exact aspect ratio. */
+  [data-theme="dark"] .stagger-figure.duo video {
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1636 1600' preserveAspectRatio='none'%3E%3Crect x='5.5' y='0' width='781' height='1600' rx='125' ry='125'/%3E%3Crect x='849.5' y='0' width='781' height='1600' rx='125' ry='125'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1636 1600' preserveAspectRatio='none'%3E%3Crect x='5.5' y='0' width='781' height='1600' rx='125' ry='125'/%3E%3Crect x='849.5' y='0' width='781' height='1600' rx='125' ry='125'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  }
+
   /* ── Nav iframe (top_row_permanent_V3.html) ──────────────────────────── */
+
+  /* The logo, pill and hamburger hover lifts are written with a literal pure
+     white highlight. A phone keeps :hover stuck on whatever was tapped last,
+     so after opening the menu the hamburger sat there with a white glow on its
+     upper-left edge, as if it were lit. Same lift, Slate pair, at the mobile
+     x0.65 scale. */
+  [data-theme="dark"] .logo:hover,
+  [data-theme="dark"] .pill:hover,
+  [data-theme="dark"] .hamburger:hover {
+    box-shadow: 7.15px 7.15px 15.6px rgba(12,12,14,0.95), -5.2px -5.2px 13px rgba(51,51,56,0.6);
+  }
 
   /* The LM mark is a black PNG; on a Slate pill it disappears. */
   [data-theme="dark"] .logo-mark { filter: invert(1) brightness(0.92); }

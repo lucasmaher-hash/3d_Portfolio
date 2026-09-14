@@ -575,6 +575,17 @@ and the 3D overlays are untouched.
   and read as light app UI on the dark page; the two that are pure translucent glass — the
   Drei Formen "Off air" lip and the icon-cluster rounds — had borrowed the light page as their base
   and became dark holes, so they get an opaque `var(--material)` base like the retro/modern labels.
+- **to.morrow's four screen recordings have the light page grey `rgb(219,220,227)` baked in around
+  the phone**, invisible on the light page and a pale box on Slate. In dark they are clipped to the
+  bezel, measured off the frames: each phone is 792px wide with its bezel from x 5 to 786, running the
+  full 1600px height, corners ~125px → `clip-path: inset(0 0.69% 0 0.69% round 15.8% / 7.8%)`.
+  `live-pair.mp4` is two phones in one 1636px frame (x 5–786 and 849–1630), which one `inset()` cannot
+  express, so it uses an SVG `mask` with two rounded rects in the video's own pixel space
+  (`preserveAspectRatio='none'`, `100% 100%` — the element keeps the frame's exact aspect).
+- **Sticky `:hover` on touch:** the nav's `.logo` / `.pill` / `.hamburger` hover lifts use a
+  literal white highlight, and a phone keeps `:hover` on the last-tapped element — so after opening
+  the menu the hamburger glowed as if lit. Overridden with the Slate pair (reported by Lucas on
+  device; the same trap applies to any future hover lift).
 - Verified over CDP at 390 with touch emulation: all 9 pages paint `rgb(28,28,34)` with the nav
   dark and no JS errors; tap Dunkel → page, nav and blob all flip and `localStorage.theme` is
   `dark`; tap Hell → all back and the key is removed; reload keeps it; **1440 desktop control with
