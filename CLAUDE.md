@@ -531,6 +531,51 @@ all absolutely positioned. That is harmless here (everything positions from `lef
 and the flex centring still puts that at the container centre) but do not measure the group
 off it.
 
+## Dark mode — mobile only (2026-09-14)
+
+**Palette "Slate"** (`#1C1C22`, the literal inversion of `#DCDCE3`, keeping its blue-violet
+cast), picked by Lucas from six candidates. Text `#E8E8E9` / `#99999C`, border `#404045`. The
+neumorphic pair is DERIVED from the surface: shadow = surface × 0.42 → `rgb(12,12,14)`,
+highlight = surface mixed 10% to white → `rgb(51,51,56)` at ~0.5 alpha. **Do not reuse the light
+theme's pure-white highlight on a dark surface** — it reads as a glowing halo, not a raised edge.
+
+**Scope: `(max-width: 640px)` only, on the 8 2D pages + the nav iframe + the landing hero blob.**
+Everything lives in `public/theme/dark-mobile.css` and `public/theme/theme.js` — shared files,
+not the usual copy-the-block convention, because it is one palette across nine documents.
+A desktop window, or a phone rotated past 640px, renders light even with dark stored. `index.html`
+and the 3D overlays are untouched.
+
+- **Switching:** an inline one-liner right after `<meta charset>` in every page sets
+  `<html data-theme="dark">` from `localStorage.theme` **before first paint**; the CSS `<link>` and
+  `theme.js` (`defer`) sit at the end of `<head>`, AFTER each page's `<style>`, and every dark
+  selector carries one extra attribute, so it wins on specificity and source order both.
+- **Toggle:** the burger menu's `.mobile-theme-toggle`, directly under the language toggle, built
+  from the same `.mobile-view-toggle` / `.mobile-mode-btn` classes with `data-theme-choice`
+  (`light`/`dark`), labels `menu-light` / `menu-dark` in every page's `TRANSLATIONS`
+  (Light/Dark, Hell/Dunkel). The dark "selected well" rule is `:not([data-mode])` so it cannot
+  take the orange off the 2D/3D toggle it ties with.
+- **Iframes follow on their own:** `theme.js` posts `theme-change` to every iframe. The nav links the
+  same CSS and has a listener. **The hero blob (`blob_morph_bouncy.html`) must NOT use its own media
+  query** — the frame is a few hundred px wide even on desktop, so `(max-width: 640px)` would match
+  there; it asks the PARENT instead (`parent` has `data-theme="dark"` AND
+  `parent.matchMedia('(max-width: 640px)')`) and sets `data-theme-dark` on itself.
+- **No `color-scheme: dark` anywhere, deliberately.** When an iframe document's colour scheme
+  differs from its `<iframe>` element's in the parent, browsers paint an OPAQUE backdrop behind
+  the frame — the transparent nav bar would turn into a solid strip.
+- **Literal-colour rules that needed their own override** (everything else follows the tokens):
+  menu text `#555`, the menu/lang/tag/pill-seg inset wells, about/contact neumorphic rows
+  (including their stuck-on-touch `:hover`), `b.kw` (darkens on light → lightens on dark), the
+  spec-list hairline, mac-lamp gallery dots, the Cybercoffee click veil, the LM logo PNG
+  (`invert(1)`), the Unify `#1A1A1A` swatch (hairline so it does not vanish), and two SkeuKit
+  pieces on to.morrow. **SkeuKit exhibits keep their own light material** (scoped tokens on `.sk`)
+  and read as light app UI on the dark page; the two that are pure translucent glass — the
+  Drei Formen "Off air" lip and the icon-cluster rounds — had borrowed the light page as their base
+  and became dark holes, so they get an opaque `var(--material)` base like the retro/modern labels.
+- Verified over CDP at 390 with touch emulation: all 9 pages paint `rgb(28,28,34)` with the nav
+  dark and no JS errors; tap Dunkel → page, nav and blob all flip and `localStorage.theme` is
+  `dark`; tap Hell → all back and the key is removed; reload keeps it; **1440 desktop control with
+  dark stored stays light** (`rgb(220,220,227)`, blob light).
+
 ## Nav bar iframe
 
 Every 2D page embeds the nav as a fixed iframe:

@@ -1,0 +1,138 @@
+/* ── Dark mode — MOBILE ONLY (2026-09-14) ──────────────────────────────────
+   Palette "B — Slate", picked from /darkmode-test.html: the literal inversion
+   of the light theme, keeping #DCDCE3's faint blue-violet cast.
+
+   How it switches: an inline script at the very top of every page's <head>
+   sets <html data-theme="dark"> from localStorage.theme BEFORE first paint, and
+   the burger menu's Hell/Dunkel toggle (/theme/theme.js) flips it live. The nav
+   iframe links this same file and follows along on its own.
+
+   Everything below sits inside the 640px query on purpose — "mobile only for
+   now". A desktop window, or a phone rotated past 640px, ignores the attribute
+   and renders the light theme. This is also the burger menu's breakpoint, so
+   the toggle and the theme it controls exist at exactly the same widths.
+
+   This file is <link>ed AFTER each page's own <style>, and every selector here
+   carries one more attribute than the rule it overrides, so it wins on
+   specificity and source order both — including against the pages' late
+   mobile token blocks.
+
+   Deliberately NO `color-scheme: dark`. When an iframe document's used colour
+   scheme differs from the colour scheme of the <iframe> element in its parent,
+   browsers paint an OPAQUE backdrop behind the frame — and the nav bar is a
+   transparent iframe over the page. Colour-scheme on one side and not the
+   other would turn the nav strip into a solid block. Nothing here needs it:
+   the site draws its own scrollbar and has no native form controls on mobile.
+
+   Shadow pair, derived from the surface rather than picked by eye:
+     shadow    = surface x 0.42            rgb(12, 12, 14)
+     highlight = surface mixed 10% to white rgb(51, 51, 56), at ~0.5 alpha
+   The light theme's highlight is pure white at full alpha; copied onto a dark
+   surface that reads as a glowing halo, not a raised edge. Offsets and blur are
+   the mobile x0.65 values the light theme already uses at this width. */
+
+@media (max-width: 640px) {
+
+  :root[data-theme="dark"] {
+    --bg-surface:     #1C1C22;
+    --text-primary:   #E8E8E9;
+    --text-secondary: #99999C;
+    --text-tertiary:  #606064;
+    --border-color:   #404045;
+
+    --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(12,12,14,0.9), -3.25px -3.25px 7.8px rgba(51,51,56,0.55);
+    --shadow-raised:    5.2px 5.2px 11.7px rgba(12,12,14,0.9), -5.2px -5.2px 11.7px rgba(51,51,56,0.55);
+    --shadow-pressed:   inset 3.25px 3.25px 6.5px rgba(12,12,14,0.85), inset -3.25px -3.25px 6.5px rgba(51,51,56,0.5);
+
+    /* Local names for the same pair, for the handful of rules below that were
+       written with literal light-theme shadows instead of the tokens. */
+    --dk-shadow:   rgba(12,12,14,0.9);
+    --dk-hl:       rgba(51,51,56,0.55);
+  }
+
+  /* ── Burger menu ─────────────────────────────────────────────────────── */
+
+  /* #555 is tuned for the light grey surface; on Slate it measures ~2:1. The
+     secondary token keeps the same "unselected" weight at ~6:1. */
+  [data-theme="dark"] .mobile-mode-btn,
+  [data-theme="dark"] .mobile-nav-btn { color: var(--text-secondary); }
+  [data-theme="dark"] .mobile-nav-btn.is-active { color: var(--text-primary); }
+
+  /* Selected segment well. :not([data-mode]) keeps the 2D/3D toggle's flat
+     orange pill — that rule ties with this one on specificity and would
+     otherwise lose its orange on source order. */
+  [data-theme="dark"] .mobile-mode-btn:not([data-mode]).is-active,
+  [data-theme="dark"] .mobile-mode-btn[data-lang]:active:not(.is-active),
+  [data-theme="dark"] .mobile-mode-btn[data-theme-choice]:active:not(.is-active) {
+    box-shadow: var(--shadow-pressed);
+  }
+
+  /* The darkened backdrop behind the menu panel needs a little more weight
+     to separate a dark panel from a dark page. */
+  [data-theme="dark"] .mobile-menu { background: rgba(0, 0, 0, 0.7); }
+
+  /* ── Rules written with literal light-theme colours ──────────────────── */
+
+  /* 2D.html: project tags and the to.morrow tile's icon shadow. */
+  [data-theme="dark"] .tag { box-shadow: var(--shadow-pressed); }
+  [data-theme="dark"] .morrow-icon-tile .app-icon,
+  [data-theme="dark"] .app-icon,
+  [data-theme="dark"] .win-devices-inner { filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.55)); }
+
+  /* about2d.html accordion rows + inset text, contact2d.html buttons. */
+  [data-theme="dark"] .item,
+  [data-theme="dark"] .contact-item {
+    box-shadow: -3.25px -3.25px 7.8px 0 var(--dk-hl), 3.25px 3.25px 7.8px 0 var(--dk-shadow);
+  }
+  /* Touch keeps :hover stuck on the last-tapped row, and the light rule for it
+     outranks the plain .item selector above. */
+  [data-theme="dark"] .item:hover:not(.open):not(.closing),
+  [data-theme="dark"] .contact-item:hover {
+    box-shadow: -3.25px -3.25px 7.8px 0 var(--dk-hl), 3.25px 3.25px 7.8px 0 var(--dk-shadow);
+  }
+  [data-theme="dark"] .item.open,
+  [data-theme="dark"] .item.closing {
+    box-shadow: -5.2px -5.2px 15.6px 0 var(--dk-hl), 5.2px 5.2px 15.6px 0 var(--dk-shadow);
+  }
+  [data-theme="dark"] .text-inset { box-shadow: var(--shadow-pressed); }
+
+  /* Project pages: the hairline between spec-list rows, and the <b class="kw">
+     skim keywords, which darken on a light page and so must LIGHTEN here. */
+  [data-theme="dark"] .meta-tile + .meta-tile { border-top-color: rgba(255, 255, 255, 0.08); }
+  [data-theme="dark"] b.kw { color: #D4D4D8; }
+
+  /* mac-lamp2d.html gallery dots. */
+  [data-theme="dark"] .gallery-dot { box-shadow: 2px 2px 2px var(--dk-shadow), -2px -2px 2px var(--dk-hl); }
+
+  /* kaffeemaschine2d.html: the "[ klick mich ]" veil over the machine. */
+  [data-theme="dark"] .machine-overlay { background: rgba(28, 28, 34, 0.68); }
+
+  /* unify2d.html: the #1A1A1A palette swatch is the page colour, near enough,
+     so it vanishes. A hairline gives it an edge without recolouring the chip. */
+  [data-theme="dark"] .color-swatch[style*="1A1A1A"] { box-shadow: inset 0 0 0 1px var(--border-color); }
+
+  /* to-shove2d.html SkeuKit exhibits. These keep their own light material
+     (they are the app's UI, scoped tokens on .sk), and most of them are opaque
+     so they simply read as light objects on the dark page. The two that are
+     pure translucent glass — the "Off air" lip in Drei Formen and the icon
+     rounds in Schrift und Icons — had borrowed the LIGHT page as their base
+     and turned into dark holes with near-black ink inside. They get the same
+     opaque material base the retro/modern labels already carry. */
+  [data-theme="dark"] .dna-ws,
+  [data-theme="dark"] .ic-item .sk-round { background-color: var(--material); }
+
+  /* ── Nav iframe (top_row_permanent_V3.html) ──────────────────────────── */
+
+  /* The LM mark is a black PNG; on a Slate pill it disappears. */
+  [data-theme="dark"] .logo-mark { filter: invert(1) brightness(0.92); }
+  [data-theme="dark"] .pill__seg.is-active { box-shadow: var(--shadow-pressed); }
+}
+
+/* The theme toggle's tap preview, in the LIGHT theme — the language toggle has
+   the same rule keyed on [data-lang]; this is its twin for [data-theme-choice]
+   so both toggles press the same way. Mobile-only because the burger menu is. */
+@media (max-width: 640px) {
+  .mobile-mode-btn[data-theme-choice]:active:not(.is-active) {
+    box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
+  }
+}

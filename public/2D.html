@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>/* dark mode before first paint — see /theme/dark-mobile.css */try{if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
   <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
   <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
@@ -1029,6 +1030,8 @@
       .morrow-icon-tile { margin-bottom: 14px; }
     }
   </style>
+  <link rel="stylesheet" href="/theme/dark-mobile.css" />
+  <script src="/theme/theme.js" defer></script>
 </head>
 <body>
   <!-- Site entrance loader — the orange liquid ball, once per tab (see the
@@ -1228,6 +1231,12 @@
       <div class="mobile-view-toggle mobile-lang-toggle">
         <button class="mobile-mode-btn" data-lang="de">Deutsch</button>
         <button class="mobile-mode-btn" data-lang="en">English</button>
+      </div>
+      <!-- Light/dark toggle, directly under the language toggle and built from the
+           same two classes, so the pair always match. Mobile-only, like the menu. -->
+      <div class="mobile-view-toggle mobile-theme-toggle">
+        <button class="mobile-mode-btn" data-theme-choice="light" data-i18n="menu-light">Light</button>
+        <button class="mobile-mode-btn" data-theme-choice="dark" data-i18n="menu-dark">Dark</button>
       </div>
     </div>
   </div>
@@ -1618,7 +1627,7 @@
     // ── i18n ─────────────────────────────────────────────────────
     const TRANSLATIONS = {
       en: {
-        'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
+        'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact', 'menu-light': 'Light', 'menu-dark': 'Dark',
         'label-project-01': 'Project 01', 'label-project-02': 'Project 02',
         'label-project-03': 'Project 03', 'label-project-04': 'Project 04',
         'label-project-05': 'Project 05', 'label-project-06': 'Project 06',
@@ -1632,7 +1641,7 @@
         'footer-copyright': '© 2026 Lucas Maher. All Rights Reserved.',
       },
       de: {
-        'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
+        'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt', 'menu-light': 'Hell', 'menu-dark': 'Dunkel',
         'label-project-01': 'Projekt 01', 'label-project-02': 'Projekt 02',
         'label-project-03': 'Projekt 03', 'label-project-04': 'Projekt 04',
         'label-project-05': 'Projekt 05', 'label-project-06': 'Projekt 06',

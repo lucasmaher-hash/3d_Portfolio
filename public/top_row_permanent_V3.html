@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>/* dark mode before first paint — see /theme/dark-mobile.css */try{if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Top Row v3 · Lucas Maher</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -504,6 +505,28 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/theme/dark-mobile.css" />
+  <script>
+    /* The nav is its own document, so it follows the page's theme itself: the
+       head script above covers first paint, this keeps it in step when the
+       burger menu's toggle is tapped (postMessage from /theme/theme.js) or the
+       theme changes in another tab (storage event). */
+    (function () {
+      function apply(t) {
+        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        else document.documentElement.removeAttribute('data-theme');
+      }
+      window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'theme-change') apply(e.data.theme);
+      });
+      window.addEventListener('storage', function (e) {
+        if (e.key === 'theme' || e.key === null) {
+          var t = 'light'; try { t = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'; } catch (err) {}
+          apply(t);
+        }
+      });
+    })();
+  </script>
 </head>
 
 <body>

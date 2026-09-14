@@ -41,7 +41,39 @@
   .blob path {
     fill: var(--surface);
   }
+
+  /* Dark mode (2026-09-14). Driven by the PARENT page, not by this frame's own
+     media query: this iframe is only a few hundred pixels wide even on a
+     desktop, so (max-width: 640px) evaluated in here would match there too.
+     The script below sets data-theme-dark only when the landing page is both
+     dark AND at its own mobile width. Same Slate pair as /theme/dark-mobile.css. */
+  :root[data-theme-dark] { --surface: #1C1C22; }
+  :root[data-theme-dark] .blob {
+    filter:
+      drop-shadow(29px 29px 27px rgba(12,12,14,1))
+      drop-shadow(-21px -21px 20px rgba(51,51,56,0.9));
+  }
 </style>
+<script>
+  (function () {
+    function sync() {
+      var dark = false;
+      try {
+        dark = parent !== window &&
+               parent.document.documentElement.getAttribute('data-theme') === 'dark' &&
+               parent.matchMedia('(max-width: 640px)').matches;
+      } catch (e) {}
+      if (dark) document.documentElement.setAttribute('data-theme-dark', '');
+      else document.documentElement.removeAttribute('data-theme-dark');
+    }
+    sync();
+    // The parent's toggle writes localStorage, which fires 'storage' in this
+    // frame; a rotation across 640px is the parent's media query changing.
+    window.addEventListener('storage', sync);
+    try { parent.matchMedia('(max-width: 640px)').addEventListener('change', sync); } catch (e) {}
+    window.addEventListener('message', function (e) { if (e.data && e.data.type === 'theme-change') sync(); });
+  })();
+</script>
 </head>
 <body>
   <div class="stage">
