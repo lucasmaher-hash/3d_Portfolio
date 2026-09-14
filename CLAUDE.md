@@ -482,17 +482,27 @@ surroundings transparent.
 un-mixed from the grey) left a hairline gap on-device** — not reproducible headless, so it went
 unnoticed until Lucas saw it on his phone. Replaced with a real transparent iPhone-12 mockup already in
 his own asset library (`mockup-apple-iphone-12-pro-transparent.png`, 396×800), upscaled 2× with Lanczos
-to match. Screen bounds measured directly off ITS alpha channel by row/column-scanning for the flat
-(non-notch, non-corner) body, not eyeballed: **x 44–746, y 120–1484, corner radius 76** at 792×1600 —
-short of where the notch cuts a further-up "ear" on each side, which is fine, since the frame's own
-opaque bezel covers that gap and the video (a plain rectangle, no notch shape) doesn't need to reach it.
+to match.
+
+**The video crop and the frame image are two independent measurements, and conflating them broke
+this once already.** The frame's own screen-hole geometry (measured off its alpha channel: x 44–746,
+y 120–1484, corner radius 76 at 792×1600 — short of where the notch cuts a further-up "ear" on each
+side) has nothing to do with where the VIDEO's own baked-in content sits, because the two are
+unrelated assets that merely need to agree approximately. Recomputing the video's `clip-path` from
+the frame's numbers (tried first) shrank the visible window well inside the video's real content —
+empty grey bars appeared above/below the app UI, on-device only, not reproducible headless. The
+correct source is the VIDEO: decode a frame, find the dark-navy bezel band the recording already has
+baked in (vs. the light screen content), per row/column. That measurement is unchanged from before
+this session and is **independent of which frame PNG sits on top** — see the numbers below.
 
 Each video is wrapped in `.phone-shot`, a one-cell grid holding the `<video>` and the frame `<img>` in
 the same cell, so they size identically from the existing rules with no absolute positioning (the
 mobile `.stagger-figure.phone video` rule now also names `.phone-frame`). The video is **clipped to a
-rounded rect that lies inside the black border**: that measured box grown 20px, radius 96 →
-`clip-path: inset(6.25% 3.283% 6% 3.03% round 12.12% / 6%)` — comfortably inside the ~40px of solid
-border measured at the sides, so small measuring error stays hidden under the frame regardless.
+rounded rectangle that lies INSIDE the frame's black border** — 14px outside the screen on every
+side, which leaves at least 20px of solid frame on either side of the cut — so the cut is always
+hidden under the frame and its precision no longer matters. Measured on the 792x1600 video content:
+screen x 43-748, y 37-1562, corner radius 87. Clip = that box grown 14px, radius 101 →
+`clip-path: inset(1.4375% 3.662% round 12.753% / 6.3125%)`.
 `live-pair.mp4` stays ONE file (the lock screen must not drift from the app): two frames at `48.411%`
 width docked to either edge (right phone is 844px over in the 1636px file), video masked to the two
 inner rects with an SVG `mask` — **that mask's own rect coordinates were not re-derived for the new
