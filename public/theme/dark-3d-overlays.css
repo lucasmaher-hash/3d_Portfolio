@@ -1,0 +1,90 @@
+/* ── Dark mode for the 3D view's overlay pages (2026-09-14) ───────────────────
+   Linked by about3d / contact3d / craft3d / controls_open3d /
+   controls_fullscreen3d. Keyed on <html data-theme-dark>, which
+   /theme/overlay-theme.js sets only while the 3D page around the frame is dark
+   AND at phone width — so there is deliberately no media query in this file
+   (a width query inside a frame measures the frame, not the phone).
+
+   Same Slate palette as /theme/dark-mobile.css. Every selector leads with
+   :root[data-theme-dark], two more than the light rule it replaces, so it wins
+   on specificity against the pages' desktop rules and their later
+   pointer:coarse blocks alike. Shadow offsets are the pages' own mobile (x0.65)
+   values; only the colours change. */
+
+:root[data-theme-dark] {
+  --bg-base:        #1C1C22;
+  --bg-surface:     #1C1C22;
+  --text-primary:   #E8E8E9;
+  --text-secondary: #99999C;
+  --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(12,12,14,0.9), -3.25px -3.25px 7.8px rgba(51,51,56,0.55);
+
+  --dk-shadow: rgba(12, 12, 14, 0.9);
+  --dk-hl:     rgba(51, 51, 56, 0.55);
+  --dk-shadow-in: rgba(12, 12, 14, 0.85);
+  --dk-hl-in:     rgba(51, 51, 56, 0.5);
+  /* The dark ink of the controls glyphs (#4a4a4a), lightened to read on Slate. */
+  --dk-ink: 200, 200, 204;
+}
+
+/* ── about3d / contact3d / craft3d ─────────────────────────────────────── */
+
+:root[data-theme-dark] .item,
+:root[data-theme-dark] .contact-item,
+:root[data-theme-dark] .item:hover:not(.open):not(.closing),
+:root[data-theme-dark] .contact-item:hover {
+  box-shadow: -3.25px -3.25px 7.8px 0 var(--dk-hl), 3.25px 3.25px 7.8px 0 var(--dk-shadow);
+}
+:root[data-theme-dark] .item.open,
+:root[data-theme-dark] .item.closing {
+  box-shadow: -5.2px -5.2px 15.6px 0 var(--dk-hl), 5.2px 5.2px 15.6px 0 var(--dk-shadow);
+}
+:root[data-theme-dark] .text-inset {
+  box-shadow: inset -3.25px -3.25px 6.5px 0 var(--dk-hl-in), inset 3.25px 3.25px 6.5px 0 var(--dk-shadow-in);
+}
+:root[data-theme-dark] .container { border-color: #404045; }
+
+/* ── controls_open3d / controls_fullscreen3d ───────────────────────────── */
+
+/* The fullscreen intro: its panel border, and the translucent veil around the
+   panel — the only page here whose body is see-through, so it is matched by
+   the .panel it holds rather than by a bare body selector. */
+:root[data-theme-dark] .panel { border-color: #404045; }
+:root[data-theme-dark] body:has(> .panel) { background: rgba(28, 28, 34, 0.85); }
+
+:root[data-theme-dark] .card {
+  box-shadow: inset 3.25px 3.25px 6.5px var(--dk-shadow-in), inset -3.25px -3.25px 6.5px var(--dk-hl-in);
+}
+:root[data-theme-dark] .key {
+  box-shadow: 1.63px 1.63px 3.9px var(--dk-shadow), -1.63px -1.63px 3.9px var(--dk-hl);
+}
+:root[data-theme-dark] .icon-square {
+  box-shadow: inset 1.3px 1.3px 2.6px var(--dk-shadow-in), inset -1.3px -1.3px 2.6px var(--dk-hl-in);
+}
+:root[data-theme-dark] .lm-button {
+  box-shadow: inset -3.25px -3.25px 7.8px var(--dk-hl-in), inset 3.25px 3.25px 7.8px var(--dk-shadow-in);
+}
+:root[data-theme-dark] .mouse-left,
+:root[data-theme-dark] .mouse-right--raised,
+:root[data-theme-dark] .touch-swipe,
+:root[data-theme-dark] .touch-tap {
+  box-shadow: 3.25px 3.25px 7.8px var(--dk-shadow), -3.25px -3.25px 7.8px var(--dk-hl);
+}
+:root[data-theme-dark] .mouse-right,
+:root[data-theme-dark] .mouse-left--pressed,
+:root[data-theme-dark] .touch-joystick {
+  box-shadow: inset 2.6px 2.6px 6.5px var(--dk-shadow-in), inset -2.6px -2.6px 6.5px var(--dk-hl-in);
+}
+:root[data-theme-dark] .touch-joystick-thumb {
+  box-shadow: 1.95px 1.95px 4.55px var(--dk-shadow), -1.95px -1.95px 4.55px var(--dk-hl);
+}
+
+:root[data-theme-dark] .icon-dot,
+:root[data-theme-dark] .mouse-dot,
+:root[data-theme-dark] .touch-tap-dot,
+:root[data-theme-dark] .touch-swipe span:last-child { background: rgb(var(--dk-ink)); }
+:root[data-theme-dark] .touch-swipe span { background: rgba(var(--dk-ink), 0.3); }
+:root[data-theme-dark] .touch-swipe span:nth-child(2) { background: rgba(var(--dk-ink), 0.55); }
+:root[data-theme-dark] .touch-tap::before { border-color: rgba(var(--dk-ink), 0.22); }
+
+/* The LM badge is a black PNG, same fix as the nav's logo. */
+:root[data-theme-dark] .lm-mark { filter: invert(1) brightness(0.92); }

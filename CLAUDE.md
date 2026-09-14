@@ -609,6 +609,22 @@ and the 3D overlays are untouched.
   dark and no JS errors; tap Dunkel → page, nav and blob all flip and `localStorage.theme` is
   `dark`; tap Hell → all back and the key is removed; reload keeps it; **1440 desktop control with
   dark stored stays light** (`rgb(220,220,227)`, blob light).
+- **The 3D view is dark too (2026-09-14).** `index.html` has the same pre-paint head script, links
+  `dark-mobile.css` + `theme.js`, and carries the sun/moon toggle under its language toggle.
+  `dark-mobile.css` darkens the frosted joystick and the overlay veils; `#help-fab` is built
+  from tokens and follows on its own. **The overlay pages (`about3d`, `contact3d`, `craft3d`,
+  `controls_open3d`, `controls_fullscreen3d`) cannot use a width query** — they are ~330px
+  frames — so `/theme/overlay-theme.js` (sync, in their `<head>`) asks the PARENT: dark only while
+  `index.html` is `data-theme="dark"` AND the parent matches `(max-width: 640px)`. It sets
+  `<html data-theme-dark>`, which `/theme/dark-3d-overlays.css` keys on with no media query; it
+  re-syncs on `theme-change`, `storage` and the parent's 640px `change`.
+- **Burger menu pills are 43px on every page, 2D and 3D alike** (80% of the 3D menu's old 54px;
+  the 2D menus were 67px because their body line-height is 1.6). `/theme/mobile-menu.css`, linked
+  after `dark-mobile.css` on all 10 menu pages, pins the text box to 22px: nav button 10.5+22+10.5,
+  toggle 5 track + 5.5+22+5.5 + 5, sun/moon glyph `margin: -2px auto`. Change the height there,
+  not in the pages.
+- `2D.html`'s Virtual Cooking tile has an inline `box-shadow: none` (desktop's cut-out render);
+  its mobile kitchen photo gets `--shadow-raised` in the file's last 640px block, like every tile.
 
 ## Nav bar iframe
 

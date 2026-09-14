@@ -125,6 +125,30 @@
      frame is a separate transparent image over a clipped video (see
      .phone-shot in that page), which looks the same on either theme. */
 
+  /* ── 3D page (index.html) ────────────────────────────────────────────── */
+
+  /* The joystick is frosted glass over the scene, tinted with the LIGHT
+     surface. On a dark theme that pale disc is the brightest thing on screen,
+     so the tint becomes Slate and the rims lose most of their white. */
+  [data-theme="dark"] #joystick-base {
+    background: rgba(28, 28, 34, 0.30);
+    border-color: rgba(255, 255, 255, 0.10);
+  }
+  [data-theme="dark"] #joystick-thumb {
+    background: rgba(28, 28, 34, 0.72);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  }
+  /* #help-fab is built from the tokens and follows on its own. */
+
+  /* The veil behind the About / Contact / Craft / Controls windows. The pages
+     inside those frames follow the theme themselves — see
+     /theme/overlay-theme.js. */
+  [data-theme="dark"] #about-overlay,
+  [data-theme="dark"] #contact-overlay,
+  [data-theme="dark"] #craft-overlay,
+  [data-theme="dark"] #controls-overlay { background: rgba(0, 0, 0, 0.6); }
+
   /* ── Nav iframe (top_row_permanent_V3.html) ──────────────────────────── */
 
   /* The logo, pill and hamburger hover lifts are written with a literal pure

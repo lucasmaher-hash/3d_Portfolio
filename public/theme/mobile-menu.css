@@ -1,0 +1,31 @@
+/* ── Burger menu button height — shared by the 2D pages AND index.html ───────
+   (2026-09-14) Every pill in the menu — Craft / About / Contact and the
+   segmented toggles under them — is 43px tall, which is 80% of the 54px the 3D
+   menu used to have. The 2D menus came out at 67px against it, because their
+   <body> sets line-height 1.6 (35.2px text box) where index.html resolves to
+   `normal` (22px), and each page's own rules were levelled against that.
+
+   So the text box is pinned to the font size here, and both pills are built to
+   the same 43px from it on every page, regardless of what the page inherits:
+     nav button:  10.5 + 22 + 10.5                 = 43
+     toggle:      5 (track) + 5.5 + 22 + 5.5 + 5   = 43
+
+   Linked AFTER each page's own <style>; the extra .mobile-menu-panel class
+   makes these win on specificity as well, including over the pages' later
+   mobile blocks. */
+@media (max-width: 640px) {
+  .mobile-menu-panel .mobile-nav-btn {
+    line-height: 22px;
+    padding-top: 10.5px;
+    padding-bottom: 10.5px;
+  }
+  .mobile-menu-panel .mobile-mode-btn {
+    line-height: 22px;
+    padding-top: 5.5px;
+    padding-bottom: 5.5px;
+  }
+  /* The sun / moon glyphs stay 26px (13 cells x 2px, whole-pixel art) and give
+     back the 4px they are taller than the 22px text line, so the theme toggle
+     stays level with the language toggle above it. */
+  .mobile-menu-panel .theme-pix { margin: -2px auto; }
+}

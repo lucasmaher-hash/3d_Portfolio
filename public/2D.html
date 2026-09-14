@@ -1028,9 +1028,17 @@
       /* …and a little more air under it than the section's own 16px flex gap,
          so the icon is not sitting on the word. */
       .morrow-icon-tile { margin-bottom: 14px; }
+
+      /* Virtual Cooking's tile carries an inline `box-shadow: none` (the desktop
+         render is a cut-out on a transparent ground, where a raised edge would
+         outline empty space). Below 640px it shows the kitchen PHOTO instead, a
+         full rectangle like every other tile, so it gets the same raised shadow
+         they have. !important only because the value it beats is inline. */
+      a[href="/virtual_cooking2d.html"] > .project-tile { box-shadow: var(--shadow-raised) !important; }
     }
   </style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
+  <link rel="stylesheet" href="/theme/mobile-menu.css" />
   <script src="/theme/theme.js" defer></script>
 </head>
 <body>
