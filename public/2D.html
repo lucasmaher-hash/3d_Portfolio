@@ -1354,9 +1354,26 @@
     <!-- Project 04 -->
     <div class="project-section reverse" style="align-items: stretch;">
       <a href="/kaffeemaschine2d.html" style="display:block;">
-        <div class="project-tile tile-tall-media" style="box-shadow: none; overflow: hidden; cursor: pointer;">
-          <video autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: contain; display: block;">
+        <!-- Dark mode swaps to a second screen recording of the machine's own
+             UI, captured on a dark ground (a plain crop+re-encode of the same
+             file Lucas dropped in — no colour grading needed, the recording's
+             own background is already ~#1A1A1E against the page's #1C1C22).
+             Two full videos rather than a filter: brightness/invert tricks on
+             the light clip would also hit the physical machine body, which
+             must stay the same light plastic in both themes. cc-vid-light is
+             the default; dark-mobile.css swaps which one is `display` below
+             640px, matching every other mobile-only dark-mode toggle on the
+             site. The dark source is also pre-cropped ~4% off its right edge
+             — the raw recording had the page's own orange scroll-dots bleed
+             into that corner, close enough to the edge that no reasonable
+             border-radius could mask them (checked: it would take ~30% of the
+             tile's width to reach), so the fix is in the asset, not the CSS. -->
+          <div class="project-tile tile-tall-media" style="box-shadow: none; overflow: hidden; cursor: pointer; border-radius: 24px;">
+          <video class="cc-vid-light" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: contain; display: block;">
             <source src="/videos/kaffeemaschine/coffeemachine_interface_video.mov" type="video/mp4">
+          </video>
+          <video class="cc-vid-dark" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: contain; display: none;">
+            <source src="/videos/kaffeemaschine/coffeemachine_interface_video_dark.mov" type="video/mp4">
           </video>
         </div>
       </a>
@@ -1803,6 +1820,29 @@
       window.addEventListener('load', scheduleSnap);
       window.addEventListener('resize', scheduleSnap);
       if (mq.addEventListener) mq.addEventListener('change', scheduleSnap);
+    })();
+  </script>
+
+  <script>
+    // Cybercoffee tile: the light/dark clip swap is CSS-only (dark-mobile.css
+    // toggles `display`), but `autoplay`/`loop` on both elements means the
+    // hidden one keeps decoding in the background — this pauses whichever one
+    // just went out of view and (re)plays whichever came into it. A
+    // MutationObserver on documentElement's data-theme is the one thing that
+    // fires on every trigger (the menu tap, a storage event from another tab,
+    // the pre-paint inline script) without depending on theme.js internals.
+    (function () {
+      var light = document.querySelector('.cc-vid-light');
+      var dark = document.querySelector('.cc-vid-dark');
+      if (!light || !dark) return;
+      function sync() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var show = isDark ? dark : light, hide = isDark ? light : dark;
+        hide.pause();
+        show.play().catch(function () {});
+      }
+      sync();
+      new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     })();
   </script>
 </body>

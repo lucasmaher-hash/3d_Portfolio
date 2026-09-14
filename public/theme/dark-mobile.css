@@ -165,6 +165,15 @@
      frame is a separate transparent image over a clipped video (see
      .phone-shot in that page), which looks the same on either theme. */
 
+  /* 2D.html's Cybercoffee tile: two full recordings, not a filter — see the
+     markup comment on the tile for why. Swap which one is in flow; the CSS
+     `autoplay`/`loop` on both means the hidden one keeps decoding, so a tiny
+     script (bottom of 2D.html) also pauses/plays them to match. */
+  /* !important: both videos carry an inline `style="display: ..."` (their
+     own base state), which any external rule can only beat with !important. */
+  [data-theme="dark"] .cc-vid-light { display: none !important; }
+  [data-theme="dark"] .cc-vid-dark  { display: block !important; }
+
   /* ── 3D page (index.html) ────────────────────────────────────────────── */
 
   /* The joystick is frosted glass over the scene, tinted with the LIGHT
