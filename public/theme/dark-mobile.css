@@ -227,6 +227,15 @@
      own base state), which any external rule can only beat with !important. */
   [data-theme="dark"] .cc-vid-light { display: none !important; }
   [data-theme="dark"] .cc-vid-dark  { display: block !important; }
+  /* The dark recording is 1168x1376 (0.8488), not the light one's
+     1064x1104 (0.9638) the tile is shaped for — object-fit: contain was
+     therefore pillarboxing it inside the tile, showing the tile's own
+     flat background as bars down both sides and shrinking the egg inside
+     them (reported as "a frame around it, the egg isn't cut out").
+     Reshaping the tile itself to the dark video's own aspect ratio in
+     dark mode removes the mismatch at the source, so contain renders
+     with zero letterbox — no re-encode, no crop, nothing lost. */
+  [data-theme="dark"] .project-tile.tile-tall-media { aspect-ratio: 1168 / 1376; }
 
   /* ── 3D page (index.html) ────────────────────────────────────────────── */
 
