@@ -161,6 +161,60 @@
   [data-theme="dark"] .dna-ws,
   [data-theme="dark"] .ic-item .sk-round { background-color: var(--material); }
 
+  /* .ic-side .ic-bubble (the retro/modern labels) already carries this exact
+     declaration, unconditionally, in the page's own <style> — so why did it
+     need restating here? Both rules are (0,2,0): `.ic-side .ic-bubble`
+     (2 classes) versus `[data-theme="dark"] .sk-glass`'s IMPLICIT
+     `background-color: transparent` (its `background:` shorthand two rules
+     up resets every sub-property it doesn't mention, including this one) —
+     an attribute selector plus a class is also (0,2,0). A tie is broken by
+     source order, and this file is `<link>`ed AFTER the page's own `<style>`,
+     so the transparent reset from .sk-glass was winning and the pills lost
+     their opaque backing — which is why they read visibly darker than the
+     icon rounds next to them (those get the same fix, one rule up, but at
+     (0,3,0): `.ic-item .sk-round` is two classes, so the attribute selector
+     tips it over the tie and it never had this problem). One more class in
+     the selector is what fixes it here too. */
+  [data-theme="dark"] .ic-side .ic-bubble { background-color: var(--material); }
+
+  /* The trough's outer "bloom" (the soft halo that seats it into the page —
+     .sk-trough__bloom and its .live__bloom twin) fades from --material-top
+     at the top to --recess at the bottom. In dark mode --recess (#191A1C) is
+     only a hair off the page's own #1C1C22, so the object had a lit top edge
+     and NO contact shadow at all underneath it — it read as floating rather
+     than seated, which is what Lucas flagged on the segmented On/Off toggle
+     (the others sit further from their own bloom's bottom edge, so it showed
+     less there). Bottom stop swapped to a real near-black so the underside
+     actually reads as a cast shadow against the page. */
+  [data-theme="dark"] .sk-trough__bloom,
+  [data-theme="dark"] .live__bloom {
+    background: linear-gradient(to bottom, var(--material-top), #000000);
+  }
+
+  /* The "Live" mark (the ring-and-core icon under "Live notifications")
+     never had a dark palette at all — it is a self-contained component with
+     its OWN token scope (.live, not .sk), built when "this site has no dark
+     mode" per its own comment, and dark-mobile.css only ever touched .sk. */
+  [data-theme="dark"] .live {
+    --canvas:#2C2D30; --material-top:#3C3F42;
+    --recess:#191A1C; --recess-bottom:#35373B;
+    --outline:#141517; --outline-bottom:#505357;
+    --edge-light:#D6E5FF; --edge-shade:#070708;
+    --ink:#DCE5F5; --shadow:#09090A;
+  }
+  /* The breathing mark's own keyframes hard-code colours (`breathe-light`
+     grows DARK → BLACK, which reads as "more present" against a light page)
+     rather than reading --ink, so they need a real second keyframe, not a
+     token swap: the dark equivalent has to grow the OTHER way, light → white,
+     to read as "more present" against a dark one. Swapping only
+     `animation-name` (not the whole `animation` shorthand) keeps the
+     duration/timing/iteration the base rule already sets. */
+  @keyframes breathe-dark {
+    from { opacity: .28; transform: scale(.88); border-color: var(--ink); --core: var(--ink); }
+    to   { opacity: 1;   transform: scale(1.08); border-color: #fff;      --core: #fff; }
+  }
+  [data-theme="dark"] .live[data-onair="true"] .live__mark { animation-name: breathe-dark; }
+
   /* to-shove2d.html's screen recordings need nothing here any more: the phone
      frame is a separate transparent image over a clipped video (see
      .phone-shot in that page), which looks the same on either theme. */
