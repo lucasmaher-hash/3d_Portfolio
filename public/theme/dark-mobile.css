@@ -121,28 +121,9 @@
   [data-theme="dark"] .dna-ws,
   [data-theme="dark"] .ic-item .sk-round { background-color: var(--material); }
 
-  /* to-shove2d.html screen recordings. All four clips have the LIGHT page grey
-     (rgb 219,220,227 — i.e. #DCDCE3) baked in around the phone frame, so that on
-     the light page the frame sits on nothing; on Slate that grey shows as a pale
-     box with rounded-out corners. Clip each video to its own bezel instead,
-     the Unify technique. Measured on the frames themselves: the bezel starts
-     5px in from both sides of each 792px-wide phone and runs the full 1600px
-     height (it is cut by the top and bottom edges), corners ~125px, which is
-     15.8% of the phone's width and 7.8% of its height — two radii, or the
-     corners stretch into ellipses. 0.69% is 5.5px: half a pixel inside the
-     first anti-aliased bezel column, so no grey fringe survives. */
-  [data-theme="dark"] .stagger-figure.phone video {
-    clip-path: inset(0 0.69% 0 0.69% round 15.8% / 7.8%);
-  }
-  /* live-pair.mp4 is TWO phones in one 1636x1600 frame (left phone x 5-787,
-     right phone x 849-1631, grey gutter between), which one inset() cannot
-     describe. An SVG mask in the video's own pixel coordinates does, and with
-     preserveAspectRatio="none" at 100% 100% it scales with the element, whose
-     box keeps the frame's exact aspect ratio. */
-  [data-theme="dark"] .stagger-figure.duo video {
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1636 1600' preserveAspectRatio='none'%3E%3Crect x='5.5' y='0' width='781' height='1600' rx='125' ry='125'/%3E%3Crect x='849.5' y='0' width='781' height='1600' rx='125' ry='125'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1636 1600' preserveAspectRatio='none'%3E%3Crect x='5.5' y='0' width='781' height='1600' rx='125' ry='125'/%3E%3Crect x='849.5' y='0' width='781' height='1600' rx='125' ry='125'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
-  }
+  /* to-shove2d.html's screen recordings need nothing here any more: the phone
+     frame is a separate transparent image over a clipped video (see
+     .phone-shot in that page), which looks the same on either theme. */
 
   /* ── Nav iframe (top_row_permanent_V3.html) ──────────────────────────── */
 

@@ -828,6 +828,46 @@
        has no alpha), so a silhouette shadow would draw a rectangle. */
     .stagger-figure video { width: 100%; height: auto; display: block; }
 
+    /* ── Phone frames: the recording sits UNDER a separate frame image ─────────
+       (2026-09-14) All four clips were exported with the phone mockup AND the
+       light page grey baked into the video. On the light page that grey sat on
+       nothing; on the dark page it showed as a pale box, and cutting it away
+       with a clip-path could never be exact — the bezel edge is compressed and
+       anti-aliased against grey in the video itself.
+       Now the frame is its own image, /images/to.morrow/phone-frame.png, cut
+       out of the mockup with a real alpha edge: metal rim, black border and
+       notch opaque, screen and surroundings transparent (built from the median
+       of nine frames, so compression noise is averaged out, with the outer
+       anti-aliasing un-mixed from the grey). It looks the same on any page
+       colour.
+       The video underneath is clipped to a rounded rectangle that lies INSIDE
+       the frame's black border — 14px outside the screen on every side, which
+       leaves at least 20px of solid frame on either side of the cut — so the
+       cut is always hidden under the frame and its precision no longer matters.
+       Measured on the 792x1600 phone: screen x 43-748, y 37-1562, corner
+       radius 87. Clip = that box grown 14px, radius 101 → the numbers below.
+       Video and frame share ONE grid cell, so they get identical sizing from
+       the existing rules with no absolute-positioning or percentage-in-fit-
+       content traps; the frame ignores the pointer, so tap-to-restart and the
+       press swell (which targets the video's parent, now .phone-shot, and so
+       scales frame and video together) still work. */
+    .phone-shot { display: grid; }
+    .phone-shot > video,
+    .phone-shot > .phone-frame { grid-area: 1 / 1; }
+    .phone-frame { pointer-events: none; user-select: none; -webkit-user-drag: none; }
+    .phone-shot > video { clip-path: inset(1.4375% 3.662% round 12.753% / 6.3125%); }
+    /* live-pair.mp4: two phones in one 1636x1600 frame (the right one 844px
+       over), kept as ONE file so the lock screen cannot drift from the app.
+       Two frames, each 792/1636 of the width, docked to either edge; the video
+       is masked to the two inner rectangles in its own pixel coordinates. */
+    .phone-shot--duo > .phone-frame { width: 48.411%; align-self: start; }
+    .phone-shot--duo > .phone-frame:last-child { justify-self: end; }
+    .phone-shot--duo > video {
+      clip-path: none;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1636 1600' preserveAspectRatio='none'%3E%3Crect x='29' y='23' width='734' height='1554' rx='101' ry='101'/%3E%3Crect x='873' y='23' width='734' height='1554' rx='101' ry='101'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+              mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1636 1600' preserveAspectRatio='none'%3E%3Crect x='29' y='23' width='734' height='1554' rx='101' ry='101'/%3E%3Crect x='873' y='23' width='734' height='1554' rx='101' ry='101'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+    }
+
     /* Centred lead paragraph — used where a point introduces a feature
        rather than sitting beside it. */
     .centered-note {
@@ -2255,7 +2295,8 @@
          reproduces Unify's visible width is --phone-h x 0.47 / 0.48875 =
          --phone-h x 0.9617 — every stop of the clamp scaled by that. */
       .stagger-figure.phone { width: auto; }
-      .stagger-figure.phone video {
+      .stagger-figure.phone video,
+      .stagger-figure.phone .phone-frame {
         width: auto;
         height: clamp(428px, 80.3vh, 615px);
         margin-inline: auto;
@@ -2994,9 +3035,13 @@
                  the left, and two independently looping videos drift apart
                  within a few cycles. Baked together, the offset can never
                  slip. -->
-            <video autoplay loop muted playsinline data-loop-end="13.3" width="1636" height="1600" aria-label="Links wird in to.morrow eine Aufgabe als Live Activity aktiviert, rechts erscheint sie daraufhin auf dem Sperrbildschirm">
-              <source src="/videos/to.morrow/live-pair.mp4" type="video/mp4" />
-            </video>
+            <div class="phone-shot phone-shot--duo">
+              <video autoplay loop muted playsinline data-loop-end="13.3" width="1636" height="1600" aria-label="Links wird in to.morrow eine Aufgabe als Live Activity aktiviert, rechts erscheint sie daraufhin auf dem Sperrbildschirm">
+                <source src="/videos/to.morrow/live-pair.mp4" type="video/mp4" />
+              </video>
+              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
+              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
+            </div>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f1b-title">Ein Feld, ein Schalter</h3>
@@ -3012,9 +3057,12 @@
 
         <div class="stagger-row">
           <div class="stagger-figure phone">
-            <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben">
-              <source src="/videos/to.morrow/swipe.mp4" type="video/mp4" />
-            </video>
+            <div class="phone-shot">
+              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben">
+                <source src="/videos/to.morrow/swipe.mp4" type="video/mp4" />
+              </video>
+              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
+            </div>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f2b-title">Drei Listen, eine Geste</h3>
@@ -3025,9 +3073,12 @@
         <!-- 2.3 Workspaces & Co: copy left, recording right -->
         <div class="stagger-row right">
           <div class="stagger-figure phone">
-            <video autoplay loop muted playsinline width="792" height="1600" aria-label="Workspaces wechseln, Aufgaben abhaken, löschen und neu anordnen">
-              <source src="/videos/to.morrow/restfeatures.mp4" type="video/mp4" />
-            </video>
+            <div class="phone-shot">
+              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Workspaces wechseln, Aufgaben abhaken, löschen und neu anordnen">
+                <source src="/videos/to.morrow/restfeatures.mp4" type="video/mp4" />
+              </video>
+              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
+            </div>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f3-title">Workspaces &amp; Co</h3>
@@ -3038,9 +3089,12 @@
         <!-- 2.4 Einstellungen: recording left, copy right -->
         <div class="stagger-row">
           <div class="stagger-figure phone">
-            <video autoplay loop muted playsinline width="792" height="1600" aria-label="Die Einstellungen von to.morrow: Themes, Hell- und Dunkelmodus, Schrift und Tab-Namen">
-              <source src="/videos/to.morrow/settings.mp4" type="video/mp4" />
-            </video>
+            <div class="phone-shot">
+              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Die Einstellungen von to.morrow: Themes, Hell- und Dunkelmodus, Schrift und Tab-Namen">
+                <source src="/videos/to.morrow/settings.mp4" type="video/mp4" />
+              </video>
+              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
+            </div>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f4-title">Einstellungen</h3>

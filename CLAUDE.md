@@ -471,6 +471,30 @@ rather than 13.5** because `timeupdate` fires only ~4×/s, so the fallback path 
 one the IntersectionObserver has paused off screen would restart it. **`loop` stays on the
 element** as the no-JS fallback. Verified in Chrome: `maxTime 13.286`, one wrap, no JS errors.
 
+**Phone frames: the recording sits UNDER a transparent frame image** (2026-09-14). All four clips
+were exported with the phone mockup and the light page grey `rgb(219,220,227)` baked in — invisible on
+the light page, a pale box on dark, and impossible to clip exactly because the bezel edge in the video
+is compressed and anti-aliased against that grey. So the frame is now its own asset,
+`/images/to.morrow/phone-frame.png` (792×1600, 170 KB): metal rim, black border and notch opaque;
+screen and surroundings transparent. Built from the **median of nine frames** (compression noise
+averaged out), with the outer edge's anti-aliasing **un-mixed from the grey** (each edge pixel's alpha
+is its projection from the background toward the nearest solid rim colour), so it has no fringe on any
+page colour.
+
+Each video is wrapped in `.phone-shot`, a one-cell grid holding the `<video>` and the frame `<img>` in
+the same cell, so they size identically from the existing rules with no absolute positioning (the
+mobile `.stagger-figure.phone video` rule now also names `.phone-frame`). The video is **clipped to a
+rounded rect that lies inside the black border**: screen measured at x 43–748, y 37–1562, radius 87,
+grown 14px → `clip-path: inset(1.4375% 3.662% round 12.753% / 6.3125%)`. The border is ≥37px thick
+everywhere, so the cut sits under ≥20px of solid frame on both sides and its precision is irrelevant —
+verified as zero overlap with a 4px band around the outside region. `live-pair.mp4` stays ONE file (the
+lock screen must not drift from the app): two frames at `48.411%` width docked to either edge (right
+phone is 844px over in the 1636px file), video masked to the two inner rects with an SVG `mask`.
+The frame ignores the pointer, so tap-to-restart and the press swell — which targets the video's parent,
+now `.phone-shot` — still work, and scale frame and video together. The video files are untouched.
+Verified at 390 dark, 390 light and 1440: frame boxes coincide with the video boxes to 0.01px, and the
+rim reads clean on both page colours.
+
 **Videos play only while on screen** (2026-09-08). One `IntersectionObserver` at the bottom of
 the file turns `video.autoplay` **off**, pauses everything once, then plays/pauses on
 visibility (`rootMargin: '10% 0px'`). The `autoplay` ATTRIBUTE stays in the markup on purpose
@@ -575,13 +599,8 @@ and the 3D overlays are untouched.
   and read as light app UI on the dark page; the two that are pure translucent glass — the
   Drei Formen "Off air" lip and the icon-cluster rounds — had borrowed the light page as their base
   and became dark holes, so they get an opaque `var(--material)` base like the retro/modern labels.
-- **to.morrow's four screen recordings have the light page grey `rgb(219,220,227)` baked in around
-  the phone**, invisible on the light page and a pale box on Slate. In dark they are clipped to the
-  bezel, measured off the frames: each phone is 792px wide with its bezel from x 5 to 786, running the
-  full 1600px height, corners ~125px → `clip-path: inset(0 0.69% 0 0.69% round 15.8% / 7.8%)`.
-  `live-pair.mp4` is two phones in one 1636px frame (x 5–786 and 849–1630), which one `inset()` cannot
-  express, so it uses an SVG `mask` with two rounded rects in the video's own pixel space
-  (`preserveAspectRatio='none'`, `100% 100%` — the element keeps the frame's exact aspect).
+- **to.morrow's screen recordings are framed by a separate image, not by the video** — see
+  "Phone frames" in the to.morrow section. Nothing theme-specific is needed for them any more.
 - **Sticky `:hover` on touch:** the nav's `.logo` / `.pill` / `.hamburger` hover lifts use a
   literal white highlight, and a phone keeps `:hover` on the last-tapped element — so after opening
   the menu the hamburger glowed as if lit. Overridden with the Slate pair (reported by Lucas on
