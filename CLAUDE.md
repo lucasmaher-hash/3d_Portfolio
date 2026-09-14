@@ -471,29 +471,36 @@ rather than 13.5** because `timeupdate` fires only ~4×/s, so the fallback path 
 one the IntersectionObserver has paused off screen would restart it. **`loop` stays on the
 element** as the no-JS fallback. Verified in Chrome: `maxTime 13.286`, one wrap, no JS errors.
 
-**Phone frames: the recording sits UNDER a transparent frame image** (2026-09-14). All four clips
-were exported with the phone mockup and the light page grey `rgb(219,220,227)` baked in — invisible on
-the light page, a pale box on dark, and impossible to clip exactly because the bezel edge in the video
-is compressed and anti-aliased against that grey. So the frame is now its own asset,
-`/images/to.morrow/phone-frame.png` (792×1600, 170 KB): metal rim, black border and notch opaque;
-screen and surroundings transparent. Built from the **median of nine frames** (compression noise
-averaged out), with the outer edge's anti-aliasing **un-mixed from the grey** (each edge pixel's alpha
-is its projection from the background toward the nearest solid rim colour), so it has no fringe on any
-page colour.
+**Phone frames: the recording sits UNDER a transparent frame image** (2026-09-14, asset replaced same
+day). All four clips were exported with the phone mockup and the light page grey `rgb(219,220,227)`
+baked in — invisible on the light page, a pale box on dark, and impossible to clip exactly because the
+bezel edge in the video is compressed and anti-aliased against that grey. So the frame is its own asset,
+`/images/to.morrow/phone-frame.png` (792×1600): metal rim, black border and notch opaque; screen and
+surroundings transparent.
+
+**The first version of that asset (median of nine of Lucas's own recording frames, edge alpha
+un-mixed from the grey) left a hairline gap on-device** — not reproducible headless, so it went
+unnoticed until Lucas saw it on his phone. Replaced with a real transparent iPhone-12 mockup already in
+his own asset library (`mockup-apple-iphone-12-pro-transparent.png`, 396×800), upscaled 2× with Lanczos
+to match. Screen bounds measured directly off ITS alpha channel by row/column-scanning for the flat
+(non-notch, non-corner) body, not eyeballed: **x 44–746, y 120–1484, corner radius 76** at 792×1600 —
+short of where the notch cuts a further-up "ear" on each side, which is fine, since the frame's own
+opaque bezel covers that gap and the video (a plain rectangle, no notch shape) doesn't need to reach it.
 
 Each video is wrapped in `.phone-shot`, a one-cell grid holding the `<video>` and the frame `<img>` in
 the same cell, so they size identically from the existing rules with no absolute positioning (the
 mobile `.stagger-figure.phone video` rule now also names `.phone-frame`). The video is **clipped to a
-rounded rect that lies inside the black border**: screen measured at x 43–748, y 37–1562, radius 87,
-grown 14px → `clip-path: inset(1.4375% 3.662% round 12.753% / 6.3125%)`. The border is ≥37px thick
-everywhere, so the cut sits under ≥20px of solid frame on both sides and its precision is irrelevant —
-verified as zero overlap with a 4px band around the outside region. `live-pair.mp4` stays ONE file (the
-lock screen must not drift from the app): two frames at `48.411%` width docked to either edge (right
-phone is 844px over in the 1636px file), video masked to the two inner rects with an SVG `mask`.
-The frame ignores the pointer, so tap-to-restart and the press swell — which targets the video's parent,
-now `.phone-shot` — still work, and scale frame and video together. The video files are untouched.
-Verified at 390 dark, 390 light and 1440: frame boxes coincide with the video boxes to 0.01px, and the
-rim reads clean on both page colours.
+rounded rect that lies inside the black border**: that measured box grown 20px, radius 96 →
+`clip-path: inset(6.25% 3.283% 6% 3.03% round 12.12% / 6%)` — comfortably inside the ~40px of solid
+border measured at the sides, so small measuring error stays hidden under the frame regardless.
+`live-pair.mp4` stays ONE file (the lock screen must not drift from the app): two frames at `48.411%`
+width docked to either edge (right phone is 844px over in the 1636px file), video masked to the two
+inner rects with an SVG `mask` — **that mask's own rect coordinates were not re-derived for the new
+asset** (still the original hand-measured ones) and were only checked visually, not pixel-measured;
+revisit if a gap is ever reported there specifically. The frame ignores the pointer, so tap-to-restart
+and the press swell — which targets the video's parent, now `.phone-shot` — still work, and scale frame
+and video together. The video files are untouched. Verified at 390/1440, light/dark: no visible seam at
+either top corner or the left button edge, where the old asset's gap showed.
 
 **Videos play only while on screen** (2026-09-08). One `IntersectionObserver` at the bottom of
 the file turns `video.autoplay` **off**, pauses everything once, then plays/pauses on
@@ -625,6 +632,35 @@ and the 3D overlays are untouched.
   not in the pages.
 - `2D.html`'s Virtual Cooking tile has an inline `box-shadow: none` (desktop's cut-out render);
   its mobile kitchen photo gets `--shadow-raised` in the file's last 640px block, like every tile.
+- **The Cybercoffee landing tile has a real SECOND recording for dark mode**, not a filter — a
+  brightness/invert trick on the light clip would also hit the physical machine body, which has to
+  stay the same light plastic in both themes. `.cc-vid-light` / `.cc-vid-dark`, two full `<video>`s
+  in the tile; `dark-mobile.css` toggles which one is `display` (both `!important` — each video
+  carries an inline `style="display:…"` of its own, which only `!important` can beat) below 640px,
+  and a small script at the bottom of `2D.html` pauses/plays them to match (both would otherwise
+  keep decoding since both carry `autoplay`/`loop`). No colour grading needed — the recording's own
+  background is `#1A1A1E`, imperceptibly close to the page's `#1C1C22`.
+  `coffeemachine_interface_video_dark.mov` is a `crop`ped-then-reverted, then keyed, source: the
+  raw recording had the site's OWN `#FF5C00` scroll-dots bleed into the bottom-right corner (the
+  page's own UI, captured by the screen recording, not part of the machine). **A width crop was
+  tried first and reverted** — it removed real footage. The actual fix: `ffmpeg`'s `colorkey` on
+  the DOT colour (not the background) does nothing when composited back onto a duplicate of the
+  same source frame — `[0:v]split[base][fg];[fg]colorkey=…[k];[base][k]overlay` is a no-op, since
+  transparent pixels in the overlay just reveal the identical pixel underneath. **The dots were
+  actually removed by a `drawbox` fill over their known fixed screen position** (a static site UI
+  element, same spot every frame) — colorkey contributed nothing and was dropped. A hard-edged
+  `drawbox` alone left a visible seam once through H.264 (CRF 26): a perfectly flat region reads
+  differently than the surrounding compression grain even at a near-identical colour. Fixed with a
+  **tight, small-radius blur** (`gblur=sigma=4` over a crop just ~20px larger than the box) —
+  a first attempt used `sigma=22` over a much bigger crop, which was wide enough to pull the
+  nearby light egg body's brightness into the average, visibly lightening the patch (reported as
+  "too light"); the small sigma/tight crop keeps the blur's reach inside pure background. Even
+  then CRF 26 consistently lifted the patch **+13 per channel** versus its true neighbours (a
+  flat, noise-free region gets quantized differently than the grainy real footage around it) —
+  fixed by pre-darkening the fill colour by that same offset (`0x0D0D11` instead of the sampled
+  `0x1A1A1E`) so the POST-COMPRESSION result lands on the real value. **Verify any future edit to
+  this file by decoding a frame back out and sampling it** — the lossless source PNG can look
+  perfect while the actual shipped `.mov` still shows a seam.
 
 ## Nav bar iframe
 

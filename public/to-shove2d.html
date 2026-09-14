@@ -834,18 +834,32 @@
        nothing; on the dark page it showed as a pale box, and cutting it away
        with a clip-path could never be exact — the bezel edge is compressed and
        anti-aliased against grey in the video itself.
-       Now the frame is its own image, /images/to.morrow/phone-frame.png, cut
-       out of the mockup with a real alpha edge: metal rim, black border and
-       notch opaque, screen and surroundings transparent (built from the median
-       of nine frames, so compression noise is averaged out, with the outer
-       anti-aliasing un-mixed from the grey). It looks the same on any page
-       colour.
+       The frame is its own image, /images/to.morrow/phone-frame.png: metal
+       rim, black border and notch opaque, screen and surroundings
+       transparent. It looks the same on any page colour.
+
+       **The asset itself changed (2026-09-14, second pass).** The original
+       was hand-cut from a median of nine frames of Lucas's own recordings —
+       real device, but the alpha edge it produced still left a hairline gap
+       against the frame on-device (not reproducible headless; Safari and
+       Chrome's compositing differ enough that this kind of edge only showed
+       up on the phone it was reported on). Lucas pointed at a proper
+       transparent iPhone-12 mockup already sitting in his own asset library
+       (`~/Documents/creative-work/ongoing/resources/
+       mockup-apple-iphone-12-pro-transparent.png`) — a real cutout with a
+       clean alpha channel, not a reconstruction — and that's what's here now,
+       upscaled 2x (396x800 → 792x1600, Lanczos) to match the width/height
+       attributes already on every video tag on this page.
        The video underneath is clipped to a rounded rectangle that lies INSIDE
-       the frame's black border — 14px outside the screen on every side, which
-       leaves at least 20px of solid frame on either side of the cut — so the
-       cut is always hidden under the frame and its precision no longer matters.
-       Measured on the 792x1600 phone: screen x 43-748, y 37-1562, corner
-       radius 87. Clip = that box grown 14px, radius 101 → the numbers below.
+       the frame's black border — 20px outside the screen on every side,
+       comfortably inside the ~40px of solid border measured at the sides —
+       so the cut stays hidden under the frame regardless of small measuring
+       error. Measured on the new 792x1600 asset directly (row/column scan of
+       its alpha channel, not eyeballed): screen x 44-746, y 120-1484, corner
+       radius 76 — the flat body of the display, short of where the notch
+       cuts a further-up "ear" on each side (the frame's own opaque bezel
+       covers that gap; the video does not need to reach it). Clip = that box
+       grown 20px, radius 96 → the numbers below.
        Video and frame share ONE grid cell, so they get identical sizing from
        the existing rules with no absolute-positioning or percentage-in-fit-
        content traps; the frame ignores the pointer, so tap-to-restart and the
@@ -855,7 +869,7 @@
     .phone-shot > video,
     .phone-shot > .phone-frame { grid-area: 1 / 1; }
     .phone-frame { pointer-events: none; user-select: none; -webkit-user-drag: none; }
-    .phone-shot > video { clip-path: inset(1.4375% 3.662% round 12.753% / 6.3125%); }
+    .phone-shot > video { clip-path: inset(6.25% 3.283% 6% 3.03% round 12.12% / 6%); }
     /* live-pair.mp4: two phones in one 1636x1600 frame (the right one 844px
        over), kept as ONE file so the lock screen cannot drift from the app.
        Two frames, each 792/1636 of the width, docked to either edge; the video

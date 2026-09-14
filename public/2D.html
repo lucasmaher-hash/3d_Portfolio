@@ -1355,19 +1355,28 @@
     <div class="project-section reverse" style="align-items: stretch;">
       <a href="/kaffeemaschine2d.html" style="display:block;">
         <!-- Dark mode swaps to a second screen recording of the machine's own
-             UI, captured on a dark ground (a plain crop+re-encode of the same
-             file Lucas dropped in — no colour grading needed, the recording's
-             own background is already ~#1A1A1E against the page's #1C1C22).
-             Two full videos rather than a filter: brightness/invert tricks on
-             the light clip would also hit the physical machine body, which
-             must stay the same light plastic in both themes. cc-vid-light is
-             the default; dark-mobile.css swaps which one is `display` below
-             640px, matching every other mobile-only dark-mode toggle on the
-             site. The dark source is also pre-cropped ~4% off its right edge
-             — the raw recording had the page's own orange scroll-dots bleed
-             into that corner, close enough to the edge that no reasonable
-             border-radius could mask them (checked: it would take ~30% of the
-             tile's width to reach), so the fix is in the asset, not the CSS. -->
+             UI, captured on a dark ground (no colour grading needed — the
+             recording's own background is already ~#1A1A1E against the
+             page's #1C1C22). Two full videos rather than a filter:
+             brightness/invert tricks on the light clip would also hit the
+             physical machine body, which must stay the same light plastic in
+             both themes. cc-vid-light is the default; dark-mobile.css swaps
+             which one is `display` below 640px, matching every other
+             mobile-only dark-mode toggle on the site.
+             The dark source is a keyed composite, not a crop (a crop tried
+             first cut real content off the frame and was reverted). The
+             recording had the page's OWN orange scroll-dots bleed into the
+             bottom-right corner — the site's `#FF5C00` UI leaking into the
+             capture, not part of the machine at all. Cropping the edge to
+             remove them shaved a slice off the actual footage; instead the
+             machine's own UI is left untouched and only pixels matching that
+             specific orange are keyed out (ffmpeg colorkey on 0xFF5C00,
+             tight similarity so it doesn't touch the machine's own pinkish-
+             red glow, which sits far enough away in colour), plus a small
+             solid-fill rectangle over that exact screen position to erase
+             the antialiased fringe the key alone couldn't fully clean up —
+             both filled with the recording's own sampled background colour,
+             so nothing shows a seam. Full frame width preserved. -->
           <div class="project-tile tile-tall-media" style="box-shadow: none; overflow: hidden; cursor: pointer; border-radius: 24px;">
           <video class="cc-vid-light" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: contain; display: block;">
             <source src="/videos/kaffeemaschine/coffeemachine_interface_video.mov" type="video/mp4">
