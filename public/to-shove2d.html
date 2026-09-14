@@ -2860,6 +2860,14 @@
 
   <div id="mobile-menu" class="mobile-menu">
     <div class="mobile-menu-panel">
+      <!-- Light/dark toggle, first in the panel above Craft, built from the
+           same two classes, so the pair always match. Mobile-only, like the menu.
+           The labels are 13x13 pixel-art glyphs (sun / moon), not text, so they carry
+           no data-i18n — /theme/theme.js sets the aria-label in the current language. -->
+      <div class="mobile-view-toggle mobile-theme-toggle">
+        <button class="mobile-mode-btn" data-theme-choice="light" aria-label="Hell"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="5" y="3" width="3" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="0" y="6" width="2" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="11" y="6" width="2" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="3" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="1" y="11" width="1" height="1"/><rect x="6" y="11" width="1" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/></svg></button>
+        <button class="mobile-mode-btn" data-theme-choice="dark" aria-label="Dunkel"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="0" width="5" height="1"/><rect x="2" y="1" width="4" height="1"/><rect x="1" y="2" width="4" height="1"/><rect x="1" y="3" width="3" height="1"/><rect x="0" y="4" width="4" height="1"/><rect x="0" y="5" width="4" height="1"/><rect x="0" y="6" width="4" height="1"/><rect x="0" y="7" width="4" height="1"/><rect x="0" y="8" width="5" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="1" y="9" width="6" height="1"/><rect x="10" y="9" width="2" height="1"/><rect x="1" y="10" width="11" height="1"/><rect x="2" y="11" width="9" height="1"/><rect x="4" y="12" width="5" height="1"/></svg></button>
+      </div>
       <a class="mobile-nav-btn" data-page="craft" data-i18n="menu-craft">Craft</a>
       <a class="mobile-nav-btn" data-page="about" data-i18n="menu-about">About</a>
       <a class="mobile-nav-btn" data-page="contact" data-i18n="menu-contact">Contact</a>
@@ -2870,14 +2878,6 @@
       <div class="mobile-view-toggle mobile-lang-toggle">
         <button class="mobile-mode-btn" data-lang="de">Deutsch</button>
         <button class="mobile-mode-btn" data-lang="en">English</button>
-      </div>
-      <!-- Light/dark toggle, directly under the language toggle and built from the
-           same two classes, so the pair always match. Mobile-only, like the menu.
-           The labels are 13x13 pixel-art glyphs (sun / moon), not text, so they carry
-           no data-i18n — /theme/theme.js sets the aria-label in the current language. -->
-      <div class="mobile-view-toggle mobile-theme-toggle">
-        <button class="mobile-mode-btn" data-theme-choice="light" aria-label="Hell"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="5" y="3" width="3" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="0" y="6" width="2" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="11" y="6" width="2" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="3" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="1" y="11" width="1" height="1"/><rect x="6" y="11" width="1" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/></svg></button>
-        <button class="mobile-mode-btn" data-theme-choice="dark" aria-label="Dunkel"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="0" width="5" height="1"/><rect x="2" y="1" width="4" height="1"/><rect x="1" y="2" width="4" height="1"/><rect x="1" y="3" width="3" height="1"/><rect x="0" y="4" width="4" height="1"/><rect x="0" y="5" width="4" height="1"/><rect x="0" y="6" width="4" height="1"/><rect x="0" y="7" width="4" height="1"/><rect x="0" y="8" width="5" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="1" y="9" width="6" height="1"/><rect x="10" y="9" width="2" height="1"/><rect x="1" y="10" width="11" height="1"/><rect x="2" y="11" width="9" height="1"/><rect x="4" y="12" width="5" height="1"/></svg></button>
       </div>
     </div>
   </div>
