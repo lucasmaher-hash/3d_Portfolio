@@ -111,13 +111,53 @@
      so it vanishes. A hairline gives it an edge without recolouring the chip. */
   [data-theme="dark"] .color-swatch[style*="1A1A1A"] { box-shadow: inset 0 0 0 1px var(--border-color); }
 
-  /* to-shove2d.html SkeuKit exhibits. These keep their own light material
-     (they are the app's UI, scoped tokens on .sk), and most of them are opaque
-     so they simply read as light objects on the dark page. The two that are
-     pure translucent glass — the "Off air" lip in Drei Formen and the icon
-     rounds in Schrift und Icons — had borrowed the LIGHT page as their base
-     and turned into dark holes with near-black ink inside. They get the same
-     opaque material base the retro/modern labels already carry. */
+  /* to-shove2d.html SkeuKit exhibits — the retro/modern icon clusters, the
+     "Off air"/"Personal" pill, the day/segmented toggle. First shipped with
+     ONLY their light material (the app's own UI, scoped tokens on .sk), on
+     the theory that they read as light objects on a dark page and needed no
+     more than an opaque backing on the two pure-glass pieces (the .dna-ws
+     lip and the icon-cluster rounds, which have no base of their own — see
+     the comment on .ic-side .ic-bubble in the page itself). Lucas reported
+     they still read as bright UI chrome floating on the dark page, so the
+     component now gets its OWN dark palette — .sk.dark from
+     shove95-components.css, which this page's .sk block is itself a lifted
+     subset of (see the comment there: "the .dark half of that file is left
+     out rather than shipped dead"). Re-declaring the tokens here, rather
+     than shipping the unused rules, keeps that same convention.
+     Every child (.sk-pill, .sk-round, .sk-trough, .sk-seg, .sk-glass, the
+     retro/modern bubbles) reads these through var(), so overriding the
+     tokens on .sk is enough to redye the whole component tree — nothing
+     below needs its own rule. .dna's two extra tokens (ink-muted/faint,
+     scoped there because the page's trimmed .sk block never defined them)
+     get the same swap. The two pure-glass pieces still need an opaque
+     backing — var(--material) now resolves dark, so the SAME rule that
+     used to patch them light-on-dark now gives them a correct dark base. */
+  [data-theme="dark"] .sk {
+    --canvas:#2C2D30; --material:#2C2D30; --material-top:#3C3F42;
+    --recess:#191A1C; --recess-bottom:#35373B;
+    --outline:#141517; --outline-bottom:#505357;
+    --edge-light:#D6E5FF; --edge-shade:#070708;
+    --ink:#DCE5F5; --shadow:#09090A;
+  }
+  [data-theme="dark"] .dna { --ink-muted: #9FAABD; --ink-faint: #707B8C; }
+
+  /* Dark: no inward relief, thinner/dimmer rim, no 1.3x boost on the top
+     stop — a bright glass rim reads as a highlight on a dark material, so it
+     needs less of it than the light version's near-white-on-near-white
+     contact edge. Lifted verbatim from .dark .sk-glass / .dark .sk-glass::after
+     in shove95-components.css. */
+  [data-theme="dark"] .sk-glass {
+    background: radial-gradient(ellipse 62% 62% at 50% 118%,
+      rgba(255,255,255,calc(.30 * var(--str))) 0%, rgba(255,255,255,0) 70%);
+  }
+  [data-theme="dark"] .sk-glass::after {
+    padding: max(.8px, calc(2.971px * var(--k)));
+    background: linear-gradient(to bottom,
+      color-mix(in srgb, var(--edge-light) calc(55% * var(--str)), transparent) 0%,
+      color-mix(in srgb, var(--edge-light) calc(5% * var(--str)), transparent) 50%,
+      color-mix(in srgb, var(--edge-light) calc(60% * var(--str)), transparent) 100%);
+  }
+
   [data-theme="dark"] .dna-ws,
   [data-theme="dark"] .ic-item .sk-round { background-color: var(--material); }
 
