@@ -57,9 +57,24 @@
     tellNav(theme);
   });
 
+  // The segments are pixel glyphs rather than words, so their accessible names
+  // are set here in the page's language instead of through data-i18n (which
+  // writes textContent and would wipe the SVG). The nav re-broadcasts
+  // 'lang-change' to the page whenever the language is switched.
+  var LABELS = { de: { light: 'Hell', dark: 'Dunkel' }, en: { light: 'Light', dark: 'Dark' } };
+  function label(lang) {
+    var l = LABELS[lang] || LABELS.de;
+    var btns = document.querySelectorAll('[data-theme-choice]');
+    for (var i = 0; i < btns.length; i++) btns[i].setAttribute('aria-label', l[btns[i].getAttribute('data-theme-choice')]);
+  }
+
   window.addEventListener('storage', function (e) {
     if (e.key === KEY || e.key === null) apply(read());
   });
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.type === 'lang-change') label(e.data.lang);
+  });
 
   mark(read());
+  try { label(localStorage.getItem('lang') || 'de'); } catch (e) { label('de'); }
 })();

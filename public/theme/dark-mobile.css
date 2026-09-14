@@ -132,6 +132,13 @@
    the same rule keyed on [data-lang]; this is its twin for [data-theme-choice]
    so both toggles press the same way. Mobile-only because the burger menu is. */
 @media (max-width: 640px) {
+  /* The sun / moon glyphs. 13 cells at exactly 2px each = 26px, so every pixel
+     of the pixel art lands on whole CSS pixels (a non-integer cell size makes
+     crispEdges round some rows fat and some thin). The vertical margins make up
+     the rest of the segment's 35.2px text line box (22px x line-height 1.6), so
+     this track comes out exactly as tall as the language toggle above it. */
+  .theme-pix { display: block; width: 26px; height: 26px; margin: 4.6px auto; }
+
   .mobile-mode-btn[data-theme-choice]:active:not(.is-active) {
     box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
   }

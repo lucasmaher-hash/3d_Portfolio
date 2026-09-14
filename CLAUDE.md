@@ -551,8 +551,12 @@ and the 3D overlays are untouched.
   selector carries one extra attribute, so it wins on specificity and source order both.
 - **Toggle:** the burger menu's `.mobile-theme-toggle`, directly under the language toggle, built
   from the same `.mobile-view-toggle` / `.mobile-mode-btn` classes with `data-theme-choice`
-  (`light`/`dark`), labels `menu-light` / `menu-dark` in every page's `TRANSLATIONS`
-  (Light/Dark, Hell/Dunkel). The dark "selected well" rule is `:not([data-mode])` so it cannot
+  (`light`/`dark`). **The segments are 13×13 pixel-art glyphs (outline sun / filled moon), not
+  text** — inline SVG `rect`s with `shape-rendering: crispEdges`, sized to **exactly 26px** (2px per
+  cell; a fractional cell size rounds some rows fat and some thin), with `4.6px` vertical margins so
+  the track stays the language toggle's height (both measure 67.19px). They carry **no `data-i18n`**
+  — that writes `textContent` and would wipe the SVG — so `theme.js` sets the `aria-label`
+  (Hell/Dunkel, Light/Dark) from `localStorage.lang` and on every `lang-change` message. The dark "selected well" rule is `:not([data-mode])` so it cannot
   take the orange off the 2D/3D toggle it ties with.
 - **Iframes follow on their own:** `theme.js` posts `theme-change` to every iframe. The nav links the
   same CSS and has a listener. **The hero blob (`blob_morph_bouncy.html`) must NOT use its own media
