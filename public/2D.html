@@ -365,11 +365,16 @@
        from whatever box holds it, so the desktop tile keeps centring it the way it
        centred the bare video before (349px wide at 1440, against the old 353px).
 
-       `.phone-shot-screen` is the frame's screen hole, measured off its alpha channel
-       (x 36-839, y 30-1777 of 876 x 1808), with that hole's own corner radius, stated
-       against the hole's own width/height so it survives any rendered size. That
-       radius is 128px, and it has to be MEASURED BY FITTING A CIRCLE to the corner
-       arc — all four corners agree on 128.5/128.0 to within half a pixel. Reading it
+       `.phone-shot-screen` is the frame's screen hole — measured off its alpha channel
+       at x 36-839, y 30-1777 of 876 x 1808, so 804 x 1748 with an even 36/30 margin,
+       then GROWN 2px on every side (and its radius with it) so its edge sits under the
+       frame rather than inside the hole. Sized at the hole exactly, a hairline of page
+       background showed all the way round: the boundary is anti-aliased, and an
+       inclusive bbox is a pixel wider than the naive x1-x0. Everything outside the
+       hole is covered by the frame, so overhanging costs nothing and half a pixel of
+       shortfall costs a visible seam. All percentages are against the hole's own
+       width/height, so they survive any rendered size. The radius is 128px, and it has
+       to be MEASURED BY FITTING A CIRCLE to the corner arc — all four corners agree on 128.5/128.0 to within half a pixel. Reading it
        off the point where the edge stops moving gives ~145 (tried, shipped, wrong):
        the arc meets the straight edge tangentially, so its last several pixels are
        almost parallel to it and anti-aliasing hides exactly where they stop. 13% too
@@ -389,11 +394,25 @@
        so the numbers are solved backwards: take the island in the raw file
        (x 249-440, y 52-106 of 688 x 1406), take it in the frame (x 314-561, y 60-130
        of 876 x 1808), and derive the placement that makes them agree. The crop
-       (crop=658:1396:16:10) is deliberately LOOSE — the whole screen plus ~20px of
-       the recording's own bezel — because at that island-locked scale the video is
-       slightly narrower than the hole and slightly taller than it, so the bezel fills
-       the 1-3px slivers left at the sides while the excess height is simply clipped.
-       A tight, screen-edge crop (tried) leaves nothing to fill those slivers.
+       (crop=634:1374:28:22) lands INSIDE the recording's own black bezel on every
+       side — that band is x 24-34 / 656-665 and y 17-28 / 1391-1400 in the raw file,
+       and the crop sits a few px within it. This matters more than it looks: at the
+       island-locked scale the recording's screen falls ~4px short of the clip box, so
+       whatever the crop happened to include at its edge is what fills that sliver.
+       A looser crop (tried) carried the recording's OWN SILVER RIM in, which drew a
+       pale hairline between the frame's black border and the screen — read as "a thin
+       gap between frame and recording". Black bezel there is invisible; silver is not.
+       Crop tighter than the screen and there is nothing to fill it with at all.
+
+       The video is also zoomed 1.5% HORIZONTALLY ONLY, about the island centre, which
+       puts real screen ~1.4px past the box on both sides. Vertical stays at 1:1 on
+       purpose. Zooming both ways (tried) visibly ate the bottom of the app's nav row:
+       the island sits near the top, so a scale about it barely moves the top edge but
+       swings the bottom hard — it took the bottom overhang from 14px to 40px to buy
+       1px at the top. So the horizontal seam is closed by zoom and the ~3.5px the top
+       edge is short is left to the black bezel, under the frame's own rim, where it
+       cannot be seen. Horizontal zoom grows the island 3.7 frame px (about one
+       rendered pixel) and moves its centre not at all.
 
        object-fit must be `fill` (NOT cover, and not the `contain` a video defaults
        to) — anything that re-fits would undo the island alignment these numbers exist
@@ -409,15 +428,15 @@
     }
     .phone-shot-screen {
       position: absolute;
-      top: 1.6593%; left: 4.1096%;
-      width: 91.6667%; height: 96.6261%;
-      border-radius: 15.9826% / 7.3513%;
+      top: 1.5487%; left: 3.8813%;
+      width: 92.2374%; height: 96.9027%;
+      border-radius: 16.0891% / 7.4201%;
       overflow: hidden;
     }
     .phone-shot-video {
       position: absolute;
-      top: -1.3992%; left: -2.9034%;
-      width: 105.9678%; height: 103.585%;
+      top: -0.3932%; left: -1.4771%;
+      width: 102.9930%; height: 101.6616%;
       object-fit: fill;
       display: block;
     }
