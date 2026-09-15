@@ -2238,64 +2238,102 @@ the only `.process-title` directly following a divider) with `!important`, since
 | `settings.mov` | 672 × 1370 |
 | `map-courses.mov` | 614 × 1250 (framed tighter than the rest) |
 
-### Background removal — `clip-path`, not re-encoding
+### Background removal — a transparent frame OVER the recording (2026-09-15)
 
-Every `.mov` has `#D8D7DC` (RGB 216,215,220) baked in as the app-UI background, filling the thin margin and the four corners around the phone. **The files are untouched.** The grey is hidden by clipping each `<video>` to the phone's rounded bezel in CSS:
+Every `.mov` has `#D8D7DC` (216,215,220) baked in as the app-UI background, around a phone
+mockup that is part of the footage. **The files are untouched.** They used to be hidden with a
+per-file `clip-path` measured to the phone's bezel; that is **gone**, on this page and on
+`2D.html`'s Unify tile, because it could never cut cleanly — each recording's screen corners are
+ROUNDED and baked in, so clipping a rectangular element to a rounded rect always left bezel
+wedges in the corners.
 
-```css
-.feature-media video,
-.scrolly-vid video {
-  clip-path: inset(1.01% 1.79% 0.72% 1.79% round 15.8% / 7.7%);
-}
-```
+Now a stock transparent iPhone 17 mockup (`/images/unify/iphone-17-frame.png`, 876x1808, a real
+alpha channel, screen hole and surroundings transparent) sits OVER each recording, and a box
+shaped like that frame's screen hole does the clipping — so the corner is the frame's own curve
+by construction. Three boxes per phone:
 
-Per-file overrides, because the phone sits slightly differently in each recording:
+- `.phone-shot` — the frame's pixel ratio (`aspect-ratio: 876/1808`), sized by height wherever
+  the bare `<video>` used to be.
+- `.phone-shot-screen` — the frame's screen hole (**x 36-839, y 30-1777**, i.e. 804x1748 with an
+  even 36/30 margin), **grown 2px on every side** so its edge hides under the frame. Sized to the
+  hole exactly, a hairline of page background showed all the way round: the boundary is
+  anti-aliased and an inclusive bbox is a pixel wider than `x1-x0`. Outside the hole is covered by
+  the frame, so overhanging is free; falling short is a visible seam. `overflow: hidden`.
+- `.phone-shot-video` — the recording, absolutely positioned, `object-fit: fill`.
 
-| Video | Selector | `clip-path: inset(...)` |
-|---|---|---|
-| default (timetable, socials, map-friends) | `.feature-media video, .scrolly-vid video` | `1.01% 1.79% 0.72% 1.79% round 15.8% / 7.7%` |
-| homepage | `video[data-vid="homepage"]` | `0.50% 1.46% 0.29% 1.75% round 15.9% / 7.8%` |
-| settings | `video[data-vid="settings"]` | `0.44% 1.79% 0.44% 1.79% round 15.8% / 7.7%` |
-| map-courses | `#nav-friends-scrolly .scrolly-vid[data-step="courses"] video` | `1.04% 1.95% 0.30% 2.44% round 16.3% / 8.0%` |
+**Two measurements that must be made the right way:**
 
-The two standalone videos carry `data-vid="homepage"` / `data-vid="settings"` attributes purely so they can be targeted individually.
+1. **The corner radius is 128px, and it has to be found by FITTING A CIRCLE to the hole's corner
+   arc** (all four corners agree to within half a pixel). Reading it off the point where the edge
+   stops moving gives ~145 — the arc meets the straight edge tangentially, so its last pixels run
+   almost parallel to it and anti-aliasing hides where they end. 13% too round is plainly visible
+   as corners that do not sit in the cutout. Stated against the hole's own width/height
+   (`16.0891% / 7.4201%`) so it survives any rendered size.
+2. **Each video is placed by matching its DYNAMIC ISLAND to the frame's**, not by matching screen
+   edges. Both assets draw an island — the frame paints its own over the video — so if they do not
+   coincide you see a doubled, offset pill. They are the same shape but sit at slightly different
+   fractions of their own screen, because the recordings are different iPhone generations.
+   **Find each island by taking a pixelwise MAX over ~60 frames**: the screen is lit at some point,
+   the island never is, so it falls out as a dark hole. (The same max-image gives the screen bounds
+   wherever the app lights them; a permanently dark bottom is recovered from the mockup's own
+   symmetry — bottom margin equals top margin.)
 
-**Two-value radius is required.** `round 15.8% / 7.7%` states the same pixel radius twice — once against width, once against height. A single percentage resolves horizontally against width and vertically against height, which on a tall phone stretches the corners into ellipses. If you re-measure, recompute both.
+**The crop lands INSIDE each recording's own black bezel** (`ffmpeg crop`, files named
+`<name>_screen.mov`). At island-locked scale the recording's screen stops ~4px short of the clip
+box, so whatever the crop includes at its edge is what fills that sliver. A looser crop carries the
+recording's OWN SILVER RIM in, which draws a pale hairline between the frame's black border and the
+screen — reported as "a thin gap between frame and recording". Black bezel there is invisible;
+silver is not. Crop tighter than the screen and there is nothing to fill it with at all.
 
-**Re-measuring:** `qlmanage -t -s 1400 -o . <file>.mov` produces a PNG frame; find the first non-background pixel along the middle row/column for the insets, and the row where the left edge reaches its final x for the corner radius.
+**The ~1% zoom that closes the side seam is HORIZONTAL ONLY.** Vertical scale keeps the
+recording's pixels square. Zooming both ways about the island (tried) visibly ate the bottom of the
+app's nav row: the island sits near the top, so a scale about it barely moves the top edge but
+swings the bottom hard — it took one video's bottom overhang from 14px to 40px to buy 1px at the
+top. The ~1-2px the top edge is left short is black bezel under the frame's own rim, where it
+cannot be seen.
 
-**Superseded:** `map-courses.mov` previously used `clip-path: inset(0 0 3px 0)` to crop an unwanted bottom line. That crop is now folded into its full inset above — don't re-add it.
+Per-file placement lives in one block of `.phone-shot-video[data-vid="..."]` rules. **They are not
+interchangeable between files.** Measured geometry, for re-deriving:
+
+| file | size | screen | island | crop |
+|---|---|---|---|---|
+| homepage | 688x1406 | 35-655, 29-1377 | 249-440, 52-106 | `634:1374:28:22` |
+| timetable / socials / map-friends | 672x1382 | 34-637, 35-1351 | 243-428, 58-110 | `612:1324:30:31` |
+| settings | 672x1370 | 34-637, 27-1336 | 243-428, 50-102 | `612:1322:30:23` |
+| map-courses | 614x1250 | 35-581, 32-1229 | 224-392, 53-100 | `554:1206:31:28` |
+
+The originals (`homepage.mov` etc.) are **still on disk but no longer referenced** — kept in case
+the crops need re-deriving.
+
+**The press swell targets `.phone-shot`, not the video's parent** — its parent is now the clipping
+screen box, and scaling that reads as the screen zooming inside a static frame.
+
+Verified over CDP at 1440 and 390, light and dark: all six frames coincide with their box, the
+video covers the screen box in every case, every edge reads rail → black border → screen with no
+pale pixel between, captions match the phone width exactly, and no console errors.
 
 ### Mobile sizing: `--phone-h` / `--phone-w`
 
 All six mockups take their height from **one** custom property, `--phone-h`, set in the last
 `@media (max-width: 640px)` block (it must stay last — the height is also declared earlier for
-`.feature-media video` and `.scrolly-vid video`, and this wins on source order). Currently
-`clamp(445px, 83.5vh, 640px)`, which is the original `clamp(416px, 78vh, 598px)` with **+7% on all
-three stops**, so the short-phone floor, the vh tracking and the tall-phone ceiling keep the same
-relationship.
+`.feature-media .phone-shot` and `.scrolly-vid .phone-shot`, and this wins on source order).
+Currently `clamp(445px, 83.5vh, 640px)`, which is the original `clamp(416px, 78vh, 598px)` with
+**+7% on all three stops**, so the short-phone floor, the vh tracking and the tall-phone ceiling
+keep the same relationship. **The height goes on `.phone-shot`, never on the `<video>`** — the
+video is positioned inside the frame now, and sizing it directly would break that placement.
 
 Captions attached to a video (`.feature-copy`, `.scrolly-panel` — *not* other paragraphs) are
 constrained to `--phone-w` and centred, matching the reference where the text spans the phone.
 
-**`--phone-w` is derived from the VISIBLE phone, not the element box.** Because every video is
-clip-path'd to the bezel, ~3.6% of the element is cropped away and the box stays wider than what
-you see. Per video that is `height × aspect × (1 − horizontal insets)`:
+**`--phone-w` is `calc(var(--phone-h) * 0.4845)`** — simply the frame image's aspect ratio
+(876/1808), because the mockup IS the frame now. It replaced a four-row table of per-file ratios
+(0.4688–0.4736) averaged to one shared `0.47`, which was the best the old clip-path approach could
+do: each video's visible phone was its element box minus that file's own insets, so no single
+number was exact and 0.47 landed within ~2.3px of each. One frame for all six makes it exact.
 
-| video | ratio |
-|---|---|
-| homepage | 0.4736 |
-| settings | 0.4730 |
-| timetable / socials / map-friends | 0.4688 |
-| map-courses | 0.4696 |
-
-One shared `0.47` rather than four rules: at the 640px ceiling those span 300.0–303.1px, so it
-lands within **2.3px worst case** of every one — below the threshold where an edge misalignment is
-visible. If the clip-paths are ever re-measured, redo this table.
-
-**Testing gotcha:** Chrome collapses `inset()` shorthand in `getComputedStyle().clipPath` when
-sides are equal, so a naive parser reads a corner radius as an inset. Split on `round` and drop
-the radii before parsing, or the measured "visible width" will be badly wrong.
+**Testing gotcha (historical, for the clip-path era):** Chrome collapses `inset()` shorthand in
+`getComputedStyle().clipPath` when sides are equal, so a naive parser reads a corner radius as an
+inset. No `clip-path` remains on this page, but the same trap applies anywhere one is measured.
 
 **Transparent video files are NOT worth it for this site.** `.mov`/H.264 can't carry an alpha channel; real transparency needs WebM/VP9 (Chrome/Firefox) *plus* HEVC-with-alpha (Safari) — 12 files to replace 6, with quality loss. Only go there if the videos are needed outside the website.
 

@@ -368,31 +368,67 @@
       justify-content: center;
     }
 
-    .feature-media video {
-      width: auto;
+    .feature-media .phone-shot {
       height: clamp(442px, 62.4vh, 676px);
       max-width: 100%;
+    }
+
+    /* ── Phone mockups: a transparent iPhone frame OVER the recording ──────
+       Every .mov was exported with its own phone mockup and the app's grey
+       (#D8D7DC) baked in around it. That grey used to be hidden with a per-file
+       clip-path measured to the phone's bezel, which never cut cleanly: each
+       recording's screen corners are ROUNDED and baked in, so clipping a
+       rectangular element to a rounded rect always left bezel wedges in the
+       corners. The recordings are untouched; what changed is that a stock
+       transparent iPhone 17 frame now sits on top, and a box shaped like that
+       frame's screen hole does the clipping — so the corner is the frame's own
+       curve by construction. Same system as 2D.html's Unify tile; the long
+       comment there carries the full reasoning.
+
+       Three boxes: .phone-shot is the frame's own pixel ratio, sized by height
+       wherever the bare recording used to be; .phone-shot-screen is that frame's
+       screen hole (x 36-839, y 30-1777 of 876 x 1808, grown 2px so its edge
+       hides under the frame instead of leaving a hairline of page showing);
+       .phone-shot-video is the recording, cropped to sit inside its own black
+       bezel and placed so ITS dynamic island lands on the frame's.
+
+       The per-file numbers below are derived, not eyeballed. Each recording's
+       island was found by taking a pixelwise MAX over 60 frames — the screen is
+       lit at some point, the island never is — and the placement solved so the
+       two islands coincide. They are NOT interchangeable between files: these
+       are different iPhone generations at different framings. Vertical scale
+       keeps each recording's pixels square, and the ~1% zoom that closes the
+       side seam is HORIZONTAL ONLY, because the islands sit near the top and
+       scaling vertically about them swings the bottom hard enough to crop the
+       app's own nav row. */
+    .phone-shot {
+      position: relative;
+      aspect-ratio: 876 / 1808;
+    }
+    .phone-shot-screen {
+      position: absolute;
+      top: 1.5487%; left: 3.8813%;
+      width: 92.2374%; height: 96.9027%;
+      border-radius: 16.0891% / 7.4201%;
+      overflow: hidden;
+    }
+    .phone-shot-video {
+      position: absolute;
+      object-fit: fill;
       display: block;
     }
-
-    /* Each .mov has the app's grey (#D8D7DC) baked in around the phone.
-       Clip every video to the phone's rounded bezel so that grey never shows
-       against the page — this is what lets the page background be any colour.
-       Insets are measured per file (the phone sits slightly differently in each);
-       the radius is 15.8% of width, restated as 7.7% of height so the corners
-       stay circular rather than stretching into ellipses on a tall element. */
-    .feature-media video,
-    .scrolly-vid video {
-      clip-path: inset(1.01% 1.79% 0.72% 1.79% round 15.8% / 7.7%);
+    .phone-shot-frame {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      display: block;
     }
-
-    .feature-media video[data-vid="homepage"] {
-      clip-path: inset(0.50% 1.46% 0.29% 1.75% round 15.9% / 7.8%);
-    }
-
-    .feature-media video[data-vid="settings"] {
-      clip-path: inset(0.44% 1.79% 0.44% 1.79% round 15.8% / 7.7%);
-    }
+    .phone-shot-video[data-vid="homepage"] { top: -0.3831%; left: -1.3252%; width: 102.6885%; height: 101.4183%; }
+    .phone-shot-video[data-vid="timetable"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.8972%; }
+    .phone-shot-video[data-vid="socials"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.8972%; }
+    .phone-shot-video[data-vid="map-friends"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.8972%; }
+    .phone-shot-video[data-vid="map-courses"] { top: -0.2458%; left: -1.0697%; width: 102.0156%; height: 101.2047%; }
+    .phone-shot-video[data-vid="settings"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.7448%; }
 
     .feature-copy {
       display: flex;
@@ -448,21 +484,12 @@
 
     .scrolly-vid { cursor: pointer; }
 
-    .scrolly-vid video {
-      display: block;
-      width: auto;
+    .scrolly-vid .phone-shot {
       height: calc(clamp(442px, 62.4vh, 676px) * 0.6);   /* inactive: 40% smaller */
       transition: height 480ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* map-courses.mov is framed tighter than the rest; its own measured inset,
-       with a slightly deeper bottom that also absorbs the 3px line that used to
-       be cropped here separately. */
-    #nav-friends-scrolly .scrolly-vid[data-step="courses"] video {
-      clip-path: inset(1.04% 1.95% 0.30% 2.44% round 16.3% / 8.0%);
-    }
-
-    .scrolly-vid.is-active video {
+    .scrolly-vid.is-active .phone-shot {
       height: clamp(442px, 62.4vh, 676px);   /* matches the other feature videos */
     }
 
@@ -528,8 +555,8 @@
          Restating at ID strength is what actually overrides it. */
       #timetable-socials-scrolly .scrolly-sticky { flex-direction: column; }
       #timetable-socials-scrolly .scrolly-media { margin-left: 0; margin-right: 0; }
-      .scrolly-vid video,
-      .scrolly-vid.is-active video { height: clamp(360px, 64vw, 460px); }
+      .scrolly-vid .phone-shot,
+      .scrolly-vid.is-active .phone-shot { height: clamp(360px, 64vw, 460px); }
       .scrolly-copy { min-height: 0; }
       .scrolly-panel { position: static; transform: none; opacity: 1; pointer-events: auto; }
       .scrolly-panel + .scrolly-panel { margin-top: 24px; }
@@ -613,7 +640,7 @@
       .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
       .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
       .meta-inset { padding: 8px 10px; }
-      .feature-media video { height: clamp(416px, 78vh, 598px); }
+      .feature-media .phone-shot { height: clamp(416px, 78vh, 598px); }
     }
 
     /* ── Project nav ──────────────────────────────────────── */
@@ -1355,8 +1382,8 @@
       /* Same ramp as .feature-media video, so all six phone mockups on the page
          render at one size. Both rules needed: the active/inactive size split is
          a desktop affordance and there is no active step down here. */
-      .scrolly-vid video,
-      .scrolly-vid.is-active video { height: clamp(416px, 78vh, 598px); }
+      .scrolly-vid .phone-shot,
+      .scrolly-vid.is-active .phone-shot { height: clamp(416px, 78vh, 598px); }
 
       /* The 860px fallback's 24px panel gap now lands between a video and its own
          caption, which should be the tight pair; the breathing room belongs
@@ -1396,24 +1423,17 @@
            same relationship to each other. */
         --phone-h: clamp(445px, 83.5vh, 640px);
 
-        /* Visible width of a mockup as a fraction of its height — NOT just the
-           file's aspect ratio. Every video is clip-path'd to the phone bezel, so
-           ~3.6% of the element box is cropped away and the element box stays
-           wider than the phone you actually see. Per video that is
-           height x aspect x (1 - horizontal insets):
-             homepage                  685/1400 x 0.9679 = 0.4736
-             settings                  672/1370 x 0.9642 = 0.4730
-             timetable/socials/friends 672/1382 x 0.9642 = 0.4688
-             map-courses               614/1250 x 0.9561 = 0.4696
-           One shared value rather than four: at the 640px ceiling those span
-           300.0px to 303.1px, so 0.47 lands within ~2px of every one of them —
-           below the threshold where an edge misalignment is visible. */
-        --phone-w: calc(var(--phone-h) * 0.47);
+        /* Visible width of a mockup as a fraction of its height. The mockup is
+           the frame IMAGE now, so this is simply its aspect ratio (876/1808),
+           replacing the old per-file "element box minus its clip-path insets"
+           table — one number, exact for all six, where that table only managed
+           to land within ~2px of each. */
+        --phone-w: calc(var(--phone-h) * 0.4845);
       }
 
-      .feature-media video,
-      .scrolly-vid video,
-      .scrolly-vid.is-active video { height: var(--phone-h); }
+      .feature-media .phone-shot,
+      .scrolly-vid .phone-shot,
+      .scrolly-vid.is-active .phone-shot { height: var(--phone-h); }
 
       /* Only the copy that belongs to a mockup: .feature-copy is the Home and
          Settings caption, .scrolly-panel the four scrolly captions. Every other
@@ -1690,10 +1710,15 @@
     <div class="guide-section" style="border-bottom: none;">
       <div class="feature-row">
         <div class="feature-media">
-          <video autoplay loop muted playsinline data-vid="homepage">
-            <source src="/videos/unify/homepage.mov" type="video/quicktime" />
-            <source src="/videos/unify/homepage.mov" type="video/mp4" />
-          </video>
+          <div class="phone-shot">
+            <div class="phone-shot-screen">
+              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="homepage">
+                <source src="/videos/unify/homepage_screen.mov" type="video/quicktime" />
+                <source src="/videos/unify/homepage_screen.mov" type="video/mp4" />
+              </video>
+            </div>
+            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+          </div>
         </div>
         <div class="feature-copy">
           <h2 class="feature-title" data-i18n="feat-home-title">Your Day at a Glance</h2>
@@ -1708,16 +1733,26 @@
       <div class="scrolly-sticky">
         <div class="scrolly-media">
           <div class="scrolly-vid is-active" data-step="timetable">
-            <video autoplay loop muted playsinline>
-              <source src="/videos/unify/timetable.mov" type="video/quicktime" />
-              <source src="/videos/unify/timetable.mov" type="video/mp4" />
-            </video>
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="timetable">
+              <source src="/videos/unify/timetable_screen.mov" type="video/quicktime" />
+              <source src="/videos/unify/timetable_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
           </div>
           <div class="scrolly-vid" data-step="socials">
-            <video autoplay loop muted playsinline>
-              <source src="/videos/unify/socials.mov" type="video/quicktime" />
-              <source src="/videos/unify/socials.mov" type="video/mp4" />
-            </video>
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="socials">
+              <source src="/videos/unify/socials_screen.mov" type="video/quicktime" />
+              <source src="/videos/unify/socials_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
           </div>
         </div>
         <div class="scrolly-copy">
@@ -1739,16 +1774,26 @@
       <div class="scrolly-sticky">
         <div class="scrolly-media">
           <div class="scrolly-vid is-active" data-step="friends">
-            <video autoplay loop muted playsinline>
-              <source src="/videos/unify/map-friends.mov" type="video/quicktime" />
-              <source src="/videos/unify/map-friends.mov" type="video/mp4" />
-            </video>
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="map-friends">
+              <source src="/videos/unify/map-friends_screen.mov" type="video/quicktime" />
+              <source src="/videos/unify/map-friends_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
           </div>
           <div class="scrolly-vid" data-step="courses">
-            <video autoplay loop muted playsinline>
-              <source src="/videos/unify/map-courses.mov" type="video/quicktime" />
-              <source src="/videos/unify/map-courses.mov" type="video/mp4" />
-            </video>
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="map-courses">
+              <source src="/videos/unify/map-courses_screen.mov" type="video/quicktime" />
+              <source src="/videos/unify/map-courses_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
           </div>
         </div>
         <div class="scrolly-copy">
@@ -1768,10 +1813,15 @@
     <div class="guide-section" style="border-bottom: none;">
       <div class="feature-row reverse">
         <div class="feature-media">
-          <video autoplay loop muted playsinline data-vid="settings">
-            <source src="/videos/unify/settings.mov" type="video/quicktime" />
-            <source src="/videos/unify/settings.mov" type="video/mp4" />
-          </video>
+          <div class="phone-shot">
+            <div class="phone-shot-screen">
+              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="settings">
+            <source src="/videos/unify/settings_screen.mov" type="video/quicktime" />
+            <source src="/videos/unify/settings_screen.mov" type="video/mp4" />
+              </video>
+            </div>
+            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+          </div>
         </div>
         <div class="feature-copy">
           <h2 class="feature-title" data-i18n="feat-settings-title">Profile &amp; Friends</h2>
@@ -2565,7 +2615,9 @@
       vids.forEach(function (v) {
         // See the .vid-press comment in the stylesheet for why this is the
         // parent and not the video.
-        var target = v.parentElement || v;
+        // .phone-shot-screen clips, so scaling it would read as the screen
+        // zooming inside a static frame — go up to the phone itself.
+        var target = v.closest('.phone-shot') || v.parentElement || v;
         target.classList.add('vid-press');
 
         function press()   { target.classList.add('is-pressed'); }
