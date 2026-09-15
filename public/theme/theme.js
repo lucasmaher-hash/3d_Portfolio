@@ -4,10 +4,22 @@
    highlight in sync and flip the theme when a segment is tapped. It is loaded
    with `defer`, so the menu markup exists by the time it runs.
 
-   Stored in localStorage.theme ('dark' or absent), the same way the language
-   lives in localStorage.lang — so the choice survives reloads and carries
-   across every page, and a change made in one tab reaches the others through
-   the `storage` event.
+   Stored in localStorage.theme, the same way the language lives in
+   localStorage.lang — so the choice survives reloads and carries across every
+   page, and a change made in one tab reaches the others through the `storage`
+   event.
+
+   THREE states, not two: 'dark' and 'light' are explicit taps and always win,
+   and the key being ABSENT means "decide by the clock" — dark from 20:00 to
+   08:00 local, light through the day (2026-09-15). That is why tapping Hell now
+   WRITES 'light' instead of removing the key: removing it would hand the page
+   back to the clock, so a visitor choosing light at 21:00 would get dark again
+   on the next load. The same rule runs in the pre-paint one-liner at the top of
+   every page's <head> and in the nav's own copy (top_row_permanent_V3.html) —
+   all three have to agree, so change them together.
+
+   The clock is only read at load. A page left open across 20:00 does not flip
+   under the reader; that would be a jarring, unrequested repaint mid-visit.
 
    The nav bar is its own document (an iframe) and follows the theme itself:
    it reads localStorage on load and listens for 'theme-change'. The message is
@@ -17,9 +29,18 @@
   var KEY = 'theme';
   var root = document.documentElement;
 
+  // Dark between DARK_FROM and DARK_UNTIL, by the visitor's own clock.
+  var DARK_FROM = 20, DARK_UNTIL = 8;
+  function byClock() {
+    var h = new Date().getHours();
+    return (h >= DARK_FROM || h < DARK_UNTIL) ? 'dark' : 'light';
+  }
+
   function read() {
-    try { return localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light'; }
-    catch (e) { return 'light'; }
+    var stored = null;
+    try { stored = localStorage.getItem(KEY); } catch (e) {}
+    if (stored === 'dark' || stored === 'light') return stored;
+    return byClock();
   }
 
   function mark(theme) {
@@ -49,10 +70,9 @@
     var btn = e.target.closest && e.target.closest('[data-theme-choice]');
     if (!btn) return;
     var theme = btn.getAttribute('data-theme-choice') === 'dark' ? 'dark' : 'light';
-    try {
-      if (theme === 'dark') localStorage.setItem(KEY, 'dark');
-      else localStorage.removeItem(KEY);
-    } catch (err) {}
+    // Both choices are written, 'light' included — see the three-state note at
+    // the top. Clearing the key would mean "follow the clock", not "stay light".
+    try { localStorage.setItem(KEY, theme); } catch (err) {}
     apply(theme);
     tellNav(theme);
   });

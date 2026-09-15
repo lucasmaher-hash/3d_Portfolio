@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <script>/* dark mode before first paint — see /theme/dark-mobile.css */try{if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script>
   <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
   <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
@@ -348,6 +348,80 @@
       box-shadow: var(--shadow-raised);
     }
 
+    /* Unify's landing tile: a transparent iPhone frame image sits OVER the recording,
+       instead of the clip-path that used to be measured to the video's own baked-in
+       bezel. homepage.mov has no content outside its own device mockup — the phone
+       body and its ROUNDED screen corners are baked into the footage — so no
+       rectangular crop of that screen can avoid leaving bezel/rim wedges in the four
+       corners. An opaque frame with a matching rounded hole hides that slack
+       completely; same technique as to.morrow's `.phone-shot` (see CLAUDE.md), but
+       the frame here is a stock Apple mockup (iPhone 17) rather than a hand-extracted
+       asset, and the video was pre-cropped with `ffmpeg crop` to just its own screen
+       rather than clipped live.
+
+       THREE boxes, and each one exists because a two-box version visibly failed:
+
+       `.phone-shot` is the frame's own pixel ratio (876 x 1808) and takes its height
+       from whatever box holds it, so the desktop tile keeps centring it the way it
+       centred the bare video before (349px wide at 1440, against the old 353px).
+
+       `.phone-shot-screen` is the frame's screen hole, measured off its alpha channel
+       (x 36-839, y 30-1777 of 876 x 1808), with that hole's own corner radius
+       (~145px, stated against the hole's own width/height so it survives any rendered
+       size). It clips — and THE CLIP IS THE POINT. The recording's mockup is an older
+       iPhone whose screen corners curve differently from this frame's, so no scaling
+       of the video can make its own baked corner sit on the frame's cutout; letting
+       the video round its own corners left them visibly out of line. Clipping to the
+       hole's shape instead means the corner is the FRAME's curve by construction, and
+       whatever of the video lands in it is that recording's own black bezel, which
+       disappears against the frame's black inner border.
+
+       The video is then sized and placed by its DYNAMIC ISLAND, not by its screen
+       edges. Both assets draw an island — the frame paints its own over the video —
+       so if the two don't coincide you get a doubled, offset pill. They are the same
+       shape (both 3.49:1) but sit at slightly different fractions of their own screen,
+       so the numbers are solved backwards: take the island in the raw file
+       (x 249-440, y 52-106 of 688 x 1406), take it in the frame (x 314-561, y 60-130
+       of 876 x 1808), and derive the placement that makes them agree. The crop
+       (crop=658:1396:16:10) is deliberately LOOSE — the whole screen plus ~20px of
+       the recording's own bezel — because at that island-locked scale the video is
+       slightly narrower than the hole and slightly taller than it, so the bezel fills
+       the 1-3px slivers left at the sides while the excess height is simply clipped.
+       A tight, screen-edge crop (tried) leaves nothing to fill those slivers.
+
+       object-fit must be `fill` (NOT cover, and not the `contain` a video defaults
+       to) — anything that re-fits would undo the island alignment these numbers exist
+       for. `width`/`height` are explicit, NOT `inset` shorthand: an absolutely
+       positioned replaced element (video/img) does not stretch to fill
+       left+right / top+bottom the way a div does, it falls back to its intrinsic size
+       (the sitewide gotcha in CLAUDE.md — this file shipped exactly that bug once, on
+       the project heroes). */
+    .phone-shot {
+      position: relative;
+      height: 100%;
+      aspect-ratio: 876 / 1808;
+    }
+    .phone-shot-screen {
+      position: absolute;
+      top: 1.6593%; left: 4.1096%;
+      width: 91.6667%; height: 96.6261%;
+      border-radius: 18.06% / 8.30%;
+      overflow: hidden;
+    }
+    .phone-shot-video {
+      position: absolute;
+      top: -1.3992%; left: -2.9034%;
+      width: 105.9678%; height: 103.585%;
+      object-fit: fill;
+      display: block;
+    }
+    .phone-shot-frame {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      display: block;
+    }
+
     .project-content {
       min-width: 0;
       display: flex;
@@ -513,26 +587,20 @@
          font-size rule for .btn-view-work in the last @media block below is now inert. */
       .btn-view-work { display: none; }
 
-      /* Unify and Cybercoffee: tile ratio set to the video's OWN intrinsic ratio, so
-         the video fills the tile edge to edge with no letterboxing and no crop. Both
-         previously used a squarer tile (16/15 and 16/21) that their portrait /
-         near-square videos could not fill, leaving dead space left and right.
+      /* Cybercoffee: tile ratio set to the video's OWN intrinsic ratio, so the video
+         fills the tile edge to edge with no letterboxing and no crop — it previously
+         used a squarer tile (16/21) its near-square video could not fill, leaving
+         dead space left/right. Ratio is the file's measured pixel dimensions (mdls),
+         not the intrinsic ratio CSS could infer — a tile can't read its child's
+         ratio. If the video is re-exported at a different size, update this number.
 
-         Matching the ratio — rather than switching to object-fit: cover in the existing
-         box — is deliberate for BOTH, for two different reasons:
-           · Unify's video carries a clip-path measured to the phone bezel in
-             homepage.mov (it hides the grey baked around the phone). Those insets are
-             percentages of the element box, so they only line up while the box keeps
-             the video's ratio. cover would also crop top/bottom rather than the sides,
-             leaving exactly the grey side margins the clip-path exists to remove.
-           · Cybercoffee has no clip-path, but its video is near-square, so cover in a
-             wider box would crop real content off the top and bottom for no reason.
-
-         Ratios are the files' measured pixel dimensions (mdls), not the intrinsic ratio
-         CSS could infer — a tile can't read its child's ratio. If either video is
-         re-exported at a different size, these two numbers must be updated with it. */
+         Unify (below, `.phone-shot`) works differently — see that block's comment. */
       .project-tile.tile-tall-media { aspect-ratio: 1064 / 1104; }  /* Cybercoffee */
-      .project-tile.tile-xl-media   { aspect-ratio: 688 / 1406; }   /* Unify */
+
+      /* Unify's tile takes the FRAME image's ratio here, not the video's — the phone
+         is now drawn by `.phone-shot` (see its rules near `.project-tile`), whose box
+         is the frame, so the tile it fills edge to edge has to be that same shape. */
+      .project-tile.tile-xl-media { aspect-ratio: 876 / 1808; }
 
       /* Unify only: 25% smaller on mobile. Its video is by far the tallest of the
          five (688 x 1406 — nearly 1:2), so at full column width it ran ~800px tall
@@ -663,13 +731,14 @@
       padding: 5px;
     }
 
-    /* Mobile menu only: extra breathing room under the 2D/3D toggle so it reads as
-       its own control rather than as the first item of the Craft/About/Contact
-       stack below it. Added as margin on top of the panel's uniform 24px gap.
-       :first-child scopes this to the 2D/3D toggle specifically — .mobile-lang-toggle
-       reuses the same .mobile-view-toggle class but is the panel's LAST child, so it
-       keeps the plain 24px and nothing drifts. */
-    .mobile-menu-panel > .mobile-view-toggle:first-child { margin-bottom: 22px; }
+    /* No extra margin on any one control: every item in the burger menu is
+       separated by the panel's own uniform 24px gap (2026-09-15). The theme
+       toggle moved to the TOP of the panel, which silently handed it a
+       `:first-child { margin-bottom: 22px }` rule written for the 2D/3D toggle
+       that used to lead — so it alone sat further from its neighbour than
+       anything else. Removed rather than re-targeted: the menu reads better
+       evenly spaced, and a rule keyed on position breaks again the next time
+       the order changes. */
 
     .mobile-mode-btn {
       border: none;
@@ -1288,11 +1357,19 @@
       </div>
       <a href="/unify2d.html" style="display:block;">
         <div class="project-tile tile-xl-media" style="box-shadow: none; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; background: transparent;">
-          <!-- clip-path matches homepage.mov's measured phone bounds on unify2d.html,
-               so the grey baked into the video never shows against the page. -->
-          <video autoplay loop muted playsinline style="height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; clip-path: inset(0.50% 1.46% 0.29% 1.75% round 15.9% / 7.8%);">
-            <source src="/videos/unify/homepage.mov" type="video/mp4">
-          </video>
+          <!-- The recording, pre-cropped to just its own screen (ffmpeg
+               crop=614:1356:38:32 off homepage.mov, whose screen was measured at
+               x 36-654, y 30-1390 and then pulled 2px tighter on every side), sits
+               UNDER a transparent iPhone frame. See the .phone-shot block in <style>
+               for why, and for where every number comes from. -->
+          <div class="phone-shot">
+            <div class="phone-shot-screen">
+              <video class="phone-shot-video" autoplay loop muted playsinline>
+                <source src="/videos/unify/homepage_screen.mov" type="video/mp4">
+              </video>
+            </div>
+            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+          </div>
         </div>
       </a>
     </div>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <script>/* dark mode before first paint — see /theme/dark-mobile.css */try{if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Top Row v3 · Lucas Maher</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -521,7 +521,14 @@
       });
       window.addEventListener('storage', function (e) {
         if (e.key === 'theme' || e.key === null) {
-          var t = 'light'; try { t = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'; } catch (err) {}
+          // Three states, same rule as /theme/theme.js and the pre-paint
+          // one-liner above: an explicit choice wins, no key means the clock
+          // decides (dark 20:00-08:00). Change all three together.
+          var t = 'light';
+          try {
+            var s = localStorage.getItem('theme'), h = new Date().getHours();
+            t = (s === 'dark' || s === 'light') ? s : ((h >= 20 || h < 8) ? 'dark' : 'light');
+          } catch (err) {}
           apply(t);
         }
       });

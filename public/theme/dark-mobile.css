@@ -289,6 +289,10 @@
      the rest of the segment's 35.2px text line box (22px x line-height 1.6), so
      this track comes out exactly as tall as the language toggle above it. */
   .theme-pix { display: block; width: 26px; height: 26px; margin: 4.6px auto; }
+  /* Moon glyph sized down slightly relative to the sun — margin grows by the
+     same amount the icon shrinks so the segment's 35.2px line box (and the
+     track's overall height, matched to the language toggle) is unchanged. */
+  .mobile-mode-btn[data-theme-choice="dark"] .theme-pix { width: 22px; height: 22px; margin: 6.6px auto; }
 
   .mobile-mode-btn[data-theme-choice]:active:not(.is-active) {
     box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);

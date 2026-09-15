@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <script>/* dark mode before first paint — see /theme/dark-mobile.css */try{if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script>
   <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
   <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
@@ -260,13 +260,14 @@
       box-shadow: var(--shadow-raised-sm);
       padding: 5px;
     }
-    /* Mobile menu only: extra breathing room under the 2D/3D toggle so it reads as
-       its own control rather than as the first item of the Craft/About/Contact
-       stack below it. Sits on top of the panel's uniform 24px gap.
-       :first-child scopes this to the 2D/3D toggle specifically — .mobile-lang-toggle
-       reuses the same .mobile-view-toggle class but is the panel's LAST child, so it
-       keeps the plain 24px and the two toggles do not drift apart. */
-    .mobile-menu-panel > .mobile-view-toggle:first-child { margin-bottom: 22px; }
+    /* No extra margin on any one control: every item in the burger menu is
+       separated by the panel's own uniform 24px gap (2026-09-15). The theme
+       toggle moved to the TOP of the panel, which silently handed it a
+       `:first-child { margin-bottom: 22px }` rule written for the 2D/3D toggle
+       that used to lead — so it alone sat further from its neighbour than
+       anything else. Removed rather than re-targeted: the menu reads better
+       evenly spaced, and a rule keyed on position breaks again the next time
+       the order changes. */
 
     .mobile-mode-btn {
       border: none; background: transparent; border-radius: 9999px;

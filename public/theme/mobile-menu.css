@@ -24,8 +24,12 @@
     padding-top: 5.5px;
     padding-bottom: 5.5px;
   }
-  /* The sun / moon glyphs stay 26px (13 cells x 2px, whole-pixel art) and give
-     back the 4px they are taller than the 22px text line, so the theme toggle
-     stays level with the language toggle above it. */
+  /* The sun glyph stays 26px (13 cells x 2px, whole-pixel art) and gives back the
+     4px it is taller than the 22px text line, so the theme toggle stays level with
+     the language toggle above it. The moon is drawn 22px — it reads heavier than
+     the outline sun at the same size — which is already exactly the line height,
+     so it takes no negative margin. Both boxes therefore measure 22px and the
+     track keeps its 43px. Whatever the sizes, box = glyph + 2 x margin = 22. */
   .mobile-menu-panel .theme-pix { margin: -2px auto; }
+  .mobile-menu-panel .mobile-mode-btn[data-theme-choice="dark"] .theme-pix { margin: 0 auto; }
 }
