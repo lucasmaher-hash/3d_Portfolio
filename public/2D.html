@@ -366,9 +366,15 @@
        centred the bare video before (349px wide at 1440, against the old 353px).
 
        `.phone-shot-screen` is the frame's screen hole, measured off its alpha channel
-       (x 36-839, y 30-1777 of 876 x 1808), with that hole's own corner radius
-       (~145px, stated against the hole's own width/height so it survives any rendered
-       size). It clips — and THE CLIP IS THE POINT. The recording's mockup is an older
+       (x 36-839, y 30-1777 of 876 x 1808), with that hole's own corner radius, stated
+       against the hole's own width/height so it survives any rendered size. That
+       radius is 128px, and it has to be MEASURED BY FITTING A CIRCLE to the corner
+       arc — all four corners agree on 128.5/128.0 to within half a pixel. Reading it
+       off the point where the edge stops moving gives ~145 (tried, shipped, wrong):
+       the arc meets the straight edge tangentially, so its last several pixels are
+       almost parallel to it and anti-aliasing hides exactly where they stop. 13% too
+       round is plainly visible as corners that do not sit in the frame's cutout.
+       It clips — and THE CLIP IS THE POINT. The recording's mockup is an older
        iPhone whose screen corners curve differently from this frame's, so no scaling
        of the video can make its own baked corner sit on the frame's cutout; letting
        the video round its own corners left them visibly out of line. Clipping to the
@@ -405,7 +411,7 @@
       position: absolute;
       top: 1.6593%; left: 4.1096%;
       width: 91.6667%; height: 96.6261%;
-      border-radius: 18.06% / 8.30%;
+      border-radius: 15.9826% / 7.3513%;
       overflow: hidden;
     }
     .phone-shot-video {
