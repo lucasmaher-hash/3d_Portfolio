@@ -1642,8 +1642,6 @@
       display: flex; flex-direction: column;
     }
     .v1-still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; background: #000; }
-    /* v1 has five screens, the final row three: its own 5-up grid. */
-    .pivot-screens--v1 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .v1-window {
       flex: 1 1 0; min-height: 0; overflow: hidden;
       container-type: size;   /* 100cqh = the window's own height */
@@ -1723,13 +1721,38 @@
       .chat-row::-webkit-scrollbar { display: none; }
       .chat-shot { flex: 0 0 72%; scroll-snap-align: center; }
       .chat-row + .cs-caption { text-align: left; }
-      .pivot-screens--v1 {
-        display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-        margin-inline: -20px; padding: 4px 20px 16px; scrollbar-width: none;
-        justify-items: initial;
-      }
-      .pivot-screens--v1::-webkit-scrollbar { display: none; }
-      .pivot-screens--v1 .phone-shot { flex: 0 0 42%; scroll-snap-align: center; }
+    }
+
+    /* v1 carousel: five phones on five slots (-2..2), the middle one largest.
+       Every 3s the whole row steps one slot to the right; the phone leaving
+       the right edge fades out and comes back in on the far left, so it
+       loops. Geometry is pure CSS per data-slot; the script only changes
+       each phone's slot. The outer pair tuck behind their neighbours.
+       Offsets are in phone widths (translateX %), so the
+       layout scales with the container. */
+    .v1-carousel {
+      position: relative; aspect-ratio: 1.86 / 1;
+      --w: 26%;
+    }
+    .v1-carousel > .phone-shot {
+      position: absolute; left: 50%; top: 50%;
+      width: var(--w); max-width: none;
+      --k: 0; --sc: 1;
+      transform: translate(-50%, -50%) translateX(calc(var(--k) * 100%)) scale(var(--sc));
+      transition: transform 900ms cubic-bezier(.65, 0, .35, 1), opacity 450ms ease;
+    }
+    .v1-carousel > [data-slot="0"]  { --k: 0;     --sc: 1;   z-index: 3; }
+    .v1-carousel > [data-slot="1"]  { --k: .96;   --sc: .84; z-index: 2; }
+    .v1-carousel > [data-slot="-1"] { --k: -.96;  --sc: .84; z-index: 2; }
+    .v1-carousel > [data-slot="2"]  { --k: 1.56;  --sc: .68; z-index: 1; }
+    .v1-carousel > [data-slot="-2"] { --k: -1.56; --sc: .68; z-index: 1; }
+    .v1-carousel > [data-slot="out-right"] { --k: 2.1;  --sc: .56; opacity: 0; z-index: 0; }
+    .v1-carousel > [data-slot="out-left"]  { --k: -2.1; --sc: .56; opacity: 0; z-index: 0; }
+    .v1-carousel.no-anim > .phone-shot { transition: none; }
+    @media (max-width: 640px) {
+      /* Two phones' worth of width: the middle one and its neighbours cut by
+         the screen edge; the outer pair sits off screen. */
+      .v1-carousel { aspect-ratio: 1.05 / 1; --w: 44%; margin-inline: -20px; overflow: hidden; }
     }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
@@ -1949,7 +1972,7 @@
       <div class="pivot-compare">
         <div class="pivot-row">
           <span class="pivot-label">v1 · technical</span>
-          <div class="pivot-screens pivot-screens--v1">
+          <div class="v1-carousel" aria-label="Unify v1 screens">
             <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, scrolling">
               <div class="v1-window"><img class="is-scrolling" src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
               <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
@@ -2984,6 +3007,47 @@
           if (p && p.catch) p.catch(function () {});
         });
       });
+    })();
+  </script>
+
+  <script>
+    // ── v1 carousel: step every phone one slot right every 3s, wrap at the edge
+    (function () {
+      var car = document.querySelector('.v1-carousel');
+      if (!car) return;
+      var items = Array.prototype.slice.call(car.children), n = items.length;
+      var DWELL = 3000, MOVE = 900, FADE = 450;
+      var center = 0;                                   // index of the phone in the middle
+      function slotOf(i) {                              // left of centre = next in order
+        var d = ((center - i) % n + n) % n;             // 0..n-1
+        return d > 2 ? d - n : d;                       // -2..2
+      }
+      function place() { items.forEach(function (el, i) { el.dataset.slot = slotOf(i); }); }
+      place();
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      function step() {
+        var wrapping = items.filter(function (el) { return el.dataset.slot === '2'; })[0];
+        center = (center + 1) % n;
+        items.forEach(function (el, i) { if (el !== wrapping) el.dataset.slot = slotOf(i); });
+        if (!wrapping) return;
+        wrapping.dataset.slot = 'out-right';            // fade out past the right edge…
+        setTimeout(function () {
+          wrapping.style.transition = 'none';
+          wrapping.dataset.slot = 'out-left';           // …jump unseen to the far left…
+          void wrapping.offsetWidth;
+          wrapping.style.transition = '';
+          wrapping.dataset.slot = '-2';                 // …and fade in there
+        }, FADE);
+      }
+
+      var timer = null;
+      function start() { if (!timer) timer = setInterval(step, DWELL + MOVE); }
+      function stop()  { clearInterval(timer); timer = null; }
+      var onScreen = false;
+      function sync() { onScreen && !document.hidden ? start() : stop(); }
+      new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; sync(); }).observe(car);
+      document.addEventListener('visibilitychange', sync);
     })();
   </script>
 </body>

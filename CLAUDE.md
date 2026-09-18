@@ -147,8 +147,15 @@ key would let the old `TRANSLATIONS` value overwrite the draft text (the Role ti
 Every `[ bracketed ]` value is a placeholder; plan numbers are examples, not results.
 
 **v1 screens (pivot section)**: all five v1 Figma exports (1608px wide = iPhone 17 at 4x) in the
-same `.phone-shot` iPhone frame as the final design, in a 5-up grid (`.pivot-screens--v1`; a
-swipe strip below 640px). The three building screens are single stills (`.v1-still`). The two
+same `.phone-shot` iPhone frame as the final design, in a looping **carousel**
+(`.v1-carousel`, from Lucas's reference): five slots, the middle phone largest, neighbours at 0.84,
+the outer pair at 0.68 tucked BEHIND the neighbours. Every 3s (+0.9s move) the whole row steps one
+slot right, so the next screen in order (home → timetable → building → friends → open) arrives
+from the left; the phone leaving the right edge fades out and reappears on the far left. Geometry
+is CSS per `data-slot` (offsets in phone widths via `translateX(%)`); the script at the end of the
+page only rewrites slots, pauses off-screen and in a hidden tab, and does nothing under
+`prefers-reduced-motion`. Below 640px the carousel bleeds to the screen edges and the outer pair
+sits off screen. The three building screens are single stills (`.v1-still`). The two
 long ones, home and timetable, are split into the page (`v1-<name>.webp`) and its tab bar
 (`v1-<name>-bar.webp`, the bottom 321px of the export), so the bar stays fixed while the page
 scrolls under it. **No safe-area band** — per Lucas the content runs up under the frame's island,
