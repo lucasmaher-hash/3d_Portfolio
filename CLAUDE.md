@@ -146,6 +146,13 @@ is `#support-scrolly` (socials + friends map; it took over the mirrored-layout C
 key would let the old `TRANSLATIONS` value overwrite the draft text (the Role tile especially).
 Every `[ bracketed ]` value is a placeholder; plan numbers are examples, not results. v1 screens
 are provisional crops of a Figma screenshot in `public/images/unify/v1/`.
+
+**Problem section = three real WhatsApp screenshots** (`public/images/unify/problem/chat-1-jamie`,
+`-2-sophia`, `-3-me.webp`, 780px wide), edited for anonymity: group renamed "lil g", Karla → Jamie,
+Konst → Anna (incl. one mention inside a message, and "Konsumopfer" → "admin"), yaz → Sophia. The
+third one's Käfer letter (it showed Lucas's home address) was replaced by his timetable. The
+per-person avatars beside incoming messages are still the real ones. Below 640px the
+`.chat-row` becomes a horizontal scroll-snap strip rather than three stacked full-height images.
 | `public/top_row_permanent_V3.html` | Nav bar — loaded as an iframe on every 2D page |
 
 ## to.morrow page (`public/to-shove2d.html`)
