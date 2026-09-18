@@ -1632,9 +1632,35 @@
       display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: clamp(14px, 2.4vw, 28px); align-items: start; justify-items: center;
     }
-    .pivot-screens img.v1-shot {
-      width: 100%; max-width: 220px; height: auto; display: block;
-      border-radius: 18px; box-shadow: var(--shadow-raised-sm);
+    /* v1 screens in the same iPhone frame as the final design. The Figma
+       frames were designed without a safe area, so a black top band (the
+       status-bar height, 7%) keeps the frame's island off the content. The
+       tab bar is cut off each export and laid over the bottom so it stays put
+       while the page scrolls under it, like the real app. */
+    .v1-screen {
+      position: absolute; inset: 0; background: #000;
+      display: flex; flex-direction: column;
+    }
+    .v1-safe { flex: 0 0 7%; }
+    .v1-window {
+      flex: 1 1 0; min-height: 0; overflow: hidden;
+      container-type: size;   /* 100cqh = the window's own height */
+    }
+    .v1-window img, .v1-bar { display: block; width: 100%; height: auto; }
+    .v1-bar { flex: none; }
+    /* Scroll the whole page down and back, eased at both ends, holding at the
+       top and bottom. The travel is calc(-100% + 100cqh): the image's own height
+       minus the window's, so it lands exactly on the last row whatever size the
+       phone renders at. Timing: hold 1.3s, down 5.2s, hold 1.6s, up 3.9s. */
+    .v1-window img.is-scrolling { animation: v1-scroll 13s infinite; }
+    .v1-window img.is-scrolling.is-late { animation-delay: 1.4s; }
+    @keyframes v1-scroll {
+      0%, 10%  { transform: translateY(0); animation-timing-function: cubic-bezier(.42, 0, .25, 1); }
+      50%, 62% { transform: translateY(calc(-100% + 100cqh)); animation-timing-function: cubic-bezier(.42, 0, .25, 1); }
+      92%, 100% { transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .v1-window img.is-scrolling { animation: none; }
     }
     .pivot-screens .phone-shot { width: 100%; max-width: 220px; }
 
@@ -1915,9 +1941,21 @@
         <div class="pivot-row">
           <span class="pivot-label">v1 · technical</span>
           <div class="pivot-screens">
-            <img class="v1-shot" src="/images/unify/v1/v1-home.png" alt="Unify v1 home screen" />
-            <img class="v1-shot" src="/images/unify/v1/v1-timetable.png" alt="Unify v1 timetable" />
-            <img class="v1-shot" src="/images/unify/v1/v1-map.png" alt="Unify v1 building map" />
+            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, scrolling">
+              <div class="v1-safe"></div>
+              <div class="v1-window"><img class="is-scrolling" src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
+              <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
+            </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable, scrolling">
+              <div class="v1-safe"></div>
+              <div class="v1-window"><img class="is-scrolling is-late" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
+              <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
+            </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 building map with friends list">
+              <div class="v1-safe"></div>
+              <div class="v1-window"><img src="/images/unify/v1/v1-map.webp" width="720" alt="" /></div>
+              <img class="v1-bar" src="/images/unify/v1/v1-map-bar.webp" width="720" height="144" alt="" />
+            </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
           </div>
         </div>
         <div class="pivot-row">
