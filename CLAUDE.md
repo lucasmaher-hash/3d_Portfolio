@@ -149,21 +149,28 @@ Every `[ bracketed ]` value is a placeholder; plan numbers are examples, not res
 **v1 screens (pivot section)**: all five v1 Figma exports (1608px wide = iPhone 17 at 4x) in the
 same `.phone-shot` iPhone frame as the final design, in a looping **carousel**
 (`.v1-carousel`, from Lucas's reference): five slots, the middle phone largest, neighbours at 0.84,
-the outer pair at 0.68 tucked BEHIND the neighbours. Every 3s (+0.9s move) the whole row steps one
-slot right, so the next screen in order (home → timetable → building → friends → open) arrives
-from the left; the phone leaving the right edge shrinks and fades as if stepping back (a third of a slot sideways), then on the far left grows and fades in as if stepping forward. Geometry
-is CSS per `data-slot` (offsets in phone widths via `translateX(%)`); the script at the end of the
-page only rewrites slots, pauses off-screen and in a hidden tab, and does nothing under
-`prefers-reduced-motion`. Below 640px the carousel bleeds to the screen edges and the outer pair
-sits off screen. The three building screens are single stills (`.v1-still`). The two
-long ones, home and timetable, are split into the page (`v1-<name>.webp`) and its tab bar
-(`v1-<name>-bar.webp`, the bottom 321px of the export), so the bar stays fixed while the page
-scrolls under it. **No safe-area band** — per Lucas the content runs up under the frame's island,
-as it would on the phone (a 7% black band was tried and dropped). Scrolling uses
-`@keyframes v1-scroll` (13s: hold, eased down, hold, eased up); the travel is
-`calc(-100% + 100cqh)` against the `.v1-window` size container, so it always ends exactly on the
-last row, whatever size the phone renders at. The timetable starts 1.4s late so the two don't
-move in lockstep. Off under `prefers-reduced-motion`.
+the outer pair at 0.68 tucked BEHIND the neighbours. It autoplays one slot to the RIGHT per turn,
+so the next screen in order (home → timetable → building → friends → open) arrives from the left.
+A turn is 3s for a still; for home and timetable it is their whole scroll (0.5s, 5.2s eased down,
+1.2s hold) — **they only scroll while they are the middle phone** (Web Animations API, started
+when they arrive, glided back to the top as they leave), so each one starts at its top when it
+opens. A phone passing an edge shrinks and fades as if stepping back (a third of a slot sideways),
+then grows and fades in on the other side. **Clicking** a phone brings it to the middle and stops
+the autoplay for good; a parked home/timetable then loops its scroll (13s down-hold-up-hold).
+A **sideways trackpad scroll** (only when |deltaX| > |deltaY|, so vertical page scrolling is never
+blocked) or a **swipe** steps one slot and also stops the autoplay. Geometry is CSS per
+`data-slot` (offsets in phone widths via `translateX(%)`); the script pauses off-screen and in a
+hidden tab and does nothing under `prefers-reduced-motion`. Below 640px the carousel bleeds to the
+screen edges and the outer pair sits off screen.
+
+The three building screens are single stills (`.v1-still`). Home and timetable are split into the
+page (`v1-<name>.webp`) and its tab bar (`v1-<name>-bar.webp`, the bottom 321px of the export), so
+the bar stays fixed while the page scrolls under it. The scroll travel is `calc(-100% + 100cqh)`
+against the `.v1-window` size container, so it ends exactly on the last row at any size. Content
+runs up under the frame's island (per Lucas), with two per-screen edits: the **timetable** has a
+10%-of-width black band on top (`.v1-clear-island`) so its buttons clear the island, and the
+**home** export's white card was extended to the very top with square corners (its rounded top
+and a stray blue line above it were painted over before export; the Desktop original is unedited).
 
 **Problem section = three real WhatsApp screenshots** (`public/images/unify/problem/chat-1-jamie`,
 `-2-sophia`, `-3-me.webp`, 780px wide), edited for anonymity: group renamed "lil g", Karla → Jamie,

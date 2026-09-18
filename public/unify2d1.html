@@ -1653,20 +1653,14 @@
        below it. Padding is in the image's box, so the scroll travel
        (calc(-100% + 100cqh)) still lands on the last row. */
     .v1-window img.v1-clear-island { padding-top: 10%; background: #000; box-sizing: content-box; }
-    /* Scroll the whole page down and back, eased at both ends, holding at the
-       top and bottom. The travel is calc(-100% + 100cqh): the image's own height
-       minus the window's, so it lands exactly on the last row whatever size the
-       phone renders at. Timing: hold 1.3s, down 5.2s, hold 1.6s, up 3.9s. */
-    .v1-window img.is-scrolling { animation: v1-scroll 13s infinite; }
-    .v1-window img.is-scrolling.is-late { animation-delay: 1.4s; }
-    @keyframes v1-scroll {
-      0%, 10%  { transform: translateY(0); animation-timing-function: cubic-bezier(.42, 0, .25, 1); }
-      50%, 62% { transform: translateY(calc(-100% + 100cqh)); animation-timing-function: cubic-bezier(.42, 0, .25, 1); }
-      92%, 100% { transform: translateY(0); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .v1-window img.is-scrolling { animation: none; }
-    }
+    /* Home and timetable scroll their whole length, but only while they are
+       the phone in the middle of the carousel — the script plays it with the
+       Web Animations API (see the carousel script). The travel is
+       calc(-100% + 100cqh): the image's own height minus the window's, so it
+       lands exactly on the last row whatever size the phone renders at. */
+    .v1-carousel { touch-action: pan-y; }
+    .v1-carousel > .phone-shot { cursor: pointer; }
+    .v1-carousel > .phone-shot[data-slot="0"] { cursor: default; }
     .pivot-screens .phone-shot { width: 100%; max-width: 220px; }
 
     /* Timetable variants A / B / C with their metrics underneath. */
@@ -1979,11 +1973,11 @@
           <span class="pivot-label">v1 · technical</span>
           <div class="v1-carousel" aria-label="Unify v1 screens">
             <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, scrolling">
-              <div class="v1-window"><img class="is-scrolling" src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
+              <div class="v1-window"><img src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
               <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
             </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
             <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable, scrolling">
-              <div class="v1-window"><img class="is-scrolling is-late v1-clear-island" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
+              <div class="v1-window"><img class="v1-clear-island" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
               <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
             </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
             <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building.webp" alt="Unify v1 building map with floor switcher" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
@@ -3016,46 +3010,130 @@
   </script>
 
   <script>
-    // ── v1 carousel: step every phone one slot right every 3s, wrap at the edge
+    // ── v1 carousel ───────────────────────────────────────────────────────────
+    // Five phones on five slots (-2..2). It advances on its own, one slot to the
+    // right, after each screen has had its turn in the middle: 3s for a still,
+    // the full scroll for home and timetable, which only play while they are in
+    // the middle. Clicking a phone brings it to the middle and stops the
+    // autoplay there; a sideways trackpad scroll or a swipe steps through them.
     (function () {
       var car = document.querySelector('.v1-carousel');
       if (!car) return;
       var items = Array.prototype.slice.call(car.children), n = items.length;
-      var DWELL = 3000, MOVE = 900, FADE = 450, GROW = 700;
-      var center = 0;                                   // index of the phone in the middle
+      var STILL = 3000, MOVE = 900, FADE = 450, GROW = 700;
+      var SCROLL_IN = 500, SCROLL_DOWN = 5200, SCROLL_HOLD = 1200;
+      var EASE = 'cubic-bezier(.42, 0, .25, 1)';
+      var END = 'translateY(calc(-100% + 100cqh))';
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var center = 0, auto = !reduce, timer = null, onScreen = false, playing = null;
+
       function slotOf(i) {                              // left of centre = next in order
-        var d = ((center - i) % n + n) % n;             // 0..n-1
-        return d > 2 ? d - n : d;                       // -2..2
+        var d = ((center - i) % n + n) % n;
+        return d > 2 ? d - n : d;
       }
-      function place() { items.forEach(function (el, i) { el.dataset.slot = slotOf(i); }); }
-      place();
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      function scroller(el) { return el.querySelector('.v1-window img'); }
 
-      function step() {
-        var wrapping = items.filter(function (el) { return el.dataset.slot === '2'; })[0];
-        center = (center + 1) % n;
-        items.forEach(function (el, i) { if (el !== wrapping) el.dataset.slot = slotOf(i); });
-        if (!wrapping) return;
-        // The outer phone does not slide round the edge: it shrinks and fades
-        // away as if stepping back (only a third of a slot sideways), then on
-        // the far left it grows and fades in, as if stepping forward.
-        wrapping.style.transition = 'transform ' + FADE + 'ms cubic-bezier(.5, 0, .75, 0), opacity ' + FADE + 'ms ease-in';
-        wrapping.dataset.slot = 'out-right';
-        setTimeout(function () {
-          wrapping.style.transition = 'none';
-          wrapping.dataset.slot = 'out-left';           // jump unseen to the far left
-          void wrapping.offsetWidth;
-          wrapping.style.transition = 'transform ' + GROW + 'ms cubic-bezier(.25, 1, .5, 1), opacity ' + GROW + 'ms ease-out';
-          wrapping.dataset.slot = '-2';
-          setTimeout(function () { wrapping.style.transition = ''; }, GROW);
-        }, FADE);
+      // ── the scroll inside home / timetable
+      function play(el) {
+        var img = scroller(el);
+        if (!img || reduce) return;
+        playing = img.animate(auto
+          // autoplay: once down, then hold at the bottom until the carousel moves on
+          ? [{ transform: 'translateY(0)', offset: 0, easing: EASE },
+             { transform: END }]
+          // parked by a click: down, hold, back up, hold, for as long as it stays
+          : [{ transform: 'translateY(0)', offset: 0 },
+             { transform: 'translateY(0)', offset: .08, easing: EASE },
+             { transform: END, offset: .48 },
+             { transform: END, offset: .6, easing: EASE },
+             { transform: 'translateY(0)', offset: .92 },
+             { transform: 'translateY(0)', offset: 1 }],
+          auto ? { duration: SCROLL_DOWN, delay: SCROLL_IN, fill: 'forwards' }
+               : { duration: 13000, iterations: Infinity });
+      }
+      function rewind() {                               // glide back to the top as it leaves
+        if (!playing) return;
+        var img = playing.effect.target, from = getComputedStyle(img).transform;
+        playing.cancel(); playing = null;
+        if (from && from !== 'none') img.animate([{ transform: from }, { transform: 'translateY(0)' }],
+                                                 { duration: MOVE, easing: 'cubic-bezier(.65, 0, .35, 1)' });
       }
 
-      var timer = null;
-      function start() { if (!timer) timer = setInterval(step, DWELL + MOVE); }
-      function stop()  { clearInterval(timer); timer = null; }
-      var onScreen = false;
-      function sync() { onScreen && !document.hidden ? start() : stop(); }
+      // ── moving the row by c slots (c > 0 = rightwards)
+      function moveBy(c) {
+        if (!c) return;
+        rewind();
+        var old = items.map(function (el) { return +el.dataset.slot; });
+        center = ((center + c) % n + n) % n;
+        items.forEach(function (el, i) {
+          var to = slotOf(i), passes = old[i] + c;
+          if (passes >= -2 && passes <= 2) { el.dataset.slot = to; return; }
+          // Past an edge: step back and fade on that side, then step forward
+          // and fade in on the other side, only a third of a slot sideways.
+          el.style.transition = 'transform ' + FADE + 'ms cubic-bezier(.5, 0, .75, 0), opacity ' + FADE + 'ms ease-in';
+          el.dataset.slot = passes > 2 ? 'out-right' : 'out-left';
+          setTimeout(function () {
+            el.style.transition = 'none';
+            el.dataset.slot = passes > 2 ? 'out-left' : 'out-right';
+            void el.offsetWidth;
+            el.style.transition = 'transform ' + GROW + 'ms cubic-bezier(.25, 1, .5, 1), opacity ' + GROW + 'ms ease-out';
+            el.dataset.slot = to;
+            setTimeout(function () { el.style.transition = ''; }, GROW);
+          }, FADE);
+        });
+        setTimeout(function () { play(items[center]); }, MOVE);
+        schedule();
+      }
+
+      // ── autoplay: each screen's turn lasts as long as it needs
+      function turnLength(el) {
+        return scroller(el) ? SCROLL_IN + SCROLL_DOWN + SCROLL_HOLD : STILL;
+      }
+      function schedule() {
+        clearTimeout(timer); timer = null;
+        if (!auto || !onScreen || document.hidden) return;
+        timer = setTimeout(function () { moveBy(1); }, MOVE + turnLength(items[center]));
+      }
+      function park() { auto = false; clearTimeout(timer); timer = null; }
+
+      items.forEach(function (el, i) {
+        el.dataset.slot = slotOf(i);
+        el.addEventListener('click', function () {
+          var s = +el.dataset.slot;
+          park();
+          if (s === 0) { rewind(); play(el); return; }   // restart its scroll, looping
+          moveBy(-s);
+        });
+      });
+
+      // sideways trackpad / mouse-wheel: one step per gesture
+      var acc = 0, lock = false;
+      car.addEventListener('wheel', function (e) {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;   // vertical: let the page scroll
+        e.preventDefault();
+        if (lock) return;
+        acc += e.deltaX;
+        if (Math.abs(acc) < 40) return;
+        park(); moveBy(acc > 0 ? -1 : 1);
+        acc = 0; lock = true;
+        setTimeout(function () { lock = false; }, MOVE + 150);
+      }, { passive: false });
+
+      // swipe on touch
+      var x0 = null, y0 = null;
+      car.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+      car.addEventListener('touchend', function (e) {
+        if (x0 === null) return;
+        var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+        x0 = null;
+        if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+        park(); moveBy(dx > 0 ? 1 : -1);
+      }, { passive: true });
+
+      function sync() {
+        if (onScreen && !document.hidden) { if (!playing) play(items[center]); schedule(); }
+        else { clearTimeout(timer); timer = null; }
+      }
       new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; sync(); }).observe(car);
       document.addEventListener('visibilitychange', sync);
     })();
