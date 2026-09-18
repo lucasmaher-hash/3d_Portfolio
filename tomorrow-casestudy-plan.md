@@ -78,7 +78,7 @@ What happens to the current sections:
 
 ## 3. Research programme
 
-Eight studies. Each entry: **why**, **how**, **what to measure**, **what to show**, an
+Nine studies. Each entry: **why**, **how**, **what to measure**, **what to show**, an
 **example result**, and **what it changes on the page**.
 
 ### Study 1 — The over-planner, quantified
@@ -159,6 +159,29 @@ Eight studies. Each entry: **why**, **how**, **what to measure**, **what to show
 - **Example result:** 3 row actions unreachable by VoiceOver, fixed as custom actions. Body text 6.4:1 in every theme. VoiceOver users 5/5 tasks completed after the fix.
 - **Page change:** section 7. Short and factual: a list, one comparison image, one table.
 
+### Study 9 — App Store reviews
+
+- **Why:** real words from strangers who paid attention to the app, not testers you recruited. The strongest proof on the page that the app works for someone other than you, and the only study here that needs no setup: the reviews already exist in App Store Connect.
+- **How:**
+  1. Export every review and rating from App Store Connect (*Ratings and Reviews*).
+  2. Tag each review with the themes it mentions: swipe / speed, Live task, design / look, simplicity, a missing feature, a bug.
+  3. Count the themes, then pick quotes.
+- **Show:**
+  - **the average rating and the number of ratings** in the fact bar
+  - **2–3 review cards** in the page's own style: stars, the review text unedited, reviewer name as shown in the store, country, month
+  - optionally, a **sorted bar chart of review themes**, if there are enough reviews (about 20+) for the shares to mean something
+- **Example result:** 4.8 average from 63 ratings. 41 % of written reviews mention the swipe or speed, 27 % the Live task, 12 % ask for widgets.
+- **Page changes:**
+  - **Result section:** the rating in the fact bar, one card that names the swipe (proof of the spine).
+  - **Live section:** one card that names the Live task.
+  - **Next steps:** if reviews ask for widgets, conclusion-4's "widgets first" stops being your plan and becomes a response to users. Quote the request.
+
+Rules for using them:
+- **Unedited.** Quote exactly, including the reviewer's wording. Shorten only with a visible `…`.
+- **Pick for content, not just for stars.** A 4-star review that names the swipe beats a 5-star "great app". If a review criticises something you then fixed, it can be the best card on the page: problem → fix → proof.
+- **State the total.** Always print the rating count next to the average; a 5.0 from 4 ratings reads differently from 4.8 from 63.
+- **Translate, don't paraphrase.** A German review on the English page gets a translation with the original available, not a rewrite.
+
 ---
 
 ## 4. From studies to page
@@ -173,6 +196,9 @@ flowchart LR
     S6["App Store data"] --> F["Fact bar · feature order · result"]
     S7["Shape test n=20"] --> DS["Rules, not taste"]
     S8["A11y audit"] --> A["Accessibility"]
+    S9["App Store reviews"] --> F
+    S9 --> L["Live section<br/>review card"]
+    S9 --> N["Next steps<br/>widgets requested"]
 ```
 
 ---
@@ -212,6 +238,9 @@ flowchart LR
 | 15 | Contrast table | Table | Accessibility | Study 8 |
 | 16 | Share of task actions | Sorted bar chart | The rest / result | Study 6 |
 | 17 | Colour fan | Existing | The rest | On the page |
+| 18 | Average rating + rating count | Big number in the fact bar | Hero / result | Study 9 |
+| 19 | Review cards (2–3) | Quote cards in SkeuKit style | Result, Live | Study 9 |
+| 20 | Review themes | Sorted bar chart (only with ~20+ reviews) | Result | Study 9 |
 
 Rules, from the vault guide:
 - Motion only where the thing moves. The swipe, the Live task and the pivot's interaction differences are video; charts, diagrams and the side-by-side are stills.
@@ -223,7 +252,7 @@ Rules, from the vault guide:
 
 ## 7. Work order
 
-- [ ] **Study 6 first.** The app is live, the data exists, and it decides the fact bar and the feature order
+- [ ] **Study 6 and Study 9 first.** The app is live and both datasets already exist in App Store Connect; together they decide the fact bar, the feature order and the result section
 - [ ] Study 2 (taps benchmark). A single afternoon, and it produces the page's clearest chart
 - [ ] Pick the Windows 95 screen whose SkeuKit twin shows the change best; export both at the same crop
 - [ ] Study 4 (retention of both builds) → pivot evidence
