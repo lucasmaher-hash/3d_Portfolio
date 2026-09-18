@@ -1670,6 +1670,32 @@
       padding: clamp(20px, 3vw, 32px);
     }
 
+
+    /* Problem: the chat screenshots in a row, in the order they were sent. */
+    .chat-row {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(14px, 2.4vw, 32px);
+      width: min(100%, 960px); margin-inline: auto;
+    }
+    .chat-shot { margin: 0; }
+    .chat-shot img {
+      display: block; width: 100%; height: auto;
+      border-radius: clamp(18px, 2.4vw, 30px);
+      box-shadow: var(--shadow-raised-sm);
+    }
+    .chat-row + .cs-caption { text-align: center; }
+    /* On a phone three full-height screenshots stacked would be ~2000px of
+       scrolling, so the row becomes a swipeable strip instead. */
+    @media (max-width: 640px) {
+      .chat-row {
+        display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+        width: auto; margin-inline: -20px; padding: 4px 20px 16px;
+        scrollbar-width: none;
+      }
+      .chat-row::-webkit-scrollbar { display: none; }
+      .chat-shot { flex: 0 0 72%; scroll-snap-align: center; }
+      .chat-row + .cs-caption { text-align: left; }
+    }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
     }
@@ -1815,17 +1841,24 @@
       </div>
       <div class="dot-divider"></div>
       <p class="guide-text">My friends and I study different subjects. We share a campus but rarely a course, so every week the three of us swapped screenshots of our timetables to work out when we could meet. [ Arranging a 30-minute coffee took 00 minutes of texting. ]</p>
+      <!-- The evidence: three real screenshots from the group chat, in the order
+           they were sent. Names changed (Jamie, Anna, Sophia), group renamed. -->
+      <div class="chat-row">
+        <figure class="chat-shot"><img src="/images/unify/problem/chat-1-jamie.webp" width="780" height="1688" loading="lazy" alt="Group chat: Jamie posts a screenshot of her timetable" /></figure>
+        <figure class="chat-shot"><img src="/images/unify/problem/chat-2-sophia.webp" width="780" height="1688" loading="lazy" alt="Group chat: Sophia posts her timetable" /></figure>
+        <figure class="chat-shot"><img src="/images/unify/problem/chat-3-me.webp" width="780" height="1688" loading="lazy" alt="Group chat: I post my timetable and ask who is on campus for lunch" /></figure>
+      </div>
+      <p class="cs-caption"><b>Three timetables, three screenshots</b> — and the comparing is still done by hand. From our group chat, names changed.</p>
       <div class="cs-grid-2">
-        <div class="cs-figure">
-          <div class="ph ph--square"><span class="ph-tag">Visual 03 · Chat thread</span><span class="ph-desc">The screenshot swapping, recreated and anonymised</span></div>
-        </div>
         <div class="cs-figure">
           <div class="ph ph--square"><span class="ph-tag">Visual 04 · Bar chart</span><span class="ph-desc">How students coordinate free time — Study 1 survey</span></div>
           <p class="cs-caption"><b>[ 00 % ]</b> coordinate by texting or screenshots. <b>[ 00 % ]</b> have close friends in other subjects.</p>
         </div>
+        <div class="cs-figure">
+          <div class="ph ph--square"><span class="ph-tag">Visual 05 · Funnel</span><span class="ph-desc">Attempts → agreed → actually met — Study 2 diary</span></div>
+          <p class="cs-caption"><b>[ 00 ]</b> attempts, <b>[ 00 ]</b> agreed, <b>[ 00 ]</b> met.</p>
+        </div>
       </div>
-      <div class="ph ph--chart"><span class="ph-tag">Visual 05 · Funnel</span><span class="ph-desc">Attempts → agreed → actually met — Study 2 diary</span></div>
-      <p class="cs-caption"><b>[ 00 ]</b> attempts, <b>[ 00 ]</b> agreed, <b>[ 00 ]</b> met.</p>
     </section>
 
     <!-- 2 · Research → one model -->
