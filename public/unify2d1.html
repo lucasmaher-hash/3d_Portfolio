@@ -1,0 +1,2914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script>
+  <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Unlinked draft of the Unify case study. Nothing on the site links here; keep it out of search too. -->
+  <meta name="robots" content="noindex, nofollow" />
+  <title>lucasmaher.com</title>
+  <script src="/analytics.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&family=Nunito:wght@300;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'OCR-A-BT';
+      src: url('/OCR-A-BT.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    :root {
+      --bg-surface: #DCDCE3;
+      --text-primary: #1A1A1A;
+      --text-secondary: #8E8E93;
+      --text-tertiary: #c7c7cc;
+      --accent-orange: #FF5C00;
+      --border-color: #6f6f6f;
+
+      --shadow-raised-sm: 5px 5px 12px rgba(174,174,192,0.65), -5px -5px 12px rgba(255,255,255,1);
+      --shadow-raised: 8px 8px 18px rgba(174,174,192,0.65), -8px -8px 18px rgba(255,255,255,1);
+      --shadow-pressed: inset 5px 5px 10px rgba(174,174,192,0.6), inset -5px -5px 10px rgba(255,255,255,1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      /* clip (not hidden) prevents the root from becoming a scroll
+         container, which would break position:sticky in the scrolly section */
+      overflow-x: clip;
+      /* Standard site surface, same as every other 2D page. The videos no
+         longer need the page to match their baked-in grey — they're clipped
+         to the phone bezel instead (see .feature-media video below). */
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-family: 'Roboto Flex', sans-serif;
+      line-height: 1.6;
+      /* Fluid outer padding: full clamp() ceiling (55px) at/above 1440px,
+         shrinks linearly to exactly 0 by 860px — matches the vertical
+         border-removal breakpoint below, so the disappearance is continuous
+         instead of jumping straight from ~25px to 0. */
+      padding: 0 clamp(0px, calc(9.483vw - 81.552px), 55px);
+    }
+
+    /* Desktop-only shrink cap: once the padded/bordered layout has fully
+       collapsed (below 860px), stop reflowing further — narrowing the real
+       browser window just clips the extra width (no horizontal scrollbar);
+       vertical scroll is unaffected. pointer:fine + hover:hover targets
+       mouse/trackpad devices specifically, so actual touchscreens (phones,
+       tablets) are excluded and keep reflowing normally down to their real
+       widths via the existing @media (max-width: 640px) rules below. */
+    @media (hover: hover) and (pointer: fine) {
+      html, body { min-width: 860px; }
+    }
+
+    #top-bar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 140px;
+      border: none;
+      z-index: 9999;
+      pointer-events: auto;
+      background: transparent;
+      overflow: visible;
+      transition: transform 300ms ease;
+    }
+
+    #top-bar.hide { transform: translateY(-220px); }
+
+    .page-wrapper {
+      padding-top: 0;
+      padding-bottom: 12px;
+      border: 1px solid var(--border-color);
+      margin: 12px auto;
+      /* Cap the content card so it stops sprawling on wide monitors; the
+         page background fills the space left/right. With the body's ~55px
+         side padding, the cap only bites above ~1550px — 13"/14" MacBooks
+         stay edge-to-edge; 16" + external monitors get the whitespace. */
+      max-width: 1440px;
+      /* visible (not hidden) so the hero blob can break out above the
+         top border and run to the very top edge of the page */
+      overflow: visible;
+    }
+
+    /* ── Hero: big blob anchored top-right, bleeding off the top ──
+       The blob is larger than the hero box and positioned above it, so
+       its head is clipped by the top edge (overflow:hidden) — it reads
+       as running off the top of the page. The header (breadcrumb + title
+       + divider) sits at the bottom-left, beneath the blob's eyes. */
+    .hero-top {
+      position: relative;
+      padding: 0 clamp(40px, 8vw, 80px);
+      min-height: calc(clamp(400px, 44vw, 620px) - 30px);
+      display: flex;
+      align-items: flex-end;
+    }
+
+    /* The blob is anchored to the top of the page-wrapper and pulled up
+       past its top border (margin + border ≈ 13px) so it runs to the very
+       top edge of the page, unclipped by the frame. */
+    .hero-blob {
+      position: absolute;
+      top: clamp(-85px, -6vw, -50px);
+      /* center of the blob fixed to the 2/3 mark of the page so it
+         scales consistently across all screen sizes */
+      left: 66.667%;
+      transform: translateX(-50%);
+      height: clamp(440px, 50vw, 680px);
+      width: auto;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 3;
+      /* drops in from above the page and bounces into place on load */
+      animation: blobDrop 1.5s linear both;
+    }
+
+    /* keep translateX(-50%) throughout so the 2/3 centering is preserved.
+       per-keyframe easing gives a gravity-like fall, then soft settling
+       bounces so velocity stays continuous across segments. */
+    @keyframes blobDrop {
+      0%   { transform: translateX(-50%) translateY(-135%); animation-timing-function: cubic-bezier(0.45, 0, 0.7, 0.35); }
+      48%  { transform: translateX(-50%) translateY(8%);    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1); }
+      68%  { transform: translateX(-50%) translateY(-4%);   animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+      84%  { transform: translateX(-50%) translateY(1.6%);  animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+      100% { transform: translateX(-50%) translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-blob { animation: none; }
+    }
+
+    /* Wide-aspect external monitors (wider than the 16:10 MacBook screen):
+       scale the hero blob up 35%, and give the hero more height so the
+       header (and everything below) drops clear of the taller blob.
+       MacBook (~1.55) stays as-is. */
+    @media (min-width: 1600px) and (min-aspect-ratio: 17/10) {
+      .hero-blob { height: clamp(594px, 67.5vw, 918px); }
+      .hero-top { min-height: calc(clamp(560px, 60vw, 880px) - 60px); }
+    }
+
+    .hero-blob circle[id^="unify-pupil"] {
+      will-change: cx, cy;
+    }
+
+    /* Body extension is mobile-only — hidden here so desktop keeps the original
+       silhouette, viewBox, height and position untouched. */
+    .blob-ext { display: none; }
+
+    .hero-header {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      padding-bottom: clamp(4px, 1vw, 10px);
+    }
+
+    /* ── Shared section padding ── */
+    .section {
+      border-bottom: 1px solid var(--border-color);
+      padding: clamp(32px, 5vw, 56px) clamp(40px, 8vw, 80px);
+    }
+
+    /* ── Shared section padding ── */
+    .section {
+      border-bottom: 1px solid var(--border-color);
+      padding: clamp(32px, 5vw, 56px) clamp(40px, 8vw, 80px);
+    }
+
+    /* ── Header ── */
+    .project-header { display: flex; flex-direction: column; gap: 16px; }
+
+    .breadcrumb {
+      font-family: 'VT323', monospace;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .title-row { display: flex; align-items: baseline; gap: 12px; }
+
+    .project-title {
+      font-family: 'OCR-A-BT', monospace;
+      font-size: clamp(40px, 7vw, 96px);
+      line-height: 1.05;
+      color: var(--text-primary);
+      letter-spacing: -0.04em;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    /* Sits ON the text baseline like a full stop. An empty flex item has no baseline
+       of its own, so one is synthesised from its bottom edge — with margin-bottom 0
+       that edge IS the dot's bottom, so it lands on the baseline at ANY heading size.
+       The old align-items: flex-end + margin-bottom: 12px aligned to the LINE BOX
+       bottom instead, and the gap from there down to the baseline is the font's
+       descent, which scales with font-size — so one fixed value could only ever be
+       right at one size. Measured: 7.8px BELOW the baseline on the 96px desktop
+       heading, 4.2px ABOVE it on the 35px mobile one. */
+    .accent-dot {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--accent-orange);
+      margin-bottom: 0;
+      flex-shrink: 0;
+      animation: blink 1.5s step-end infinite;
+    }
+
+    .dot-divider {
+      width: 100%; height: 4px;
+      background-image: radial-gradient(circle, var(--text-primary) 1.5px, transparent 1.5px);
+      background-size: 10px 4px;
+      background-repeat: space no-repeat;
+    }
+
+    /* ── Meta grid ── */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(16px, 3vw, 48px);
+    }
+
+    .meta-tile {
+      background: var(--bg-surface);
+      border-radius: 24px;
+      box-shadow: var(--shadow-raised);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 180px;
+    }
+
+    .meta-label {
+      font-family: 'VT323', monospace;
+      font-size: 24px;
+      color: var(--accent-orange);
+      text-transform: uppercase;
+    }
+
+    .meta-inset {
+      flex: 1;
+      background: var(--bg-surface);
+      border-radius: 14px;
+      padding: 14px 18px;
+      box-shadow: var(--shadow-pressed);
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+
+    /* ── Section (single-track, same padding as everything else) ── */
+    .guide-section {
+      padding: clamp(32px, 5vw, 56px) clamp(40px, 8vw, 80px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 3vw, 28px);
+    }
+
+    .section-heading-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-family: 'OCR-A-BT', monospace;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      color: var(--text-primary);
+      letter-spacing: -0.04em;
+    }
+
+    .step-badge {
+      width: 38px; height: 38px;
+      background: var(--accent-orange);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .guide-text {
+      font-size: 14.4px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .guide-text + .guide-text { margin-top: -8px; }
+
+    /* ── At a glance ── */
+    .glance-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .glance-row {
+      display: grid;
+      grid-template-columns: 20px 120px 1fr;
+      gap: 14px;
+      align-items: baseline;
+    }
+
+    .glance-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--accent-orange);
+      transform: translateY(-1px);
+    }
+
+    .glance-label {
+      font-family: 'VT323', monospace;
+      font-size: 17px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .glance-value {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 640px) {
+      .glance-row { grid-template-columns: 14px 1fr; }
+      .glance-label { grid-column: 2; }
+      .glance-value { grid-column: 2; }
+      .glance-dot { grid-row: 1; }
+    }
+
+    /* ── Feature row: portrait phone video beside text, alternating ── */
+    .feature-row {
+      display: grid;
+      grid-template-columns: 42fr 58fr;
+      gap: clamp(28px, 5vw, 64px);
+      align-items: center;
+    }
+
+    .feature-row.reverse { grid-template-columns: 58fr 42fr; }
+    .feature-row.reverse .feature-media { order: 2; }
+    .feature-row.reverse .feature-copy  { order: 1; }
+
+    .feature-media {
+      display: flex;
+      justify-content: center;
+    }
+
+    .feature-media .phone-shot {
+      height: clamp(442px, 62.4vh, 676px);
+      max-width: 100%;
+    }
+
+    /* ── Phone mockups: a transparent iPhone frame OVER the recording ──────
+       Every .mov was exported with its own phone mockup and the app's grey
+       (#D8D7DC) baked in around it. That grey used to be hidden with a per-file
+       clip-path measured to the phone's bezel, which never cut cleanly: each
+       recording's screen corners are ROUNDED and baked in, so clipping a
+       rectangular element to a rounded rect always left bezel wedges in the
+       corners. The recordings are untouched; what changed is that a stock
+       transparent iPhone 17 frame now sits on top, and a box shaped like that
+       frame's screen hole does the clipping — so the corner is the frame's own
+       curve by construction. Same system as 2D.html's Unify tile; the long
+       comment there carries the full reasoning.
+
+       Three boxes: .phone-shot is the frame's own pixel ratio, sized by height
+       wherever the bare recording used to be; .phone-shot-screen is that frame's
+       screen hole (x 36-839, y 30-1777 of 876 x 1808, grown 2px so its edge
+       hides under the frame instead of leaving a hairline of page showing);
+       .phone-shot-video is the recording, cropped to sit inside its own black
+       bezel and placed so ITS dynamic island lands on the frame's.
+
+       The per-file numbers below are derived, not eyeballed. Each recording's
+       island was found by taking a pixelwise MAX over 60 frames — the screen is
+       lit at some point, the island never is — and the placement solved so the
+       two islands coincide. They are NOT interchangeable between files: these
+       are different iPhone generations at different framings. Vertical scale
+       keeps each recording's pixels square, and the ~1% zoom that closes the
+       side seam is HORIZONTAL ONLY, because the islands sit near the top and
+       scaling vertically about them swings the bottom hard enough to crop the
+       app's own nav row. */
+    .phone-shot {
+      position: relative;
+      aspect-ratio: 876 / 1808;
+    }
+    .phone-shot-screen {
+      position: absolute;
+      top: 1.5487%; left: 3.8813%;
+      width: 92.2374%; height: 96.9027%;
+      border-radius: 16.0891% / 7.4201%;
+      overflow: hidden;
+    }
+    .phone-shot-video {
+      position: absolute;
+      object-fit: fill;
+      display: block;
+    }
+    .phone-shot-frame {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      display: block;
+    }
+    .phone-shot-video[data-vid="homepage"] { top: -0.3831%; left: -1.3252%; width: 102.6885%; height: 101.4183%; }
+    .phone-shot-video[data-vid="timetable"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.8972%; }
+    .phone-shot-video[data-vid="socials"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.8972%; }
+    .phone-shot-video[data-vid="map-friends"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.8972%; }
+    .phone-shot-video[data-vid="map-courses"] { top: -0.2458%; left: -1.0697%; width: 102.0156%; height: 101.2047%; }
+    .phone-shot-video[data-vid="settings"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.7448%; }
+
+    .feature-copy {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(16px, 2vw, 22px);
+    }
+
+
+    .feature-title {
+      font-family: 'OCR-A-BT', monospace;
+      font-size: clamp(22px, 3vw, 34px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+    }
+
+    /* ── Scroll-driven dual-video section (steps 03 + 04) ──
+       A tall spacer pins the .scrolly-sticky panel; scrolling past its
+       midpoint (or clicking a video) swaps which video is full-size and
+       which text panel shows. Videos on the left, text on the right. */
+    .scrolly {
+      position: relative;
+      height: 175vh;
+    }
+
+    .scrolly-sticky {
+      position: sticky;
+      top: 12vh;
+      height: 76vh;
+      display: flex;
+      align-items: center;
+      gap: clamp(28px, 5vw, 64px);
+      padding: 0 clamp(40px, 8vw, 80px);
+    }
+
+    .scrolly-media {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-end;      /* phones stand on a shared baseline */
+      gap: clamp(16px, 2vw, 32px);
+      margin-left: 50px;          /* nudge the pair toward centre */
+    }
+
+    /* Only mirror layout for steps 2 & 5 (Timetable/Socials) */
+    #support-scrolly .scrolly-sticky {
+      flex-direction: row-reverse;  /* text left, videos right */
+    }
+
+    #support-scrolly .scrolly-media {
+      margin-left: 0;
+      margin-right: 50px;         /* nudge toward centre from right */
+    }
+
+    .scrolly-vid { cursor: pointer; }
+
+    .scrolly-vid .phone-shot {
+      height: calc(clamp(442px, 62.4vh, 676px) * 0.6);   /* inactive: 40% smaller */
+      transition: height 480ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .scrolly-vid.is-active .phone-shot {
+      height: clamp(442px, 62.4vh, 676px);   /* matches the other feature videos */
+    }
+
+    .scrolly-copy {
+      position: relative;
+      flex: 1 1 auto;
+      min-width: 0;
+      align-self: center;
+      min-height: 220px;
+    }
+
+    .scrolly-panel {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(16px, 2vw, 22px);
+      opacity: 0;
+      transition: opacity 350ms ease;
+      pointer-events: none;
+    }
+
+    .scrolly-panel.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* progress rail: two dots showing which step is active */
+    .scrolly-rail {
+      position: absolute;
+      left: clamp(16px, 3vw, 40px);
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .scrolly-rail span {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--text-tertiary);
+      transition: background 300ms ease, transform 300ms ease;
+    }
+    .scrolly-rail span.on { background: var(--accent-orange); transform: scale(1.3); }
+
+    @media (max-width: 860px) {
+      .scrolly { height: auto; }
+      .scrolly-sticky {
+        position: static; height: auto;
+        flex-direction: column; align-items: stretch;
+        gap: 28px; padding: 32px 20px;
+      }
+      .scrolly-media { justify-content: center; margin-left: 0; }
+      /* The mirrored desktop layout is declared at ID strength
+         (#support-scrolly .scrolly-sticky, specificity 1,0,1), so the
+         plain `.scrolly-sticky { flex-direction: column }` above (0,1,0) lost to
+         it and this one section stayed row-reverse for the whole stacked band —
+         which squeezed .scrolly-copy and both its panels to ZERO width and pushed
+         the videos off the left edge. Sibling #nav-friends-scrolly has no
+         ID-level direction rule, which is why only this one broke.
+         Restating at ID strength is what actually overrides it. */
+      #support-scrolly .scrolly-sticky { flex-direction: column; }
+      #support-scrolly .scrolly-media { margin-left: 0; margin-right: 0; }
+      .scrolly-vid .phone-shot,
+      .scrolly-vid.is-active .phone-shot { height: clamp(360px, 64vw, 460px); }
+      .scrolly-copy { min-height: 0; }
+      .scrolly-panel { position: static; transform: none; opacity: 1; pointer-events: auto; }
+      .scrolly-panel + .scrolly-panel { margin-top: 24px; }
+      .scrolly-rail { display: none; }
+    }
+
+    @media (max-width: 860px) {
+      .meta-grid { grid-template-columns: 1fr 1fr; }
+      .feature-row,
+      .feature-row.reverse { grid-template-columns: 1fr; gap: 28px; }
+      .feature-row.reverse .feature-media { order: 1; }
+      .feature-row.reverse .feature-copy  { order: 2; }
+    }
+
+    /* Endpoint of the fluid shrink above: padding is already 0 by here via
+       the clamp(), but the page-wrapper's own border/margin need an explicit
+       cut — a 1px border can't fade gradually, so it's removed outright at
+       the exact width the padding hits zero, which reads as continuous. */
+    @media (max-width: 860px) {
+      html, body { padding: 0; }
+      .page-wrapper { margin: 0; border-left: none; border-right: none; }
+      /* Keep the wrapper's border-bottom off the document's LAST row. That
+         border is the final painted line in the document, and the document does
+         not end on a whole pixel, so its last fraction falls outside the
+         scrollable area. The pixel-snap script near the bottom of this file only
+         rounds where the border STARTS; it cannot stop it being the terminal
+         row, and WebKit drops that sliver outright (Chrome happens not to, which
+         is why this only showed on the phone). One pixel of sill beneath the
+         card demotes the border to an ordinary interior row. */
+      body { padding-bottom: 1px; }
+    }
+
+    @media (max-width: 640px) {
+      #top-bar { height: 140px; }
+      #top-bar.hide { transform: translateY(-90px); }
+      .section { padding: 24px 20px; }
+      .guide-section { padding: 32px 20px; }
+      /* .hero-header is bottom-aligned in .hero-top, so this min-height is what
+         sets the header's position — and therefore everything below it.
+         It grows by the blob's extension MINUS 14px, so the content moves down
+         with the longer body but slightly less than it, which tightens the gap
+         under the legs from ~28px to ~18px at 390px. The extension term is the
+         same expression used for .hero-blob's `top` below; keep the two in sync. */
+      .hero-top {
+        padding: 0 20px;
+        min-height: calc(clamp(420px, 92vw, 560px)
+                         + 0.3935 * (clamp(420px, 92vw, 560px) - 100px)
+                         - 8px);
+      }
+      /* Blob was clamp(400px, 108vw, 620px) = 421px at 390px wide, and with
+         top: -30px its bottom edge landed at 392px — 74px past the header's top
+         (319px), so it covered the breadcrumb and most of the "Unify" title.
+         Height is now derived from the SAME expression as .hero-top's min-height
+         above, minus 84px. Deriving it rather than picking another vw factor
+         matters: the two used to grow at different rates (108vw vs 92vw), so any
+         fixed factor that cleared the header at 390px would start overlapping
+         again further up the range.
+         The 100px offset is sized for the WORST case, 640px, where
+         .project-title hits its clamp ceiling (56px) and the header is ~19px
+         taller than at phone widths — a constant offset can't track that, so it
+         has to cover the tallest header. Clearance measures +29px at 390px down
+         to +4px at 640px; at 84px it was +12px on phones but -13px at 640. */
+      /* Body elongated 40% — see the .blob-ext path in the SVG. The element's
+         height and therefore the shape's SCALE are unchanged; the extra length is
+         drawn above the viewBox, so it would grow the blob UPWARD and the legs
+         would not move. Pushing the element down by exactly the extension length
+         is what converts that into downward growth: the pink top edge lands back
+         where it was (it bleeds off-page either way) while the eyes and legs move
+         down by the full 326.6 units.
+         0.3935 = 326.6 / 830 — the extension in viewBox units over the viewBox
+         height — so multiplying by the element height converts it to pixels and
+         tracks the blob at every width instead of being a fixed px nudge. */
+      .blob-ext { display: inline; }
+      .hero-blob {
+        height: calc(clamp(420px, 92vw, 560px) - 100px);
+        left: 66.667%;
+        transform: translateX(-50%);
+        top: calc(-30px + 0.3935 * (clamp(420px, 92vw, 560px) - 100px));
+      }
+      .project-title { font-size: clamp(32px, 9vw, 56px); }
+      .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
+      .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
+      .meta-inset { padding: 8px 10px; }
+      .feature-media .phone-shot { height: clamp(416px, 78vh, 598px); }
+    }
+
+    /* ── Project nav ──────────────────────────────────────── */
+    .project-nav {
+      display: flex;
+      border-top: 1px solid var(--border-color);
+      position: relative;
+      min-height: clamp(160px, 18vw, 220px);
+      margin-bottom: -12px;   /* cancels .page-wrapper padding-bottom so the real border below reaches the outer card edge */
+    }
+
+    .project-nav-item + .project-nav-item {
+      border-left: 1px solid var(--border-color);   /* real border on the flex item — always spans its full height, unlike an absolutely positioned divider */
+    }
+
+    .project-nav-item {
+      flex: 1;
+      padding: clamp(24px, 3vw, 40px) clamp(40px, 8vw, 80px);
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    /* Hover scale lives on this inner wrapper, not .project-nav-item itself —
+       .project-nav-item carries the real border-left divider (see rule above),
+       and scaling that element would visibly grow/shift the divider line too. */
+    .project-nav-item-inner {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      transition: transform 200ms ease;
+    }
+
+    .project-nav-item:hover .project-nav-item-inner { transform: translateY(-2px) scale(1.03); transition: transform 150ms ease; }
+
+    .project-nav-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .project-nav-number {
+      font-family: 'VT323', monospace;
+      font-size: clamp(14px, 1.5vw, 18px);
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+    }
+
+    .project-nav-label {
+      font-family: 'VT323', monospace;
+      font-size: clamp(14px, 1.5vw, 18px);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+    }
+
+    .project-nav-title {
+      font-family: 'OCR-A-BT', monospace;
+      font-size: clamp(20px, 3vw, 36px);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: auto;
+    }
+
+    /* ── Mobile menu overlay ───────────────────────────────── */
+    .mobile-menu {
+      /* z-index must beat #top-bar, which is 9999 on this page (most other 2D pages use
+         10). At 200 the nav iframe painted over this backdrop, leaving the nav pill bright
+         while the rest of the page darkened. Raising this instead of lowering #top-bar
+         leaves desktop untouched — this element is opacity:0/pointer-events:none unless
+         .open, and never .open at desktop widths. */
+      position: fixed; inset: 0; z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.55);
+      opacity: 0; pointer-events: none; transition: opacity 250ms ease;
+    }
+    .mobile-menu.open { opacity: 1; pointer-events: auto; }
+    .mobile-menu-panel {
+      width: 64%;
+      background: var(--bg-surface);
+      border-radius: 28px;
+      /* No outer shadow/highlight — a neumorphic glow would read as a halo
+         against the darkened backdrop. Depth lives on the buttons inside. */
+      padding: 20px; display: flex; flex-direction: column; gap: 24px;
+      transform: translateY(10px); transition: transform 250ms ease;
+    }
+    .mobile-menu.open .mobile-menu-panel { transform: translateY(0); }
+    .mobile-view-toggle {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
+      background: var(--bg-surface); border-radius: 9999px;
+      box-shadow: var(--shadow-raised-sm);
+      padding: 5px;
+    }
+    /* No extra margin on any one control: every item in the burger menu is
+       separated by the panel's own uniform 24px gap (2026-09-15). The theme
+       toggle moved to the TOP of the panel, which silently handed it a
+       `:first-child { margin-bottom: 22px }` rule written for the 2D/3D toggle
+       that used to lead — so it alone sat further from its neighbour than
+       anything else. Removed rather than re-targeted: the menu reads better
+       evenly spaced, and a rule keyed on position breaks again the next time
+       the order changes. */
+
+    .mobile-mode-btn {
+      border: none; background: transparent; border-radius: 9999px;
+      padding: 11px 0; font-family: 'VT323', monospace; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
+         line-height, so a segment's text box is identical to a nav button's. The
+         segment keeps 11px vertical padding, which is exactly what makes the TRACK
+         come out level with a nav button: the track adds its own 5px padding top and
+         bottom, so 5+11 and 11+5 sum to the nav button's 16px — the two pills end up
+         the same height without hardcoding one. line-height is stated explicitly
+         because these are <button>s, which do not reliably inherit it. */
+      font-size: 22px;
+      line-height: 1.6;
+      color: #555; cursor: pointer; text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: box-shadow 150ms ease, color 150ms ease, transform 150ms ease;
+    }
+    .mobile-mode-btn.is-active {
+      /* Shared by BOTH toggles: the selected segment is a recessed well. The inset is
+         --shadow-pressed's 5px offset / 10px blur reduced 35%, matching the desktop nav's
+         .pill__seg.is-active in top_row_permanent_V3.html. Scoped to the segments INSIDE
+         the toggle — .mobile-view-toggle's own raised track shadow is untouched, mirroring
+         the desktop .pill track.
+         background must be a real colour, NOT transparent: an inset shadow paints over the
+         element's own background, so without one the segment would read as a hole punched
+         through to the track rather than a well.
+         Deliberately sets NO color — selecting a segment must not darken its text, so both
+         toggles keep the base #555 and the inset alone marks the language selection. */
+      background: var(--bg-surface);
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
+    }
+
+    /* 2D/3D toggle ONLY: a flat orange fill, and explicitly NO inset — the neumorphic
+       shading and white highlight are cancelled here so the orange reads as a solid pill.
+       The language toggle shares .mobile-view-toggle / .mobile-mode-btn and keeps both the
+       surface fill and the inset from the rule above.
+       Matched on [data-mode] rather than child position or the .mobile-lang-toggle class,
+       so the orange cannot wander onto the wrong control if the panel is reordered — the
+       language segments carry [data-lang] instead. Specificity (0,3,0) beats the shared
+       rule, so source order does not matter.
+       --accent-orange is undefined on index.html (the 3D page declares no such custom
+       property), hence the literal fallback. */
+    .mobile-mode-btn[data-mode].is-active {
+      background: var(--accent-orange, #FF5C00);
+      /* Black, overriding the base rule's #555. That grey is tuned for an UNSELECTED
+         segment on the grey surface; over #FF5C00 it measures 2.4:1 and the label reads
+         as disabled rather than selected. Black on this orange is 6.8:1. Scoped to
+         [data-mode], so the language segments keep #555 on their grey well. */
+      color: #000;
+      /* Same well as the language toggle above — same offsets, same blur, same
+         alphas — recoloured so it reads on orange instead of on the grey
+         surface. The grey/white pair was built to sit on #DCDCE3; over #FF5C00
+         a white highlight desaturates to a pale wash and the cool grey shadow
+         reads as dirt. So the two hues are re-derived from the orange itself:
+         top-left gets a darker orange, bottom-right a lighter one, keeping the
+         site's light-from-top-left convention. */
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(168, 56, 0, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 173, 122, 1);
+    }
+    .mobile-mode-btn:active:not(.is-active) {
+      /* Scale is the tap feedback both toggles share. */
+      transform: scale(0.96);
+    }
+
+    /* Press inset for the LANGUAGE toggle only. A tap should preview the state it lands
+       in: a language segment lands in an inset well, but a 2D/3D segment now lands in a
+       flat orange pill, so flashing an inset there would animate to something that no
+       longer exists in that control. Same reduced spread as the settled state. */
+    .mobile-mode-btn[data-lang]:active:not(.is-active) {
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
+    }
+    .mobile-nav-btn {
+      display: block; background: var(--bg-surface); border-radius: 9999px;
+      box-shadow: var(--shadow-raised-sm);
+      padding: 16px 24px; font-family: 'VT323', monospace; font-size: 22px;
+      color: #555; text-transform: uppercase; text-decoration: none;
+      text-align: center; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: box-shadow 150ms ease, transform 150ms ease;
+    }
+    .mobile-nav-btn:active {
+      transform: scale(0.98);
+      box-shadow: var(--shadow-pressed);
+    }
+
+    html { scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    #scroll-track {
+      position: fixed; right: 16px; top: 24px; bottom: 24px;
+      width: 6px; z-index: 999; pointer-events: none;
+      transform: translateZ(0); will-change: transform;
+    }
+    /* Mobile only: sit the scroll dots closer to the screen edge. Same
+       specificity as the rule above, so this wins purely on source order —
+       keep it immediately after. Desktop keeps right: 16px. */
+    @media (max-width: 640px) {
+      #scroll-track { right: 6px; }
+    }
+    #scroll-thumb {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .scroll-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent-orange, #FF5C00); display: block; flex-shrink: 0;
+    }
+    /* Desktop: the dot column doubles as a real scrollbar — drag the dots, or
+       click the strip to jump there (macOS behaviour). The grab area is
+       widened to 20px while the dots stay optically put: the extra width is
+       added on the left and `right` shrinks by the same amount, so the centre
+       line (19px from the edge) is unchanged.
+       Touch keeps the base `pointer-events: none` — a live 20px strip down the
+       screen edge would swallow swipe-scrolling on a phone. */
+    @media (hover: hover) and (pointer: fine) {
+      #scroll-track {
+        width: 20px;
+        right: 9px;            /* 16 + 6/2 = 19 centre; 19 − 20/2 = 9 */
+        pointer-events: auto;
+        cursor: pointer;
+      }
+      #scroll-thumb { cursor: grab; }
+      #scroll-track.is-dragging,
+      #scroll-track.is-dragging #scroll-thumb { cursor: grabbing; }
+      /* Affordance: dots swell while the strip is hovered or dragged. Transform
+         only — no layout shift, so the thumb's measured height never changes
+         (the scroll maths reads offsetHeight). */
+      .scroll-dot { transition: transform 160ms cubic-bezier(.2,.7,.2,1); }
+      #scroll-track:hover .scroll-dot,
+      #scroll-track.is-dragging .scroll-dot { transform: scale(1.3); }
+    }
+
+    /* ── Design Process / Color Palette / Typography / Character Design sections ── */
+    .process-section {
+      padding: clamp(32px, 5vw, 56px) clamp(40px, 8vw, 80px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 3vw, 28px);
+    }
+
+    .process-title {
+      font-family: 'OCR-A-BT', monospace;
+      font-size: clamp(24px, 3.4vw, 36px);
+      line-height: 1.05;
+      color: var(--text-primary);
+      letter-spacing: -0.04em;
+    }
+
+    /* Color palette boxes */
+    .color-grid {
+      display: flex;
+      gap: clamp(20px, 4vw, 40px);
+      align-items: flex-end;
+      margin-bottom: 50px;
+    }
+
+    .color-box {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .color-swatch {
+      width: 100%;
+      aspect-ratio: 1.83 / 1;
+      border-radius: clamp(30px, 8vw, 50px);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: clamp(16px, 3vw, 24px);
+    }
+
+    .color-swatch-code {
+      font-family: 'VT323', monospace;
+      font-size: clamp(13px, 1.5vw, 16px);
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .color-label {
+      font-family: 'VT323', monospace;
+      font-size: clamp(13px, 1.5vw, 16px);
+      color: var(--text-primary);
+      text-align: center;
+      margin-top: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Typography cards. Every stop of the desktop treatment is 30% down from
+       where it started (card 160 -> 112px tall, preview 72 -> 50px, and so on
+       through the padding, gaps and labels), so the three pills scale as one
+       piece. The <=640px block further down re-specs these cards for phones —
+       it hides the preview and sizes the label itself — so mobile is
+       untouched by this. */
+    .typography-grid {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(11px, 1.4vw, 17px);
+    }
+
+    .typography-card {
+      background: var(--bg-surface);
+      border-radius: 9999px;
+      box-shadow: var(--shadow-raised);
+      padding: 0 clamp(22px, 3.5vw, 39px);
+      min-height: clamp(84px, 9.8vw, 112px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: clamp(22px, 4.2vw, 42px);
+    }
+
+    .typography-info {
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .typography-label {
+      font-family: 'Roboto', sans-serif;
+      font-size: clamp(11px, 1.4vw, 14px);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .typography-spec {
+      font-family: 'Roboto', sans-serif;
+      font-size: clamp(11px, 1.4vw, 14px);
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .typography-spec::before {
+      content: '·';
+      margin-right: 8px;
+      color: var(--text-secondary);
+    }
+
+    .typography-preview {
+      flex: 1;
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(25px, 4.2vw, 50px);
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: right;
+      line-height: 1;
+    }
+
+    /* Character design section — staggered character + text rows */
+    .character-list {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(48px, 7vw, 96px);
+      margin-top: clamp(24px, 4vw, 48px);
+      /* Fluid centring: the column grows slower than the viewport, so on a
+         MacBook it stays full-width (no change) and on wider screens it
+         progressively narrows + centres, gradually pulling the figures in.
+         max-width:100% keeps it from ever exceeding the content box. */
+      width: calc(520px + 40vw);
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Past the 1440px card cap, freeze the fluid spread to its value AT 1440
+       (calc(520 + 40*14.4) = 1096) so wide monitors match the MacBook layout
+       instead of pulling the figures apart inside the capped card. */
+    @media (min-width: 1440px) {
+      .character-list { width: 1096px; }
+    }
+
+    .character-row {
+      display: flex;
+      align-items: center;
+      gap: clamp(28px, 4vw, 56px);
+      max-width: 640px;
+    }
+
+    /* Organic idle drift — each figure floats on its own rhythm.
+       Applied to .character-figure, NOT .character-row: the row also contains
+       the paragraph, so animating it dragged the body copy around with the
+       character. Only the figure should move. */
+    .character-row:nth-child(1) .character-figure { animation: charFloat1 9s ease-in-out infinite; }
+    .character-row:nth-child(2) .character-figure { animation: charFloat2 11s ease-in-out infinite; }
+    .character-row:nth-child(3) .character-figure { animation: charFloat3 10s ease-in-out infinite; }
+
+    @keyframes charFloat1 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33%      { transform: translate(9px, -11px) rotate(-1.1deg); }
+      66%      { transform: translate(-7px, 7px) rotate(0.8deg); }
+    }
+    @keyframes charFloat2 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33%      { transform: translate(-11px, 9px) rotate(1.2deg); }
+      66%      { transform: translate(8px, -8px) rotate(-1.3deg); }
+    }
+    @keyframes charFloat3 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33%      { transform: translate(10px, 8px) rotate(1.3deg); }
+      66%      { transform: translate(-9px, -10px) rotate(-0.9deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .character-figure { animation: none !important; }
+    }
+
+    /* text left, character right — pushed to the right side */
+    .character-row.right {
+      flex-direction: row-reverse;
+      margin-left: auto;
+    }
+
+    /* character left, text right — indented from the left edge */
+    .character-row.indent {
+      margin-left: clamp(24px, 8vw, 120px);
+    }
+
+    .character-figure {
+      flex-shrink: 0;
+      width: clamp(130px, 15vw, 180px);
+      will-change: transform;
+    }
+
+    .character-figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .character-copy {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 860px) {
+      .color-grid { flex-direction: column; }
+      .typography-card { flex-direction: column; text-align: center; }
+      .typography-preview { text-align: center; }
+      .character-row,
+      .character-row.right,
+      .character-row.indent {
+        margin-left: 0;
+        max-width: none;
+        flex-direction: row;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .process-section { padding: 24px 20px; }
+
+      /* ── Typography panels: one line per pill ──────────────────────────────
+         Spec (size · weight) on the LEFT, the big Nunito word on the RIGHT.
+         The @media 860 block above stacks this card into a centred column, which
+         is what put the text on two lines; this restores a row.
+
+         The big word is .typography-label — it already reads "Header" / "Body
+         text" / "Info text" and is already translated, so promoting it to the
+         sample means NO markup and NO TRANSLATIONS change, and desktop keeps its
+         own layout and its sample phrases untouched. .typography-preview (the
+         phrase) is hidden instead.
+
+         Each card's weight is an inline style on that now-hidden .typography-
+         preview (800 / 700 / 300), so it is re-applied to the label by position
+         below — otherwise every row would render at the same weight and stop
+         being a specimen of the weight it names. */
+      .typography-card {
+        padding: 16px 12px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        text-align: left;
+        gap: 12px;
+        /* was clamp(120px, 14vw, 160px), sized for the two-line stack */
+        min-height: 72px;
+      }
+
+      .typography-preview { display: none; }
+
+      .typography-info {
+        flex: 1;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .typography-spec {
+        order: 1;
+        white-space: nowrap;
+      }
+
+      /* The "·" divider separated label from spec while both sat together on the
+         left. With the label moved to the far right it is orphaned in front of
+         "72px", reading as "· 72px · bold". */
+      .typography-spec::before { content: none; }
+
+      .typography-label {
+        order: 2;
+        font-family: 'Nunito', sans-serif;
+        font-size: clamp(20px, 6.5vw, 30px);
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      /* Weights carried over from each card's hidden .typography-preview. Sized
+         to fit the longest German label ("Überschrift") next to its spec without
+         wrapping — see the measurement in the reply. */
+      .typography-card:nth-child(1) .typography-label { font-weight: 800; }
+      .typography-card:nth-child(2) .typography-label { font-weight: 700; }
+      .typography-card:nth-child(3) .typography-label { font-weight: 300; }
+      .character-row,
+      .character-row.right,
+      .character-row.indent { flex-direction: column; align-items: flex-start; gap: 16px; }
+    }
+    /* ── Reduced motion (apple-design §14): drop non-essential movement,
+       keep layout + opacity cues. No effect unless the OS pref is set. */
+    @media (prefers-reduced-motion: reduce) {
+      .accent-dot { animation: none !important; opacity: 1; }
+      .machine-overlay-btn,
+      .hero-blob,
+      .character-figure,
+      .spin-scrolly .spin { animation: none !important; }
+      .project-nav-item:hover .project-nav-item-inner,
+      .meta-tile:hover,
+      .project-tile:hover,
+      .machine-frame-wrap:hover,
+      .tag:hover { transform: none !important; }
+    }
+
+    /* ── Mobile only: readable type scale ──────────────────────────────────
+       At 390px these all sat under the platform minimum — body copy was 14.4px,
+       the smallest text on the page despite carrying the most reading load
+       (iOS body default is 17px; Material's body-large is 16sp).
+       Tiers: 16px proportional body · 15px short-but-real content (meta values)
+       · 16px VT323 UI labels — VT323 has a small x-height and 1px strokes, so it
+       reads ~2-3px smaller than a proportional face at the same declared size.
+       MUST stay last in the stylesheet: several of these selectors already set
+       font-size in earlier max-width blocks and these overrides have equal
+       specificity, so they win on source order alone. */
+    @media (max-width: 640px) {
+      /* proportional body copy */
+      .guide-text,
+      .character-copy { font-size: 16px; }
+      /* short but real content, kept below body size */
+      .meta-inset { font-size: 15px; }
+      /* VT323 UI labels */
+      .breadcrumb,
+      .color-swatch-code { font-size: 16px; }
+
+      /* Project nav — mobile only. The project TITLE under the label is hidden, so
+         the footer reads just "NEXT >>" and the number. It is dropped rather than
+         shrunk because the destination is already named by the big title at the top
+         of the page you land on, and at 390px the OCR-A-BT title wrapped to two
+         lines inside a box that was mostly empty anyway.
+         With the title gone the label/number pair is the only content left, so it
+         takes the primary (near-black) text colour instead of the secondary grey and
+         a step up in size. It is NOT in the 16px VT323 group above any more: that
+         size was calibrated for a secondary label sitting BELOW a title, which is no
+         longer the relationship. min-height drops from clamp(160px, 18vw, 220px) —
+         160px at phone widths — to 84px, which is the ~70px the remaining content
+         actually occupies (24px padding x2 + one ~22px line) plus a little air. */
+      .project-nav-title { display: none; }
+      .project-nav-label,
+      .project-nav-number { font-size: 18px; color: var(--text-primary); }
+      .project-nav { min-height: 84px; }
+    }
+
+    /* Comma carriers inserted before each <br> in the meta values by the script at
+       the bottom of this file. Hidden by default so DESKTOP is untouched — it keeps
+       the <br> and its stacked values. The mobile block below swaps which of the two
+       is visible. They are inserted unconditionally rather than only under the media
+       query, which is what makes resizing across 640px work in both directions. */
+    .meta-sep { display: none; }
+
+    /* ── Mobile: meta tiles as a spec list ──────────────────────────────────────
+       Replaces the 2x2 tile grid, which struggles on a phone: every tile is locked
+       to height: 155px so a one-word value leaves most of its inset empty; a raised
+       tile wrapping a pressed inset puts two opposing shadow systems inside a
+       ~170px-wide box, which reads as noise at that size; and two columns leave each
+       value ~150px wide, so dates wrap mid-phrase.
+       One pressed card now holds four label/value rows, hairline-separated — same
+       tokens (VT323 orange labels, --text-secondary values), no nesting, height
+       driven by content.
+       Appended LAST on purpose: it beats the earlier mobile rules
+       (grid-template-columns + height: 155px) on source order alone, and deleting
+       this block restores the previous design exactly. No markup or data-i18n
+       changes are involved. */
+    @media (max-width: 640px) {
+      .meta-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        background: var(--bg-surface);
+        border-radius: 24px;
+        /* Pressed, not raised: the card reads as a recess holding the rows. Same
+           token the old per-tile .meta-inset panels used — the depth just moved from
+           four small insets to one big one. */
+        box-shadow: var(--shadow-pressed);
+        padding: 6px 18px;
+      }
+
+      .meta-tile {
+        display: grid;
+        /* 88px fits the widest label in either language — measured at 18px VT323 the
+           longest is "Fähigkeiten" at 80px. Fixed rather than auto because each tile
+           is its own grid, so an auto track would size per row and the values would
+           not line up with each other. */
+        grid-template-columns: 88px 1fr;
+        align-items: start;
+        gap: 14px;
+        height: auto;
+        min-height: 0;
+        padding: 14px 0;
+        background: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      /* A real border on a full-width row spans it exactly — no pseudo-element
+         offsets to get wrong, and no dotted-divider JS to wire up (the site's
+         .dot-divider needs a measured exact-divisor script to avoid half dots). */
+      .meta-tile + .meta-tile {
+        border-top: 1px solid rgba(111, 111, 111, 0.18);
+      }
+
+      .meta-label {
+        font-size: 18px;
+        line-height: 1.25;
+      }
+
+      /* Values run inline, comma-separated, instead of one per line. Hiding the <br>
+         un-breaks them; the comma itself is a real .meta-sep node inserted by the
+         script at the bottom of this file. That split is necessary, not incidental —
+         measured in Blink:
+           · br{display:none} / br{display:contents} -> one line, but the runs merge
+             into "FigmaPrototypingClaude Code" with nothing between them;
+           · br::after{content:", "}                 -> adds 0px, i.e. generated
+             content on a <br> never renders;
+           · <br> as a flex item                     -> still forces the break.
+         So CSS alone cannot supply the comma. */
+      .meta-inset {
+        flex: none;
+        padding: 0;
+        background: none;
+        border-radius: 0;
+        box-shadow: none;
+        line-height: 1.5;
+      }
+
+      .meta-inset br { display: none; }
+      .meta-sep { display: inline; }
+    }
+    /* ── Mobile layout repairs ─────────────────────────────────────────────────
+       Three sections were genuinely broken at phone widths. Appended last so each
+       fix wins on source order; every rule here is inside the media query, so
+       desktop is untouched. */
+    @media (max-width: 640px) {
+
+      /* 1. COLOUR PALETTE — swatches were rendering 75x58px, right-aligned.
+         Cause: .color-grid is a row with `align-items: flex-end` (to bottom-align
+         swatches of unequal height). The @media 860 block flips it to
+         `flex-direction: column`, and in a column `align-items` controls the
+         CROSS axis — so flex-end stopped meaning "bottom" and started meaning
+         "right", while each box shrank to its content width instead of filling.
+         Three swatches side by side is also the better read for a palette, so
+         this restores the row rather than fixing the column. */
+      .color-grid {
+        flex-direction: row;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+
+      .color-box { flex: 1 1 0; min-width: 0; }
+
+      .color-swatch {
+        /* 1.83/1 is a wide desktop chip; at ~103px per column that collapses to a
+           thin bar, so square reads as a proper swatch. */
+        aspect-ratio: 1 / 1;
+        border-radius: 20px;
+        padding: 10px;
+        align-items: flex-end;
+        justify-content: center;
+      }
+
+      /* 2. CHARACTERS — .character-copy measured 367px inside a 350px column,
+         pushing text past the page edge. Cause: the paragraphs carry inline
+         `margin-left: -15px` / `margin-right: -15px`, which tuck the text against
+         the figure in the desktop ROW layout. At <=640px the row becomes a
+         column, so those negative margins pull the text sideways out of the
+         container instead. !important is required — they are inline styles. */
+      .character-copy {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
+
+      /* 3. TIMETABLE/SOCIALS SCROLLY — was the worst of the three: the sticky row
+         stayed `row-reverse`, which squeezed .scrolly-copy and both its panels to
+         ZERO width and pushed the videos 46px off the left edge, over a
+         2917px-tall section. It is a specificity bug, and it affected the whole
+         stacked band rather than just phones, so the fix lives in the
+         @media (max-width: 860px) fallback block further up — see the comment
+         there. What follows is layout, not repair.
+
+         3b. Give both scrolly sections a layout that actually suits a phone.
+         The <=860px fallback stands the two phones SIDE BY SIDE and then stacks
+         both captions underneath. At 390px that leaves each phone ~175px wide —
+         narrower than the app UI inside it is legible at — and it divorces each
+         caption from the screenshot it describes. Two phones at 175px also
+         overflow the 350px column once the gap is counted, which is what pushed
+         the second video's frame past its own clip.
+         Instead, pair each video with its own caption, exactly like the
+         single-video Home and Settings sections above and below.
+         `display: contents` dissolves the two wrapper divs so their children
+         become direct flex items of the column, and `order` interleaves them —
+         no markup change, so desktop's row layout is untouched. */
+      .scrolly-media,
+      .scrolly-copy { display: contents; }
+
+      .scrolly-vid:nth-child(1)   { order: 1; }
+      .scrolly-panel:nth-child(1) { order: 2; }
+      .scrolly-vid:nth-child(2)   { order: 3; }
+      .scrolly-panel:nth-child(2) { order: 4; }
+
+      /* The column is align-items: stretch, so without this the box spans the
+         full width and the video sits hard against the left edge. */
+      .scrolly-vid { align-self: center; }
+
+      /* Same ramp as .feature-media video, so all six phone mockups on the page
+         render at one size. Both rules needed: the active/inactive size split is
+         a desktop affordance and there is no active step down here. */
+      .scrolly-vid .phone-shot,
+      .scrolly-vid.is-active .phone-shot { height: clamp(416px, 78vh, 598px); }
+
+      /* The 860px fallback's 24px panel gap now lands between a video and its own
+         caption, which should be the tight pair; the breathing room belongs
+         before the NEXT video instead. */
+      .scrolly-panel + .scrolly-panel { margin-top: 0; }
+      .scrolly-vid:nth-child(2) { margin-top: 28px; }
+
+      /* 4. CHARACTERS — the figures are locked to a 130px minimum, which above a
+         350px-wide paragraph read as an afterthought rather than the subject of
+         the section. Bigger, and the desktop stagger is kept alive by alternating
+         which edge each figure hangs off instead of by horizontal offsets (which
+         a single-column layout has no room for). */
+      .character-figure { width: 150px; }
+      .character-row.right  .character-figure { align-self: flex-end; }
+      .character-row.indent .character-figure { align-self: center; }
+
+      /* 5. DESIGN PROCESS — the "Choosing the right colorpalette" heading carries
+         an inline `margin-top: 190px`, a fixed spacer that reads as deliberate air
+         under the section head in the 1440px layout. At 390px it is ~26% of the
+         whole section's height and lands as a dead hole between the dotted divider
+         and the heading, with nothing in it. Structural selector rather than the
+         data-i18n key: this is the only .process-title that directly follows a
+         divider. !important because the 190px is an inline style. */
+      .process-section .dot-divider + .process-title { margin-top: 40px !important; }
+    }
+
+    /* ── Mobile: phone mockups +7%, and their captions matched to their width ──
+       Appended last so the height here beats the two earlier declarations of it
+       (.feature-media video in the first 640px block, .scrolly-vid video in the
+       block above) on source order. Desktop is untouched. */
+    @media (max-width: 640px) {
+      :root {
+        /* Single source of truth for every phone mockup. Was
+           clamp(416px, 78vh, 598px), declared separately for the feature videos
+           and the scrolly videos; +7% is applied to all three stops so the
+           short-phone floor, the vh tracking and the tall-phone ceiling keep the
+           same relationship to each other. */
+        --phone-h: clamp(445px, 83.5vh, 640px);
+
+        /* Visible width of a mockup as a fraction of its height. The mockup is
+           the frame IMAGE now, so this is simply its aspect ratio (876/1808),
+           replacing the old per-file "element box minus its clip-path insets"
+           table — one number, exact for all six, where that table only managed
+           to land within ~2px of each. */
+        --phone-w: calc(var(--phone-h) * 0.4845);
+      }
+
+      .feature-media .phone-shot,
+      .scrolly-vid .phone-shot,
+      .scrolly-vid.is-active .phone-shot { height: var(--phone-h); }
+
+      /* Only the copy that belongs to a mockup: .feature-copy is the Home and
+         Settings caption, .scrolly-panel the four scrolly captions. Every other
+         paragraph on the page keeps the full column width.
+         Constrained with auto margins rather than justify-self/align-self
+         because these two sit in different formatting contexts — .feature-copy
+         is a grid item, .scrolly-panel a flex item (display: contents dissolves
+         .scrolly-copy above) — and auto margins centre correctly in both.
+         max-width guards the short-phone case, where the 445px floor could put
+         --phone-w above the column width on a very narrow screen. */
+      .feature-copy,
+      .scrolly-panel {
+        width: var(--phone-w);
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+  
+    /* Keyword emphasis for skimming — inert by default (desktop unchanged);
+       the mobile block below supplies the darker ink. */
+    b.kw { font-weight: inherit; color: inherit; }
+
+    /* ── Mobile breathing room (design pass, 2026-07-31) ─────────────────
+       Appended LAST so it wins earlier ≤640px rules on source order. Same
+       treatment as virtual_cooking2d.html (tianqicraft / junhyungpark-hanwha
+       references): more air border-to-border, air below the divider before
+       body copy, darker skim keywords. Scrolly sections are deliberately
+       untouched — their heights drive the pin math. */
+    @media (max-width: 640px) {
+      /* At a Glance + both standalone feature rows live in .guide-section. */
+      .guide-section { padding: 52px 20px; }
+      /* Design-story sections (colors / typography / characters): shorter
+         units, slighter bump. */
+      .process-section { padding: 44px 20px; }
+
+      /* Air below the overview divider. Scoped: .process-section's own
+         divider already carries a deliberate 40px on the following title. */
+      .guide-section .dot-divider { margin-bottom: 12px; }
+
+      /* Same -8px paragraph collapse as the other pages — one slab on a
+         phone. Neutralised here only. */
+      .guide-text + .guide-text { margin-top: 0; }
+
+      /* Skim keywords: darker grey ink, weight unchanged. */
+      b.kw { color: #4a4a52; }
+      /* The At-a-Glance lead reads as the project's one-paragraph pitch — full
+         primary ink, no partial highlights (they were unwrapped from this key). */
+      [data-i18n-html="overview-text"] { color: var(--text-primary); }
+    }
+    /* Mobile: neumorphic shadow spread/radius reduced 35% (offsets & blur ×0.65),
+       matching the nav's 2D/3D toggle segment. Redefining only the tokens keeps
+       desktop untouched; every var(--shadow-*) user inherits this automatically. */
+    @media (max-width: 640px) {
+      :root {
+        --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(174,174,192,0.65), -3.25px -3.25px 7.8px rgba(255,255,255,1);
+        --shadow-raised: 5.2px 5.2px 11.7px rgba(174,174,192,0.65), -5.2px -5.2px 11.7px rgba(255,255,255,1);
+        --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
+      }
+    }
+
+    /* ── Video press feedback ───────────────────────────────────────────
+       Click a video to restart it from the beginning, with a button-like
+       swell on press.
+
+       The transform goes on the video's PARENT, not on the video itself.
+       Most of these videos sit inside a container that clips —
+       .guide-media, .scrolly-vid, the mac-lamp gallery frame — and
+       scaling the video inside one of those reads as a zoom, because the
+       growth is cut off at the container's edge. Scaling the container
+       moves the whole object, which is what makes it feel like a button.
+
+       Curve overshoots slightly on release, so it settles rather than
+       snapping back. */
+    .vid-press { transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
+    .vid-press.is-pressed { transform: scale(1.035); transition-duration: 110ms; }
+    .vid-press video { cursor: pointer; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .vid-press,
+      .vid-press.is-pressed { transition: none; transform: none; }
+    }
+
+    /* ══ Case-study rebuild (unify2d1.html) ═══════════════════════════════
+       Everything below is new for the draft page and only exists here.
+       Plan: /unify-casestudy-plan.md. Every [ bracketed ] value and every
+       .ph box is a placeholder waiting for a real study result or asset. */
+
+    /* Draft marker — only Lucas ever sees this page, so it can say so. */
+    .draft-flag {
+      position: fixed; left: 16px; bottom: 16px; z-index: 50;
+      font-family: 'VT323', monospace; font-size: 16px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #fff;
+      background: var(--accent-orange); border-radius: 999px;
+      padding: 4px 12px 3px; pointer-events: none;
+    }
+
+    .cs-section { border-bottom: none; }
+    .cs-section + .cs-section { padding-top: clamp(16px, 3vw, 32px); }
+
+    /* Hero one-liner: the spine of the whole page, in one sentence. */
+    .cs-lead {
+      font-family: 'Roboto Flex', sans-serif;
+      font-size: clamp(20px, 2.4vw, 30px);
+      font-weight: 300;
+      line-height: 1.35;
+      color: var(--text-primary);
+      max-width: 36ch;
+    }
+
+    /* Page map: announces the structure, links to each section. */
+    .cs-map {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
+      font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--text-secondary);
+    }
+    .cs-map a { color: var(--text-primary); text-decoration: none; }
+    .cs-map a:hover { color: var(--accent-orange); }
+    .cs-map span[aria-hidden] { color: var(--accent-orange); }
+
+    /* Fact bar: three big numbers under the hero. */
+    .fact-bar {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(14px, 2.4vw, 28px);
+    }
+    .fact {
+      background: var(--bg-surface);
+      border-radius: 20px;
+      box-shadow: var(--shadow-raised-sm);
+      padding: clamp(18px, 2.4vw, 28px);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .fact-num {
+      font-family: 'OCR-A-BT', monospace;
+      font-size: clamp(28px, 3.4vw, 44px);
+      line-height: 1; letter-spacing: -0.04em;
+      color: var(--accent-orange);
+    }
+    .fact-label { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+    .fact-src {
+      font-family: 'VT323', monospace; font-size: 15px; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--text-secondary); opacity: 0.8;
+    }
+
+    /* Placeholder visual: a pressed well that names what goes there. */
+    .ph {
+      background: var(--bg-surface);
+      border-radius: 20px;
+      box-shadow: var(--shadow-pressed);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; text-align: center; padding: 24px;
+      aspect-ratio: 16 / 9; width: 100%;
+    }
+    .ph--chart  { aspect-ratio: 16 / 6; }
+    .ph--square { aspect-ratio: 1 / 1; }
+    .ph--tall   { aspect-ratio: 4 / 5; }
+    .ph--phone  { aspect-ratio: 876 / 1808; border-radius: 28px; }
+    .ph-tag {
+      font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--accent-orange);
+    }
+    .ph-desc { font-size: 13px; line-height: 1.5; color: var(--text-secondary); max-width: 40ch; }
+
+    /* Caption: states the finding, never decorates. */
+    .cs-caption {
+      font-family: 'VT323', monospace; font-size: 17px; line-height: 1.3;
+      letter-spacing: 0.02em; color: var(--text-secondary);
+      margin-top: -8px;
+    }
+    .cs-caption b { color: var(--text-primary); font-weight: 400; }
+
+    .cs-sub {
+      font-family: 'OCR-A-BT', monospace;
+      font-size: clamp(20px, 2.6vw, 26px);
+      line-height: 1.1; letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-top: clamp(12px, 2vw, 24px);
+    }
+
+    .cs-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(18px, 3vw, 36px); align-items: start; }
+    .cs-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); align-items: start; }
+    .cs-figure { display: flex; flex-direction: column; gap: 14px; }
+
+    /* Pivot: v1 and the final design on the SAME three screens. */
+    .pivot-compare { display: flex; flex-direction: column; gap: clamp(24px, 4vw, 44px); }
+    .pivot-row { display: flex; flex-direction: column; gap: 14px; }
+    .pivot-label {
+      font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-secondary);
+    }
+    .pivot-label b { color: var(--accent-orange); font-weight: 400; }
+    .pivot-screens {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(14px, 2.4vw, 28px); align-items: start; justify-items: center;
+    }
+    .pivot-screens img.v1-shot {
+      width: 100%; max-width: 220px; height: auto; display: block;
+      border-radius: 18px; box-shadow: var(--shadow-raised-sm);
+    }
+    .pivot-screens .phone-shot { width: 100%; max-width: 220px; }
+
+    /* Timetable variants A / B / C with their metrics underneath. */
+    .variant { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+    .variant-name {
+      font-family: 'VT323', monospace; font-size: 20px; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--text-primary);
+    }
+    .variant.is-winner .variant-name { color: var(--accent-orange); }
+    .variant.is-winner .ph { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
+    .variant-metrics {
+      display: flex; gap: 16px;
+      font-family: 'VT323', monospace; font-size: 17px; color: var(--text-secondary);
+    }
+
+    /* Results: task success before / after one iteration. */
+    .cs-table { width: 100%; border-collapse: collapse; font-size: 14px; color: var(--text-secondary); }
+    .cs-table th {
+      font-family: 'VT323', monospace; font-size: 17px; font-weight: 400;
+      letter-spacing: 0.04em; text-transform: uppercase; text-align: left;
+      color: var(--text-primary); padding: 10px 12px 10px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .cs-table td { padding: 10px 12px 10px 0; border-bottom: 1px dotted var(--border-color); }
+    .cs-table td.num, .cs-table th.num { text-align: right; font-family: 'VT323', monospace; font-size: 18px; }
+    .cs-table tr.is-highlight td { color: var(--text-primary); }
+    .cs-table tr.is-highlight td.num:last-child { color: var(--accent-orange); }
+
+    .sus {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+      background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-raised-sm);
+      padding: clamp(20px, 3vw, 32px);
+    }
+
+    @media (max-width: 860px) {
+      .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .fact-bar, .cs-grid-3 { grid-template-columns: minmax(0, 1fr); }
+      .pivot-screens { gap: 10px; }
+      .ph--chart { aspect-ratio: 4 / 3; }
+      .draft-flag { font-size: 14px; left: 10px; bottom: 10px; }
+    }
+  </style>
+  <link rel="stylesheet" href="/theme/dark-mobile.css" />
+  <link rel="stylesheet" href="/theme/mobile-menu.css" />
+  <script src="/theme/theme.js" defer></script>
+</head>
+<body>
+  <div class="draft-flag">Draft · not linked</div>
+  <iframe id="top-bar" src="/top_row_permanent_V3.html" allowtransparency="true" scrolling="no"></iframe>
+
+  <div id="mobile-menu" class="mobile-menu">
+    <div class="mobile-menu-panel">
+      <!-- Light/dark toggle, first in the panel above Craft, built from the
+           same two classes, so the pair always match. Mobile-only, like the menu.
+           The labels are 13x13 pixel-art glyphs (sun / moon), not text, so they carry
+           no data-i18n — /theme/theme.js sets the aria-label in the current language. -->
+      <div class="mobile-view-toggle mobile-theme-toggle">
+        <button class="mobile-mode-btn" data-theme-choice="light" aria-label="Hell"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="5" y="3" width="3" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="0" y="6" width="2" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="11" y="6" width="2" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="3" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="1" y="11" width="1" height="1"/><rect x="6" y="11" width="1" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/></svg></button>
+        <button class="mobile-mode-btn" data-theme-choice="dark" aria-label="Dunkel"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="0" width="5" height="1"/><rect x="2" y="1" width="4" height="1"/><rect x="1" y="2" width="4" height="1"/><rect x="1" y="3" width="3" height="1"/><rect x="0" y="4" width="4" height="1"/><rect x="0" y="5" width="4" height="1"/><rect x="0" y="6" width="4" height="1"/><rect x="0" y="7" width="4" height="1"/><rect x="0" y="8" width="5" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="1" y="9" width="6" height="1"/><rect x="10" y="9" width="2" height="1"/><rect x="1" y="10" width="11" height="1"/><rect x="2" y="11" width="9" height="1"/><rect x="4" y="12" width="5" height="1"/></svg></button>
+      </div>
+      <a class="mobile-nav-btn" data-page="craft" data-i18n="menu-craft">Craft</a>
+      <a class="mobile-nav-btn" data-page="about" data-i18n="menu-about">About</a>
+      <a class="mobile-nav-btn" data-page="contact" data-i18n="menu-contact">Contact</a>
+      <!-- Language toggle. Deliberately the SAME component as the 2D/3D toggle
+           above — same two classes, no styling of its own — so the pair can
+           never drift apart. The nav bar's own de/en text is hidden below
+           640px; this replaces it. -->
+      <div class="mobile-view-toggle mobile-lang-toggle">
+        <button class="mobile-mode-btn" data-lang="de">Deutsch</button>
+        <button class="mobile-mode-btn" data-lang="en">English</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrapper">
+
+    <!-- Hero: extended blob runs off the top-right; header sits bottom-left.
+         Blob exported from Figma; pupils track the cursor. -->
+    <div class="hero-top">
+      <svg id="unify-blob" class="hero-blob" viewBox="-10 -65 760 830" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741C25.2772 -86 -6.99887 -60 202.306 -60L429.004 -60C709.5 -55 694.991 -102 694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
+        <!-- Mobile-only body extension (hidden by default; see .blob-ext).
+           Draws ONLY the band inserted between the original top cap and a copy of
+           that cap translated up by 326.6 units (= 40% of the 816.5-unit body).
+           Its bottom boundary is the original top cap traced in reverse, so the
+           union with the body path above is seamless — nothing is scaled, so the
+           eyes and legs keep their exact size.
+           The two straight sides are exact, not approximations: the body path
+           leaves (25.2783, 265.741) with its control point at x=25.2772 and
+           arrives at (694.991, 171.552) from x=694.991, i.e. both junctions are
+           already vertical, so length can be inserted there with no kink.
+           Coordinates run above the viewBox top (-65) and render only because
+           .hero-blob sets overflow: visible. -->
+      <path class="blob-ext" d="M25.2783 265.741L25.2783 -60.859C25.2772 -412.6 -6.99887 -386.6 202.306 -386.6L429.004 -386.6C709.5 -381.6 694.991 -428.6 694.991 -155.048L694.991 171.552C694.991 -102 709.5 -55 429.004 -60L202.306 -60C-6.99887 -60 25.2772 -86 25.2783 265.741Z" fill="#FF88C8"/>
+      <circle cx="266.586" cy="324.744" r="168.5" fill="#fff"/>
+        <circle cx="574.086" cy="324.744" r="168" fill="#fff"/>
+        <circle id="unify-pupil-l" cx="223.086" cy="425.744" r="52.5" fill="#292925"/>
+        <circle id="unify-pupil-r" cx="530.586" cy="425.744" r="52.5" fill="#292925"/>
+      </svg>
+      <div class="hero-header">
+        <div class="project-header">
+          <p class="breadcrumb" data-i18n-html="breadcrumb">Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;Unify</p>
+          <div class="title-row">
+            <h1 class="project-title">Unify</h1>
+            <span class="accent-dot"></span>
+          </div>
+          <div class="dot-divider"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CASE-STUDY DRAFT ══════════════════════════════════════════════
+         Order follows unify-casestudy-plan.md §2. Every [ bracketed ] value
+         and every .ph box is a placeholder. New copy is English-only and
+         carries no data-i18n yet — German comes when the copy is final. -->
+
+    <!-- Hero one-liner + page map + fact bar -->
+    <div class="guide-section cs-section" id="top">
+      <p class="cs-lead">Unify shows you when your friends are free at the same time as you — so meeting up between classes stops taking a group chat.</p>
+      <nav class="cs-map" aria-label="Page map">
+        <a href="#problem">Problem</a><span aria-hidden="true">→</span>
+        <a href="#research">Research</a><span aria-hidden="true">→</span>
+        <a href="#idea">Idea</a><span aria-hidden="true">→</span>
+        <a href="#pivot">Pivot</a><span aria-hidden="true">→</span>
+        <a href="#timetable">Timetable</a><span aria-hidden="true">→</span>
+        <a href="#results">Results</a>
+      </nav>
+      <div class="fact-bar">
+        <div class="fact">
+          <span class="fact-num">[ 00 min ]</span>
+          <span class="fact-label">spent texting to arrange one meetup between classes</span>
+          <span class="fact-src">Diary study · n=[ 00 ]</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">[ 0.0× ]</span>
+          <span class="fact-label">more meetups per person per week during the pilot</span>
+          <span class="fact-src">Pilot · n=[ 00 ]</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">[ 00 ]</span>
+          <span class="fact-label">SUS score after one round of iteration</span>
+          <span class="fact-src">Usability test · n=[ 00 ]</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Meta -->
+    <div class="section">
+      <div class="meta-grid">
+        <div class="meta-tile">
+          <div class="meta-label" data-i18n="label-timeline">Timeline</div>
+          <div class="meta-inset" data-i18n-html="val-timeline">[ Timeline ]</div>
+        </div>
+        <div class="meta-tile">
+          <div class="meta-label" data-i18n="label-team">Team</div>
+          <div class="meta-inset" data-i18n-html="val-team">[ Team ]</div>
+        </div>
+        <div class="meta-tile">
+          <div class="meta-label" data-i18n="label-role">Role</div>
+          <!-- New role line (plan §5). No data-i18n yet, or the old value would overwrite it. -->
+          <div class="meta-inset">Lucas Maher — concept, UX, v1 visual design, Figma and coded prototype<br>Sophie Meyer, Moritz Ackermann — character design, user feedback sessions</div>
+        </div>
+        <div class="meta-tile">
+          <div class="meta-label" data-i18n="label-skills">Skills</div>
+          <div class="meta-inset" data-i18n-html="val-skills">[ Skills ]</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1 · The problem -->
+    <section class="guide-section cs-section" id="problem">
+      <div class="section-heading-row">
+        <h2 class="section-title">The problem</h2>
+        <span class="step-badge">1</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text">My friends and I study different subjects. We share a campus but rarely a course, so every week the three of us swapped screenshots of our timetables to work out when we could meet. [ Arranging a 30-minute coffee took 00 minutes of texting. ]</p>
+      <div class="cs-grid-2">
+        <div class="cs-figure">
+          <div class="ph ph--square"><span class="ph-tag">Visual 03 · Chat thread</span><span class="ph-desc">The screenshot swapping, recreated and anonymised</span></div>
+        </div>
+        <div class="cs-figure">
+          <div class="ph ph--square"><span class="ph-tag">Visual 04 · Bar chart</span><span class="ph-desc">How students coordinate free time — Study 1 survey</span></div>
+          <p class="cs-caption"><b>[ 00 % ]</b> coordinate by texting or screenshots. <b>[ 00 % ]</b> have close friends in other subjects.</p>
+        </div>
+      </div>
+      <div class="ph ph--chart"><span class="ph-tag">Visual 05 · Funnel</span><span class="ph-desc">Attempts → agreed → actually met — Study 2 diary</span></div>
+      <p class="cs-caption"><b>[ 00 ]</b> attempts, <b>[ 00 ]</b> agreed, <b>[ 00 ]</b> met.</p>
+    </section>
+
+    <!-- 2 · Research → one model -->
+    <section class="guide-section cs-section" id="research">
+      <div class="section-heading-row">
+        <h2 class="section-title">Research</h2>
+        <span class="step-badge">2</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text">[ One paragraph condensing the survey and the diary into a single model: how structured your week is, against how spread out your friends are. The quadrant with the most missed overlaps is Unify's user. ]</p>
+      <div class="ph ph--square" style="max-width: 560px;"><span class="ph-tag">Visual 06 · 2×2 model</span><span class="ph-desc">Fixed ↔ flexible timetable × same course ↔ other faculties</span></div>
+      <p class="cs-caption">[ Finding: fixed timetable + friends in other faculties holds the most missed overlaps. ]</p>
+    </section>
+
+    <!-- 3 · The idea: shared free time -->
+    <section class="guide-section cs-section" id="idea">
+      <div class="section-heading-row">
+        <h2 class="section-title">The idea</h2>
+        <span class="step-badge">3</span>
+      </div>
+      <div class="dot-divider"></div>
+      <div class="feature-row">
+        <div class="feature-media">
+          <div class="phone-shot">
+            <div class="phone-shot-screen">
+              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="homepage">
+                <source src="/videos/unify/homepage_screen.mov" type="video/quicktime" />
+                <source src="/videos/unify/homepage_screen.mov" type="video/mp4" />
+              </video>
+            </div>
+            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+          </div>
+        </div>
+        <div class="feature-copy">
+          <h3 class="feature-title">Who's free now</h3>
+          <p class="guide-text">[ Open Unify in a break and the first thing it shows is which friends are free at the same time as you, and for how long. Everything else in the app supports this one view. ]</p>
+        </div>
+      </div>
+      <h3 class="cs-sub">How the overlap is found</h3>
+      <p class="guide-text">[ Short paragraph: each friend's free gaps are extracted, intersected, gaps shorter than 00 minutes are dropped, and walking time between buildings is subtracted. ]</p>
+      <div class="ph ph--chart"><span class="ph-tag">Visual 07 · Step diagram</span><span class="ph-desc">Timetables → free intervals → intersect → ≥ [ 00 ] min → minus walking time → free together</span></div>
+      <div class="ph ph--chart"><span class="ph-tag">Visual 08 · Sketches</span><span class="ph-desc">Scanned sketches and early flows</span></div>
+    </section>
+
+    <!-- 4 · The pivot: v1 → character design -->
+    <section class="guide-section cs-section" id="pivot">
+      <div class="section-heading-row">
+        <h2 class="section-title">The pivot</h2>
+        <span class="step-badge">4</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text">I designed the first version: blue, typewriter type, hard lines. It was clear and structured, but the team's feedback round found it felt cold — like a tool, not something you'd share your location in. The information architecture and the timetable logic stayed; only the visual language was replaced. [ Result of the preference test goes here. ]</p>
+      <div class="pivot-compare">
+        <div class="pivot-row">
+          <span class="pivot-label">v1 · technical</span>
+          <div class="pivot-screens">
+            <img class="v1-shot" src="/images/unify/v1/v1-home.png" alt="Unify v1 home screen" />
+            <img class="v1-shot" src="/images/unify/v1/v1-timetable.png" alt="Unify v1 timetable" />
+            <img class="v1-shot" src="/images/unify/v1/v1-map.png" alt="Unify v1 building map" />
+          </div>
+        </div>
+        <div class="pivot-row">
+          <span class="pivot-label"><b>Final</b> · character-based</span>
+          <div class="pivot-screens">
+            <div class="phone-shot"><div class="phone-shot-screen"><video class="phone-shot-video" autoplay loop muted playsinline data-vid="homepage"><source src="/videos/unify/homepage_screen.mov" type="video/mp4" /></video></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+            <div class="phone-shot"><div class="phone-shot-screen"><video class="phone-shot-video" autoplay loop muted playsinline data-vid="timetable"><source src="/videos/unify/timetable_screen.mov" type="video/mp4" /></video></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+            <div class="phone-shot"><div class="phone-shot-screen"><video class="phone-shot-video" autoplay loop muted playsinline data-vid="map-friends"><source src="/videos/unify/map-friends_screen.mov" type="video/mp4" /></video></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+          </div>
+        </div>
+      </div>
+      <p class="cs-caption">Same screens, same data. Only the visual language changed — [ and willingness to share location went from 00 % to 00 %. ]</p>
+      <div class="ph ph--chart"><span class="ph-tag">Visual 10 · Semantic differential</span><span class="ph-desc">cold–warm · tool–social · serious–playful · trustworthy — v1 vs final, Study 4</span></div>
+
+      <h3 class="cs-sub">What replaced it</h3>
+      <p class="guide-text">[ Colour, type and characters, told as the answer to "v1 felt cold". Character design by Sophie Meyer and Moritz Ackermann. ]</p>
+      <div class="color-grid">
+        <div class="color-box"><div class="color-swatch" style="background: #FF88C8;"><span class="color-swatch-code">FF88C8</span></div></div>
+        <div class="color-box"><div class="color-swatch" style="background: #F9F2EB;"><span class="color-swatch-code" style="color: #1A1A1A;">F9F2EB</span></div></div>
+        <div class="color-box"><div class="color-swatch" style="background: #1A1A1A;"><span class="color-swatch-code">1A1A1A</span></div></div>
+      </div>
+      <div class="typography-grid">
+        <div class="typography-card">
+          <div class="typography-info"><span class="typography-label">Header</span><span class="typography-spec">72px  ·  bold</span></div>
+          <div class="typography-preview" style="font-size: clamp(25px, 4.2vw, 50px); font-weight: 800;">soccer match</div>
+        </div>
+        <div class="typography-card">
+          <div class="typography-info"><span class="typography-label">Body text</span><span class="typography-spec">48px  ·  bold</span></div>
+          <div class="typography-preview" style="font-size: clamp(20px, 2.8vw, 34px); font-weight: 700;">bring all your friends</div>
+        </div>
+        <div class="typography-card">
+          <div class="typography-info"><span class="typography-label">Info text</span><span class="typography-spec">48px  ·  light</span></div>
+          <div class="typography-preview" style="font-size: clamp(28px, 4vw, 48px); font-weight: 300;">from 15:00 - 17:00</div>
+        </div>
+      </div>
+      <div class="character-list">
+        <div class="character-row">
+          <div class="character-figure"><img src="/images/unify/characters/char-arch.svg" alt="" /></div>
+          <p class="character-copy" style="margin-left: -15px;">[ Characters as profile icons: friends recognise you at a glance. ]</p>
+        </div>
+        <div class="character-row right">
+          <div class="character-figure"><img src="/images/unify/characters/char-bird.svg" alt="" /></div>
+          <p class="character-copy" style="margin-right: -15px;">[ Characters inside the interface: the map bar, the timetable/socials toggle. ]</p>
+        </div>
+        <div class="character-row indent">
+          <div class="character-figure"><img src="/images/unify/characters/char-mountain.svg" alt="" /></div>
+          <p class="character-copy" style="margin-left: -15px;">[ Third character line, or cut. ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Designing the merged timetable -->
+    <section class="guide-section cs-section" id="timetable">
+      <div class="section-heading-row">
+        <h2 class="section-title">Designing the merged timetable</h2>
+        <span class="step-badge">5</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text">[ The hardest design problem: showing several timetables at once. Three variants, one task — "find the next time at least two friends are free with you" — and one choice. ]</p>
+      <div class="cs-grid-3">
+        <div class="variant">
+          <span class="variant-name">A · Columns</span>
+          <div class="ph ph--phone"><span class="ph-tag">Variant A</span><span class="ph-desc">Side-by-side columns per friend</span></div>
+          <div class="variant-metrics"><span>[ 00.0 s ]</span><span>[ 00 % ] errors</span></div>
+        </div>
+        <div class="variant">
+          <span class="variant-name">B · Overlay</span>
+          <div class="ph ph--phone"><span class="ph-tag">Variant B</span><span class="ph-desc">Stacked overlay with transparency</span></div>
+          <div class="variant-metrics"><span>[ 00.0 s ]</span><span>[ 00 % ] errors</span></div>
+        </div>
+        <div class="variant is-winner">
+          <span class="variant-name">C · Shared lane</span>
+          <div class="ph ph--phone"><span class="ph-tag">Variant C</span><span class="ph-desc">One lane showing only shared free slots, with avatars</span></div>
+          <div class="variant-metrics"><span>[ 00.0 s ]</span><span>[ 00 % ] errors</span></div>
+        </div>
+      </div>
+      <p class="cs-caption">[ Finding sentence for the winning variant, plus what it costs — tap to expand to the full view. ]</p>
+      <div class="feature-row reverse">
+        <div class="feature-media">
+          <div class="phone-shot">
+            <div class="phone-shot-screen">
+              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="timetable">
+                <source src="/videos/unify/timetable_screen.mov" type="video/quicktime" />
+                <source src="/videos/unify/timetable_screen.mov" type="video/mp4" />
+              </video>
+            </div>
+            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+          </div>
+        </div>
+        <div class="feature-copy">
+          <h3 class="feature-title">The chosen design</h3>
+          <p class="guide-text">[ The shipped timetable: your schedule in pink, socials in beige, friends' timetables below. ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · Supporting features, ordered by measured use -->
+    <section class="guide-section cs-section" id="features">
+      <div class="section-heading-row">
+        <h2 class="section-title">Supporting features</h2>
+        <span class="step-badge">6</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text">[ Ordered by how much the pilot actually used them, not by the app's tab order. ]</p>
+      <div class="ph ph--chart"><span class="ph-tag">Visual 12 · Sorted bar chart</span><span class="ph-desc">Share of time per feature — Study 7 pilot</span></div>
+      <p class="cs-caption"><b>[ 00 % ]</b> of pilot sessions started on "who's free now".</p>
+    </section>
+
+    <!-- Socials + indoor friend map: scroll-driven dual video (text left, videos right) -->
+    <section class="scrolly" id="support-scrolly">
+      <div class="scrolly-sticky">
+        <div class="scrolly-media">
+          <div class="scrolly-vid is-active" data-step="socials">
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="socials">
+                  <source src="/videos/unify/socials_screen.mov" type="video/quicktime" />
+                  <source src="/videos/unify/socials_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
+          </div>
+          <div class="scrolly-vid" data-step="friends">
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="map-friends">
+                  <source src="/videos/unify/map-friends_screen.mov" type="video/quicktime" />
+                  <source src="/videos/unify/map-friends_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
+          </div>
+        </div>
+        <div class="scrolly-copy">
+          <div class="scrolly-panel is-active" data-step="socials">
+            <h3 class="feature-title">Socials</h3>
+            <p class="guide-text">[ Activities posted in one place instead of buried in a group chat; one tap adds them to your timetable. ]</p>
+          </div>
+          <div class="scrolly-panel" data-step="friends">
+            <h3 class="feature-title">Friends indoors</h3>
+            <p class="guide-text">[ Room-level position on the floor plan, where GPS maps stop being useful. ]</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="guide-section cs-section">
+      <p class="guide-text">[ One sentence on the room finder — measured as rarely used, so it doesn't get its own section. ]</p>
+    </div>
+
+    <!-- 7 · Privacy -->
+    <section class="guide-section cs-section" id="privacy">
+      <div class="section-heading-row">
+        <h2 class="section-title">Privacy</h2>
+        <span class="step-badge">7</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text">GPS is used only to detect that you are on campus. After that, Unify shows the room you are in — never an exact dot — and only to friends you have opted in, one by one. [ Evidence sentence from Study 8. ]</p>
+      <div class="cs-grid-2">
+        <div class="cs-figure">
+          <div class="ph ph--square"><span class="ph-tag">Visual 13 · Stacked bar</span><span class="ph-desc">Willingness to share by precision: GPS / building / room / nothing — Study 8</span></div>
+          <p class="cs-caption"><b>[ 00 % ]</b> want to choose per friend.</p>
+        </div>
+        <div class="feature-media">
+          <div class="phone-shot">
+            <div class="phone-shot-screen">
+              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="settings">
+                <source src="/videos/unify/settings_screen.mov" type="video/quicktime" />
+                <source src="/videos/unify/settings_screen.mov" type="video/mp4" />
+              </video>
+            </div>
+            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · Testing + results -->
+    <section class="guide-section cs-section" id="results">
+      <div class="section-heading-row">
+        <h2 class="section-title">Testing and results</h2>
+        <span class="step-badge">8</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text">[ Moderated test, 00 participants, five tasks. One iteration between rounds — the one with the biggest jump is shown before/after. ]</p>
+      <div class="cs-grid-2">
+        <table class="cs-table">
+          <thead><tr><th>Task</th><th class="num">Before</th><th class="num">After</th></tr></thead>
+          <tbody>
+            <tr><td>Find a friend free at 12:15</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
+            <tr><td>See who is in the building</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
+            <tr><td>Add a social to your timetable</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
+            <tr><td>Find room X</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
+            <tr class="is-highlight"><td>Hide yourself from one friend</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
+          </tbody>
+        </table>
+        <div class="sus">
+          <span class="fact-src">System Usability Scale</span>
+          <span class="fact-num">[ 00 → 00 ]</span>
+          <span class="fact-label">[ What changed between the two rounds. ]</span>
+        </div>
+      </div>
+      <div class="ph ph--chart"><span class="ph-tag">Before / after</span><span class="ph-desc">The iteration with the biggest jump, side by side</span></div>
+    </section>
+
+    <!-- 9 · What we learned + next -->
+    <section class="guide-section cs-section" id="learned">
+      <div class="section-heading-row">
+        <h2 class="section-title">What we learned</h2>
+        <span class="step-badge">9</span>
+      </div>
+      <div class="dot-divider"></div>
+      <p class="guide-text">[ Learning one. ]</p>
+      <p class="guide-text">[ Learning two. ]</p>
+      <p class="guide-text">[ What's next. ]</p>
+    </section>
+    <div class="project-nav">
+      <div class="project-nav-item"></div>
+      <a href="/virtual_cooking2d.html" class="project-nav-item" style="text-align: right;">
+        <div class="project-nav-item-inner">
+          <div class="project-nav-top">
+            <span class="project-nav-label" data-i18n="nav-next">NEXT &gt;&gt;</span>
+            <span class="project-nav-number">02</span>
+          </div>
+          <span class="project-nav-title" data-i18n="nav-virtual-cooking">Virtual Cooking</span>
+        </div>
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Page transitions ──────────────────────────────────────────
+    (function() {
+      var KF = '@keyframes _sR{from{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes _sL{from{transform:translateX(-100%)}to{transform:translateX(0)}}';
+      var s = document.createElement('style'); s.textContent = KF; document.head.appendChild(s);
+      var DUR = 380, EASE = 'cubic-bezier(0.4,0,0.2,1)';
+
+      function _getWrap() {
+        var w = document.getElementById('_sw');
+        if (!w) {
+          w = document.createElement('div'); w.id = '_sw';
+          Array.from(document.body.children).forEach(function(c) {
+            if (c.id !== 'top-bar' && c.id !== '_sw') w.appendChild(c);
+          });
+          document.body.appendChild(w);
+        }
+        return w;
+      }
+
+      var _rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var dir = sessionStorage.getItem('_sv');
+      if (dir) sessionStorage.removeItem('_sv');
+      if (dir && !_rm) {
+        var wrap = _getWrap();
+        wrap.style.transform = dir === 'right' ? 'translateX(100%)' : 'translateX(-100%)';
+        var done = false;
+        function reveal() {
+          if (done) return; done = true;
+          requestAnimationFrame(function() {
+            wrap.style.transform = '';
+            wrap.style.animation = (dir === 'right' ? '_sR' : '_sL') + ' ' + DUR + 'ms ' + EASE + ' both';
+            setTimeout(function() { wrap.style.animation = ''; }, DUR + 60);
+          });
+        }
+        if (document.fonts && document.fonts.ready) { document.fonts.ready.then(reveal); } else { requestAnimationFrame(function() { requestAnimationFrame(reveal); }); }
+        setTimeout(reveal, 300);
+      }
+
+      window._nav = function(url, into) {
+        sessionStorage.setItem('_sv', into);
+        var dim = document.createElement('div');
+        dim.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0);z-index:9999;transition:background 220ms ease;pointer-events:none;';
+        document.body.appendChild(dim);
+        requestAnimationFrame(function() { dim.style.background = 'rgba(0,0,0,0.28)'; });
+        setTimeout(function() { location.href = url; }, 220);
+      };
+
+      window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'page-slide') window._nav(e.data.url, e.data.enterFrom);
+      });
+    })();
+
+    (function () {
+      const menu = document.getElementById('mobile-menu');
+      /* The mobile menu is an opaque neumorphic panel using the site's own
+         surface colour and shadow tokens, so it no longer adapts its shading
+         to the page behind it (that was needed only for the old glass look). */
+      function openMenu()  { menu.classList.add('open'); }
+      function closeMenu() { menu.classList.remove('open'); }
+      window.addEventListener('message', e => {
+        if (e.data.type === 'mobile-menu-toggle')
+          menu.classList.contains('open') ? closeMenu() : openMenu();
+      });
+      menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
+      menu.querySelectorAll('[data-mode]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.dataset.mode === '3d') {
+            // _enter3d: deliberate switch to 3D — see the "/" guard in index.html
+            try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
+            window._nav('/', 'right');
+          }
+          else window.location.href = '/2D.html';
+        });
+      });
+      menu.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault(); closeMenu();
+          if      (btn.dataset.page === 'craft')   window.location.href = '/2D.html#craft-section';
+          else if (btn.dataset.page === 'about')   window.location.href = '/about2d.html';
+          else if (btn.dataset.page === 'contact') window.location.href = '/contact2d.html';
+        });
+      });
+
+      // Language toggle. It does NOT translate this page directly — it writes
+      // the preference and hands the change to the nav iframe, which is already
+      // the site's single owner of language and broadcasts 'lang-change' back to
+      // the handler this page has always had. One path, so nothing desyncs.
+      const langBtns = menu.querySelectorAll('[data-lang]');
+      function markLang(l) {
+        langBtns.forEach(b => b.classList.toggle('is-active', b.dataset.lang === l));
+      }
+      // Seed the highlight synchronously; the nav also broadcasts the stored
+      // language ~100ms after it loads, which corrects a stale value (e.g. an
+      // old 'fr' preference, which the nav rewrites to 'en').
+      try { markLang(localStorage.getItem('lang') || 'de'); } catch (e) { markLang('de'); }
+      langBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const l = btn.dataset.lang;
+          try { localStorage.setItem('lang', l); } catch (e) {}
+          markLang(l);
+          const bar = document.getElementById('top-bar');
+          if (bar && bar.contentWindow) bar.contentWindow.postMessage({ type: 'lang-change', lang: l }, '*');
+        });
+      });
+      window.addEventListener('message', e => {
+        if (e.data && e.data.type === 'lang-change') markLang(e.data.lang);
+      });
+    })();
+
+    let lastScrollY = 0;
+    let lastToggleY = 0;
+    const topBar = document.getElementById('top-bar');
+    const hideThreshold = 250;
+    const showThreshold = 180;
+
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY === 0) {
+        topBar.classList.remove('hide');
+        lastToggleY = 0;
+      } else if (currentScrollY > lastScrollY && Math.abs(currentScrollY - lastToggleY) > hideThreshold) {
+        topBar.classList.add('hide');
+        lastToggleY = currentScrollY;
+      } else if (currentScrollY < lastScrollY && Math.abs(currentScrollY - lastToggleY) > showThreshold) {
+        topBar.classList.remove('hide');
+        lastToggleY = currentScrollY;
+      }
+      lastScrollY = currentScrollY;
+    });
+
+    // ── i18n ─────────────────────────────────────────────────────
+    const TRANSLATIONS = {
+      en: {
+        'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
+        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;Unify',
+        'label-timeline': 'Timeline', 'val-timeline': 'February 2026<br>June 2026',
+        'label-team': 'Team', 'val-team': 'Lucas Maher<br>Sophie Meyer<br>Moritz Ackermann',
+        'label-role': 'Role', 'val-role': 'Concept<br>Design<br>Prototyping<br>Vibe coding',
+        'label-skills': 'Skills', 'val-skills': 'Figma<br>UX research<br>Vibe coding',
+        'section-overview': 'At a Glance',
+        'overview-text': 'Unify started from a problem in my own campus life: my friends study different subjects, so even though we\'re all on the same campus, we\'re rarely in the same courses. Meeting up between classes meant memorising everyone\'s timetable or texting around every break. We began by swapping screenshots of our schedules — Unify turns that into one place where you see your own timetable alongside your friends\'. Open it during a break and you can tell at a glance who\'s on campus right now and who you can meet up with.',
+        'section-design-process': 'Design Process',
+        'colors-title': 'Choosing the right colorpalette',
+        'colors-text': 'We chose three soft, pastel-leaning colours: pink and beige as the primaries, with a dark grey as the accent. The goal was a look that feels <b class="kw">young, student-y and cheerful</b> — so we picked a bold, slightly unusual pink you don\'t often see in apps.',
+        'typography-title': 'Typography',
+        'typography-text': 'We set the interface in <b class="kw">Nunito</b>. Its rounded terminals and soft, edgeless letterforms mirror the playful, youthful feel of the whole app.',
+        'typography-label-header': 'Header', 'typography-spec-header': '72px  ·  bold', 'typography-preview-header': 'soccer match',
+        'typography-label-body': 'Body text', 'typography-spec-body': '48px  ·  bold', 'typography-preview-body': 'bring all your friends',
+        'typography-label-info': 'Info text', 'typography-spec-info': '48px  ·  light', 'typography-preview-info': 'from 15:00 - 17:00',
+        'characters-title': 'Character based design',
+        'characters-text-1': 'Characters are the core of Unify\'s <b class="kw">visual identity</b> — the whole app is built around them, giving it a consistent, friendly personality from screen to screen.',
+        'characters-text-2': 'Their main role is <b class="kw">personalisation</b>: you choose a character as your <b class="kw">profile icon</b>, so your friends can spot and recognise you at a glance across the app.',
+        'characters-text-3': 'The characters also live <b class="kw">inside the interface itself</b> — turning up in details like the bar on the map view or the toggle between your timetable and social activities.',
+        'section-final-product': 'Final Product',
+        'glance-what-label': 'What', 'glance-what-value': 'A campus app that helps students find each other and their shared free time.',
+        'glance-core-label': 'Core idea', 'glance-core-value': 'Automatic timetable matching surfaces the overlaps that make meeting up easy.',
+        'glance-nav-label': 'Navigation', 'glance-nav-value': 'Live friend locations plus interactive campus and building navigation.',
+        'glance-status-label': 'Status', 'glance-status-value': '[ Placeholder — add specifics later ]',
+        'feat-home-title': 'Your Day at a Glance',
+        'feat-home-text': 'The home screen is your <b class="kw">quick daily overview</b>. At a glance it shows who you can meet up with right now or in your next break — which friends are free, and exactly when. Below that sit the day\'s social activities, and a map of how many friends are around you at this moment. Everything important lives on <b class="kw">one scrollable page</b>; when something catches your eye, the dedicated pages let you dig into the detail.',
+        'feat-timetable-title': "Your Timetable, and Everyone's",
+        'feat-timetable-text': 'See your own timetable alongside your friends\', and who shares each course. Your schedule splits in two: <b class="kw">pink for regular courses</b>, beige for the social activities you add from the Socials page. Below it sit your friends\' timetables. Location tracking detects when you\'re inside the building and <b class="kw">lights up your current room in green</b>.',
+        'feat-courses-title': 'Find the Right Room',
+        'feat-courses-text': 'The same idea, now for your courses. Universities are huge — hundreds of rooms across sprawling buildings — and working out where each class is can be overwhelming, especially when you\'re new. Unify syncs with your timetable to plot <b class="kw">every course room on the map</b>; tap one to see the full details of that class.',
+        'feat-friends-title': 'Find Your Friends Indoors',
+        'feat-friends-text': 'Apps like Find My are great for locating friends — until everyone\'s inside the same building and the map turns useless. Unify syncs <b class="kw">room-level location</b> with the university\'s <b class="kw">floor plans</b>, so you can see exactly who\'s around you on the map, or search for someone specific from the menu.',
+        'feat-socials-title': 'Beyond the Group Chat',
+        'feat-socials-text': 'Every uni has that one group chat where events and social plans get buried under hundreds of messages. <b class="kw">Socials replaces it</b> — activities get posted here instead, so nothing slips through. Scroll through the week, and when something appeals to you, add it <b class="kw">straight to your timetable</b> in a tap.',
+        'feat-settings-title': 'Profile & Friends',
+        'feat-settings-text': 'The menu is where you set yourself up. Customise your profile, and connect your courses in one step — everything <b class="kw">syncs automatically</b> from your matriculation number. It\'s also home to your <b class="kw">friends list</b>, where you add or remove people whenever you need.',
+        'nav-next': 'NEXT >>',
+        'nav-virtual-cooking': 'Virtual Cooking',
+      },
+      de: {
+        'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
+        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;Unify',
+        'label-timeline': 'Zeitraum', 'val-timeline': 'Februar 2026<br>Juni 2026',
+        'label-team': 'Team', 'val-team': 'Lucas Maher<br>Sophie Meyer<br>Moritz Ackermann',
+        'label-role': 'Rolle', 'val-role': 'Konzept<br>Design<br>Prototyping<br>Vibe-Coding',
+        'label-skills': 'Fähigkeiten', 'val-skills': 'Figma<br>UX-Research<br>Vibe-Coding',
+        'section-overview': 'Auf einen Blick',
+        'overview-text': 'Unify entstand aus einem Problem in meinem Uni-Alltag: Meine Freunde studieren andere Fächer — wir sind zwar auf demselben Campus, aber selten in denselben Kursen. Sich in den Pausen zu treffen hieß, jeden Stundenplan auswendig zu kennen oder ständig herumzufragen. Erst schickten wir uns Screenshots — Unify macht daraus einen Ort, an dem dein Stundenplan neben denen deiner Freunde steht. In der Pause siehst du auf einen Blick, wer gerade auf dem Campus ist und mit wem du dich treffen kannst.',
+        'section-design-process': 'Designprozess',
+        'colors-title': 'Die richtige Farbpalette wählen',
+        'colors-text': 'Drei weiche Pastelltöne: Pink und Beige als Grundfarben, dazu dunkles Grau als Akzent. Der Look sollte <b class="kw">jung, studentisch und fröhlich</b> wirken — daher ein kräftiges, ungewöhnliches Pink, das man selten in Apps sieht.',
+        'typography-title': 'Typografie',
+        'typography-text': 'Die Oberfläche ist in <b class="kw">Nunito</b> gesetzt. Runde Enden und weiche, kantenlose Formen greifen den verspielten Charakter der App auf.',
+        'typography-label-header': 'Überschrift', 'typography-spec-header': '72px  ·  fett', 'typography-preview-header': 'Fußballspiel',
+        'typography-label-body': 'Fließtext', 'typography-spec-body': '48px  ·  fett', 'typography-preview-body': 'bring alle deine Freunde',
+        'typography-label-info': 'Infotext', 'typography-spec-info': '48px  ·  leicht', 'typography-preview-info': 'von 15:00 – 17:00',
+        'characters-title': 'Charakterbasiertes Design',
+        'characters-text-1': 'Die Charaktere sind der Kern von Unifys <b class="kw">visueller Identität</b> — die ganze App ist um sie herum gebaut und bekommt dadurch auf jedem Screen dieselbe freundliche Persönlichkeit.',
+        'characters-text-2': 'Vor allem dienen sie der <b class="kw">Personalisierung</b>: Du wählst einen Charakter als <b class="kw">Profilbild</b>, damit deine Freunde dich überall in der App sofort erkennen.',
+        'characters-text-3': 'Die Charaktere stecken auch <b class="kw">in der Oberfläche selbst</b> — in Details wie der Leiste in der Kartenansicht oder dem Umschalter zwischen Stundenplan und Socials.',
+        'section-final-product': 'Endprodukt',
+        'glance-what-label': 'Was', 'glance-what-value': 'Eine Campus-App, mit der Studierende einander finden — und ihre gemeinsame freie Zeit.',
+        'glance-core-label': 'Kernidee', 'glance-core-value': 'Der automatische Stundenplan-Abgleich zeigt, wann ihr gleichzeitig frei habt.',
+        'glance-nav-label': 'Navigation', 'glance-nav-value': 'Live-Standorte von Freunden plus interaktive Campus- und Gebäudenavigation.',
+        'glance-status-label': 'Status', 'glance-status-value': '[ Platzhalter — Details folgen ]',
+        'feat-home-title': 'Dein Tag auf einen Blick',
+        'feat-home-text': 'Der Startbildschirm ist deine <b class="kw">schnelle Tagesübersicht</b>. Auf einen Blick siehst du, mit wem du dich jetzt oder in der nächsten Pause treffen kannst — welche Freunde frei sind und von wann bis wann. Darunter die sozialen Aktivitäten des Tages und auf der Karte, wie viele Freunde gerade in der Nähe sind. Alles Wichtige liegt auf <b class="kw">einer scrollbaren Seite</b>; für mehr Details geht es auf die jeweilige Unterseite.',
+        'feat-timetable-title': 'Dein Stundenplan, und alle anderen',
+        'feat-timetable-text': 'Du siehst deinen Stundenplan neben dem deiner Freunde — und wer welchen Kurs mit dir teilt. Dein Plan ist zweigeteilt: <b class="kw">Pink für reguläre Kurse</b>, Beige für Aktivitäten von der Socials-Seite. Darunter stehen die Stundenpläne deiner Freunde. Durch Standort-Tracking erkennt die App, ob du im Gebäude bist, und <b class="kw">leuchtet deinen aktuellen Raum grün auf</b>.',
+        'feat-courses-title': 'Der richtige Raum',
+        'feat-courses-text': 'Dasselbe Prinzip, jetzt für deine Kurse. Unis sind riesig — hunderte Räume in weitläufigen Gebäuden — und gerade am Anfang ist kaum zu überblicken, wo welcher Kurs stattfindet. Unify übernimmt deinen Stundenplan und zeigt <b class="kw">jeden Kursraum auf der Karte</b>; ein Tipp zeigt alle Details.',
+        'feat-friends-title': 'Freunde drinnen finden',
+        'feat-friends-text': 'Apps wie „Wo ist“ sind super, um Freunde zu finden — bis alle im selben Gebäude stehen und die Karte nichts mehr hergibt. Unify gleicht <b class="kw">Rauminformationen</b> mit den <b class="kw">Gebäudeplänen der Uni</b> ab. So siehst du, wer um dich herum ist — oder suchst gezielt im Menü.',
+        'feat-socials-title': 'Mehr als der Gruppenchat',
+        'feat-socials-text': 'Jede Uni hat den einen Gruppenchat, in dem Events zwischen hunderten Nachrichten untergehen. <b class="kw">Socials ersetzt ihn</b> — Aktivitäten stehen stattdessen hier. Scroll durch die Woche, und was dir gefällt, landet mit einem Tipp <b class="kw">direkt in deinem Stundenplan</b>.',
+        'feat-settings-title': 'Profil & Freunde',
+        'feat-settings-text': 'Im Menü richtest du dich ein. Passe dein Profil an und verbinde deine Kurse in einem Schritt — alles <b class="kw">synchronisiert sich automatisch</b> über deine Matrikelnummer. Hier liegt auch deine <b class="kw">Freundesliste</b>, in der du jederzeit Leute hinzufügen oder entfernen kannst.',
+        'nav-next': 'WEITER >>',
+        'nav-virtual-cooking': 'Virtual Cooking',
+      }
+    };
+    function applyLang(lang) {
+      const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => { if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n]; });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => { if (t[el.dataset.i18nHtml] !== undefined) el.innerHTML = t[el.dataset.i18nHtml]; });
+    }
+    applyLang(localStorage.getItem('lang') || 'de');
+
+    window.addEventListener('message', function(e) {
+      if (!e.data || !e.data.type) return;
+      if (e.data.type === 'nav-expand') topBar.style.height = '400px';
+      if (e.data.type === 'nav-collapse') topBar.style.height = '140px';
+      if (e.data.type === 'lang-change') applyLang(e.data.lang);
+    });
+
+    // ── Blob pupils track the cursor ─────────────────────────────
+    // Each pupil moves toward the pointer but is clamped to stay inside
+    // its white eye. Coordinates come straight from the Figma export.
+    (function () {
+      const svg = document.getElementById('unify-blob');
+      const pr  = document.getElementById('unify-pupil-r');
+      const pl  = document.getElementById('unify-pupil-l');
+      if (!svg || !pr || !pl) return;
+
+      // eye centre (ex,ey) + pupil rest position (rx,ry) per eye
+      const EYES = [
+        { el: pr, ex: 574.086, ey: 324.744, rx: 530.586, ry: 425.744 },
+        { el: pl, ex: 266.586, ey: 324.744, rx: 223.086, ry: 425.744 },
+      ];
+      const MAX = 108;            // max pupil travel from eye centre (eyeR - pupilR ≈ 115)
+      const state = EYES.map(e => ({ x: e.rx, y: e.ry }));
+      let targetX = null, targetY = null;   // null ⇒ rest (look toward Figma default)
+
+      function clientToSvg(cx, cy) {
+        const ctm = svg.getScreenCTM();
+        if (!ctm) return null;
+        const pt = svg.createSVGPoint();
+        pt.x = cx; pt.y = cy;
+        return pt.matrixTransform(ctm.inverse());
+      }
+      // Which kind of pointer was last seen. Only used by the two guards below;
+      // the tracking maths is identical for mouse and touch.
+      let lastPointerType = 'mouse';
+
+      window.addEventListener('pointermove', function (e) {
+        lastPointerType = e.pointerType;
+        const p = clientToSvg(e.clientX, e.clientY);
+        if (p) { targetX = p.x; targetY = p.y; }
+      }, { passive: true });
+
+      // TOUCH: a screen has no hover, so a tap fires pointerdown/pointerup with no
+      // pointermove in between and the pupils would never react. This makes a tap
+      // anywhere aim the eyes at that point, where they then stay — the touch
+      // equivalent of a desktop cursor coming to rest somewhere on the page.
+      // Dragging a finger already worked, since that does emit pointermove.
+      //
+      // Gated on `pointerType`, NOT a media query or width breakpoint: a desktop
+      // mouse click reports 'mouse' and returns immediately (its pointermove has
+      // already set the target), while touch and pen report 'touch'/'pen'. So
+      // desktop is unaffected by construction and there is no breakpoint to keep
+      // in sync with the CSS.
+      window.addEventListener('pointerdown', function (e) {
+        lastPointerType = e.pointerType;
+        if (e.pointerType === 'mouse') return;
+        const p = clientToSvg(e.clientX, e.clientY);
+        if (p) { targetX = p.x; targetY = p.y; }
+      }, { passive: true });
+
+      // Ease back to rest when the cursor leaves the window — MOUSE ONLY.
+      // Touch devices fire compatibility mouse events (mouseleave among them) once
+      // a tap ends, so without this guard the pupils would snap straight back to
+      // centre the instant the finger lifted, undoing the tap they just followed.
+      document.addEventListener('mouseleave', function () {
+        if (lastPointerType !== 'mouse') return;
+        targetX = targetY = null;
+      });
+
+      function frame() {
+        for (let i = 0; i < EYES.length; i++) {
+          const e = EYES[i];
+          let tx, ty;
+          if (targetX === null) {                 // ease back to rest
+            tx = e.rx; ty = e.ry;
+          } else {
+            let dx = targetX - e.ex, dy = targetY - e.ey;
+            const d = Math.hypot(dx, dy);
+            if (d > MAX) { dx = dx / d * MAX; dy = dy / d * MAX; }
+            tx = e.ex + dx; ty = e.ey + dy;
+          }
+          state[i].x += (tx - state[i].x) * 0.18;  // smooth follow
+          state[i].y += (ty - state[i].y) * 0.18;
+          e.el.setAttribute('cx', state[i].x.toFixed(2));
+          e.el.setAttribute('cy', state[i].y.toFixed(2));
+        }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    // ── Scroll-driven dual-video section (steps 03 + 04) ─────────
+    // The .scrolly-sticky panel is pinned; crossing the section's
+    // midpoint (or clicking a video) swaps which video is full-size
+    // and which text panel is shown.
+    function initScrolly(scrolly) {
+      const vids   = scrolly.querySelectorAll('.scrolly-vid');
+      const panels = scrolly.querySelectorAll('.scrolly-panel');
+      const steps  = Array.from(vids).map(v => v.dataset.step);   // [first, second]
+      if (steps.length < 2) return;
+      let current = steps[0];
+
+      // Below 860px the CSS fallback drops the sticky pin and shows BOTH videos
+      // and BOTH captions at once, so there is no "active" step left to swap to.
+      // Leaving the scroll logic running there did two visible things wrong: it
+      // paused whichever video wasn't active, so one phone sat on a frozen frame
+      // beside a playing one; and with .scrolly at height:auto the progress
+      // fraction (scrollY - top) / max(offsetHeight - innerHeight, 1) divides by
+      // that 1px floor, so it snapped 0 -> 1 in a single scroll step instead of
+      // easing. Desktop is unaffected — this branch cannot match there.
+      const stacked = window.matchMedia('(max-width: 860px)');
+
+      function showAll() {
+        vids.forEach(v => {
+          v.classList.add('is-active');
+          const video = v.querySelector('video');
+          if (video) video.play().catch(() => {});
+        });
+        panels.forEach(p => p.classList.add('is-active'));
+        current = null;   // so a resize back up to desktop re-applies step 1
+      }
+
+      function setActive(step) {
+        if (step === current) return;
+        current = step;
+        vids.forEach(v => {
+          const on = v.dataset.step === step;
+          v.classList.toggle('is-active', on);
+          const video = v.querySelector('video');
+          if (video) {
+            if (on) { video.play().catch(() => {}); }
+            else { video.pause(); }
+          }
+        });
+        panels.forEach(p => p.classList.toggle('is-active', p.dataset.step === step));
+      }
+
+      // pause whichever video isn't active on load (desktop only — see `stacked`)
+      if (!stacked.matches) {
+        vids.forEach(v => {
+          if (!v.classList.contains('is-active')) {
+            const video = v.querySelector('video');
+            if (video) video.pause();
+          }
+        });
+      }
+      function metrics() {
+        const rect = scrolly.getBoundingClientRect();
+        const top = rect.top + window.scrollY;
+        const total = Math.max(scrolly.offsetHeight - window.innerHeight, 1);
+        return { top, total };
+      }
+      let ticking = false;
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          if (stacked.matches) { showAll(); return; }
+          const { top, total } = metrics();
+          const p = Math.min(Math.max((window.scrollY - top) / total, 0), 1);
+          setActive(p < 0.5 ? steps[0] : steps[1]);
+        });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      stacked.addEventListener('change', onScroll);
+      onScroll();
+
+      // click a video → scroll to that step's position (which also flips state)
+      vids.forEach(v => {
+        v.addEventListener('click', () => {
+          if (stacked.matches) return;   // both are already shown; nothing to swap to
+          const { top, total } = metrics();
+          const p = v.dataset.step === steps[0] ? 0.15 : 0.85;
+          window.scrollTo({ top: Math.round(top + p * total), behavior: 'smooth' });
+        });
+      });
+    }
+    document.querySelectorAll('.scrolly').forEach(initScrolly);
+  </script>
+  <div id="scroll-track">
+    <div id="scroll-thumb">
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var thumb = document.getElementById('scroll-thumb');
+      var track = document.getElementById('scroll-track');
+      var ticking = false;
+      function maxScroll() {
+        return document.documentElement.scrollHeight - window.innerHeight;
+      }
+      function travel() { return track.offsetHeight - thumb.offsetHeight; }
+      function update() {
+        var max = maxScroll();
+        var progress = max > 0 ? Math.max(0, Math.min(1, window.scrollY / max)) : 0;
+        thumb.style.top = (progress * travel()) + 'px';
+        ticking = false;
+      }
+      window.addEventListener('scroll', function () {
+        if (!ticking) { requestAnimationFrame(update); ticking = true; }
+      }, { passive: true });
+      update();
+
+      /* ── Draggable, macOS-style ───────────────────────────────────────
+         Drag the dot column to scrub, or click the bare strip to jump there.
+         Desktop only, enforced in CSS rather than here: the base rule leaves
+         pointer-events off and only the (hover: hover) and (pointer: fine)
+         block turns it on, so on a phone these listeners can never fire and
+         cannot swallow a swipe.
+         Pointer capture is what makes the drag survive the pointer leaving the
+         20px strip — without it, moving sideways mid-drag would drop it. */
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var grabOffset = 0;   // where inside the thumb it was grabbed, so it doesn't jump on grab
+      var dragging = false;
+
+      function scrollToThumbTop(top, smooth) {
+        var t = travel();
+        var progress = t > 0 ? Math.max(0, Math.min(1, top / t)) : 0;
+        window.scrollTo({ top: progress * maxScroll(), behavior: smooth ? 'smooth' : 'auto' });
+      }
+
+      track.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0) return;
+        if (thumb.contains(e.target)) {
+          grabOffset = e.clientY - thumb.getBoundingClientRect().top;
+        } else {
+          // Bare strip: centre the thumb on the pointer and go there, matching
+          // macOS's "jump to the spot that's clicked".
+          grabOffset = thumb.offsetHeight / 2;
+          scrollToThumbTop(e.clientY - track.getBoundingClientRect().top - grabOffset, !reduceMotion);
+        }
+        dragging = true;
+        track.classList.add('is-dragging');
+        track.setPointerCapture(e.pointerId);
+        e.preventDefault();   // no text selection while dragging
+      });
+
+      track.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        // Never smooth here: the scroll must track the pointer 1:1, and a
+        // queued smooth scroll would lag a frame behind every move.
+        scrollToThumbTop(e.clientY - track.getBoundingClientRect().top - grabOffset, false);
+      });
+
+      function endDrag(e) {
+        if (!dragging) return;
+        dragging = false;
+        track.classList.remove('is-dragging');
+        try { track.releasePointerCapture(e.pointerId); } catch (err) {}
+      }
+      track.addEventListener('pointerup', endDrag);
+      track.addEventListener('pointercancel', endDrag);
+    })();
+  </script>
+
+  <script>
+    // Dot-divider exact-tiling fix: background-repeat:space is unreliable on
+    // gradient backgrounds in Safari (last dot can render half-clipped even
+    // though space is supposed to guarantee whole tiles). Root-cause fix:
+    // measure each divider's real width in JS and set background-size to an
+    // EXACT integer divisor of it, so there is no remainder tile left for
+    // any browser's tiling engine to mishandle.
+    (function () {
+      function fixDotDividers() {
+        document.querySelectorAll('.dot-divider').forEach(function (el) {
+          var w = el.offsetWidth;
+          if (!w) return;
+          var count = Math.max(2, Math.round(w / 10));
+          var tile = w / count;
+          el.style.backgroundSize = tile + 'px 4px';
+          el.style.backgroundRepeat = 'repeat-x';
+        });
+      }
+      var raf;
+      function scheduleFix() {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(fixDotDividers);
+      }
+      document.addEventListener('DOMContentLoaded', scheduleFix);
+      window.addEventListener('load', scheduleFix);
+      window.addEventListener('resize', scheduleFix);
+    })();
+  </script>
+  <script>
+    // Mobile only: pixel-snap the card's BOTTOM border.
+    //
+    // .page-wrapper's border-bottom is the last painted row of the entire document, and
+    // the document does not end on a whole pixel. Measured on a 390px phone: the
+    // wrapper's border-box bottom sits at y = 5585.078 while documentElement.scrollHeight
+    // is 5585 — so the final 0.078px of that 1px border falls outside the scrollable
+    // area. .project-nav's border-top, the line at the TOP of the same section, has
+    // ordinary content above and below it and sits at no boundary at all. That asymmetry
+    // is why only the bottom line reads as thin/clipped. Blink happens to snap both to a
+    // clean 3 device rows (verified at DPR 3: identical ink, 328.5 each), so this does
+    // NOT reproduce in Chrome — WebKit is under no obligation to make the same choice.
+    //
+    // Fix: measure the real fractional bottom and grow padding-bottom by exactly enough
+    // to land it on a whole CSS pixel, so the border fills an exact device-pixel band
+    // with nothing hanging past the end of the document. Same measure-then-set approach
+    // as the dot-divider fix above, and for the same reason: a static CSS value cannot
+    // know where the box happens to land. The added padding is always < 1px, and it sits
+    // below .project-nav (whose -12px margin cancels the base 12px), so nothing moves
+    // visibly.
+    //
+    // Desktop is untouched — outside the mobile query the inline value is cleared and
+    // the stylesheet's own padding-bottom applies.
+    (function () {
+      var wrap = document.querySelector('.page-wrapper');
+      if (!wrap) return;
+      var mq = window.matchMedia('(max-width: 640px)');
+      function snap() {
+        wrap.style.paddingBottom = '';        // always measure against the CSS value
+        if (!mq.matches) return;              // desktop: leave the stylesheet alone
+        var bottom = wrap.getBoundingClientRect().bottom + window.pageYOffset;
+        var delta = Math.ceil(bottom) - bottom;
+        if (delta > 0.002) {
+          var base = parseFloat(getComputedStyle(wrap).paddingBottom) || 0;
+          wrap.style.paddingBottom = (base + delta).toFixed(3) + 'px';
+        }
+      }
+      var raf;
+      function scheduleSnap() { cancelAnimationFrame(raf); raf = requestAnimationFrame(snap); }
+      document.addEventListener('DOMContentLoaded', scheduleSnap);
+      window.addEventListener('load', scheduleSnap);
+      window.addEventListener('resize', scheduleSnap);
+      if (mq.addEventListener) mq.addEventListener('change', scheduleSnap);
+    })();
+  </script>
+
+  <script>
+    // 3D-scene entry point: ?from=3d (set by the click handler in src/main.js
+    // when a scene object navigates here) hides the usual nav bar and shows
+    // a fixed "Exit" pill (top-left) that returns to the 3D scene instead.
+    (function () {
+      if (new URLSearchParams(location.search).get('from') !== '3d') return;
+      var topBarEl = document.getElementById('top-bar');
+      if (topBarEl) topBarEl.style.display = 'none';
+      // A 3D-scene click is only meant to open this ONE project page — no
+      // hopping to other projects from here — so the prev/next footer nav
+      // is hidden too. Untouched when the page is opened normally from 2D.
+      var projectNavEl = document.querySelector('.project-nav');
+      if (projectNavEl) projectNavEl.style.display = 'none';
+      var style = document.createElement('style');
+      // Both shadows are gated on .is-raised — see updateExitShadow() below.
+      // The transform lift is NOT gated: it works on any background.
+      style.textContent = '.exit-3d-btn{position:fixed;top:24px;left:24px;z-index:10000;background:var(--bg-surface);border:none;border-radius:9999px;padding:10px 24px;font-family:"VT323",monospace;font-size:16px;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-primary);box-shadow:none;cursor:pointer;text-decoration:none;transition:left 200ms ease, transform 150ms ease, box-shadow 260ms cubic-bezier(.2,.7,.2,1);}.exit-3d-btn.is-raised{box-shadow:var(--shadow-raised-sm);}.exit-3d-btn:hover{transform:translateY(-2px) scale(1.03);transition:left 200ms ease, transform 150ms ease, box-shadow 150ms ease;}.exit-3d-btn.is-raised:hover{box-shadow:11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);}';
+      style.textContent += /* keyframes start AND end in the :hover pose: an animation replaces the
+         whole transform, so plain scale(1) frames made the button first DROP
+         out of its hover lift on click. The mouse is on the button when this
+         runs, so the hover pose is the correct base in every frame. */
+      '@keyframes exitPop{0%{transform:translateY(-2px) scale(1.03)}50%{transform:translateY(-2px) scale(1.15)}100%{transform:translateY(-2px) scale(1.03)}}';
+      document.head.appendChild(style);
+      var btn = document.createElement('a');
+      btn.href = '/';
+      btn.className = 'exit-3d-btn';
+      btn.textContent = 'Exit';
+      document.body.appendChild(btn);
+
+      // Same button-pop as the 3D scene objects: pulse ~0.28s, THEN navigate.
+      // The deliberate delay is what makes the press visible before the page
+      // leaves — without it the pulse would be cut off by the navigation.
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (btn.dataset.leaving) return;   // double-click guard
+        btn.dataset.leaving = '1';
+        btn.style.animation = 'exitPop 280ms ease';
+        setTimeout(function () { window.location.href = btn.getAttribute('href'); }, 280);
+      });
+
+      // An iOS forward-swipe back into this page restores it from the
+      // back-forward cache with `leaving` still set, which leaves the pill
+      // permanently dead. Same latched-guard bug as the 3D scene's
+      // popNavigating; `persisted` is the only signal a bfcache restore gives.
+      window.addEventListener('pageshow', function (e) {
+        if (!e.persisted) return;
+        delete btn.dataset.leaving;
+        btn.style.animation = '';
+      });
+
+      // Keep the button clear of .page-wrapper's left border. It CENTRES in the
+      // open margin between the viewport edge and that border, capped at
+      // MARGIN_GAP so wide monitors don't push it far from the corner; if the
+      // margin is too tight for the pill to breathe, it tucks just inside the
+      // frame instead of letting the border cut across it.
+      //
+      // Centring rather than a fixed offset is what fixes MacBook widths: at
+      // 1440–1512 the margin is 110px and the pill 76px, so a flat 34px put its
+      // right edge at exactly 110 — touching the border, with the raised
+      // shadow (5px offset + 12px blur ≈ 17px) spilling over it. Centring
+      // leaves 17px either side, which is precisely the room that shadow needs.
+      // Above ~1700px the cap takes over and the position is unchanged.
+      function positionExitBtn() {
+        var wrapper = document.querySelector('.page-wrapper');
+        if (!wrapper) return;
+        var wrapperLeft = wrapper.getBoundingClientRect().left;
+        var btnWidth    = btn.offsetWidth;
+        var MARGIN_GAP  = 34;   // cap: furthest from the viewport edge it may sit
+        var INSET_GAP   = 26;   // fallback: tucked just inside the frame
+        var MIN_SIDE    = 14;   // least breathing room wanted on each side
+        var margin = wrapperLeft - btnWidth;   // free space beside the frame
+        btn.style.left = (margin >= MIN_SIDE * 2)
+          ? Math.min(MARGIN_GAP, margin / 2) + 'px'
+          : (wrapperLeft + INSET_GAP) + 'px';
+      }
+      positionExitBtn();
+      window.addEventListener('resize', positionExitBtn);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(positionExitBtn);
+
+      // A neumorphic shadow only reads correctly over the page's own surface
+      // colour — anywhere else the white highlight and grey shadow become a
+      // glowing halo. So the pill drops both shadows whenever something other
+      // than that surface is behind it.
+      //
+      // This asks what is ACTUALLY PAINTED behind the button rather than
+      // intersecting rectangles with a list of selectors. Two earlier versions
+      // failed because the list was never complete: a hero-only test left the
+      // halo on over the process shots further down, and a '.hero, img, video'
+      // test still missed Unify's colour-palette swatches, which are plain divs
+      // with a background-colour — the button sat glowing on a hot pink square.
+      // Hit-testing has no such list to keep up to date: an image, a video, a
+      // dark hero container and a coloured div all register the same way.
+      var EXIT_SAMPLES = 3;   // 3x3 grid. Coverage lands in ninths, which
+                              // straddles the 50% threshold cleanly: 4/9 = 44%,
+                              // 5/9 = 56%, so there is no exact-tie flicker.
+
+      // What paints at this point, ignoring the button itself. Walks DOWN the
+      // stack past anything transparent, because the surface-coloured section
+      // wrappers are usually several levels below whatever sits on top.
+      function exitPaintAt(x, y) {
+        var stack = document.elementsFromPoint(x, y);
+        for (var i = 0; i < stack.length; i++) {
+          var el = stack[i];
+          if (el === btn || btn.contains(el)) continue;
+          var tag = el.tagName;
+          if (tag === 'IMG' || tag === 'VIDEO' || tag === 'CANVAS') return 'media';
+          var cs = getComputedStyle(el);
+          // A real bitmap counts; a CSS gradient does not — the only gradients
+          // here are the .dot-divider rules, which are decoration ON the surface.
+          if (cs.backgroundImage.indexOf('url(') === 0) return 'media';
+          var bg = cs.backgroundColor;
+          if (!bg || bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)') continue;
+          return bg;
+        }
+        return null;   // nothing opaque found — the page background shows through
+      }
+
+      function updateExitShadow() {
+        var b = btn.getBoundingClientRect();
+        if (!b.width || !b.height) return;
+        var surface = getComputedStyle(document.body).backgroundColor;
+        var covered = 0, total = EXIT_SAMPLES * EXIT_SAMPLES;
+        for (var iy = 0; iy < EXIT_SAMPLES; iy++) {
+          for (var ix = 0; ix < EXIT_SAMPLES; ix++) {
+            var paint = exitPaintAt(
+              b.left + b.width  * (ix + 0.5) / EXIT_SAMPLES,
+              b.top  + b.height * (iy + 0.5) / EXIT_SAMPLES
+            );
+            if (paint !== null && paint !== surface) covered++;
+          }
+        }
+        btn.classList.toggle('is-raised', covered <= total * 0.5);
+      }
+
+      // rAF-throttled: nine hit tests plus a getComputedStyle walk per sample is
+      // real work, so it must not run more than once per frame during a scroll.
+      var exitTick = false;
+      function requestExitShadow() {
+        if (exitTick) return;
+        exitTick = true;
+        requestAnimationFrame(function () { exitTick = false; updateExitShadow(); });
+      }
+      window.addEventListener('scroll', requestExitShadow, { passive: true });
+      window.addEventListener('resize', requestExitShadow, { passive: true });
+      // Media that arrives late changes what is behind the button without any
+      // scroll happening, so re-check on load as well as on these timers.
+      window.addEventListener('load', updateExitShadow);
+      updateExitShadow();
+      requestAnimationFrame(updateExitShadow);
+      setTimeout(updateExitShadow, 120);
+      setTimeout(updateExitShadow, 500);
+    })();
+  </script>
+
+  <script>
+    /* Insert a comma carrier before every <br> in the meta values.
+       Needed because CSS cannot supply that comma: a <br> can be un-broken with
+       display:none/contents, but generated content on a <br> renders nowhere in
+       Blink or WebKit (measured: br::after adds 0px), and as a flex item it still
+       forces the break. So the separator has to be a real node.
+       Deliberately NOT gated on the viewport: the nodes are always present and
+       `.meta-sep { display: none }` hides them on desktop, so resizing across 640px
+       works in both directions with no JS involvement.
+       The MutationObserver is required, not defensive — the i18n layer reassigns
+       innerHTML from TRANSLATIONS on every language switch, which drops the carriers
+       and restores the raw <br>s. It self-terminates: after a pass every <br>
+       already has a carrier, so the guard makes the next callback a no-op. */
+    (function () {
+      var insets = document.querySelectorAll('.meta-inset');
+      if (!insets.length) return;
+
+      function addSeps(el) {
+        el.querySelectorAll('br').forEach(function (br) {
+          var prev = br.previousSibling;
+          if (prev && prev.nodeType === 1 && prev.classList.contains('meta-sep')) return;
+          var before = (prev && prev.nodeType === 3) ? prev.textContent.replace(/\s+$/, '') : '';
+          var sep = document.createElement('span');
+          sep.className = 'meta-sep';
+          /* A comma is wrong where the text already ends in punctuation that joins
+             the two halves — Timeline reads "May 2026 —" / "Jun 2026", which a comma
+             turns into "May 2026 —, Jun 2026". Fall back to a plain space there. */
+          sep.textContent = /[—–,;:/-]$/.test(before) ? ' ' : ', ';
+          br.parentNode.insertBefore(sep, br);
+        });
+      }
+
+      insets.forEach(function (el) {
+        addSeps(el);
+        new MutationObserver(function () { addSeps(el); })
+          .observe(el, { childList: true });
+      });
+    })();
+  </script>
+
+
+  <script>
+    // Click a video to replay it from the start, and give it a press.
+    //
+    // Two exclusions, both deliberate:
+    //   · videos inside an <a> — on the landing page the tiles ARE the
+    //     navigation, so a click leaves the page and restarting playback
+    //     first would be pointless work on the way out;
+    //   · videos inside .hero — full-bleed decoration, and scaling a
+    //     whole hero band on click reads as the page lurching, not as a
+    //     control responding.
+    (function () {
+      var vids = Array.prototype.slice.call(document.querySelectorAll('video'))
+        .filter(function (v) { return !v.closest('a') && !v.closest('.hero'); });
+
+      vids.forEach(function (v) {
+        // See the .vid-press comment in the stylesheet for why this is the
+        // parent and not the video.
+        // .phone-shot-screen clips, so scaling it would read as the screen
+        // zooming inside a static frame — go up to the phone itself.
+        var target = v.closest('.phone-shot') || v.parentElement || v;
+        target.classList.add('vid-press');
+
+        function press()   { target.classList.add('is-pressed'); }
+        function release() { target.classList.remove('is-pressed'); }
+        v.addEventListener('pointerdown', press);
+        ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (e) {
+          v.addEventListener(e, release);
+        });
+
+        v.addEventListener('click', function () {
+          v.currentTime = 0;
+          var p = v.play();
+          // play() rejects under autoplay policy in some states; the reset
+          // has already happened either way, so there is nothing to handle.
+          if (p && p.catch) p.catch(function () {});
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

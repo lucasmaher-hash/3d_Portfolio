@@ -124,6 +124,28 @@ spring-surface version (fluid.js, MIT) sat between the two and was rejected on t
 | `public/mac-lamp2d.html` | Project page — Mac-Lamp (04) |
 | `public/vaccine2d.html` | Project page — Double Packaging (05) |
 | `public/to-shove2d.html` | Project page — morrow (the iOS app). See "morrow page" below. |
+| `public/unify2d1.html` | **Unlinked draft** of the Unify case-study rebuild (see below) |
+
+## Unify case-study draft (`public/unify2d1.html`, 2026-09-18)
+
+The rebuild of the Unify page from `unify-casestudy-plan.md` happens in a **separate, unlinked
+file** so it can be committed and deployed without anyone reaching it: Lucas views it at
+`lucasmaher.com/unify2d1.html`. **Nothing on the site may link to it** (no Craft dropdown entry, no
+landing tile, no prev/next), it carries `<meta name="robots" content="noindex, nofollow">`, and a
+fixed orange `.draft-flag` pill marks it. **The live `unify2d.html` is not touched until the draft
+is finished** — then the draft is copied over it and the flag + `noindex` removed.
+
+It is a copy of `unify2d.html` (same head, nav, hero blob, scripts), so every Unify gotcha below
+still applies. The nav iframe recognises it because its checks are substring matches on
+`unify2d`. Differences: the middle follows plan §2 (Problem → Research → Idea → Pivot → Timetable
+→ Supporting features → Privacy → Results → Learned, step badges 1–9, anchors for the page map);
+new CSS lives in the `Case-study rebuild` block at the end of `<style>` (`.ph` placeholder wells,
+`.fact-bar`, `.cs-caption`, `.pivot-compare`, `.variant`, `.cs-table`); the one remaining scrolly
+is `#support-scrolly` (socials + friends map; it took over the mirrored-layout CSS of
+`#timetable-socials-scrolly`). **New copy is English-only and has NO `data-i18n`** on purpose — a
+key would let the old `TRANSLATIONS` value overwrite the draft text (the Role tile especially).
+Every `[ bracketed ]` value is a placeholder; plan numbers are examples, not results. v1 screens
+are provisional crops of a Figma screenshot in `public/images/unify/v1/`.
 | `public/top_row_permanent_V3.html` | Nav bar — loaded as an iframe on every 2D page |
 
 ## to.morrow page (`public/to-shove2d.html`)
