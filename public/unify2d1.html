@@ -1648,6 +1648,11 @@
     }
     .v1-window img, .v1-bar { display: block; width: 100%; height: auto; }
     .v1-bar { flex: none; }
+    /* The timetable's Timetable/Socialplan buttons sit right at the top of the
+       export, where the frame's island covers them; a black band pushes them
+       below it. Padding is in the image's box, so the scroll travel
+       (calc(-100% + 100cqh)) still lands on the last row. */
+    .v1-window img.v1-clear-island { padding-top: 10%; background: #000; box-sizing: content-box; }
     /* Scroll the whole page down and back, eased at both ends, holding at the
        top and bottom. The travel is calc(-100% + 100cqh): the image's own height
        minus the window's, so it lands exactly on the last row whatever size the
@@ -1978,7 +1983,7 @@
               <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
             </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
             <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable, scrolling">
-              <div class="v1-window"><img class="is-scrolling is-late" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
+              <div class="v1-window"><img class="is-scrolling is-late v1-clear-island" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
               <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
             </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
             <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building.webp" alt="Unify v1 building map with floor switcher" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
