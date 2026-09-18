@@ -1746,8 +1746,8 @@
     .v1-carousel > [data-slot="-1"] { --k: -.96;  --sc: .84; z-index: 2; }
     .v1-carousel > [data-slot="2"]  { --k: 1.56;  --sc: .68; z-index: 1; }
     .v1-carousel > [data-slot="-2"] { --k: -1.56; --sc: .68; z-index: 1; }
-    .v1-carousel > [data-slot="out-right"] { --k: 2.1;  --sc: .56; opacity: 0; z-index: 0; }
-    .v1-carousel > [data-slot="out-left"]  { --k: -2.1; --sc: .56; opacity: 0; z-index: 0; }
+    .v1-carousel > [data-slot="out-right"] { --k: 1.74;  --sc: .42; opacity: 0; z-index: 0; }
+    .v1-carousel > [data-slot="out-left"]  { --k: -1.74; --sc: .42; opacity: 0; z-index: 0; }
     .v1-carousel.no-anim > .phone-shot { transition: none; }
     @media (max-width: 640px) {
       /* Two phones' worth of width: the middle one and its neighbours cut by
@@ -3016,7 +3016,7 @@
       var car = document.querySelector('.v1-carousel');
       if (!car) return;
       var items = Array.prototype.slice.call(car.children), n = items.length;
-      var DWELL = 3000, MOVE = 900, FADE = 450;
+      var DWELL = 3000, MOVE = 900, FADE = 450, GROW = 700;
       var center = 0;                                   // index of the phone in the middle
       function slotOf(i) {                              // left of centre = next in order
         var d = ((center - i) % n + n) % n;             // 0..n-1
@@ -3031,13 +3031,18 @@
         center = (center + 1) % n;
         items.forEach(function (el, i) { if (el !== wrapping) el.dataset.slot = slotOf(i); });
         if (!wrapping) return;
-        wrapping.dataset.slot = 'out-right';            // fade out past the right edge…
+        // The outer phone does not slide round the edge: it shrinks and fades
+        // away as if stepping back (only a third of a slot sideways), then on
+        // the far left it grows and fades in, as if stepping forward.
+        wrapping.style.transition = 'transform ' + FADE + 'ms cubic-bezier(.5, 0, .75, 0), opacity ' + FADE + 'ms ease-in';
+        wrapping.dataset.slot = 'out-right';
         setTimeout(function () {
           wrapping.style.transition = 'none';
-          wrapping.dataset.slot = 'out-left';           // …jump unseen to the far left…
+          wrapping.dataset.slot = 'out-left';           // jump unseen to the far left
           void wrapping.offsetWidth;
-          wrapping.style.transition = '';
-          wrapping.dataset.slot = '-2';                 // …and fade in there
+          wrapping.style.transition = 'transform ' + GROW + 'ms cubic-bezier(.25, 1, .5, 1), opacity ' + GROW + 'ms ease-out';
+          wrapping.dataset.slot = '-2';
+          setTimeout(function () { wrapping.style.transition = ''; }, GROW);
         }, FADE);
       }
 

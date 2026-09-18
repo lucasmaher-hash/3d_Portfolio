@@ -151,7 +151,7 @@ same `.phone-shot` iPhone frame as the final design, in a looping **carousel**
 (`.v1-carousel`, from Lucas's reference): five slots, the middle phone largest, neighbours at 0.84,
 the outer pair at 0.68 tucked BEHIND the neighbours. Every 3s (+0.9s move) the whole row steps one
 slot right, so the next screen in order (home → timetable → building → friends → open) arrives
-from the left; the phone leaving the right edge fades out and reappears on the far left. Geometry
+from the left; the phone leaving the right edge shrinks and fades as if stepping back (a third of a slot sideways), then on the far left grows and fades in as if stepping forward. Geometry
 is CSS per `data-slot` (offsets in phone widths via `translateX(%)`); the script at the end of the
 page only rewrites slots, pauses off-screen and in a hidden tab, and does nothing under
 `prefers-reduced-motion`. Below 640px the carousel bleeds to the screen edges and the outer pair
