@@ -1633,15 +1633,17 @@
       gap: clamp(14px, 2.4vw, 28px); align-items: start; justify-items: center;
     }
     /* v1 screens in the same iPhone frame as the final design. The Figma
-       frames were designed without a safe area, so a black top band (the
-       status-bar height, 7%) keeps the frame's island off the content. The
-       tab bar is cut off each export and laid over the bottom so it stays put
-       while the page scrolls under it, like the real app. */
+       frames have no safe area, so the page runs right up under the frame's
+       island, the way it would on the phone. The tab bar is cut off each
+       scrolling export and laid over the bottom so it stays put while the page
+       scrolls under it, like the real app. */
     .v1-screen {
       position: absolute; inset: 0; background: #000;
       display: flex; flex-direction: column;
     }
-    .v1-safe { flex: 0 0 7%; }
+    .v1-still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; background: #000; }
+    /* v1 has five screens, the final row three: its own 5-up grid. */
+    .pivot-screens--v1 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .v1-window {
       flex: 1 1 0; min-height: 0; overflow: hidden;
       container-type: size;   /* 100cqh = the window's own height */
@@ -1721,6 +1723,13 @@
       .chat-row::-webkit-scrollbar { display: none; }
       .chat-shot { flex: 0 0 72%; scroll-snap-align: center; }
       .chat-row + .cs-caption { text-align: left; }
+      .pivot-screens--v1 {
+        display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+        margin-inline: -20px; padding: 4px 20px 16px; scrollbar-width: none;
+        justify-items: initial;
+      }
+      .pivot-screens--v1::-webkit-scrollbar { display: none; }
+      .pivot-screens--v1 .phone-shot { flex: 0 0 42%; scroll-snap-align: center; }
     }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
@@ -1940,22 +1949,18 @@
       <div class="pivot-compare">
         <div class="pivot-row">
           <span class="pivot-label">v1 · technical</span>
-          <div class="pivot-screens">
+          <div class="pivot-screens pivot-screens--v1">
             <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, scrolling">
-              <div class="v1-safe"></div>
               <div class="v1-window"><img class="is-scrolling" src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
               <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
             </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
             <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable, scrolling">
-              <div class="v1-safe"></div>
               <div class="v1-window"><img class="is-scrolling is-late" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
               <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
             </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 building map with friends list">
-              <div class="v1-safe"></div>
-              <div class="v1-window"><img src="/images/unify/v1/v1-map.webp" width="720" alt="" /></div>
-              <img class="v1-bar" src="/images/unify/v1/v1-map-bar.webp" width="720" height="144" alt="" />
-            </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+            <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building.webp" alt="Unify v1 building map with floor switcher" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+            <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-friends.webp" alt="Unify v1 building map with the friends list open" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+            <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-open.webp" alt="Unify v1 floor plan, full screen" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
           </div>
         </div>
         <div class="pivot-row">

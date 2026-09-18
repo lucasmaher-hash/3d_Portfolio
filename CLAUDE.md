@@ -146,12 +146,14 @@ is `#support-scrolly` (socials + friends map; it took over the mirrored-layout C
 key would let the old `TRANSLATIONS` value overwrite the draft text (the Role tile especially).
 Every `[ bracketed ]` value is a placeholder; plan numbers are examples, not results.
 
-**v1 screens (pivot section)** are Figma exports (1608px wide = iPhone 17 at 4x) sitting in the
-same `.phone-shot` iPhone frame as the final design. Each export was split into the page
-(`v1-<name>.webp`) and its tab bar (`v1-<name>-bar.webp`, the bottom 321px of the export), so the
-bar stays fixed while the page scrolls under it. v1 was drawn with no safe area, so `.v1-safe`
-adds a 7% black band at the top to keep the frame's island off the content. Home and timetable
-scroll with `@keyframes v1-scroll` (13s: hold, eased down, hold, eased up); the travel is
+**v1 screens (pivot section)**: all five v1 Figma exports (1608px wide = iPhone 17 at 4x) in the
+same `.phone-shot` iPhone frame as the final design, in a 5-up grid (`.pivot-screens--v1`; a
+swipe strip below 640px). The three building screens are single stills (`.v1-still`). The two
+long ones, home and timetable, are split into the page (`v1-<name>.webp`) and its tab bar
+(`v1-<name>-bar.webp`, the bottom 321px of the export), so the bar stays fixed while the page
+scrolls under it. **No safe-area band** — per Lucas the content runs up under the frame's island,
+as it would on the phone (a 7% black band was tried and dropped). Scrolling uses
+`@keyframes v1-scroll` (13s: hold, eased down, hold, eased up); the travel is
 `calc(-100% + 100cqh)` against the `.v1-window` size container, so it always ends exactly on the
 last row, whatever size the phone renders at. The timetable starts 1.4s late so the two don't
 move in lockstep. Off under `prefers-reduced-motion`.
