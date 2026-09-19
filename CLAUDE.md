@@ -178,20 +178,23 @@ runs up under the frame's island (per Lucas), with two per-screen edits: the **t
 **home** export's white card was extended to the very top with square corners (its rounded top
 and a stray blue line above it were painted over before export; the Desktop original is unedited).
 
-**Problem section = the group chat as floating iMessage bubbles** (`.imsg-stage`, after Lucas's
-notification-cloud reference): one iPhone 17 frame showing ONLY a gradient wallpaper and status bar
-(per Lucas: no chat on the screen), with the whole conversation — group "HM Group", Jamie / Anna /
-Sophia / me, English, written by Claude from the real WhatsApp chats, captioned as a
-reconstruction — floating around it, partly over the frame. Nine floats in chat order, three of
-them timetable images (`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`, cropped from
-the edited WhatsApp screenshots; `tt-me` keeps a faint dark gradient bottom-right from the WhatsApp
-photo bubble — replace it if the original timetable screenshot turns up). Each comes out of the
-phone, grows past full size, holds and folds back (`@keyframes imsg-pop`, 14s, 0.9s apart, all out
-together around 9s). Stage = SIZE container (floats in cqw/cqh), phone = inline-size container.
-**Bubble tails are a mask in the bubble's own colour**, not the two-pseudo trick: that one cuts the
-curl with a patch of background colour, which showed as grey blocks where bubbles overlap the
-phone. Below 640px the stage is 3:4, the phone bigger, five floats hidden (`data-m="off"`), the
-rest at `--mx/--my`.
+**Problem section = the group chat "lifted off" an empty iMessage thread** (`.imsg-stage`, after
+Lucas's WhatsApp-mockup reference): one iPhone 17 frame showing an EMPTY "HM Group" thread (status
+bar, header, input — no messages on the screen), and over it `.imsg-lifted`, a column wider than
+the phone (44cqw vs 27cqw) so incoming bubbles hang off the phone's left edge and Lucas's off the
+right. The conversation (Jamie / Anna / Sophia / me, English, written by Claude from the real
+WhatsApp chats and captioned as a reconstruction) plays in it: every 2.6s the script appends the
+next message at the bottom, the track glides up by its height (1.1s) while the new one pops in from
+its side, and a top-edge mask fades the oldest out as they leave; off-view ones are removed and it
+loops forever. A timetable image is always grouped with its sender's text in one message
+(`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`; `tt-me` keeps a faint dark gradient
+bottom-right from the WhatsApp photo bubble — replace it if the original screenshot turns up).
+Bubble tails are a mask in the bubble's own colour (the two-pseudo cut-out showed grey patches over
+the phone). The column refills only when the stage WIDTH changes — a phone's URL bar fires
+`resize` on every scroll, and refilling on that would restart the chat constantly (it also bit the
+headless screenshots: `captureBeyondViewport` fires a resize). Runs only while on screen; under
+`prefers-reduced-motion` it shows the first messages, still. Below 640px: 3:4 stage, 54cqw phone,
+86cqw column.
 
 ## to.morrow page (`public/to-shove2d.html`)
 
