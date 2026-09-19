@@ -181,7 +181,7 @@ and a stray blue line above it were painted over before export; the Desktop orig
 **Problem section = the group chat "lifted off" an empty iMessage thread** (`.imsg-stage`, after
 Lucas's WhatsApp-mockup reference): one iPhone 17 frame showing an EMPTY "HM Group" thread (status
 bar, header, input — no messages on the screen), and over it `.imsg-lifted`, a column wider than
-the phone (44cqw vs 27cqw) so incoming bubbles hang off the phone's left edge and Lucas's off the
+the phone (54cqw vs 27cqw; 92cqw on a phone; each message capped at 35cqw / 70cqw so a wider column spreads them outward instead of widening them) so incoming bubbles hang off the phone's left edge and Lucas's off the
 right. The conversation (Jamie / Anna / Sophia / me, English, written by Claude from the real
 WhatsApp chats and captioned as a reconstruction) plays in it: every 2.6s the script appends the
 next message at the bottom, the track glides up by its height (1.1s) while the new one pops in from
