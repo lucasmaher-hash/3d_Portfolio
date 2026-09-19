@@ -1658,7 +1658,14 @@
        Web Animations API (see the carousel script). The travel is
        calc(-100% + 100cqh): the image's own height minus the window's, so it
        lands exactly on the last row whatever size the phone renders at. */
-    .v1-carousel { touch-action: pan-y; }
+    /* Nothing inside the carousel is selectable or draggable: a click on a
+       phone should move the carousel, not highlight it or pick up an image. */
+    .v1-carousel {
+      touch-action: pan-y;
+      user-select: none; -webkit-user-select: none;
+      -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+    }
+    .v1-carousel img { -webkit-user-drag: none; user-drag: none; }
     .v1-carousel > .phone-shot { cursor: pointer; }
     .v1-carousel > .phone-shot[data-slot="0"] { cursor: default; }
     .pivot-screens .phone-shot { width: 100%; max-width: 220px; }
@@ -3111,6 +3118,8 @@
           moveBy(-s);
         });
       });
+
+      car.addEventListener('dragstart', function (e) { e.preventDefault(); });   // Firefox ignores -webkit-user-drag
 
       // sideways trackpad / mouse-wheel: one step per gesture
       var acc = 0, lock = false;
