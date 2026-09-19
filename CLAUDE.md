@@ -178,20 +178,20 @@ runs up under the frame's island (per Lucas), with two per-screen edits: the **t
 **home** export's white card was extended to the very top with square corners (its rounded top
 and a stray blue line above it were painted over before export; the Desktop original is unedited).
 
-**Problem section = the group chat rebuilt as iMessage** (`.imsg-stage`): one iPhone 17 frame with
-the chat drawn in HTML/CSS (group "HM Group", Jamie / Anna / Sophia / me, English, written by Claude
-from the real WhatsApp chats — it is a RECONSTRUCTION and the caption says so), three timetable
-images in it (`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`, cropped from the edited
-WhatsApp screenshots; `tt-me` came off the WhatsApp photo bubble and keeps a faint dark gradient in
-its bottom-right corner — replace it from the original timetable screenshot if that ever turns up).
-Six key messages float out of the phone to spots around it, grow past full size, hold and fold
-back in (`@keyframes imsg-pop`, 12s, a second apart). The stage is a SIZE container (floats in
-cqw/cqh), the phone an inline-size container (everything on the screen in cqi), so it all scales
-together. The tail is the two-pseudo curl trick with `isolation: isolate` + `z-index: -1`, and
-`--tail-bg` must equal whatever is behind the bubble (#fff in the phone, `--bg-surface` for floats);
-the in-phone avatars need `z-index: 1` or the tail's cut-out covers them. Below 640px the stage is
-3:4, the phone bigger, two floats hidden (`data-m="off"`), the rest at `--mx/--my`. The earlier
-WhatsApp-screenshot row and its `chat-*.webp` files are gone.
+**Problem section = the group chat as floating iMessage bubbles** (`.imsg-stage`, after Lucas's
+notification-cloud reference): one iPhone 17 frame showing ONLY a gradient wallpaper and status bar
+(per Lucas: no chat on the screen), with the whole conversation — group "HM Group", Jamie / Anna /
+Sophia / me, English, written by Claude from the real WhatsApp chats, captioned as a
+reconstruction — floating around it, partly over the frame. Nine floats in chat order, three of
+them timetable images (`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`, cropped from
+the edited WhatsApp screenshots; `tt-me` keeps a faint dark gradient bottom-right from the WhatsApp
+photo bubble — replace it if the original timetable screenshot turns up). Each comes out of the
+phone, grows past full size, holds and folds back (`@keyframes imsg-pop`, 14s, 0.9s apart, all out
+together around 9s). Stage = SIZE container (floats in cqw/cqh), phone = inline-size container.
+**Bubble tails are a mask in the bubble's own colour**, not the two-pseudo trick: that one cuts the
+curl with a patch of background colour, which showed as grey blocks where bubbles overlap the
+phone. Below 640px the stage is 3:4, the phone bigger, five floats hidden (`data-m="off"`), the
+rest at `--mx/--my`.
 
 ## to.morrow page (`public/to-shove2d.html`)
 
