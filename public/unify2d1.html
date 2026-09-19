@@ -1739,6 +1739,12 @@
       --k: 0; --sc: 1;
       transform: translate(-50%, -50%) translateX(calc(var(--k) * 100%)) scale(var(--sc));
       transition: transform 900ms cubic-bezier(.65, 0, .35, 1), opacity 450ms ease;
+      /* Keep each phone on its own compositing layer all the time. Without it
+         Safari promotes the phone to a layer when a move starts and drops it
+         again when it ends, re-rasterising at a slightly different subpixel
+         offset — the small jolt as a phone settles into place. */
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     .v1-carousel > [data-slot="0"]  { --k: 0;     --sc: 1;   z-index: 3; }
     .v1-carousel > [data-slot="1"]  { --k: .96;   --sc: .84; z-index: 2; }
@@ -3020,7 +3026,7 @@
       var car = document.querySelector('.v1-carousel');
       if (!car) return;
       var items = Array.prototype.slice.call(car.children), n = items.length;
-      var STILL = 3000, MOVE = 900, FADE = 450, GROW = 700;
+      var STILL = 3000, MOVE = 900, FADE = 380, GROW = 520;   // FADE + GROW = MOVE: every phone lands together
       var SCROLL_IN = 500, SCROLL_DOWN = 5200, SCROLL_HOLD = 1200;
       var EASE = 'cubic-bezier(.42, 0, .25, 1)';
       var END = 'translateY(calc(-100% + 100cqh))';
@@ -3076,7 +3082,7 @@
             el.style.transition = 'none';
             el.dataset.slot = passes > 2 ? 'out-left' : 'out-right';
             void el.offsetWidth;
-            el.style.transition = 'transform ' + GROW + 'ms cubic-bezier(.25, 1, .5, 1), opacity ' + GROW + 'ms ease-out';
+            el.style.transition = 'transform ' + GROW + 'ms cubic-bezier(.2, .6, .35, 1), opacity ' + GROW + 'ms ease-out';
             el.dataset.slot = to;
             setTimeout(function () { el.style.transition = ''; }, GROW);
           }, FADE);
