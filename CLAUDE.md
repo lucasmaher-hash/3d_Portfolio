@@ -193,6 +193,10 @@ version (bubble text 1.72cqw, timetables 24.7cqw). It loops forever. A timetable
 (`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`; `tt-me` keeps a faint dark gradient
 bottom-right from the WhatsApp photo bubble — replace it if the original screenshot turns up).
 The status bar shares the nav bar's grey (#F7F7F8) and has real signal / Wi-Fi / battery glyphs.
+**The `<img>`s carry their own width/height** (`SIZE` in the script): without them an image is 0 tall
+until it loads, so the column glided by the wrong amount and jumped, and on a cold first load the
+initial fill overshot the stage and covered the section heading. `trim()` also removes anything
+above the column's top after the fill, as a safety net.
 Bubble tails are a mask in the bubble's own colour (the two-pseudo cut-out showed grey patches over
 the phone). The column refills only when the stage WIDTH changes — a phone's URL bar fires
 `resize` on every scroll, and refilling on that would restart the chat constantly (it also bit the

@@ -3303,6 +3303,12 @@
       if (!stage) return;
       var box = stage.querySelector('.imsg-lifted'), track = stage.querySelector('.imsg-track');
       var IMG = '/images/unify/problem/';
+      // Each image's own size goes on the <img>, so its box has its final height
+      // the moment it is added. Without it the image is 0 tall until it loads:
+      // the column glides up by the wrong amount and jumps when it arrives, and
+      // the first fill overshoots the top of the stage once they all load.
+      var SIZE = { 'tt-jamie': [858, 396], 'tt-sophia': [858, 595], 'tt-me': [742, 270] };
+      Object.keys(SIZE).forEach(function (n) { new Image().src = IMG + n + '.webp'; });   // warm the cache
       var MSGS = [
         { who: 'Anna',   text: "when's your next break??" },
         { who: 'Jamie',  img: 'tt-jamie',  text: 'idk, check mine' },
@@ -3323,7 +3329,7 @@
         var el = document.createElement('div');
         el.className = 'imsg-msg ' + (m.out ? 'out' : 'in');
         el.innerHTML = (m.who ? '<span class="imsg-float-from">' + m.who + '</span>' : '') +
-                       (m.img ? '<img src="' + IMG + m.img + '.webp" alt="" />' : '') +
+                       (m.img ? '<img src="' + IMG + m.img + '.webp" width="' + SIZE[m.img][0] + '" height="' + SIZE[m.img][1] + '" alt="" />' : '') +
                        '<p class="b ' + (m.out ? 'out' : 'in') + ' tail">' + m.text + '</p>';
         return el;
       }
@@ -3358,6 +3364,13 @@
           add(false);
           if (track.offsetHeight > box.offsetHeight) { track.lastChild.remove(); k--; break; }
         }
+        trim();
+      }
+      function trim() {                               // safety net: nothing ever sits above the top
+        var top = box.getBoundingClientRect().top;
+        Array.prototype.slice.call(track.children).forEach(function (c) {
+          if (!c.dataset.leaving && c.getBoundingClientRect().top < top - 1) c.remove();
+        });
       }
       function start() { if (!timer) timer = setInterval(function () { add(true); }, STEP); }
       function stop()  { clearInterval(timer); timer = null; }
