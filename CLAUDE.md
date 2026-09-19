@@ -185,10 +185,14 @@ the phone (44cqw vs 27cqw) so incoming bubbles hang off the phone's left edge an
 right. The conversation (Jamie / Anna / Sophia / me, English, written by Claude from the real
 WhatsApp chats and captioned as a reconstruction) plays in it: every 2.6s the script appends the
 next message at the bottom, the track glides up by its height (1.1s) while the new one pops in from
-its side, and a top-edge mask fades the oldest out as they leave; off-view ones are removed and it
-loops forever. A timetable image is always grouped with its sender's text in one message
+its side. **Nothing is clipped or masked** (per Lucas: a message on screen is always whole): a
+message whose final spot would be above the column's top eases out as a whole during the glide and is
+then removed; the new one fades in whole at the bottom. The column sits between the phone's nav bar
+and input (desktop top 18% / bottom 14%, phone 25% / 17%). Messages are 30% larger than the first
+version (bubble text 1.72cqw, timetables 24.7cqw). It loops forever. A timetable image is always grouped with its sender's text in one message
 (`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`; `tt-me` keeps a faint dark gradient
 bottom-right from the WhatsApp photo bubble — replace it if the original screenshot turns up).
+The status bar shares the nav bar's grey (#F7F7F8) and has real signal / Wi-Fi / battery glyphs.
 Bubble tails are a mask in the bubble's own colour (the two-pseudo cut-out showed grey patches over
 the phone). The column refills only when the stage WIDTH changes — a phone's URL bar fires
 `resize` on every scroll, and refilling on that would restart the chat constantly (it also bit the

@@ -1773,12 +1773,16 @@
       display: flex; flex-direction: column;
       font-family: var(--ui); color: #000; -webkit-font-smoothing: antialiased;
     }
+    /* The status bar sits on the same grey as the nav bar, as it does in iOS —
+       the bar runs up under the island to the top of the screen. */
     .imsg-status {
       flex: none; display: flex; justify-content: space-between; align-items: center;
-      padding: 4.2cqi 8cqi 0 11cqi; height: 11.5cqi;
+      padding: 4.4cqi 7.5cqi 0 11.5cqi; height: 11.5cqi; background: #F7F7F8;
       font-size: 4.3cqi; font-weight: 600; letter-spacing: -.01em;
     }
-    .imsg-status svg { width: 17cqi; height: auto; fill: currentColor; }
+    .imsg-icons { display: flex; align-items: center; gap: 1.5cqi; }
+    .imsg-icons svg { height: 3cqi; width: auto; fill: currentColor; display: block; }
+    .imsg-icons svg:last-child { height: 3.1cqi; }
     .imsg-head {
       flex: none; position: relative;
       display: flex; justify-content: center; align-items: center;
@@ -1808,34 +1812,32 @@
     /* The lifted conversation: a column wider than the phone, centred on it, so
        incoming messages hang off its left edge and yours off its right, over the
        screen and the frame. New messages come in at the bottom and the column
-       scrolls up; the top edge fades, so the oldest dissolve as they leave. */
+       scrolls up. Nothing is clipped or masked: a message on screen is always
+       whole, and the script eases one out as a whole once it would reach the top. */
     .imsg-lifted {
-      position: absolute; left: 50%; top: 13%; bottom: 14%; z-index: 3;
+      position: absolute; left: 50%; top: 18%; bottom: 14%; z-index: 3;   /* between the nav bar and the input */
       width: 44cqw; transform: translateX(-50%);
-      overflow: hidden;
-      -webkit-mask: linear-gradient(to bottom, transparent 0, #000 22%);
-              mask: linear-gradient(to bottom, transparent 0, #000 22%);
     }
     .imsg-track {
       position: absolute; left: 0; right: 0; bottom: 0;
-      display: flex; flex-direction: column; gap: 1.1cqw;
-      padding: 0 1cqw 1.4cqw;   /* room for the shadows */
+      display: flex; flex-direction: column; gap: 1.45cqw;
+      padding: 0 1.3cqw 1.8cqw;   /* room for the shadows */
       will-change: transform;
     }
-    .imsg-msg { display: flex; flex-direction: column; align-items: flex-start; gap: .35cqw; max-width: 72%; }
+    .imsg-msg { display: flex; flex-direction: column; align-items: flex-start; gap: .45cqw; max-width: 80%; }
     .imsg-msg.out { align-self: flex-end; align-items: flex-end; }
     .imsg-msg.is-new { transform-origin: 0 100%; }
     .imsg-msg.out.is-new { transform-origin: 100% 100%; }
-    .imsg-float-from { font-family: var(--ui); font-size: .95cqw; color: var(--text-secondary); padding-left: .9em; }
+    .imsg-float-from { font-family: var(--ui); font-size: 1.24cqw; color: var(--text-secondary); padding-left: .9em; }
     .imsg-msg img {
-      display: block; width: 19cqw; height: auto;
-      border-radius: 1.4cqw; border: 1px solid rgba(0, 0, 0, .08);
+      display: block; width: 24.7cqw; height: auto;
+      border-radius: 1.8cqw; border: 1px solid rgba(0, 0, 0, .08);
       box-shadow: 0 .5cqw 1.4cqw rgba(60, 60, 90, .16);
     }
     .imsg-msg .b {
       position: relative; margin: 0; width: max-content; max-width: 100%;
       padding: .45em .8em; border-radius: 1.1em;
-      font-family: var(--ui); font-size: 1.32cqw; line-height: 1.3; letter-spacing: -.01em;
+      font-family: var(--ui); font-size: 1.72cqw; line-height: 1.3; letter-spacing: -.01em;
       box-shadow: 0 .5cqw 1.4cqw rgba(60, 60, 90, .16);
     }
     /* The tail is a mask in the bubble's own colour, so it looks right over the
@@ -1853,12 +1855,12 @@
     @media (max-width: 640px) {
       .imsg-stage { aspect-ratio: 3 / 4; margin-inline: -20px; width: calc(100% + 40px); }
       .imsg-phone { width: 54cqw; }
-      .imsg-lifted { width: 86cqw; top: 15%; bottom: 15%; }
-      .imsg-track { gap: 2.2cqw; padding: 0 2cqw 2.6cqw; }
-      .imsg-msg { max-width: 76%; gap: .8cqw; }
-      .imsg-msg .b { font-size: 3.1cqw; }
-      .imsg-float-from { font-size: 2.4cqw; }
-      .imsg-msg img { width: 40cqw; border-radius: 3cqw; }
+      .imsg-lifted { width: 86cqw; top: 25%; bottom: 17%; }
+      .imsg-track { gap: 2.9cqw; padding: 0 2.6cqw 3.4cqw; }
+      .imsg-msg { max-width: 82%; gap: 1cqw; }
+      .imsg-msg .b { font-size: 4cqw; }
+      .imsg-float-from { font-size: 3.1cqw; }
+      .imsg-msg img { width: 52cqw; border-radius: 3.9cqw; }
     }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
@@ -2014,7 +2016,11 @@
             <div class="imsg">
               <div class="imsg-status">
                 <span>9:12</span>
-                <svg viewBox="0 0 64 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><path d="M30 3.2a10 10 0 0 1 13 0l-1.4 1.5a8 8 0 0 0-10.2 0zm2.6 2.9a6 6 0 0 1 7.8 0L39 7.6a4 4 0 0 0-5 0zm3.9 4.4L34.4 8.4a2.6 2.6 0 0 1 4.2 0z"/><rect x="47" y="1" width="14" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="49" y="3" width="8" height="6" rx="1.5"/><rect x="62" y="4" width="1.6" height="4" rx=".8"/></svg>
+                <span class="imsg-icons" aria-hidden="true">
+                  <svg viewBox="0 0 18 12"><rect x="0" y="8.2" width="3.2" height="3.8" rx=".9"/><rect x="4.9" y="5.8" width="3.2" height="6.2" rx=".9"/><rect x="9.8" y="3.2" width="3.2" height="8.8" rx=".9"/><rect x="14.7" y="0" width="3.2" height="12" rx=".9"/></svg>
+                  <svg viewBox="0 0 16 12"><path d="M8 2.3c2.3 0 4.4.9 6 2.4l1.2-1.2A10.3 10.3 0 0 0 8 .6 10.3 10.3 0 0 0 .8 3.5L2 4.7a8.6 8.6 0 0 1 6-2.4Zm0 3.3c1.4 0 2.7.5 3.7 1.4l1.2-1.2A7 7 0 0 0 8 3.9a7 7 0 0 0-4.9 1.9l1.2 1.2c1-.9 2.3-1.4 3.7-1.4Zm0 3.2c.6 0 1.2.2 1.6.6L8 11.1 6.4 9.4c.4-.4 1-.6 1.6-.6Z"/></svg>
+                  <svg viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".38"/><rect x="2.2" y="2.2" width="16.5" height="7.6" rx="2"/><path d="M25 4.1v3.8c.8-.3 1.3-1 1.3-1.9S25.8 4.4 25 4.1Z" fill-opacity=".4"/></svg>
+                </span>
               </div>
               <div class="imsg-head">
                 <span class="imsg-back">‹</span>
@@ -3289,9 +3295,9 @@
     // ── Problem: the lifted group chat ────────────────────────────────────────
     // The conversation plays as a column lifted off the empty chat: every STEP a
     // message is added at the bottom, pops in from its side, and the whole column
-    // glides up by its height. The top edge fades, so the oldest dissolve as they
-    // leave; anything fully out of view is removed. It loops, and runs only
-    // while the stage is on screen.
+    // glides up by its height. Any message that would end up above the column's
+    // top eases out as a whole while the column moves, and is then removed — a
+    // message is never shown half-cut or half-faded. Loops; runs only on screen.
     (function () {
       var stage = document.querySelector('.imsg-stage');
       if (!stage) return;
@@ -3326,24 +3332,32 @@
         track.appendChild(el);
         if (animate) {
           var gap = parseFloat(getComputedStyle(track).rowGap) || 0;
-          var h = el.offsetHeight + gap;
+          var h = el.offsetHeight + gap, top = box.getBoundingClientRect().top;
+          Array.prototype.slice.call(track.children).forEach(function (c) {
+            if (c === el || c.dataset.leaving) return;
+            if (c.getBoundingClientRect().top < top) {   // (already laid out at its final spot) would cross the top: ease it out whole
+              c.dataset.leaving = '1';
+              c.animate([{ opacity: 1, transform: 'translateY(0) scale(1)' },
+                         { opacity: 0, transform: 'translateY(-1.2cqw) scale(.96)' }],
+                        { duration: GLIDE * .7, easing: 'cubic-bezier(.4, 0, .6, 1)', fill: 'forwards' });
+              setTimeout(function () { c.remove(); }, GLIDE + 50);
+            }
+          });
           track.style.transition = 'none';
           track.style.transform = 'translateY(' + h + 'px)';       // looks unchanged…
           void track.offsetWidth;
           track.style.transition = 'transform ' + GLIDE + 'ms cubic-bezier(.45, 0, .2, 1)';
           track.style.transform = 'translateY(0)';                // …then glides up
-          el.animate([{ opacity: 0, transform: 'scale(.82)' }, { opacity: 1, transform: 'scale(1)' }],
-                     { duration: POP, delay: GLIDE * .35, easing: 'cubic-bezier(.34, 1.4, .5, 1)', fill: 'backwards' });
+          el.animate([{ opacity: 0, transform: 'translateY(1.5cqw) scale(.86)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }],
+                     { duration: POP, delay: GLIDE * .45, easing: 'cubic-bezier(.34, 1.3, .5, 1)', fill: 'backwards' });
         }
-        // drop what has scrolled out past the top
-        var top = box.getBoundingClientRect().top;
-        Array.prototype.slice.call(track.children).forEach(function (c) {
-          if (c.getBoundingClientRect().bottom < top - 400) c.remove();
-        });
       }
       function fill() {                             // start with the column already full
         track.innerHTML = ''; k = 0;
-        while (k < MSGS.length && track.offsetHeight < box.offsetHeight * .75) add(false);
+        while (k < MSGS.length) {                     // as many as fit whole
+          add(false);
+          if (track.offsetHeight > box.offsetHeight) { track.lastChild.remove(); k--; break; }
+        }
       }
       function start() { if (!timer) timer = setInterval(function () { add(true); }, STEP); }
       function stop()  { clearInterval(timer); timer = null; }
