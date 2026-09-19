@@ -1761,6 +1761,11 @@
     .v1-carousel > [data-slot="out-right"] { --k: 1.74;  --sc: .42; opacity: 0; z-index: 0; }
     .v1-carousel > [data-slot="out-left"]  { --k: -1.74; --sc: .42; opacity: 0; z-index: 0; }
     .v1-carousel.no-anim > .phone-shot { transition: none; }
+    /* Folded: all five stacked behind the middle phone, peeking out a little. */
+    .v1-carousel.is-folded > [data-slot="1"]  { --k: .07;  --sc: .92; }
+    .v1-carousel.is-folded > [data-slot="-1"] { --k: -.07; --sc: .92; }
+    .v1-carousel.is-folded > [data-slot="2"]  { --k: .12;  --sc: .84; }
+    .v1-carousel.is-folded > [data-slot="-2"] { --k: -.12; --sc: .84; }
     @media (max-width: 640px) {
       /* Two phones' worth of width: the middle one and its neighbours cut by
          the screen edge; the outer pair sits off screen. */
@@ -1984,7 +1989,7 @@
       <div class="pivot-compare">
         <div class="pivot-row">
           <span class="pivot-label">v1 · technical</span>
-          <div class="v1-carousel" aria-label="Unify v1 screens">
+          <div class="v1-carousel is-folded" aria-label="Unify v1 screens">
             <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, scrolling">
               <div class="v1-window"><img src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
               <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
@@ -3038,7 +3043,7 @@
       var EASE = 'cubic-bezier(.42, 0, .25, 1)';
       var END = 'translateY(calc(-100% + 100cqh))';
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var center = 0, auto = !reduce, timer = null, onScreen = false, playing = null;
+      var center = 0, auto = !reduce, timer = null, open = false, playing = null;
 
       function slotOf(i) {                              // left of centre = next in order
         var d = ((center - i) % n + n) % n;
@@ -3050,19 +3055,9 @@
       function play(el) {
         var img = scroller(el);
         if (!img || reduce) return;
-        playing = img.animate(auto
-          // autoplay: once down, then hold at the bottom until the carousel moves on
-          ? [{ transform: 'translateY(0)', offset: 0, easing: EASE },
-             { transform: END }]
-          // parked by a click: down, hold, back up, hold, for as long as it stays
-          : [{ transform: 'translateY(0)', offset: 0 },
-             { transform: 'translateY(0)', offset: .08, easing: EASE },
-             { transform: END, offset: .48 },
-             { transform: END, offset: .6, easing: EASE },
-             { transform: 'translateY(0)', offset: .92 },
-             { transform: 'translateY(0)', offset: 1 }],
-          auto ? { duration: SCROLL_DOWN, delay: SCROLL_IN, fill: 'forwards' }
-               : { duration: 13000, iterations: Infinity });
+        // one pass down, then it stays at the bottom until the phone leaves
+        playing = img.animate([{ transform: 'translateY(0)', offset: 0, easing: EASE }, { transform: END }],
+                              { duration: SCROLL_DOWN, delay: SCROLL_IN, fill: 'forwards' });
       }
       function rewind() {                               // glide back to the top as it leaves
         if (!playing) return;
@@ -3074,7 +3069,7 @@
 
       // ── moving the row by c slots (c > 0 = rightwards)
       function moveBy(c) {
-        if (!c) return;
+        if (!c || !open) return;
         rewind();
         var old = items.map(function (el) { return +el.dataset.slot; });
         center = ((center + c) % n + n) % n;
@@ -3104,7 +3099,7 @@
       }
       function schedule() {
         clearTimeout(timer); timer = null;
-        if (!auto || !onScreen || document.hidden) return;
+        if (!auto || !open || document.hidden) return;
         timer = setTimeout(function () { moveBy(1); }, MOVE + turnLength(items[center]));
       }
       function park() { auto = false; clearTimeout(timer); timer = null; }
@@ -3112,9 +3107,10 @@
       items.forEach(function (el, i) {
         el.dataset.slot = slotOf(i);
         el.addEventListener('click', function () {
+          if (!open) return;
           var s = +el.dataset.slot;
           park();
-          if (s === 0) { rewind(); play(el); return; }   // restart its scroll, looping
+          if (s === 0) { rewind(); play(el); return; }   // restart its scroll
           moveBy(-s);
         });
       });
@@ -3145,12 +3141,40 @@
         park(); moveBy(dx > 0 ? 1 : -1);
       }, { passive: true });
 
-      function sync() {
-        if (onScreen && !document.hidden) { if (!playing) play(items[center]); schedule(); }
-        else { clearTimeout(timer); timer = null; }
+      // ── fold / unfold with the page scroll ─────────────────────────────────
+      // Unfolds once the carousel's middle has come up past the bottom of the
+      // window, folds again once its middle has gone out past the top (the same
+      // rule as the to.morrow fan). The phones fan out one after another, left to
+      // right. Folding resets it: the next unfold autoplays again, even after a
+      // click or a swipe had parked it.
+      var STAGGER = 70;
+      function setOpen(o) {
+        if (o === open) return;
+        open = o;
+        items.forEach(function (el) { el.style.transitionDelay = (+el.dataset.slot + 2) * STAGGER + 'ms'; });
+        car.classList.toggle('is-folded', !o);
+        setTimeout(function () { items.forEach(function (el) { el.style.transitionDelay = ''; }); }, MOVE + 5 * STAGGER);
+        clearTimeout(timer); timer = null;
+        if (o) {
+          auto = !reduce;
+          setTimeout(function () { if (open && !playing) play(items[center]); }, MOVE + 2 * STAGGER);
+          schedule();
+        } else {
+          rewind();
+        }
       }
-      new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; sync(); }).observe(car);
-      document.addEventListener('visibilitychange', sync);
+      function check() {
+        var r = car.getBoundingClientRect(), mid = r.top + r.height / 2;
+        setOpen(reduce || (mid < innerHeight && mid > 0));
+      }
+      var ticking = false;
+      addEventListener('scroll', function () {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(function () { ticking = false; check(); });
+      }, { passive: true });
+      addEventListener('resize', check);
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) schedule(); else { clearTimeout(timer); timer = null; } });
+      check();
     })();
   </script>
 </body>

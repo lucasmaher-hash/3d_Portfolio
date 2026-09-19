@@ -156,11 +156,16 @@ A turn is 3s for a still; for home and timetable it is their whole scroll (0.5s,
 when they arrive, glided back to the top as they leave), so each one starts at its top when it
 opens. A phone passing an edge shrinks and fades as if stepping back (a third of a slot sideways),
 then grows and fades in on the other side. **Clicking** a phone brings it to the middle and stops
-the autoplay for good; a parked home/timetable then loops its scroll (13s down-hold-up-hold).
+the autoplay (a centred home/timetable scrolls down once and stays). **It folds and unfolds with
+the page scroll** (`.is-folded`, in the markup so it starts folded): all five stack behind the
+middle phone until the carousel's middle comes up past the window bottom, then fan out one after
+another LEFT TO RIGHT (70ms stagger); once its middle goes out past the top it folds again (same
+rule as the to.morrow fan). Folding resets the park, so every unfold autoplays again. Clicks do
+nothing while folded.
 A **sideways trackpad scroll** (only when |deltaX| > |deltaY|, so vertical page scrolling is never
 blocked) or a **swipe** steps one slot and also stops the autoplay. Geometry is CSS per
 `data-slot` (offsets in phone widths via `translateX(%)`); the script pauses off-screen and in a
-hidden tab and does nothing under `prefers-reduced-motion`. Below 640px the carousel bleeds to the
+hidden tab; under `prefers-reduced-motion` it stays unfolded and still. Below 640px the carousel bleeds to the
 screen edges and the outer pair sits off screen.
 
 The three building screens are single stills (`.v1-still`). Home and timetable are split into the
