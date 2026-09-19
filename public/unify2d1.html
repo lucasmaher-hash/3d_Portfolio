@@ -3144,20 +3144,20 @@
       // ── fold / unfold with the page scroll ─────────────────────────────────
       // Unfolds once the carousel's middle has come up past the bottom of the
       // window, folds again once its middle has gone out past the top (the same
-      // rule as the to.morrow fan). The phones fan out one after another, left to
-      // right. Folding resets it: the next unfold autoplays again, even after a
+      // rule as the to.morrow fan). Both sides open and close together, at twice
+      // the speed of a carousel step. Folding resets it: the next unfold autoplays again, even after a
       // click or a swipe had parked it.
-      var STAGGER = 70;
+      var UNFOLD = MOVE / 2;
       function setOpen(o) {
         if (o === open) return;
         open = o;
-        items.forEach(function (el) { el.style.transitionDelay = (+el.dataset.slot + 2) * STAGGER + 'ms'; });
+        items.forEach(function (el) { el.style.transitionDuration = UNFOLD + 'ms'; });
         car.classList.toggle('is-folded', !o);
-        setTimeout(function () { items.forEach(function (el) { el.style.transitionDelay = ''; }); }, MOVE + 5 * STAGGER);
+        setTimeout(function () { items.forEach(function (el) { el.style.transitionDuration = ''; }); }, UNFOLD + 50);
         clearTimeout(timer); timer = null;
         if (o) {
           auto = !reduce;
-          setTimeout(function () { if (open && !playing) play(items[center]); }, MOVE + 2 * STAGGER);
+          setTimeout(function () { if (open && !playing) play(items[center]); }, UNFOLD);
           schedule();
         } else {
           rewind();

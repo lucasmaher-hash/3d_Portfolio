@@ -158,8 +158,8 @@ opens. A phone passing an edge shrinks and fades as if stepping back (a third of
 then grows and fades in on the other side. **Clicking** a phone brings it to the middle and stops
 the autoplay (a centred home/timetable scrolls down once and stays). **It folds and unfolds with
 the page scroll** (`.is-folded`, in the markup so it starts folded): all five stack behind the
-middle phone until the carousel's middle comes up past the window bottom, then fan out one after
-another LEFT TO RIGHT (70ms stagger); once its middle goes out past the top it folds again (same
+middle phone until the carousel's middle comes up past the window bottom, then fan out, both sides
+at once, in 450ms (half a carousel step; a left-to-right stagger was tried and dropped); once its middle goes out past the top it folds again (same
 rule as the to.morrow fan). Folding resets the park, so every unfold autoplays again. Clicks do
 nothing while folded.
 A **sideways trackpad scroll** (only when |deltaX| > |deltaY|, so vertical page scrolling is never
