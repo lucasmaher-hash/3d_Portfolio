@@ -1703,31 +1703,6 @@
     }
 
 
-    /* Problem: the chat screenshots in a row, in the order they were sent. */
-    .chat-row {
-      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(14px, 2.4vw, 32px);
-      width: min(100%, 960px); margin-inline: auto;
-    }
-    .chat-shot { margin: 0; }
-    .chat-shot img {
-      display: block; width: 100%; height: auto;
-      border-radius: clamp(18px, 2.4vw, 30px);
-      box-shadow: var(--shadow-raised-sm);
-    }
-    .chat-row + .cs-caption { text-align: center; }
-    /* On a phone three full-height screenshots stacked would be ~2000px of
-       scrolling, so the row becomes a swipeable strip instead. */
-    @media (max-width: 640px) {
-      .chat-row {
-        display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-        width: auto; margin-inline: -20px; padding: 4px 20px 16px;
-        scrollbar-width: none;
-      }
-      .chat-row::-webkit-scrollbar { display: none; }
-      .chat-shot { flex: 0 0 72%; scroll-snap-align: center; }
-      .chat-row + .cs-caption { text-align: left; }
-    }
 
     /* v1 carousel: five phones on five slots (-2..2), the middle one largest.
        Every 3s the whole row steps one slot to the right; the phone leaving
@@ -1770,6 +1745,150 @@
       /* Two phones' worth of width: the middle one and its neighbours cut by
          the screen edge; the outer pair sits off screen. */
       .v1-carousel { aspect-ratio: 1.3125 / 1; --w: 35.2%; margin-inline: -20px; overflow: hidden; }
+    }
+
+    /* ── Problem: the group chat as iMessage, with its key messages floating out ──
+       The stage is a size container, so the floats are placed and sized in
+       cqw/cqh of the stage; the phone is an inline-size container of its own, so
+       everything inside the screen is sized in cqi of the phone and scales with
+       it. iMessage is drawn in its own light material and stays light in dark
+       mode, like the SkeuKit exhibits on to.morrow. */
+    .imsg-stage {
+      position: relative; width: 100%; aspect-ratio: 16 / 9;
+      container-type: size;
+      user-select: none; -webkit-user-select: none;
+      --bubble-in: #E9E9EB; --bubble-out: #0A7CFF;
+    }
+    .imsg-phone {
+      position: absolute; left: 50%; top: 50%;
+      width: 27cqw; transform: translate(-50%, -50%);
+      container-type: inline-size;
+    }
+    .imsg {
+      position: absolute; inset: 0; background: #fff;
+      display: flex; flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      color: #000; -webkit-font-smoothing: antialiased;
+      --tail-bg: #fff;
+    }
+    .imsg-status {
+      flex: none; display: flex; justify-content: space-between; align-items: center;
+      padding: 4.2cqi 8cqi 0 11cqi; height: 11.5cqi;
+      font-size: 4.3cqi; font-weight: 600; letter-spacing: -.01em;
+    }
+    .imsg-status svg { width: 17cqi; height: auto; fill: currentColor; }
+    .imsg-head {
+      flex: none; position: relative; z-index: 2;
+      display: flex; justify-content: center; align-items: center;
+      padding: 1cqi 0 2.4cqi;
+      background: rgba(249, 249, 249, .94);
+      border-bottom: .3cqi solid rgba(0, 0, 0, .12);
+    }
+    .imsg-back { position: absolute; left: 4cqi; top: 1.5cqi; font-size: 11cqi; line-height: 1; color: #0A7CFF; font-weight: 300; }
+    .imsg-group { display: flex; flex-direction: column; align-items: center; gap: .8cqi; }
+    .imsg-avs { display: flex; }
+    .imsg-avs span, .imsg-av {
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; color: #fff; font-weight: 600;
+      background: linear-gradient(#A5ABB8, #848993);
+    }
+    .imsg-avs span { width: 9cqi; height: 9cqi; font-size: 4cqi; border: .5cqi solid #F9F9F9; }
+    .imsg-avs span + span { margin-left: -3cqi; }
+    .imsg-name { font-size: 3.3cqi; color: #000; }
+    .imsg-list {
+      flex: 1 1 0; min-height: 0; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 0 3.4cqi 2cqi;
+    }
+    .imsg-time { text-align: center; font-size: 2.9cqi; color: #8A8A8E; margin: 3cqi 0 1.2cqi; }
+    .imsg-time b { font-weight: 600; }
+    .imsg-from { font-size: 2.9cqi; color: #8A8A8E; margin: 1.6cqi 0 .4cqi 11cqi; }
+    .imsg-row { display: flex; align-items: flex-end; gap: 1.6cqi; margin-top: .6cqi; }
+    .imsg-row.out { justify-content: flex-end; }
+    .imsg-av { flex: none; width: 7.6cqi; height: 7.6cqi; font-size: 3.3cqi; position: relative; z-index: 1; }   /* above the bubble tail's cut-out */
+    .imsg-av.hide { visibility: hidden; }
+    .imsg-img { width: 58%; border-radius: 4.4cqi; overflow: hidden; border: .3cqi solid rgba(0, 0, 0, .08); }
+    .imsg-img img { display: block; width: 100%; height: auto; }
+
+    /* iMessage bubble, shared by the phone and the floats. The tail is the
+       classic two-pseudo trick: a bubble-coloured curl, then a curl in the
+       background colour that cuts it. --tail-bg must match what is behind. */
+    .imsg .b, .imsg-float .b {
+      position: relative; margin: 0; max-width: 72%;
+      padding: .45em .8em; border-radius: 1.1em;
+      font-size: 4.1cqi; line-height: 1.3; letter-spacing: -.01em;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+    .b.in  { background: var(--bubble-in); color: #000; }
+    .b.out { background: var(--bubble-out); color: #fff; }
+    .b.tail::before, .b.tail::after { content: ""; position: absolute; bottom: 0; height: 1.25em; }
+    .b.in.tail::before  { left: -.42em;  width: 1.25em; background: var(--bubble-in);  border-bottom-right-radius: .95em; }
+    .b.in.tail::after   { left: -1.55em; width: 1.55em; background: var(--tail-bg);    border-bottom-right-radius: .62em; }
+    .b.out.tail::before { right: -.42em; width: 1.25em; background: var(--bubble-out); border-bottom-left-radius: .95em; }
+    .b.out.tail::after  { right: -1.55em; width: 1.55em; background: var(--tail-bg);   border-bottom-left-radius: .62em; }
+    /* isolation + z-index -1: the curls paint over the bubble's background but
+       under its text, so a descender near the tail is never cut. */
+    .b { isolation: isolate; }
+    .b.tail::before, .b.tail::after { z-index: -1; }
+
+    .imsg-input {
+      flex: none; display: flex; align-items: center; gap: 2.4cqi;
+      padding: 2cqi 4cqi 9cqi; background: #fff;
+    }
+    .imsg-plus {
+      flex: none; width: 8cqi; height: 8cqi; border-radius: 50%; background: #E9E9EB;
+      display: flex; align-items: center; justify-content: center; font-size: 6cqi; color: #7C7C80; line-height: 1;
+    }
+    .imsg-field {
+      flex: 1; border: .3cqi solid #D1D1D6; border-radius: 99px;
+      padding: 1.6cqi 3.4cqi; font-size: 3.9cqi; color: #B6B6BB;
+    }
+
+    /* Floats: each sits at --x/--y and, on its turn, comes out of the phone at
+       --ox/--oy, grows past full size, settles, holds, then folds back in.
+       One 12s cycle for all six; --i staggers them a second apart, so they
+       leave in chat order and are all out together for a moment. */
+    .imsg-float {
+      position: absolute; z-index: 3;
+      left: calc(var(--x) * 1%); top: calc(var(--y) * 1%);
+      --dx: calc((var(--ox) - var(--x)) * 1cqw);
+      --dy: calc((var(--oy) - var(--y)) * 1cqh);
+      --tail-bg: var(--bg-surface);
+      display: flex; flex-direction: column; gap: .35cqw;
+      font-size: 1.32cqw;
+      transform: translate(-50%, -50%);
+      animation: imsg-pop 12s calc(var(--i) * 1s) infinite both;
+    }
+    .imsg-float.out { align-items: flex-end; }
+    .imsg-float .b { font-size: 1.32cqw; max-width: 22cqw; width: max-content; box-shadow: 0 .5cqw 1.4cqw rgba(60, 60, 90, .16); }
+    .imsg-float-from { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: .95cqw; color: var(--text-secondary); padding-left: .9em; }
+    .imsg-float img {
+      display: block; width: 19cqw; height: auto;
+      border-radius: 1.4cqw; border: 1px solid rgba(0, 0, 0, .08);
+      box-shadow: 0 .5cqw 1.4cqw rgba(60, 60, 90, .16);
+    }
+    .imsg-float.out img { width: 22cqw; }
+    @keyframes imsg-pop {
+      0%   { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(.15); opacity: 0; animation-timing-function: cubic-bezier(.2, .8, .3, 1); }
+      9%   { transform: translate(-50%, -50%) translate(0, 0) scale(1.08); opacity: 1; animation-timing-function: ease-in-out; }
+      13%  { transform: translate(-50%, -50%) translate(0, 0) scale(1); opacity: 1; }
+      58%  { transform: translate(-50%, -50%) translate(0, 0) scale(1); opacity: 1; animation-timing-function: cubic-bezier(.6, 0, .8, .4); }
+      68%  { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(.15); opacity: 0; }
+      100% { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(.15); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .imsg-float { animation: none; }
+    }
+    @media (max-width: 640px) {
+      .imsg-stage { aspect-ratio: 3 / 4; margin-inline: -20px; width: calc(100% + 40px); }
+      .imsg-phone { width: 54cqw; }
+      .imsg-float { left: calc(var(--mx) * 1%); top: calc(var(--my) * 1%);
+                    --dx: calc((var(--ox) - var(--mx)) * 1cqw); --dy: calc((var(--oy) - var(--my)) * 1cqh);
+                    font-size: 3.1cqw; gap: .8cqw; }
+      .imsg-float .b { font-size: 3.1cqw; max-width: 46cqw; }
+      .imsg-float-from { font-size: 2.4cqw; }
+      .imsg-float.out img { width: 44cqw; border-radius: 3cqw; }
+      .imsg-float[data-m="off"] { display: none; }
     }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
@@ -1916,14 +2035,66 @@
       </div>
       <div class="dot-divider"></div>
       <p class="guide-text">My friends and I study different subjects. We share a campus but rarely a course, so every week the three of us swapped screenshots of our timetables to work out when we could meet. [ Arranging a 30-minute coffee took 00 minutes of texting. ]</p>
-      <!-- The evidence: three real screenshots from the group chat, in the order
-           they were sent. Names changed (Jamie, Anna, Sophia), group renamed. -->
-      <div class="chat-row">
-        <figure class="chat-shot"><img src="/images/unify/problem/chat-1-jamie.webp" width="780" height="1688" loading="lazy" alt="Group chat: Jamie posts a screenshot of her timetable" /></figure>
-        <figure class="chat-shot"><img src="/images/unify/problem/chat-2-sophia.webp" width="780" height="1688" loading="lazy" alt="Group chat: Sophia posts her timetable" /></figure>
-        <figure class="chat-shot"><img src="/images/unify/problem/chat-3-me.webp" width="780" height="1688" loading="lazy" alt="Group chat: I post my timetable and ask who is on campus for lunch" /></figure>
+      <!-- The evidence: the group chat, rebuilt as iMessage on the same iPhone 17
+           frame as the rest of the page. Reconstructed from the real chats (names
+           changed); the key messages float out of the phone and fold back in. -->
+      <div class="imsg-stage" role="img" aria-label="Group chat: four friends post screenshots of their timetables, fail to find a shared free slot by hand, and the one who replies late misses the lunch.">
+        <div class="phone-shot imsg-phone">
+          <div class="phone-shot-screen">
+            <div class="imsg">
+              <div class="imsg-status">
+                <span>11:42</span>
+                <svg viewBox="0 0 64 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><path d="M30 3.2a10 10 0 0 1 13 0l-1.4 1.5a8 8 0 0 0-10.2 0zm2.6 2.9a6 6 0 0 1 7.8 0L39 7.6a4 4 0 0 0-5 0zm3.9 4.4L34.4 8.4a2.6 2.6 0 0 1 4.2 0z"/><rect x="47" y="1" width="14" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="49" y="3" width="8" height="6" rx="1.5"/><rect x="62" y="4" width="1.6" height="4" rx=".8"/></svg>
+              </div>
+              <div class="imsg-head">
+                <span class="imsg-back">‹</span>
+                <div class="imsg-group">
+                  <div class="imsg-avs"><span>J</span><span>A</span><span>S</span></div>
+                  <span class="imsg-name">HM Group ›</span>
+                </div>
+              </div>
+              <div class="imsg-list">
+                <div class="imsg-time"><b>Mon</b> 09:12</div>
+                <div class="imsg-from">Anna</div>
+                <div class="imsg-row in"><span class="imsg-av">A</span><p class="b in tail">when's your next break??</p></div>
+                <div class="imsg-from">Jamie</div>
+                <div class="imsg-row in"><span class="imsg-av hide">J</span><div class="imsg-img"><img src="/images/unify/problem/tt-jamie.webp" alt="" /></div></div>
+                <div class="imsg-row in"><span class="imsg-av">J</span><p class="b in tail">idk, check mine</p></div>
+                <div class="imsg-from">Sophia</div>
+                <div class="imsg-row in"><span class="imsg-av hide">S</span><div class="imsg-img"><img src="/images/unify/problem/tt-sophia.webp" alt="" /></div></div>
+                <div class="imsg-row in"><span class="imsg-av">S</span><p class="b in tail">mine. thursday is a mess</p></div>
+                <div class="imsg-row out"><div class="imsg-img"><img src="/images/unify/problem/tt-me.webp" alt="" /></div></div>
+                <div class="imsg-row out"><p class="b out tail">wanna grab lunch next break?</p></div>
+                <div class="imsg-from">Anna</div>
+                <div class="imsg-row in"><span class="imsg-av">A</span><p class="b in tail">which break tho 😅 can't read all of these</p></div>
+                <div class="imsg-from">Jamie</div>
+                <div class="imsg-row in"><span class="imsg-av">J</span><p class="b in tail">12:15?</p></div>
+                <div class="imsg-from">Sophia</div>
+                <div class="imsg-row in"><span class="imsg-av">S</span><p class="b in tail">I'm in class till 13:00</p></div>
+                <div class="imsg-row out"><p class="b out tail">jamie's back in a lecture by then</p></div>
+                <div class="imsg-from">Anna</div>
+                <div class="imsg-row in"><span class="imsg-av">A</span><p class="b in tail">are you even going to class today?</p></div>
+                <div class="imsg-time"><b>Tue</b> 13:52</div>
+                <div class="imsg-from">Sophia</div>
+                <div class="imsg-row in"><span class="imsg-av">S</span><p class="b in tail">sorry just saw this, are you guys still at lunch?</p></div>
+              </div>
+              <div class="imsg-input"><span class="imsg-plus">+</span><span class="imsg-field">iMessage</span></div>
+            </div>
+          </div>
+          <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+        </div>
+
+        <!-- Floating copies. --x/--y: where it floats (% of the stage), --ox/--oy:
+             where it comes out of the phone, --i: its turn in the sequence.
+             --mx/--my are the phone-width positions; data-m="off" hides one there. -->
+        <div class="imsg-float in"  style="--x:19;--y:17;--ox:46;--oy:30;--i:0;--mx:28;--my:10"><span class="imsg-float-from">Anna</span><p class="b in tail">when's your next break??</p></div>
+        <div class="imsg-float in"  style="--x:15;--y:47;--ox:46;--oy:40;--i:1;--mx:0;--my:0" data-m="off"><span class="imsg-float-from">Jamie</span><img src="/images/unify/problem/tt-jamie.webp" alt="" /></div>
+        <div class="imsg-float in"  style="--x:17;--y:79;--ox:46;--oy:50;--i:2;--mx:0;--my:0" data-m="off"><span class="imsg-float-from">Sophia</span><img src="/images/unify/problem/tt-sophia.webp" alt="" /></div>
+        <div class="imsg-float out" style="--x:85;--y:19;--ox:55;--oy:58;--i:3;--mx:73;--my:30"><img src="/images/unify/problem/tt-me.webp" alt="" /></div>
+        <div class="imsg-float out" style="--x:83;--y:45;--ox:55;--oy:64;--i:4;--mx:70;--my:58"><p class="b out tail">wanna grab lunch next break?</p></div>
+        <div class="imsg-float in"  style="--x:81;--y:76;--ox:46;--oy:88;--i:5;--mx:34;--my:86"><span class="imsg-float-from">Sophia · next day</span><p class="b in tail">sorry just saw this, are you guys still at lunch?</p></div>
       </div>
-      <p class="cs-caption"><b>Three timetables, three screenshots</b> — and the comparing is still done by hand. From our group chat, names changed.</p>
+      <p class="cs-caption"><b>Three timetables, three screenshots</b> — and the comparing is still done by hand. Reconstructed from our group chat, names changed.</p>
       <div class="cs-grid-2">
         <div class="cs-figure">
           <div class="ph ph--square"><span class="ph-tag">Visual 04 · Bar chart</span><span class="ph-desc">How students coordinate free time — Study 1 survey</span></div>

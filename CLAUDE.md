@@ -125,6 +125,7 @@ spring-surface version (fluid.js, MIT) sat between the two and was rejected on t
 | `public/vaccine2d.html` | Project page — Double Packaging (05) |
 | `public/to-shove2d.html` | Project page — morrow (the iOS app). See "morrow page" below. |
 | `public/unify2d1.html` | **Unlinked draft** of the Unify case-study rebuild (see below) |
+| `public/top_row_permanent_V3.html` | Nav bar — loaded as an iframe on every 2D page |
 
 ## Unify case-study draft (`public/unify2d1.html`, 2026-09-18)
 
@@ -177,13 +178,20 @@ runs up under the frame's island (per Lucas), with two per-screen edits: the **t
 **home** export's white card was extended to the very top with square corners (its rounded top
 and a stray blue line above it were painted over before export; the Desktop original is unedited).
 
-**Problem section = three real WhatsApp screenshots** (`public/images/unify/problem/chat-1-jamie`,
-`-2-sophia`, `-3-me.webp`, 780px wide), edited for anonymity: group renamed "lil g", Karla → Jamie,
-Konst → Anna (incl. one mention inside a message, and "Konsumopfer" → "admin"), yaz → Sophia. The
-third one's Käfer letter (it showed Lucas's home address) was replaced by his timetable. The
-per-person avatars beside incoming messages are still the real ones. Below 640px the
-`.chat-row` becomes a horizontal scroll-snap strip rather than three stacked full-height images.
-| `public/top_row_permanent_V3.html` | Nav bar — loaded as an iframe on every 2D page |
+**Problem section = the group chat rebuilt as iMessage** (`.imsg-stage`): one iPhone 17 frame with
+the chat drawn in HTML/CSS (group "HM Group", Jamie / Anna / Sophia / me, English, written by Claude
+from the real WhatsApp chats — it is a RECONSTRUCTION and the caption says so), three timetable
+images in it (`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`, cropped from the edited
+WhatsApp screenshots; `tt-me` came off the WhatsApp photo bubble and keeps a faint dark gradient in
+its bottom-right corner — replace it from the original timetable screenshot if that ever turns up).
+Six key messages float out of the phone to spots around it, grow past full size, hold and fold
+back in (`@keyframes imsg-pop`, 12s, a second apart). The stage is a SIZE container (floats in
+cqw/cqh), the phone an inline-size container (everything on the screen in cqi), so it all scales
+together. The tail is the two-pseudo curl trick with `isolation: isolate` + `z-index: -1`, and
+`--tail-bg` must equal whatever is behind the bubble (#fff in the phone, `--bg-surface` for floats);
+the in-phone avatars need `z-index: 1` or the tail's cut-out covers them. Below 640px the stage is
+3:4, the phone bigger, two floats hidden (`data-m="off"`), the rest at `--mx/--my`. The earlier
+WhatsApp-screenshot row and its `chat-*.webp` files are gone.
 
 ## to.morrow page (`public/to-shove2d.html`)
 
