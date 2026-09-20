@@ -185,7 +185,13 @@ the phone (54cqw vs 27cqw; 92cqw on a phone; each message capped at 35cqw / 70cq
 right. The conversation (Jamie / Anna / Sophia / me, English, written by Claude from the real
 WhatsApp chats and captioned as a reconstruction) plays in it: every 2.6s the script appends the
 next message at the bottom, the track glides up by its height (1.1s) while the new one pops in from
-its side. **Nothing is clipped or masked** (per Lucas: a message on screen is always whole): a
+its side. **The column hangs from the screen's TOP THIRD and grows downward** (per Lucas): it only
+moves when the new message does not fit — then the oldest is taken OUT OF THE FLOW (absolutely
+positioned where it stands), faded out there, and the column glides up by exactly the height that
+freed. So the top bubble always sits around a third down and a tall image leaving never opens a gap.
+Heights are measured with `flowHeight()`, not `scrollHeight`: a leaving message is still a child and
+would keep the column looking full. WAAPI keyframes use px, not `cqw` (a `cqw` length there is
+silently dropped). **Nothing is clipped or masked** (per Lucas: a message on screen is always whole): a
 message whose final spot would be above the column's top eases out as a whole during the glide and is
 then removed; the new one fades in whole at the bottom. The column sits between the phone's nav bar
 and input (desktop top 18% / bottom 14%, phone 25% / 17%). Messages are 30% larger than the first

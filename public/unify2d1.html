@@ -157,9 +157,9 @@
       will-change: cx, cy;
     }
 
-    /* Body extension is mobile-only — hidden here so desktop keeps the original
-       silhouette, viewBox, height and position untouched. */
-    .blob-ext { display: none; }
+    /* The elongated body is mobile-only — hidden here so desktop keeps the
+       original silhouette, viewBox, height and position untouched. */
+    .blob-long { display: none; }
 
     .hero-header {
       position: relative;
@@ -621,7 +621,7 @@
          taller than at phone widths — a constant offset can't track that, so it
          has to cover the tallest header. Clearance measures +29px at 390px down
          to +4px at 640px; at 84px it was +12px on phones but -13px at 640. */
-      /* Body elongated 40% — see the .blob-ext path in the SVG. The element's
+      /* Body elongated 40% — see the .blob-long path in the SVG. The element's
          height and therefore the shape's SCALE are unchanged; the extra length is
          drawn above the viewBox, so it would grow the blob UPWARD and the legs
          would not move. Pushing the element down by exactly the extension length
@@ -631,7 +631,8 @@
          0.3935 = 326.6 / 830 — the extension in viewBox units over the viewBox
          height — so multiplying by the element height converts it to pixels and
          tracks the blob at every width instead of being a fixed px nudge. */
-      .blob-ext { display: inline; }
+      .blob-body { display: none; }
+      .blob-long { display: inline; }
       .hero-blob {
         height: calc(clamp(420px, 92vw, 560px) - 100px);
         left: 66.667%;
@@ -1519,6 +1520,16 @@
       .vid-press.is-pressed { transition: none; transform: none; }
     }
 
+    /* Phone: keep the replay-on-tap, drop the swell. The swell scales the
+       video's PARENT, and on a phone the first move of a scroll starts as a
+       touch on the video — so it fired mid-gesture and fought the scroll.
+       This block has to sit here, after the rules it overrides: an
+       equal-specificity rule earlier in the file loses on source order. */
+    @media (max-width: 640px) {
+      .vid-press,
+      .vid-press.is-pressed { transition: none; transform: none; }
+    }
+
     /* ══ Case-study rebuild (unify2d1.html) ═══════════════════════════════
        Everything below is new for the draft page and only exists here.
        Plan: /unify-casestudy-plan.md. Every [ bracketed ] value and every
@@ -1742,9 +1753,17 @@
     .v1-carousel.is-folded > [data-slot="2"]  { --k: .12;  --sc: .84; }
     .v1-carousel.is-folded > [data-slot="-2"] { --k: -.12; --sc: .84; }
     @media (max-width: 640px) {
-      /* Two phones' worth of width: the middle one and its neighbours cut by
-         the screen edge; the outer pair sits off screen. */
-      .v1-carousel { aspect-ratio: 1.3125 / 1; --w: 35.2%; margin-inline: -20px; overflow: hidden; }
+      /* Phones are 30% larger than they were here, and the container's own
+         aspect ratio is divided by the same 1.3 so its height grows with them —
+         otherwise the taller phones would be cropped by the overflow: hidden.
+         The neighbours come in from .96 to .6 of a phone width, which overlaps
+         them with the middle phone by about a fifth of its width while keeping
+         their outer edges inside the screen. They keep z-index 2 against the
+         middle phone's 3, so the overlap reads as them sitting UNDER it.
+         The outer pair is still off screen at this width. */
+      .v1-carousel { aspect-ratio: 1.0096 / 1; --w: 45.8%; margin-inline: -20px; overflow: hidden; }
+      .v1-carousel > [data-slot="1"]  { --k: .6;  }
+      .v1-carousel > [data-slot="-1"] { --k: -.6; }
     }
 
     /* ── Problem: an empty iMessage group chat whose messages lift off the screen ──
@@ -1805,21 +1824,23 @@
     .imsg-input { flex: none; display: flex; align-items: center; gap: 2.4cqi; padding: 2cqi 4cqi 9cqi; }
     .imsg-plus {
       flex: none; width: 8cqi; height: 8cqi; border-radius: 50%; background: #E9E9EB;
-      display: flex; align-items: center; justify-content: center; font-size: 6cqi; color: #7C7C80; line-height: 1;
+      display: flex; align-items: center; justify-content: center; color: #7C7C80;
     }
+    .imsg-plus svg { width: 4.2cqi; height: 4.2cqi; display: block; }   /* drawn, not a "+" glyph: a glyph sits off-centre on its baseline */
     .imsg-field { flex: 1; border: .3cqi solid #D1D1D6; border-radius: 99px; padding: 1.6cqi 3.4cqi; font-size: 3.9cqi; color: #B6B6BB; }
 
     /* The lifted conversation: a column wider than the phone, centred on it, so
        incoming messages hang off its left edge and yours off its right, over the
-       screen and the frame. New messages come in at the bottom and the column
-       scrolls up. Nothing is clipped or masked: a message on screen is always
-       whole, and the script eases one out as a whole once it would reach the top. */
+       screen and the frame. The column hangs from the screen's top third and
+       grows downward; once a new message would not fit, the oldest eases out and
+       the column glides up by exactly its height. Nothing is clipped or masked:
+       a message on screen is always whole. */
     .imsg-lifted {
-      position: absolute; left: 50%; top: 18%; bottom: 14%; z-index: 3;   /* between the nav bar and the input */
+      position: absolute; left: 50%; top: 33%; bottom: 13%; z-index: 3;   /* first bubble at the screen's top third */
       width: 54cqw; transform: translateX(-50%);
     }
     .imsg-track {
-      position: absolute; left: 0; right: 0; bottom: 0;
+      position: absolute; left: 0; right: 0; top: 0;
       display: flex; flex-direction: column; gap: 1.45cqw;
       padding: 0 1.3cqw 1.8cqw;   /* room for the shadows */
       will-change: transform;
@@ -1855,7 +1876,7 @@
     @media (max-width: 640px) {
       .imsg-stage { aspect-ratio: 3 / 4; margin-inline: -20px; width: calc(100% + 40px); }
       .imsg-phone { width: 54cqw; }
-      .imsg-lifted { width: 92cqw; top: 25%; bottom: 17%; }
+      .imsg-lifted { width: 92cqw; top: 33%; bottom: 16%; }
       .imsg-track { gap: 2.9cqw; padding: 0 2.6cqw 3.4cqw; }
       .imsg-msg { max-width: 70cqw; gap: 1cqw; }
       .imsg-msg .b { font-size: 4cqw; }
@@ -1910,20 +1931,18 @@
          Blob exported from Figma; pupils track the cursor. -->
     <div class="hero-top">
       <svg id="unify-blob" class="hero-blob" viewBox="-10 -65 760 830" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741C25.2772 -86 -6.99887 -60 202.306 -60L429.004 -60C709.5 -55 694.991 -102 694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
-        <!-- Mobile-only body extension (hidden by default; see .blob-ext).
-           Draws ONLY the band inserted between the original top cap and a copy of
-           that cap translated up by 326.6 units (= 40% of the 816.5-unit body).
-           Its bottom boundary is the original top cap traced in reverse, so the
-           union with the body path above is seamless — nothing is scaled, so the
-           eyes and legs keep their exact size.
-           The two straight sides are exact, not approximations: the body path
-           leaves (25.2783, 265.741) with its control point at x=25.2772 and
-           arrives at (694.991, 171.552) from x=694.991, i.e. both junctions are
-           already vertical, so length can be inserted there with no kink.
+        <path class="blob-body" d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741C25.2772 -86 -6.99887 -60 202.306 -60L429.004 -60C709.5 -55 694.991 -102 694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
+        <!-- Mobile-only body, elongated 40%. This is the SAME path as the
+           body above with its two vertical sides lengthened by 326.6 units, not a
+           second shape stacked on it: two abutting paths of the same fill leave an
+           antialiasing hairline along the join, which showed on the phone as a line
+           across the blob that curved down at both ends — the top cap's own corners.
+           The sides can be lengthened exactly because both junctions are already
+           vertical: the body leaves (25.2783, 265.741) with its control point at
+           x=25.2772 and arrives at (694.991, 171.552) from x=694.991.
            Coordinates run above the viewBox top (-65) and render only because
            .hero-blob sets overflow: visible. -->
-      <path class="blob-ext" d="M25.2783 265.741L25.2783 -60.859C25.2772 -412.6 -6.99887 -386.6 202.306 -386.6L429.004 -386.6C709.5 -381.6 694.991 -428.6 694.991 -155.048L694.991 171.552C694.991 -102 709.5 -55 429.004 -60L202.306 -60C-6.99887 -60 25.2772 -86 25.2783 265.741Z" fill="#FF88C8"/>
+      <path class="blob-long" d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741L25.2783 -60.859C25.2772 -412.6 -6.99887 -386.6 202.306 -386.6L429.004 -386.6C709.5 -381.6 694.991 -428.6 694.991 -155.048L694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
       <circle cx="266.586" cy="324.744" r="168.5" fill="#fff"/>
         <circle cx="574.086" cy="324.744" r="168" fill="#fff"/>
         <circle id="unify-pupil-l" cx="223.086" cy="425.744" r="52.5" fill="#292925"/>
@@ -2018,7 +2037,7 @@
                 <span>9:12</span>
                 <span class="imsg-icons" aria-hidden="true">
                   <svg viewBox="0 0 18 12"><rect x="0" y="8.2" width="3.2" height="3.8" rx=".9"/><rect x="4.9" y="5.8" width="3.2" height="6.2" rx=".9"/><rect x="9.8" y="3.2" width="3.2" height="8.8" rx=".9"/><rect x="14.7" y="0" width="3.2" height="12" rx=".9"/></svg>
-                  <svg viewBox="0 0 16 12"><path d="M8 2.3c2.3 0 4.4.9 6 2.4l1.2-1.2A10.3 10.3 0 0 0 8 .6 10.3 10.3 0 0 0 .8 3.5L2 4.7a8.6 8.6 0 0 1 6-2.4Zm0 3.3c1.4 0 2.7.5 3.7 1.4l1.2-1.2A7 7 0 0 0 8 3.9a7 7 0 0 0-4.9 1.9l1.2 1.2c1-.9 2.3-1.4 3.7-1.4Zm0 3.2c.6 0 1.2.2 1.6.6L8 11.1 6.4 9.4c.4-.4 1-.6 1.6-.6Z"/></svg>
+                  <svg viewBox="-.5 -.5 17 13" stroke="currentColor" stroke-width=".7" stroke-linejoin="round"><path d="M.22 3.72A11 11 0 0 1 15.78 3.72L13.94 5.56A8.4 8.4 0 0 0 2.06 5.56Z"/><path d="M3.05 6.55A7 7 0 0 1 12.95 6.55L11.11 8.39A4.4 4.4 0 0 0 4.89 8.39Z"/><path d="M8 11.5L5.88 9.38A3 3 0 0 1 10.12 9.38Z"/></svg>
                   <svg viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".38"/><rect x="2.2" y="2.2" width="16.5" height="7.6" rx="2"/><path d="M25 4.1v3.8c.8-.3 1.3-1 1.3-1.9S25.8 4.4 25 4.1Z" fill-opacity=".4"/></svg>
                 </span>
               </div>
@@ -2030,7 +2049,7 @@
                 </div>
               </div>
               <div class="imsg-chat"><div class="imsg-day"><b>Today</b> 09:12</div></div>
-              <div class="imsg-input"><span class="imsg-plus">+</span><span class="imsg-field">iMessage</span></div>
+              <div class="imsg-input"><span class="imsg-plus"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="imsg-field">iMessage</span></div>
             </div>
           </div>
           <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
@@ -3294,10 +3313,12 @@
   <script>
     // ── Problem: the lifted group chat ────────────────────────────────────────
     // The conversation plays as a column lifted off the empty chat: every STEP a
-    // message is added at the bottom, pops in from its side, and the whole column
-    // glides up by its height. Any message that would end up above the column's
-    // top eases out as a whole while the column moves, and is then removed — a
-    // message is never shown half-cut or half-faded. Loops; runs only on screen.
+    // message is added at the bottom and pops in from its side. The column hangs
+    // from the top, so it only moves when the new message does not fit: then the
+    // oldest is taken out of the flow, faded out where it stands, and the column
+    // glides up by exactly the height that freed — so the top message always sits
+    // around the screen's top third and a tall image leaving never opens a gap.
+    // A message is never shown half-cut or half-faded. Loops; runs only on screen.
     (function () {
       var stage = document.querySelector('.imsg-stage');
       if (!stage) return;
@@ -3333,44 +3354,50 @@
                        '<p class="b ' + (m.out ? 'out' : 'in') + ' tail">' + m.text + '</p>';
         return el;
       }
+      function gap() { return parseFloat(getComputedStyle(track).rowGap) || 0; }
+      // Only the messages still IN THE FLOW count: one on its way out is taken
+      // out of the flow and would otherwise keep the column looking full.
+      function flowHeight() {
+        var kids = Array.prototype.slice.call(track.children).filter(function (c) { return !c.dataset.leaving; });
+        var last = kids[kids.length - 1];
+        return last ? last.offsetTop + last.offsetHeight : 0;
+      }
+      function dropOldest() {                         // out of the flow, fades where it stands
+        var c = track.firstElementChild;
+        if (!c) return 0;
+        var r = c.getBoundingClientRect(), t = track.getBoundingClientRect(), h = c.offsetHeight + gap();
+        c.dataset.leaving = '1';
+        c.style.position = 'absolute'; c.style.margin = '0';
+        c.style.top = (r.top - t.top) + 'px'; c.style.left = (r.left - t.left) + 'px'; c.style.width = r.width + 'px';
+        c.animate([{ opacity: 1, transform: 'translateY(0) scale(1)' },
+                   { opacity: 0, transform: 'translateY(-10px) scale(.96)' }],
+                  { duration: GLIDE * .7, easing: 'cubic-bezier(.4, 0, .6, 1)', fill: 'forwards' });
+        setTimeout(function () { c.remove(); }, GLIDE + 60);
+        return h;
+      }
       function add(animate) {
         var el = make(MSGS[k % MSGS.length]); k++;
         track.appendChild(el);
-        if (animate) {
-          var gap = parseFloat(getComputedStyle(track).rowGap) || 0;
-          var h = el.offsetHeight + gap, top = box.getBoundingClientRect().top;
-          Array.prototype.slice.call(track.children).forEach(function (c) {
-            if (c === el || c.dataset.leaving) return;
-            if (c.getBoundingClientRect().top < top) {   // (already laid out at its final spot) would cross the top: ease it out whole
-              c.dataset.leaving = '1';
-              c.animate([{ opacity: 1, transform: 'translateY(0) scale(1)' },
-                         { opacity: 0, transform: 'translateY(-1.2cqw) scale(.96)' }],
-                        { duration: GLIDE * .7, easing: 'cubic-bezier(.4, 0, .6, 1)', fill: 'forwards' });
-              setTimeout(function () { c.remove(); }, GLIDE + 50);
-            }
-          });
+        if (!animate) return;
+        var shift = 0;
+        for (var guard = 0; guard < 6 && flowHeight() > box.offsetHeight && track.children.length > 1; guard++) shift += dropOldest();
+        if (shift) {                                  // glide up by what the leaving message freed
           track.style.transition = 'none';
-          track.style.transform = 'translateY(' + h + 'px)';       // looks unchanged…
+          track.style.transform = 'translateY(' + shift + 'px)';
           void track.offsetWidth;
           track.style.transition = 'transform ' + GLIDE + 'ms cubic-bezier(.45, 0, .2, 1)';
-          track.style.transform = 'translateY(0)';                // …then glides up
-          el.animate([{ opacity: 0, transform: 'translateY(1.5cqw) scale(.86)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }],
-                     { duration: POP, delay: GLIDE * .45, easing: 'cubic-bezier(.34, 1.3, .5, 1)', fill: 'backwards' });
+          track.style.transform = 'translateY(0)';
         }
+        el.animate([{ opacity: 0, transform: 'translateY(12px) scale(.86)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }],
+                   { duration: POP, delay: shift ? GLIDE * .45 : 0, easing: 'cubic-bezier(.34, 1.3, .5, 1)', fill: 'backwards' });
       }
       function fill() {                             // start with the column already full
         track.innerHTML = ''; k = 0;
+        track.style.transition = 'none'; track.style.transform = 'translateY(0)';
         while (k < MSGS.length) {                     // as many as fit whole
           add(false);
-          if (track.offsetHeight > box.offsetHeight) { track.lastChild.remove(); k--; break; }
+          if (flowHeight() > box.offsetHeight) { track.lastChild.remove(); k--; break; }
         }
-        trim();
-      }
-      function trim() {                               // safety net: nothing ever sits above the top
-        var top = box.getBoundingClientRect().top;
-        Array.prototype.slice.call(track.children).forEach(function (c) {
-          if (!c.dataset.leaving && c.getBoundingClientRect().top < top - 1) c.remove();
-        });
       }
       function start() { if (!timer) timer = setInterval(function () { add(true); }, STEP); }
       function stop()  { clearInterval(timer); timer = null; }
