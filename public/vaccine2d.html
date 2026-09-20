@@ -996,6 +996,16 @@
       .vid-press,
       .vid-press.is-pressed { transition: none; transform: none; }
     }
+
+    /* Phone: keep the replay-on-tap, drop the swell. The swell scales the
+       video's PARENT, and on a phone the first move of a scroll starts as a
+       touch on the video — so it fired mid-gesture and fought the scroll.
+       This block has to sit here, after the rules it overrides: an
+       equal-specificity rule earlier in the file loses on source order. */
+    @media (max-width: 640px) {
+      .vid-press,
+      .vid-press.is-pressed { transition: none; transform: none; }
+    }
   </style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
   <link rel="stylesheet" href="/theme/mobile-menu.css" />

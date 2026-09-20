@@ -155,9 +155,9 @@
       will-change: cx, cy;
     }
 
-    /* Body extension is mobile-only — hidden here so desktop keeps the original
-       silhouette, viewBox, height and position untouched. */
-    .blob-ext { display: none; }
+    /* The elongated body is mobile-only — hidden here so desktop keeps the
+       original silhouette, viewBox, height and position untouched. */
+    .blob-long { display: none; }
 
     .hero-header {
       position: relative;
@@ -619,7 +619,7 @@
          taller than at phone widths — a constant offset can't track that, so it
          has to cover the tallest header. Clearance measures +29px at 390px down
          to +4px at 640px; at 84px it was +12px on phones but -13px at 640. */
-      /* Body elongated 40% — see the .blob-ext path in the SVG. The element's
+      /* Body elongated 40% — see the .blob-long path in the SVG. The element's
          height and therefore the shape's SCALE are unchanged; the extra length is
          drawn above the viewBox, so it would grow the blob UPWARD and the legs
          would not move. Pushing the element down by exactly the extension length
@@ -629,7 +629,8 @@
          0.3935 = 326.6 / 830 — the extension in viewBox units over the viewBox
          height — so multiplying by the element height converts it to pixels and
          tracks the blob at every width instead of being a fixed px nudge. */
-      .blob-ext { display: inline; }
+      .blob-body { display: none; }
+      .blob-long { display: inline; }
       .hero-blob {
         height: calc(clamp(420px, 92vw, 560px) - 100px);
         left: 66.667%;
@@ -1516,6 +1517,16 @@
       .vid-press,
       .vid-press.is-pressed { transition: none; transform: none; }
     }
+
+    /* Phone: keep the replay-on-tap, drop the swell. The swell scales the
+       video's PARENT, and on a phone the first move of a scroll starts as a
+       touch on the video — so it fired mid-gesture and fought the scroll.
+       This block has to sit here, after the rules it overrides: an
+       equal-specificity rule earlier in the file loses on source order. */
+    @media (max-width: 640px) {
+      .vid-press,
+      .vid-press.is-pressed { transition: none; transform: none; }
+    }
   </style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
@@ -1554,20 +1565,18 @@
          Blob exported from Figma; pupils track the cursor. -->
     <div class="hero-top">
       <svg id="unify-blob" class="hero-blob" viewBox="-10 -65 760 830" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741C25.2772 -86 -6.99887 -60 202.306 -60L429.004 -60C709.5 -55 694.991 -102 694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
-        <!-- Mobile-only body extension (hidden by default; see .blob-ext).
-           Draws ONLY the band inserted between the original top cap and a copy of
-           that cap translated up by 326.6 units (= 40% of the 816.5-unit body).
-           Its bottom boundary is the original top cap traced in reverse, so the
-           union with the body path above is seamless — nothing is scaled, so the
-           eyes and legs keep their exact size.
-           The two straight sides are exact, not approximations: the body path
-           leaves (25.2783, 265.741) with its control point at x=25.2772 and
-           arrives at (694.991, 171.552) from x=694.991, i.e. both junctions are
-           already vertical, so length can be inserted there with no kink.
+        <path class="blob-body" d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741C25.2772 -86 -6.99887 -60 202.306 -60L429.004 -60C709.5 -55 694.991 -102 694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
+        <!-- Mobile-only body, elongated 40%. This is the SAME path as the
+           body above with its two vertical sides lengthened by 326.6 units, not a
+           second shape stacked on it: two abutting paths of the same fill leave an
+           antialiasing hairline along the join, which showed on the phone as a line
+           across the blob that curved down at both ends — the top cap's own corners.
+           The sides can be lengthened exactly because both junctions are already
+           vertical: the body leaves (25.2783, 265.741) with its control point at
+           x=25.2772 and arrives at (694.991, 171.552) from x=694.991.
            Coordinates run above the viewBox top (-65) and render only because
            .hero-blob sets overflow: visible. -->
-      <path class="blob-ext" d="M25.2783 265.741L25.2783 -60.859C25.2772 -412.6 -6.99887 -386.6 202.306 -386.6L429.004 -386.6C709.5 -381.6 694.991 -428.6 694.991 -155.048L694.991 171.552C694.991 -102 709.5 -55 429.004 -60L202.306 -60C-6.99887 -60 25.2772 -86 25.2783 265.741Z" fill="#FF88C8"/>
+      <path class="blob-long" d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741L25.2783 -60.859C25.2772 -412.6 -6.99887 -386.6 202.306 -386.6L429.004 -386.6C709.5 -381.6 694.991 -428.6 694.991 -155.048L694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
       <circle cx="266.586" cy="324.744" r="168.5" fill="#fff"/>
         <circle cx="574.086" cy="324.744" r="168" fill="#fff"/>
         <circle id="unify-pupil-l" cx="223.086" cy="425.744" r="52.5" fill="#292925"/>
