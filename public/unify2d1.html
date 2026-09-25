@@ -3338,21 +3338,21 @@
       // Each image's own size goes on the <img>, so its box has its final height
       // the moment it is added. Without it the image is 0 tall until it loads:
       // the column glides by the wrong amount and jumps when it arrives.
-      var SIZE = { 'tt-jamie': [858, 396], 'tt-sophia': [858, 595], 'tt-me': [742, 270] };
+      var SIZE = { 'tt-jamie': [1800, 848], 'tt-sophia': [1800, 864], 'tt-me': [1800, 960] };
       Object.keys(SIZE).forEach(function (n) { new Image().src = IMG + n + '.webp'; });   // warm the cache
       var MSGS = [
         // side: Anna and Sophia answer from the left, Jamie from the right —
         // grey either way; only mine (out) is blue.
         { who: 'Anna',   text: "when's your next break??" },
         { who: 'Jamie',  right: true, img: 'tt-jamie',  text: 'idk, check mine' },
-        { who: 'Sophia', img: 'tt-sophia', text: 'mine. thursday is a mess' },
-        { out: true,     img: 'tt-me',     text: 'and mine. lunch next break?' },
+        { who: 'Sophia', img: 'tt-sophia', text: 'mine, technisches ID till 13:00 😑' },
+        { out: true,     img: 'tt-me',     text: 'and mine. mensa next break?' },
         { who: 'Anna',   text: "which break tho 😅 can't read all of these" },
-        { who: 'Jamie',  right: true, text: '12:15?' },
-        { who: 'Sophia', text: "I'm in class till 13:00" },
-        { out: true,     text: "jamie's back in a lecture by then" },
-        { who: 'Anna',   text: 'are you even going to class today?' },
-        { who: 'Sophia · next day', text: 'sorry just saw this, are you guys still at lunch?' }
+        { who: 'Jamie',  right: true, text: "12:15? i've got 45 min" },
+        { who: 'Sophia', text: "that's exactly when I'm still in class" },
+        { out: true,     text: "and jamie's back in prototyping at 13:00" },
+        { who: 'Anna',   text: 'so nobody 🙃 next week then' },
+        { who: 'Sophia · next day', text: 'sorry just saw this — are you guys still at the mensa?' }
       ];
       var STEP = 2600, GLIDE = 1100, POP = 560, FADE = 450;
       var TARGET = .70, HARD = .78;                   // share of the screen's height

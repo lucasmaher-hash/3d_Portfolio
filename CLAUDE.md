@@ -213,14 +213,20 @@ around the phone — all rejected):
 
 **Sides: Anna and Sophia answer from the left, Jamie from the RIGHT, Lucas from the right in
 blue** (`.imsg-msg.right` — same grey bubble as any incoming one, only the side, the name label
-and the tail flip; only `.out` is blue). A timetable image is always grouped with its sender's text in one message
-(`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`; `tt-me` keeps a faint dark gradient
-bottom-right from the WhatsApp photo bubble — replace it if the original screenshot turns up).
-The status bar shares the nav bar's grey (#F7F7F8) and has real signal / Wi-Fi / battery glyphs.
-**The `<img>`s carry their own width/height** (`SIZE` in the script): without them an image is 0 tall
-until it loads, so the column glided by the wrong amount and jumped, and on a cold first load the
-initial fill overshot the stage and covered the section heading. `trim()` also removes anything
-above the column's top after the fill, as a safety net.
+and the tail flip; only `.out` is blue). A timetable image is always grouped with its sender's text in one message.
+
+**The three timetables are DRAWN, not screenshots** (2026-09-25). They were crops of the edited
+WhatsApp shots, which were three views of the same real timetable, one of them with a dark
+gradient corner from its photo bubble. They are now built in
+`scratchpad/tt.html` → captured with CDP at 4x → `public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`
+(1800px wide, ~2x of their display size). **One style per person**, after Lucas's own app
+screenshots (`~/Downloads/nw1.jpg`, `nw2.jpg`): Jamie a dark list with slate rows, Sophia light
+cards in amber/blue, Lucas a grey grid with a time rail and pastel blocks. All three are a SINGLE
+DAY (Mon 28 Sept), which is what makes them readable at ~260px wide, and **their hours carry the
+story**: Jamie 09:45–12:15 + 13:00–16:15 (free 12:15–13:00), Sophia 10:00–13:00 (in class exactly
+then), Lucas free 11:45–13:30 — so two of the three overlap but never all three. If the copy or
+the times change, change both together. Re-render with `node render.mjs` in the scratchpad; the
+`SIZE` table in the page script carries each file's pixel size and must follow.
 Bubble tails are a mask in the bubble's own colour (the two-pseudo cut-out showed grey patches over
 the phone). The column refills only when the stage WIDTH changes — a phone's URL bar fires
 `resize` on every scroll, and refilling on that would restart the chat constantly (it also bit the
