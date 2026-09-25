@@ -186,10 +186,19 @@ right. The conversation (Jamie / Anna / Sophia / me, English, written by Claude 
 WhatsApp chats and captioned as a reconstruction) plays in it. **Rebuilt 2026-09-25 to Lucas's
 brief, after three earlier attempts** (top-anchored column, masked top edge, floating bubbles
 around the phone — all rejected):
-- **Bottom-anchored.** `.imsg-lifted` has `bottom: 13%` (19% below 640px — the phone is
-  proportionally taller in that stage) and NO top/height, so the newest message always lands on
-  the same line just above the input field and the stack grows upward. Measured at rest: the last
-  bubble's bottom sits at 88.5% of the screen's height at both widths.
+- **Centred on the screen** (2026-09-25, after a bottom-anchored round Lucas rejected as sitting
+  too low): `.imsg-lifted` is `top: 50%; transform: translate(-50%, -50%)` with NO height, so the
+  column grows half a new message upward and half downward and the stack's centre stays on the
+  phone's middle, while messages still arrive at its bottom edge. Measured: centre at exactly 50%
+  of the screen in every at-rest sample, at 1440 and 390.
+- **The glide distance is MEASURED, not derived.** `add()` notes where the last existing message
+  is, appends, drops whatever passed the cap, then reads it again — that difference is the jump the
+  glide undoes. A centred column moves by half the new message and by half of whatever left in the
+  same step, so computing it would be error-prone; measuring survives any combination.
+- **A leaving message is handed to the STAGE**, not left in the column: absolutely positioned at
+  the spot it occupies, then faded. Inside the column every later add/drop would shift its box
+  (both edges move when a centred column changes height), and a message on its way out should
+  stand still.
 - **~70% of the screen, soft cap.** `TARGET = .70` is what the opening fill reaches; the oldest
   only leaves past `HARD = .78` (Lucas: a soft cap, don't drop a message early). Both are shares
   of `.phone-shot-screen`'s measured height, so they follow the phone at any size.
@@ -199,14 +208,12 @@ around the phone — all rejected):
 - **A message is never half-anything at rest** (Lucas's main complaint): no mask, no clipping, no
   partial fades; it eases in whole (0.56s) and out whole (0.45s). Verified over 54 samples at 1440
   and 390: zero elements between 2% and 98% opacity in any at-rest frame.
-- **A leaving message is pinned by its BOTTOM** (`position: absolute; bottom: trackBottom -
-  itsBottom`), not its top: the stack hangs from its own bottom edge, so that is the distance the
-  layout keeps. Pinned by `top` it jumps down by its own height the moment it leaves the flow.
-  With bottom anchoring nothing else has to move when it goes, so there is no compensating glide.
 - `stackHeight()` measures first-child-top to last-child-bottom from the RECTS, so the glide's
   transform (which moves them all alike) cancels out and a leaving message does not count.
 
-A timetable image is always grouped with its sender's text in one message
+**Sides: Anna and Sophia answer from the left, Jamie from the RIGHT, Lucas from the right in
+blue** (`.imsg-msg.right` — same grey bubble as any incoming one, only the side, the name label
+and the tail flip; only `.out` is blue). A timetable image is always grouped with its sender's text in one message
 (`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`; `tt-me` keeps a faint dark gradient
 bottom-right from the WhatsApp photo bubble — replace it if the original screenshot turns up).
 The status bar shares the nav bar's grey (#F7F7F8) and has real signal / Wi-Fi / battery glyphs.
