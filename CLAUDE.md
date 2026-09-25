@@ -197,8 +197,10 @@ around the phone — all rejected):
   **It is big by LAYOUT, not by transform** (Lucas: "a bit low rez"): a `scale(3)` on a bubble
   blows its raster up threefold and reads soft, so the bubble's and the name's `font-size` are
   multiplied instead (padding and radius are in em and follow), `max-width` is lifted, and one
-  translate centres it. The move back is a FLIP: measure where it is, drop the big font, measure
-  again, animate from the one to the other — so the type is only ever scaled WHILE it moves, never
+  translate centres it. The move back is a FLIP with the SECOND message already in place (added
+  invisible first), so the opener shrinks and rides up in one move — making the room it is about
+  to hand over — instead of shrinking in the middle and moving up a beat later: measure where it
+  is, drop the big font, add message two, measure again, animate from the one to the other — so the type is only ever scaled WHILE it moves, never
   while it is read. Measure the BUBBLE, not the message box: the box is a flex item and stretches
   to the whole column, so its centre is already the screen's and the move would come out as zero. The factor is
   `min(3, stageWidth*.92 / bubbleWidth)` — on a phone the bubble is already most of the width, so

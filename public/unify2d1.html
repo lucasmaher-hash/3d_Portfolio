@@ -2023,8 +2023,10 @@
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-role">Role</div>
-          <!-- New role line (plan §5). No data-i18n yet, or the old value would overwrite it. -->
-          <div class="meta-inset">Lucas Maher — concept, UX, v1 visual design, Figma and coded prototype<br>Sophie Meyer, Moritz Ackermann — character design, user feedback sessions</div>
+          <!-- New role line (plan §5). No data-i18n yet, or the old value would overwrite it.
+               Lucas's OWN role only — the Team tile beside it says who else was on it, and
+               the character-design credit sits in "What replaced it", next to the work. -->
+          <div class="meta-inset">Concept<br>UX<br>v1 visual design<br>Figma &amp; coded prototype</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-skills">Skills</div>
@@ -3447,13 +3449,20 @@
         el.animate([{ opacity: 0, transform: hold + ' scale(.92)' }, { opacity: 1, transform: hold + ' scale(1)' }],
                    { duration: IN, easing: 'cubic-bezier(.2, .9, .3, 1)', fill: 'backwards' });
 
-        // Then it travels to its own place. Measure where it is, drop back to
-        // the resting layout, and animate from the one to the other (a FLIP) —
-        // the type is only scaled while it is moving, never while it is read.
+        // Then it travels to its own place. The next message is put in first,
+        // still invisible, so the opener shrinks and rides up in ONE move —
+        // making the room it is about to hand over — instead of shrinking in
+        // the middle and moving up again a beat later. Measure where it is,
+        // drop back to the resting layout, measure again, animate between the
+        // two (a FLIP): the type is only scaled while it moves, never while
+        // it is read.
         introTimer = setTimeout(function () {
           var from = bubble.getBoundingClientRect();
           el.style.transform = ''; el.style.maxWidth = '';
           bubble.style.fontSize = ''; if (name) name.style.fontSize = '';
+          var next = make(MSGS[1 % MSGS.length]); k = 2;
+          next.style.opacity = '0';
+          track.appendChild(next);
           var to = bubble.getBoundingClientRect(), box = el.getBoundingClientRect();
           el.style.transformOrigin = (to.left + to.width / 2 - box.left) + 'px ' + (to.top + to.height / 2 - box.top) + 'px';
           el.animate([{ transform: 'translate(' + ((from.left + from.width / 2) - (to.left + to.width / 2)) + 'px, ' +
@@ -3461,6 +3470,10 @@
                                                  (from.width / Math.max(to.width, 1)) + ')' },
                       { transform: 'none' }],
                      { duration: MOVE, easing: 'cubic-bezier(.5, 0, .2, 1)' });
+          next.style.opacity = '';                    // …and it arrives as the opener lands
+          next.animate([{ opacity: 0, transform: 'translateY(8px) scale(.92)' },
+                        { opacity: 1, transform: 'translateY(0) scale(1)' }],
+                       { duration: POP, delay: MOVE * .55, easing: 'cubic-bezier(.3, 1.2, .5, 1)', fill: 'backwards' });
         }, IN + HOLD);
       }
 
@@ -3518,7 +3531,7 @@
       function tick() {
         if (k === 0) {                                  // a fresh run
           intro();
-          timer = setTimeout(tick, INTRO + 400);
+          timer = setTimeout(tick, INTRO + STEP - 700);   // the opener already handed over to message two
           return;
         }
         if (k % MSGS.length === 0) {                    // the run is over
