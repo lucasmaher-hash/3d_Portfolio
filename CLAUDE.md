@@ -182,7 +182,7 @@ and a stray blue line above it were painted over before export; the Desktop orig
 Lucas's WhatsApp-mockup reference): one iPhone 17 frame showing an EMPTY "HM Group" thread (status
 bar, header, input — no messages on the screen), and over it `.imsg-lifted`, a column wider than
 the phone (54cqw vs 27cqw; 92cqw on a phone; each message capped at 35cqw / 70cqw so a wider column spreads them outward instead of widening them) so incoming bubbles hang off the phone's left edge and Lucas's off the
-right. The conversation (Jamie / Anna / Sophia / me, English, written by Claude from the real
+right. The conversation (Ben / Anna / Sophia / me, English, written by Claude from the real
 WhatsApp chats and captioned as a reconstruction) plays in it. **Rebuilt 2026-09-25 to Lucas's
 brief, after three earlier attempts** (top-anchored column, masked top edge, floating bubbles
 around the phone — all rejected):
@@ -191,6 +191,13 @@ around the phone — all rejected):
   column grows half a new message upward and half downward and the stack's centre stays on the
   phone's middle, while messages still arrive at its bottom edge. Measured: centre at exactly 50%
   of the screen in every at-rest sample, at 1440 and 390.
+- **The run ends with a WIPE.** Once every message has had its turn the whole stack fades out
+  together (520ms, 70ms apart), the column empties, and after a beat the chat starts again from
+  the first message and builds back up. `tick()` is a self-scheduling `setTimeout`, not an
+  interval, so the wipe can take its own time; `wipedAt` keeps it from wiping twice at one index.
+- **A leaving message fades on OPACITY ONLY, in a box fixed to its measured size.** Scaling it out
+  re-rasterises whatever it holds every frame, and a timetable is an 1800px bitmap — that was the
+  stutter each image made as it closed.
 - **The glide distance is MEASURED, not derived.** `add()` notes where the last existing message
   is, appends, drops whatever passed the cap, then reads it again — that difference is the jump the
   glide undoes. A centred column moves by half the new message and by half of whatever left in the
@@ -211,19 +218,19 @@ around the phone — all rejected):
 - `stackHeight()` measures first-child-top to last-child-bottom from the RECTS, so the glide's
   transform (which moves them all alike) cancels out and a leaving message does not count.
 
-**Sides: Anna and Sophia answer from the left, Jamie from the RIGHT, Lucas from the right in
+**Sides: Anna and Sophia answer from the left, Ben from the RIGHT, Lucas from the right in
 blue** (`.imsg-msg.right` — same grey bubble as any incoming one, only the side, the name label
 and the tail flip; only `.out` is blue). A timetable image is always grouped with its sender's text in one message.
 
 **The three timetables are DRAWN, not screenshots** (2026-09-25). They were crops of the edited
 WhatsApp shots, which were three views of the same real timetable, one of them with a dark
 gradient corner from its photo bubble. They are now built in
-`timetable-source.html` (repo root, not deployed — only `public/` is) → captured with CDP at 4x → `public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`
+`timetable-source.html` (repo root, not deployed — only `public/` is) → captured with CDP at 4x → `public/images/unify/problem/tt-ben|tt-sophia|tt-me.webp`
 (1800px wide, ~2x of their display size). **One style per person**, after Lucas's own app
-screenshots (`~/Downloads/nw1.jpg`, `nw2.jpg`): Jamie a dark list with slate rows, Sophia light
+screenshots (`~/Downloads/nw1.jpg`, `nw2.jpg`): Ben a dark list with slate rows, Sophia light
 cards in amber/blue, Lucas a grey grid with a time rail and pastel blocks. All three are a SINGLE
 DAY (Mon 28 Sept), which is what makes them readable at ~260px wide, and **their hours carry the
-story**: Jamie 09:45–12:15 + 13:00–16:15 (free 12:15–13:00), Sophia 10:00–13:00 (in class exactly
+story**: Ben 09:45–12:15 + 13:00–16:15 (free 12:15–13:00), Sophia 10:00–13:00 (in class exactly
 then), Lucas free 11:45–13:30 — so two of the three overlap but never all three. If the copy or
 the times change, change both together. Re-render by screenshotting each card from that file; the
 `SIZE` table in the page script carries each file's pixel size and must follow.
