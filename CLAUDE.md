@@ -266,6 +266,15 @@ headless screenshots: `captureBeyondViewport` fires a resize). Runs only while o
 `prefers-reduced-motion` it shows the first messages, still. Below 640px: 3:4 stage, 54cqw phone,
 86cqw column.
 
+**No privacy section** (dropped 2026-09-25, Lucas: "the users were my friends"). The plan's §2
+had one, and the invented willingness-to-share numbers were exactly the kind of claim a reader
+would ask for evidence of — a pilot of five friend groups cannot support it. Gone with it: the
+stacked precision chart, the `.stack` rule, the location line in the pivot copy, the
+guarded–trusted pair in the semantic differential (now generic–ours), and the "would not share
+their location" learning. The settings recording survives as one `.feature-row` at the end of
+Supporting features, with the room finder, per the plan's "shrink to one line". Sections
+renumbered: Results is 7, What we learned is 8.
+
 > ⚠ **EVERY FIGURE ON THE DRAFT PAGE IS INVENTED** (2026-09-25). Lucas asked for it filled in so he
 > could judge the finished layout, so the placeholders were replaced with plausible stand-ins —
 > 23 min, 41/26/17, 58 %, n=28, 14.2/11.5/4.1 s, 71 %, 1.4 → 3.1, SUS 71 → 83, the task table, the
