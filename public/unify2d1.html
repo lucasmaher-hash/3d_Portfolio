@@ -1898,6 +1898,98 @@
       .imsg-float-from { font-size: 3.1cqw; }
       .imsg-msg img { width: 52cqw; border-radius: 3.9cqw; }
     }
+
+    /* ── Charts, drawn in the page's own style ────────────────────────────────
+       Every chart is markup, not an image: VT323 labels, the neumorphic surface,
+       one colour (the accent) for the bar that carries the finding and grey for
+       the rest. The numbers are placeholders — a value lives in one place, the
+       `--v` on its row (0–100) with the label beside it — so filling a study in
+       is a number swap, never a rebuild. */
+    .chart { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .chart-row { display: grid; grid-template-columns: minmax(84px, 26%) 1fr auto; align-items: center; gap: 12px; }
+    .chart-key {
+      font-family: 'VT323', monospace; font-size: 16px; letter-spacing: .04em;
+      text-transform: uppercase; color: var(--text-primary); line-height: 1.15;
+    }
+    .chart-track { position: relative; height: 22px; border-radius: 999px; background: var(--bg-surface); box-shadow: var(--shadow-pressed); }
+    .chart-fill {
+      position: absolute; inset: 2px auto 2px 2px; width: calc((100% - 4px) * var(--v) / 100);
+      border-radius: 999px; background: var(--text-tertiary);
+    }
+    .chart-row.is-lead .chart-fill { background: var(--accent-orange); }
+    .chart-val {
+      font-family: 'VT323', monospace; font-size: 17px; color: var(--text-secondary);
+      min-width: 74px; text-align: right;
+    }
+    .chart-row.is-lead .chart-val { color: var(--accent-orange); }
+
+    /* Funnel: each step is a bar of its own width, centred, so the drop-off is
+       the shape itself rather than three numbers in a row. */
+    .funnel { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+    .funnel-step {
+      width: calc(var(--v) * 1%); min-width: 120px;
+      background: var(--bg-surface); box-shadow: var(--shadow-raised-sm);
+      border-radius: 14px; padding: 12px 16px;
+      display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    }
+    .funnel-step:last-child { box-shadow: var(--shadow-raised-sm), 0 0 0 2px var(--accent-orange); }
+    .funnel-step b { font-family: 'VT323', monospace; font-size: 20px; font-weight: 400; color: var(--text-primary); }
+    .funnel-step span { font-size: 12.5px; color: var(--text-secondary); }
+
+    /* Stacked bar: one row per precision level, filled to its share. */
+    .stack { display: flex; flex-direction: column; gap: 10px; }
+
+    /* Semantic differential: one line per word pair, a dot for each design. */
+    .diff { display: flex; flex-direction: column; gap: 16px; }
+    .diff-row { display: grid; grid-template-columns: minmax(70px, 18%) 1fr minmax(70px, 18%); align-items: center; gap: 12px; }
+    .diff-end { font-family: 'VT323', monospace; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary); }
+    .diff-end:last-child { text-align: right; }
+    .diff-line { position: relative; height: 12px; }
+    .diff-line::before { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 2px; background: var(--text-tertiary); border-radius: 2px; }
+    .diff-dot {
+      position: absolute; top: 0; width: 12px; height: 12px; border-radius: 50%;
+      left: calc(var(--v) * 1%); transform: translateX(-50%);
+      background: var(--text-secondary);
+    }
+    .diff-dot.is-final { background: var(--accent-orange); }
+    .chart-legend {
+      display: flex; gap: 18px; font-family: 'VT323', monospace; font-size: 16px;
+      letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary);
+    }
+    .chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--text-secondary); margin-right: 6px; }
+    .chart-legend i.is-final { background: var(--accent-orange); }
+
+    /* ── The overlap, step by step ────────────────────────────────────────────
+       A day from 08:00 to 18:00 on every row, so the rows can be read straight
+       down: three timetables, then what the app does with them. Blocks are
+       placed with two custom properties, --s and --e, in hours. */
+    .ovl { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+    .ovl-row { display: grid; grid-template-columns: minmax(96px, 22%) 1fr; align-items: center; gap: 12px; }
+    .ovl-key { font-family: 'VT323', monospace; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-primary); }
+    .ovl-key small { display: block; font-family: 'Roboto Flex', sans-serif; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--text-secondary); }
+    .ovl-day { position: relative; height: 26px; border-radius: 8px; background: var(--bg-surface); box-shadow: var(--shadow-pressed); }
+    .ovl-b {
+      position: absolute; top: 3px; bottom: 3px; border-radius: 6px;
+      left: calc((var(--s) - 8) / 10 * 100%); width: calc((var(--e) - var(--s)) / 10 * 100%);
+    }
+    .ovl-b.busy { background: var(--text-tertiary); }
+    .ovl-b.free { background: rgba(255, 92, 0, .28); }
+    .ovl-b.hit  { background: var(--accent-orange); }
+    .ovl-b.out  { background: var(--text-tertiary); opacity: .55; }
+    .ovl-scale { display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 14px; color: var(--text-secondary); }
+    /* three lanes inside one row, so the gaps of the three days can be read
+       apart instead of blending into one another */
+    .ovl-b.l1 { top: 3px; height: 6px; bottom: auto; }
+    .ovl-b.l2 { top: 10px; height: 6px; bottom: auto; }
+    .ovl-b.l3 { top: 17px; height: 6px; bottom: auto; }
+    .ovl-note { font-family: 'VT323', monospace; font-size: 16px; color: var(--text-secondary); }
+    @media (max-width: 640px) {
+      .chart-row { grid-template-columns: 1fr auto; }
+      .chart-row .chart-track { grid-column: 1 / -1; grid-row: 2; }
+      .ovl-row { grid-template-columns: 1fr; gap: 4px; }
+      .diff-row { grid-template-columns: 1fr; gap: 4px; }
+      .diff-end:last-child { text-align: left; }
+    }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
     }
@@ -2076,11 +2168,20 @@
       <p class="cs-caption"><b>Three timetables, three screenshots</b> — and the comparing is still done by hand. Reconstructed from our group chat, names changed.</p>
       <div class="cs-grid-2">
         <div class="cs-figure">
-          <div class="ph ph--square"><span class="ph-tag">Visual 04 · Bar chart</span><span class="ph-desc">How students coordinate free time — Study 1 survey</span></div>
+          <div class="chart" role="img" aria-label="How students coordinate free time — survey, numbers pending">
+            <div class="chart-row is-lead"><span class="chart-key">Screenshots<br>&amp; texting</span><span class="chart-track"><span class="chart-fill" style="--v: 58"></span></span><span class="chart-val">[ 00 % ]</span></div>
+            <div class="chart-row"><span class="chart-key">Ask in person</span><span class="chart-track"><span class="chart-fill" style="--v: 24"></span></span><span class="chart-val">[ 00 % ]</span></div>
+            <div class="chart-row"><span class="chart-key">From memory</span><span class="chart-track"><span class="chart-fill" style="--v: 12"></span></span><span class="chart-val">[ 00 % ]</span></div>
+            <div class="chart-row"><span class="chart-key">Don't&nbsp;coordinate</span><span class="chart-track"><span class="chart-fill" style="--v: 6"></span></span><span class="chart-val">[ 00 % ]</span></div>
+          </div>
           <p class="cs-caption"><b>[ 00 % ]</b> coordinate by texting or screenshots. <b>[ 00 % ]</b> have close friends in other subjects.</p>
         </div>
         <div class="cs-figure">
-          <div class="ph ph--square"><span class="ph-tag">Visual 05 · Funnel</span><span class="ph-desc">Attempts → agreed → actually met — Study 2 diary</span></div>
+          <div class="funnel" role="img" aria-label="Attempts, agreed, actually met — diary study, numbers pending">
+            <div class="funnel-step" style="--v: 100"><b>[ 00 ]</b><span>attempts to meet</span></div>
+            <div class="funnel-step" style="--v: 64"><b>[ 00 ]</b><span>agreed a time</span></div>
+            <div class="funnel-step" style="--v: 41"><b>[ 00 ]</b><span>actually met</span></div>
+          </div>
           <p class="cs-caption"><b>[ 00 ]</b> attempts, <b>[ 00 ]</b> agreed, <b>[ 00 ]</b> met.</p>
         </div>
       </div>
@@ -2110,8 +2211,8 @@
           <div class="phone-shot">
             <div class="phone-shot-screen">
               <video class="phone-shot-video" autoplay loop muted playsinline data-vid="homepage">
-                <source src="/videos/unify/homepage_screen.mov" type="video/quicktime" />
-                <source src="/videos/unify/homepage_screen.mov" type="video/mp4" />
+                <source src="/videos/unify/homepage_freenow.mov" type="video/quicktime" />
+                <source src="/videos/unify/homepage_freenow.mov" type="video/mp4" />
               </video>
             </div>
             <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
@@ -2123,8 +2224,27 @@
         </div>
       </div>
       <h3 class="cs-sub">How the overlap is found</h3>
-      <p class="guide-text">[ Short paragraph: each friend's free gaps are extracted, intersected, gaps shorter than 00 minutes are dropped, and walking time between buildings is subtracted. ]</p>
-      <div class="ph ph--chart"><span class="ph-tag">Visual 07 · Step diagram</span><span class="ph-desc">Timetables → free intervals → intersect → ≥ [ 00 ] min → minus walking time → free together</span></div>
+      <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than [ 00 ] minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
+      <div class="ovl" role="img" aria-label="Three timetables, their free gaps, the overlap, the minimum length and the walk, leaving one slot the three of them share.">
+        <div class="ovl-row"><span class="ovl-key"></span><span class="ovl-scale"><span>08</span><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span></span></div>
+        <div class="ovl-row"><span class="ovl-key">Ben<small>his day</small></span><span class="ovl-day">
+          <span class="ovl-b busy" style="--s: 9.75; --e: 12.25"></span><span class="ovl-b busy" style="--s: 13; --e: 16.25"></span></span></div>
+        <div class="ovl-row"><span class="ovl-key">Sophia<small>her day</small></span><span class="ovl-day">
+          <span class="ovl-b busy" style="--s: 10; --e: 13"></span><span class="ovl-b busy" style="--s: 14; --e: 15.5"></span></span></div>
+        <div class="ovl-row"><span class="ovl-key">Me<small>my day</small></span><span class="ovl-day">
+          <span class="ovl-b busy" style="--s: 8.25; --e: 11.75"></span><span class="ovl-b busy" style="--s: 13.5; --e: 17"></span></span></div>
+        <div class="ovl-row"><span class="ovl-key">Gaps<small>free, per person</small></span><span class="ovl-day">
+          <span class="ovl-b free l1" style="--s: 8; --e: 9.75"></span><span class="ovl-b free l1" style="--s: 12.25; --e: 13"></span><span class="ovl-b free l1" style="--s: 16.25; --e: 18"></span>
+          <span class="ovl-b free l2" style="--s: 8; --e: 10"></span><span class="ovl-b free l2" style="--s: 13; --e: 14"></span><span class="ovl-b free l2" style="--s: 15.5; --e: 18"></span>
+          <span class="ovl-b free l3" style="--s: 8; --e: 8.25"></span><span class="ovl-b free l3" style="--s: 11.75; --e: 13.5"></span><span class="ovl-b free l3" style="--s: 17; --e: 18"></span></span></div>
+        <div class="ovl-row"><span class="ovl-key">Overlap<small>free for all three</small></span><span class="ovl-day">
+          <span class="ovl-b hit" style="--s: 8; --e: 8.25"></span><span class="ovl-b hit" style="--s: 17; --e: 18"></span></span></div>
+        <div class="ovl-row"><span class="ovl-key">≥ [ 00 ] min<small>too short to use</small></span><span class="ovl-day">
+          <span class="ovl-b out" style="--s: 8; --e: 8.25"></span><span class="ovl-b hit" style="--s: 17; --e: 18"></span></span></div>
+        <div class="ovl-row"><span class="ovl-key">− the walk<small>between buildings</small></span><span class="ovl-day">
+          <span class="ovl-b hit" style="--s: 17.1; --e: 17.9"></span></span></div>
+      </div>
+      <p class="cs-caption">Three timetables, one slot left: <b>17:10–17:50</b>. Finding it by hand is what the group chat was for.</p>
       <div class="ph ph--chart"><span class="ph-tag">Visual 08 · Sketches</span><span class="ph-desc">Scanned sketches and early flows</span></div>
     </section>
 
@@ -2163,7 +2283,13 @@
         </div>
       </div>
       <p class="cs-caption">Same screens, same data. Only the visual language changed — [ and willingness to share location went from 00 % to 00 %. ]</p>
-      <div class="ph ph--chart"><span class="ph-tag">Visual 10 · Semantic differential</span><span class="ph-desc">cold–warm · tool–social · serious–playful · trustworthy — v1 vs final, Study 4</span></div>
+      <div class="diff" role="img" aria-label="How v1 and the final design were rated on four word pairs — numbers pending">
+        <div class="diff-row"><span class="diff-end">Cold</span><span class="diff-line"><span class="diff-dot" style="--v: 22"></span><span class="diff-dot is-final" style="--v: 78"></span></span><span class="diff-end">Warm</span></div>
+        <div class="diff-row"><span class="diff-end">A tool</span><span class="diff-line"><span class="diff-dot" style="--v: 18"></span><span class="diff-dot is-final" style="--v: 72"></span></span><span class="diff-end">Social</span></div>
+        <div class="diff-row"><span class="diff-end">Serious</span><span class="diff-line"><span class="diff-dot" style="--v: 30"></span><span class="diff-dot is-final" style="--v: 68"></span></span><span class="diff-end">Playful</span></div>
+        <div class="diff-row"><span class="diff-end">Guarded</span><span class="diff-line"><span class="diff-dot" style="--v: 34"></span><span class="diff-dot is-final" style="--v: 71"></span></span><span class="diff-end">Trusted</span></div>
+        <div class="chart-legend"><span><i></i>v1</span><span><i class="is-final"></i>Final</span><span>[ n = 00 ]</span></div>
+      </div>
 
       <h3 class="cs-sub">What replaced it</h3>
       <p class="guide-text">[ Colour, type and characters, told as the answer to "v1 felt cold". Character design by Sophie Meyer and Moritz Ackermann. ]</p>
@@ -2255,7 +2381,13 @@
       </div>
       <div class="dot-divider"></div>
       <p class="guide-text">[ Ordered by how much the pilot actually used them, not by the app's tab order. ]</p>
-      <div class="ph ph--chart"><span class="ph-tag">Visual 12 · Sorted bar chart</span><span class="ph-desc">Share of time per feature — Study 7 pilot</span></div>
+      <div class="chart" role="img" aria-label="Share of time per feature during the pilot — numbers pending">
+        <div class="chart-row is-lead"><span class="chart-key">Who's free now</span><span class="chart-track"><span class="chart-fill" style="--v: 71"></span></span><span class="chart-val">[ 00 % ]</span></div>
+        <div class="chart-row"><span class="chart-key">Timetable</span><span class="chart-track"><span class="chart-fill" style="--v: 18"></span></span><span class="chart-val">[ 00 % ]</span></div>
+        <div class="chart-row"><span class="chart-key">Socials</span><span class="chart-track"><span class="chart-fill" style="--v: 6"></span></span><span class="chart-val">[ 00 % ]</span></div>
+        <div class="chart-row"><span class="chart-key">Friends map</span><span class="chart-track"><span class="chart-fill" style="--v: 4"></span></span><span class="chart-val">[ 00 % ]</span></div>
+        <div class="chart-row"><span class="chart-key">Room finder</span><span class="chart-track"><span class="chart-fill" style="--v: 1"></span></span><span class="chart-val">[ 00 % ]</span></div>
+      </div>
       <p class="cs-caption"><b>[ 00 % ]</b> of pilot sessions started on "who's free now".</p>
     </section>
 
@@ -2313,7 +2445,11 @@
       <p class="guide-text">GPS is used only to detect that you are on campus. After that, Unify shows the room you are in — never an exact dot — and only to friends you have opted in, one by one. [ Evidence sentence from Study 8. ]</p>
       <div class="cs-grid-2">
         <div class="cs-figure">
-          <div class="ph ph--square"><span class="ph-tag">Visual 13 · Stacked bar</span><span class="ph-desc">Willingness to share by precision: GPS / building / room / nothing — Study 8</span></div>
+          <div class="chart stack" role="img" aria-label="Willingness to share location by precision — numbers pending">
+            <div class="chart-row"><span class="chart-key">Building</span><span class="chart-track"><span class="chart-fill" style="--v: 81"></span></span><span class="chart-val">[ 00 % ]</span></div>
+            <div class="chart-row is-lead"><span class="chart-key">Room</span><span class="chart-track"><span class="chart-fill" style="--v: 68"></span></span><span class="chart-val">[ 00 % ]</span></div>
+            <div class="chart-row"><span class="chart-key">Exact GPS</span><span class="chart-track"><span class="chart-fill" style="--v: 12"></span></span><span class="chart-val">[ 00 % ]</span></div>
+          </div>
           <p class="cs-caption"><b>[ 00 % ]</b> want to choose per friend.</p>
         </div>
         <div class="feature-media">

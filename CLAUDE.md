@@ -266,6 +266,25 @@ headless screenshots: `captureBeyondViewport` fires a resize). Runs only while o
 `prefers-reduced-motion` it shows the first messages, still. Below 640px: 3:4 stage, 54cqw phone,
 86cqw column.
 
+**Charts are MARKUP, not images** (2026-09-25, the first of the plan's visuals to be built):
+`.chart` (horizontal bars — Problem's "how students coordinate" and the pilot's share of time),
+`.funnel` (attempts → agreed → met), `.chart.stack` (willingness by precision) and `.diff` (the
+semantic differential, one dot per design per word pair). VT323 keys, pressed neumorphic troughs,
+**one orange row per chart — the one carrying the finding — and grey for the rest**. Every value
+lives in exactly one place, `--v` (0–100) on its row, with the label beside it as `[ 00 % ]`, so
+filling in a study is a number swap and never a rebuild.
+
+**The overlap diagram (`.ovl`) is the plan's Study 6**, and needs no study: seven rows on one
+08:00–18:00 scale — Ben, Sophia and Lucas's days, then their gaps in three lanes, the overlap, the
+minimum-length filter (the 15-minute sliver greys out) and the walk taken off both ends, leaving
+17:10–17:50. Blocks are placed by two custom properties in hours (`--s`, `--e`), so editing the
+timetables means editing numbers. **It has to agree with the drawn timetables** — same hours.
+
+**The hero loop** `public/videos/unify/homepage_freenow.mov` is the plan's 5–8s "who's free now"
+cut: 10.6s → 16.6s of `homepage_screen.mov` (231 KB against 1.6 MB), those two endpoints chosen by
+measurement — mean per-pixel difference 3.8 of 255 between the first and last frame, so the loop seam does
+not read. Same dimensions as the source, so the `data-vid="homepage"` placement rules still apply.
+
 ## to.morrow page (`public/to-shove2d.html`)
 
 **The project is called `to.morrow`, not `morrow` (2026-09-08).** Every user-visible name
