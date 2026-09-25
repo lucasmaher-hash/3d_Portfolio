@@ -285,7 +285,7 @@ renumbered: Results is 7, What we learned is 8.
 
 **The accent on the draft page is the app's pink, not the site orange** — `--accent-orange` is
 overridden to `#FF88C8` (the hero character) at the top of the case-study block, with
-`--accent-ink: #D24C92` for ALL pink TYPE — meta labels, the fact numbers, chart values, captions,
+`--accent-ink`, now the same #FF88C8 (a darker #D24C92 was tried and dropped — Lucas wants the light pink) for ALL pink TYPE — meta labels, the fact numbers, chart values, captions,
 the page map arrows — since #FF88C8 on the page grey is too pale to
 read small. The fact bar is bare numbers on the page: no card, no raised shadow (Lucas).
 

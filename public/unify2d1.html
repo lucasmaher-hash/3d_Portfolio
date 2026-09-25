@@ -1538,11 +1538,12 @@
     }
 
     /* The case study runs on the app's own pink (the hero character's #FF88C8)
-       rather than the site orange. Text-sized accents take a darker mix of the
-       same hue — #FF88C8 on the page grey is too pale to read at label size. */
+       rather than the site orange — type included. A darker mix was tried for
+       label-sized type and dropped: per Lucas it is the light pink everywhere.
+       --accent-ink stays as the one switch if that is ever revisited. */
     :root {
       --accent-orange: #FF88C8;
-      --accent-ink: #D24C92;
+      --accent-ink: #FF88C8;
     }
 
     /* ══ Case-study rebuild (unify2d1.html) ═══════════════════════════════
