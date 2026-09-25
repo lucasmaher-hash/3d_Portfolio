@@ -1,0 +1,90 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #888; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  .card { overflow: hidden; }
+
+  /* ── Jamie: dark list (his uni app in dark mode) ───────────────── */
+  #jamie { width: 900px; height: 424px; background: #111113; border-radius: 30px; padding: 0 0 0 0; }
+  #jamie .day { color: #fff; font-size: 40px; font-weight: 700; padding: 26px 0 20px 34px; letter-spacing: -.01em; }
+  #jamie .row { display: flex; align-items: center; gap: 26px; padding: 22px 34px; }
+  #jamie .row.a { background: #7A88A0; }
+  #jamie .row.b { background: #A3ADC0; }
+  #jamie .idx { color: rgba(255,255,255,.75); font-size: 28px; width: 20px; }
+  #jamie .time { color: #fff; font-size: 30px; line-height: 1.32; font-variant-numeric: tabular-nums; }
+  #jamie .meta { color: #fff; }
+  #jamie .meta b { display: block; font-size: 32px; font-weight: 700; letter-spacing: -.01em; }
+  #jamie .meta span { display: block; font-size: 27px; color: rgba(255,255,255,.88); margin-top: 3px; }
+  #jamie .foot { color: #fff; font-size: 30px; font-weight: 600; padding: 20px 0 0 34px; }
+
+  /* ── Sophia: light cards (her app in light mode) ───────────────── */
+  #sophia { width: 900px; height: 432px; background: #fff; border-radius: 30px; padding: 30px 32px; }
+  #sophia .top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 26px; }
+  #sophia .top b { font-size: 44px; font-weight: 800; letter-spacing: -.02em; }
+  #sophia .top span { font-size: 30px; color: #2F7BE8; }
+  #sophia .blk { display: flex; align-items: center; gap: 26px; border-radius: 22px; padding: 22px 28px; margin-bottom: 18px; color: #fff; }
+  #sophia .blk.amber { background: #E7B04A; }
+  #sophia .blk.blue  { background: #5C9BDB; }
+  #sophia .idx { font-size: 28px; color: rgba(255,255,255,.8); width: 18px; }
+  #sophia .time { font-size: 30px; line-height: 1.32; font-variant-numeric: tabular-nums; }
+  #sophia .meta b { display: block; font-size: 32px; font-weight: 700; letter-spacing: -.01em; }
+  #sophia .meta span { display: block; font-size: 27px; color: rgba(255,255,255,.92); margin-top: 3px; }
+
+  /* ── Lucas: grid with a time rail (a different app again) ──────── */
+  #me { width: 900px; height: 480px; background: #F4F4F7; border-radius: 30px; padding: 24px 26px; }
+  #me .top { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; }
+  #me .top b { font-size: 34px; font-weight: 700; letter-spacing: -.01em; color: #1B1B1F; }
+  #me .top span { font-size: 26px; color: #8A8A8E; }
+  #me .grid { position: relative; height: 356px; }
+  #me .hour { position: absolute; left: 0; right: 0; border-top: 2px solid #E1E1E6; }
+  #me .hour i { position: absolute; left: 0; top: -17px; font-style: normal; font-size: 23px; color: #9A9AA0; font-variant-numeric: tabular-nums; }
+  #me .ev { position: absolute; left: 94px; right: 8px; border-radius: 14px; padding: 12px 18px; color: #17303A; }
+  #me .ev.t { background: #BFE3DE; }
+  #me .ev.p { background: #D9CDF3; color: #2A2140; }
+  #me .ev b { display: block; font-size: 28px; font-weight: 700; letter-spacing: -.01em; }
+  #me .ev span { display: block; font-size: 23px; opacity: .75; margin-top: 2px; font-variant-numeric: tabular-nums; }
+</style>
+
+<div class="card" id="jamie">
+  <div class="day">Montag</div>
+  <div class="row a">
+    <div class="idx">1</div>
+    <div class="time">09:45<br>12:15</div>
+    <div class="meta"><b>Interface Design</b><span>1.019 · Edler Golla</span></div>
+  </div>
+  <div class="row b">
+    <div class="idx">2</div>
+    <div class="time">13:00<br>16:15</div>
+    <div class="meta"><b>Prototyping</b><span>1.034 · Jürgens</span></div>
+  </div>
+  <div class="foot">Mo. 28. Sept.</div>
+</div>
+
+<div class="card" id="sophia">
+  <div class="top"><b>Montag</b><span>28. September</span></div>
+  <div class="blk amber">
+    <div class="idx">1</div>
+    <div class="time">10:00<br>13:00</div>
+    <div class="meta"><b>Technisches ID</b><span>2.008 · Petri</span></div>
+  </div>
+  <div class="blk blue">
+    <div class="idx">2</div>
+    <div class="time">14:00<br>15:30</div>
+    <div class="meta"><b>Designtheorie</b><span>0.012 · Naumann</span></div>
+  </div>
+</div>
+
+<div class="card" id="me">
+  <div class="top"><b>Montag</b><span>28. Sept.</span></div>
+  <div class="grid">
+    <div class="hour" style="top:0"><i>08</i></div>
+    <div class="hour" style="top:59px"><i>10</i></div>
+    <div class="hour" style="top:118px"><i>12</i></div>
+    <div class="hour" style="top:177px"><i>14</i></div>
+    <div class="hour" style="top:236px"><i>16</i></div>
+    <div class="hour" style="top:295px"><i>18</i></div>
+    <div class="ev t" style="top:8px;height:100px"><b>Fertigungstechnik</b><span>08:15 – 11:45 · 1.102</span></div>
+    <div class="ev p" style="top:163px;height:126px"><b>Projektarbeit</b><span>13:30 – 17:00 · Werkstatt</span></div>
+  </div>
+</div>
