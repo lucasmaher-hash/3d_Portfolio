@@ -1663,7 +1663,13 @@
        export, where the frame's island covers them; a black band pushes them
        below it. Padding is in the image's box, so the scroll travel
        (calc(-100% + 100cqh)) still lands on the last row. */
-    .v1-window img.v1-clear-island { padding-top: 10%; background: #000; box-sizing: content-box; }
+    /* The band has to clear the FRAME's island, and that is 12.6% of the screen
+       box's width below its top edge (measured off iphone-17-frame.png's alpha:
+       the pill ends at y 130, the screen box starts at y 28, over a 808px box).
+       At 10% the card's top edge landed 0.6px under the island — touching, and
+       on a device it rounded the wrong way and the island cut into the white.
+       15% leaves ~2.4% of the width as real black between the two. */
+    .v1-window img.v1-clear-island { padding-top: 15%; background: #000; box-sizing: content-box; }
     /* Home and timetable scroll their whole length, but only while they are
        the phone in the middle of the carousel — the script plays it with the
        Web Animations API (see the carousel script). The travel is
@@ -2053,7 +2059,7 @@
               <div class="imsg-head">
                 <span class="imsg-back">‹</span>
                 <div class="imsg-group">
-                  <div class="imsg-avs"><span>J</span><span>A</span><span>S</span></div>
+                  <div class="imsg-avs"><span>B</span><span>A</span><span>S</span></div>
                   <span class="imsg-name">HM Group ›</span>
                 </div>
               </div>
@@ -3338,26 +3344,26 @@
       // Each image's own size goes on the <img>, so its box has its final height
       // the moment it is added. Without it the image is 0 tall until it loads:
       // the column glides by the wrong amount and jumps when it arrives.
-      var SIZE = { 'tt-jamie': [1800, 848], 'tt-sophia': [1800, 864], 'tt-me': [1800, 960] };
+      var SIZE = { 'tt-ben': [1800, 848], 'tt-sophia': [1800, 864], 'tt-me': [1800, 960] };
       Object.keys(SIZE).forEach(function (n) { new Image().src = IMG + n + '.webp'; });   // warm the cache
       var MSGS = [
-        // side: Anna and Sophia answer from the left, Jamie from the right —
+        // side: Anna and Sophia answer from the left, Ben from the right —
         // grey either way; only mine (out) is blue.
         { who: 'Anna',   text: "when's your next break??" },
-        { who: 'Jamie',  right: true, img: 'tt-jamie',  text: 'idk, check mine' },
-        { who: 'Sophia', img: 'tt-sophia', text: 'mine, technisches ID till 13:00 😑' },
+        { who: 'Ben',    right: true, img: 'tt-ben',    text: 'idk, check mine' },
+        { who: 'Sophia', img: 'tt-sophia', text: 'mine, materials till 13:00 😑' },
         { out: true,     img: 'tt-me',     text: 'and mine. mensa next break?' },
         { who: 'Anna',   text: "which break tho 😅 can't read all of these" },
-        { who: 'Jamie',  right: true, text: "12:15? i've got 45 min" },
+        { who: 'Ben',    right: true, text: "12:15? i've got 45 min" },
         { who: 'Sophia', text: "that's exactly when I'm still in class" },
-        { out: true,     text: "and jamie's back in prototyping at 13:00" },
+        { out: true,     text: "and ben's back in prototyping at 13:00" },
         { who: 'Anna',   text: 'so nobody 🙃 next week then' },
         { who: 'Sophia · next day', text: 'sorry just saw this — are you guys still at the mensa?' }
       ];
-      var STEP = 2600, GLIDE = 1100, POP = 560, FADE = 450;
+      var STEP = 2600, GLIDE = 1100, POP = 560, FADE = 450, WIPE = 520, PAUSE = 700;
       var TARGET = .70, HARD = .78;                   // share of the screen's height
       var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var k = 0, timer = null;
+      var k = 0, timer = null, wipedAt = -1;
 
       function make(m) {
         var el = document.createElement('div');
@@ -3393,9 +3399,13 @@
         c.style.position = 'absolute'; c.style.margin = '0';
         c.style.left = (r.left - st.left) + 'px';
         c.style.top = (r.top - st.top) + 'px';
-        c.style.width = r.width + 'px';
+        c.style.width = r.width + 'px'; c.style.height = r.height + 'px';   // fixed box: no reflow as it leaves
+        c.style.willChange = 'opacity';
         stage.appendChild(c);
-        c.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.95)' }],
+        // Opacity only. Scaling a message on the way out re-rasterises whatever
+        // is inside it every frame, and a timetable is a 1800px bitmap — that is
+        // the stutter each image used to make as it closed.
+        c.animate([{ opacity: 1 }, { opacity: 0 }],
                   { duration: FADE, easing: 'cubic-bezier(.4, 0, .7, 1)', fill: 'forwards' });
         setTimeout(function () { c.remove(); }, FADE + 60);
       }
@@ -3428,15 +3438,40 @@
 
       function fill() {                               // open with the stack already at ~70%
         Array.prototype.slice.call(stage.querySelectorAll('.imsg-msg[data-leaving]')).forEach(function (c) { c.remove(); });
-        track.innerHTML = ''; k = 0;
+        track.innerHTML = ''; k = 0; wipedAt = -1;
         track.style.transition = 'none'; track.style.transform = 'translateY(0)';
         while (k < MSGS.length) {
           add(false);
           if (stackHeight() > screenHeight() * TARGET) { track.lastChild.remove(); k--; break; }
         }
       }
-      function start() { if (!timer) timer = setInterval(function () { add(true); }, STEP); }
-      function stop()  { clearInterval(timer); timer = null; }
+      // The conversation runs once, clears itself, and starts over — the wipe
+      // is what makes the repeat read as a new run rather than a jump cut.
+      function wipe() {                               // returns how long it takes
+        var out = kids(), last = (out.length - 1) * 70;
+        out.forEach(function (c, i) {
+          c.dataset.leaving = '1'; c.style.willChange = 'opacity';
+          c.animate([{ opacity: 1 }, { opacity: 0 }],
+                    { duration: WIPE, delay: i * 70, easing: 'cubic-bezier(.4, 0, .7, 1)', fill: 'forwards' });
+        });
+        var total = WIPE + last + 60;
+        setTimeout(function () {
+          track.innerHTML = '';
+          track.style.transition = 'none'; track.style.transform = 'translateY(0)';
+        }, total);
+        return total;
+      }
+      function tick() {
+        if (k > 0 && k % MSGS.length === 0 && wipedAt !== k) {   // the run is over
+          wipedAt = k;
+          timer = setTimeout(tick, wipe() + PAUSE);
+          return;
+        }
+        add(true);
+        timer = setTimeout(tick, STEP);
+      }
+      function start() { if (!timer) timer = setTimeout(tick, STEP); }
+      function stop()  { clearTimeout(timer); timer = null; }
 
       fill();
       if (reduce) return;
