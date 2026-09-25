@@ -3364,7 +3364,7 @@
       var IN = 450, HOLD = 2000, MOVE = 750, INTRO = IN + HOLD + MOVE;   // the opening message
       var TARGET = .70, HARD = .78;                   // share of the screen's height
       var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var k = 0, timer = null, onScreen = false;
+      var k = 0, timer = null, introTimer = null, onScreen = false;
 
       function make(m) {
         var el = document.createElement('div');
@@ -3420,31 +3420,48 @@
       // phone. It holds there for two seconds and then travels to its own place
       // in the column — left, and small — and the rest of the chat follows it.
       function intro() {
-        var m0out = !!(MSGS[0].out || MSGS[0].right);
         var el = make(MSGS[0]); k = 1;
+        var out = !!(MSGS[0].out || MSGS[0].right);
         track.appendChild(el);
-        var er = el.getBoundingClientRect(), sc = screenEl.getBoundingClientRect(), st = stage.getBoundingClientRect();
-        // Measure the BUBBLE, not the message box: the box is a flex item and
-        // stretches to the whole column, so its centre is already the screen's
-        // and the move would come out as zero. Scaling about the bubble's own
-        // centre keeps the maths to one step.
-        var b = (el.querySelector('.b') || el).getBoundingClientRect();
-        el.style.transformOrigin = (b.left + b.width / 2 - er.left) + 'px ' + (b.top + b.height / 2 - er.top) + 'px';
+        var bubble = el.querySelector('.b'), name = el.querySelector('.imsg-float-from');
+        var rest = bubble.getBoundingClientRect();
+        var fs = parseFloat(getComputedStyle(bubble).fontSize);
+        var nfs = name ? parseFloat(getComputedStyle(name).fontSize) : 0;
+        var st = stage.getBoundingClientRect(), sc = screenEl.getBoundingClientRect();
         // 3x, unless that would run past the stage — on a phone the bubble is
         // already most of its width, so the factor comes down to what fits.
-        var f = Math.min(3, (st.width * .92) / Math.max(b.width, 1));
-        // The tail hangs .42em past the bubble on its own side, so the shape's
-        // optical centre is half that off the box's centre.
-        var tail = parseFloat(getComputedStyle(el.querySelector('.b')).fontSize) * .21 * (m0out ? -1 : 1);
-        var dx = (sc.left + sc.width / 2) - (b.left + b.width / 2) + tail * f;
-        var dy = (sc.top + sc.height / 2) - (b.top + b.height / 2);
-        var big = 'translate(' + dx + 'px, ' + dy + 'px) scale(' + f + ')';
-        el.animate([
-          { opacity: 0, transform: 'translate(' + dx + 'px, ' + dy + 'px) scale(' + f * .9 + ')', easing: 'cubic-bezier(.2, .9, .3, 1)' },
-          { opacity: 1, transform: big, offset: IN / INTRO, easing: 'linear' },
-          { opacity: 1, transform: big, offset: (IN + HOLD) / INTRO, easing: 'cubic-bezier(.5, 0, .2, 1)' },
-          { opacity: 1, transform: 'translate(0, 0) scale(1)' }
-        ], { duration: INTRO, fill: 'backwards' });
+        var f = Math.min(3, (st.width * .92) / Math.max(rest.width, 1));
+
+        // Big by LAYOUT, not by transform: a scaled-up bubble is a bitmap blown
+        // up 3x and reads soft. The type is set 3x instead, so it is drawn at
+        // the size it is seen at. Padding and radius are in em and follow it.
+        el.style.maxWidth = 'none';
+        bubble.style.fontSize = (fs * f) + 'px';
+        if (name) name.style.fontSize = (nfs * f) + 'px';
+        var big = bubble.getBoundingClientRect();
+        var tail = fs * f * .21 * (out ? -1 : 1);     // the tail hangs past the bubble on its own side
+        var dx = (sc.left + sc.width / 2) - (big.left + big.width / 2) + tail;
+        var dy = (sc.top + sc.height / 2) - (big.top + big.height / 2);
+        var hold = 'translate(' + dx + 'px, ' + dy + 'px)';
+        el.style.transform = hold;
+        el.animate([{ opacity: 0, transform: hold + ' scale(.92)' }, { opacity: 1, transform: hold + ' scale(1)' }],
+                   { duration: IN, easing: 'cubic-bezier(.2, .9, .3, 1)', fill: 'backwards' });
+
+        // Then it travels to its own place. Measure where it is, drop back to
+        // the resting layout, and animate from the one to the other (a FLIP) —
+        // the type is only scaled while it is moving, never while it is read.
+        introTimer = setTimeout(function () {
+          var from = bubble.getBoundingClientRect();
+          el.style.transform = ''; el.style.maxWidth = '';
+          bubble.style.fontSize = ''; if (name) name.style.fontSize = '';
+          var to = bubble.getBoundingClientRect(), box = el.getBoundingClientRect();
+          el.style.transformOrigin = (to.left + to.width / 2 - box.left) + 'px ' + (to.top + to.height / 2 - box.top) + 'px';
+          el.animate([{ transform: 'translate(' + ((from.left + from.width / 2) - (to.left + to.width / 2)) + 'px, ' +
+                                                 ((from.top + from.height / 2) - (to.top + to.height / 2)) + 'px) scale(' +
+                                                 (from.width / Math.max(to.width, 1)) + ')' },
+                      { transform: 'none' }],
+                     { duration: MOVE, easing: 'cubic-bezier(.5, 0, .2, 1)' });
+        }, IN + HOLD);
       }
 
       function add(animate) {
@@ -3521,7 +3538,7 @@
       // or coming back to the tab, plays the chat again rather than picking up
       // mid-run on a frame that froze while the tab was in the background.
       function start() { if (timer) return; clear(); timer = setTimeout(tick, 200); }
-      function stop()  { clearTimeout(timer); timer = null; clear(); }
+      function stop()  { clearTimeout(timer); clearTimeout(introTimer); timer = null; clear(); }
 
       if (reduce) { fill(); return; }
       new IntersectionObserver(function (e) {

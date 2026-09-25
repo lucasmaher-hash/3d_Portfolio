@@ -194,9 +194,13 @@ around the phone — all rejected):
 - **Every run OPENS on the first message alone** (2026-09-25): Lucas's own blue "when's your next
   break??", 3x size, centred on the phone's screen, held 2s, then it travels to its own place in
   the column (right, small) and the rest follow below it. One WAAPI keyframe list does in–hold–move.
-  Two traps: measure the BUBBLE, not the message box (the box is a flex item and stretches to the
-  whole column, so its centre is already the screen's and the move comes out as zero), and scale
-  about the bubble's centre by setting `transform-origin` to it. The factor is
+  **It is big by LAYOUT, not by transform** (Lucas: "a bit low rez"): a `scale(3)` on a bubble
+  blows its raster up threefold and reads soft, so the bubble's and the name's `font-size` are
+  multiplied instead (padding and radius are in em and follow), `max-width` is lifted, and one
+  translate centres it. The move back is a FLIP: measure where it is, drop the big font, measure
+  again, animate from the one to the other — so the type is only ever scaled WHILE it moves, never
+  while it is read. Measure the BUBBLE, not the message box: the box is a flex item and stretches
+  to the whole column, so its centre is already the screen's and the move would come out as zero. The factor is
   `min(3, stageWidth*.92 / bubbleWidth)` — on a phone the bubble is already most of the width, so
   it lands near 1.9x. A tail hangs .42em past the bubble, so half of that is added back to centre
   the shape optically. Measured: bubble centre exactly on the screen centre at 1440 and 390.
