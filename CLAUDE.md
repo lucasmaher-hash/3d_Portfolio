@@ -183,7 +183,8 @@ Lucas's WhatsApp-mockup reference): one iPhone 17 frame showing an EMPTY "HM Gro
 bar, header, input — no messages on the screen), and over it `.imsg-lifted`, a column wider than
 the phone (54cqw vs 27cqw; 92cqw on a phone; each message capped at 35cqw / 70cqw so a wider column spreads them outward instead of widening them) so incoming bubbles hang off the phone's left edge and Lucas's off the
 right. The conversation (Ben / Anna / Sophia / me, English, written by Claude from the real
-WhatsApp chats and captioned as a reconstruction) plays in it. **Rebuilt 2026-09-25 to Lucas's
+WhatsApp chats — the caption no longer says so (Lucas removed it 2026-09-25), so nothing on the page
+marks the chat as a recreation) plays in it. **Rebuilt 2026-09-25 to Lucas's
 brief, after three earlier attempts** (top-anchored column, masked top edge, floating bubbles
 around the phone — all rejected):
 - **Centred on the screen** (2026-09-25, after a bottom-anchored round Lucas rejected as sitting
