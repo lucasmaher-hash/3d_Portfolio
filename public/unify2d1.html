@@ -3349,18 +3349,20 @@
       var SIZE = { 'tt-ben': [1800, 848], 'tt-sophia': [1800, 864], 'tt-me': [1800, 960] };
       Object.keys(SIZE).forEach(function (n) { new Image().src = IMG + n + '.webp'; });   // warm the cache
       var MSGS = [
-        // side: Anna and Sophia answer from the left, Ben from the right —
-        // grey either way; only mine (out) is blue.
+        // Sides alternate all the way down: me and Sophia on the right, Ben and
+        // Anna on the left — so the column zig-zags instead of stacking up on
+        // one side. Only mine (out) is blue; Sophia's right-hand bubbles are
+        // the same grey as everyone else's.
         { out: true,     text: "when's your next break??" },
-        { who: 'Ben',    right: true, img: 'tt-ben',    text: 'idk, check mine' },
-        { who: 'Sophia', img: 'tt-sophia', text: 'mine, materials till 13:00 😑' },
-        { out: true,     img: 'tt-me',     text: 'and mine. mensa?' },
+        { who: 'Ben',    img: 'tt-ben',    text: 'idk, check mine' },
+        { who: 'Sophia', right: true, img: 'tt-sophia', text: 'mine, materials till 13:00 😑' },
         { who: 'Anna',   text: "which break tho 😅 can't read all of these" },
-        { who: 'Ben',    right: true, text: "12:15? i've got 45 min" },
-        { who: 'Sophia', text: "that's exactly when I'm still in class" },
-        { out: true,     text: "and ben's back in prototyping at 13:00" },
-        { who: 'Anna',   text: 'so nobody 🙃 next week then' },
-        { who: 'Sophia · next day', text: 'sorry just saw this — are you guys still at the mensa?' }
+        { out: true,     img: 'tt-me',     text: 'mine too. mensa?' },
+        { who: 'Ben',    text: "12:15? i've got 45 min" },
+        { who: 'Sophia', right: true, text: "that's exactly when I'm still in class" },
+        { who: 'Anna',   text: "and ben's back in prototyping at 13:00" },
+        { out: true,     text: 'so nobody 🙃 next week then' },
+        { who: 'Ben · next day', text: 'sorry just saw this — are you guys still at the mensa?' }
       ];
       var STEP = 2600, GLIDE = 1100, POP = 560, FADE = 450, WIPE = 520, PAUSE = 700;
       var IN = 450, HOLD = 2000, MOVE = 750, INTRO = IN + HOLD + MOVE;   // the opening message

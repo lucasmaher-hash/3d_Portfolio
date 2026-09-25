@@ -241,8 +241,10 @@ around the phone — all rejected):
 - `stackHeight()` measures first-child-top to last-child-bottom from the RECTS, so the glide's
   transform (which moves them all alike) cancels out and a leaving message does not count.
 
-**Sides: Anna and Sophia answer from the left, Ben from the RIGHT, Lucas from the right in
-blue** (`.imsg-msg.right` — same grey bubble as any incoming one, only the side, the name label
+**Sides ALTERNATE down the column** (`.imsg-msg.right`): Lucas and Sophia on the right, Ben and
+Anna on the left, so it zig-zags instead of stacking on one side — the message after the blue
+opener comes from the left. Only `.out` (Lucas) is blue; Sophia's right-hand bubbles are the same
+grey as everyone else's, with the side, the name label and the tail flipped.** (`.imsg-msg.right` — same grey bubble as any incoming one, only the side, the name label
 and the tail flip; only `.out` is blue). A timetable image is always grouped with its sender's text in one message.
 
 **The three timetables are DRAWN, not screenshots** (2026-09-25). They were crops of the edited
