@@ -7,7 +7,14 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
   <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Unlinked draft of the Unify case study. Nothing on the site links here; keep it out of search too. -->
+  <!-- Unlinked draft of the Unify case study. Nothing on the site links here; keep it out of search too.
+       ⚠ EVERY NUMBER ON THIS PAGE IS INVENTED. They were written 2026-09-25 so Lucas could see the
+       finished layout, and they must ALL be replaced with real results before this goes live:
+       23 min diary average · 41/26/17 funnel · 58/24/12/6 % coordination · 64 % other subjects ·
+       n=120 survey, n=12 diary, n=28 preference test, n=20 pilot, n=12 usability ·
+       2.1 → 5.8 warmth, 34 → 71 % location · 14.2/11.5/4.1 s and 30/45/5 % variants ·
+       71/18/6/4/1 % feature use · 1.4 → 3.1 meetups · 81/68/12 % precision, 90 % per friend ·
+       task table 92/83/75/92/42 → 100/92/92/92/92 · SUS 71 → 83 · "7 of 12 diary participants". -->
   <meta name="robots" content="noindex, nofollow" />
   <title>lucasmaher.com</title>
   <script src="/analytics.js"></script>
@@ -1530,6 +1537,14 @@
       .vid-press.is-pressed { transition: none; transform: none; }
     }
 
+    /* The case study runs on the app's own pink (the hero character's #FF88C8)
+       rather than the site orange. Text-sized accents take a darker mix of the
+       same hue — #FF88C8 on the page grey is too pale to read at label size. */
+    :root {
+      --accent-orange: #FF88C8;
+      --accent-ink: #D24C92;
+    }
+
     /* ══ Case-study rebuild (unify2d1.html) ═══════════════════════════════
        Everything below is new for the draft page and only exists here.
        Plan: /unify-casestudy-plan.md. Every [ bracketed ] value and every
@@ -1564,8 +1579,8 @@
       text-transform: uppercase; color: var(--text-secondary);
     }
     .cs-map a { color: var(--text-primary); text-decoration: none; }
-    .cs-map a:hover { color: var(--accent-orange); }
-    .cs-map span[aria-hidden] { color: var(--accent-orange); }
+    .cs-map a:hover { color: var(--accent-ink); }
+    .cs-map span[aria-hidden] { color: var(--accent-ink); }
 
     /* Fact bar: three big numbers under the hero. */
     .fact-bar {
@@ -1573,18 +1588,12 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: clamp(14px, 2.4vw, 28px);
     }
-    .fact {
-      background: var(--bg-surface);
-      border-radius: 20px;
-      box-shadow: var(--shadow-raised-sm);
-      padding: clamp(18px, 2.4vw, 28px);
-      display: flex; flex-direction: column; gap: 8px;
-    }
+    .fact { display: flex; flex-direction: column; gap: 8px; }   /* no card: the numbers sit on the page */
     .fact-num {
       font-family: 'OCR-A-BT', monospace;
       font-size: clamp(28px, 3.4vw, 44px);
       line-height: 1; letter-spacing: -0.04em;
-      color: var(--accent-orange);
+      color: var(--accent-ink);
     }
     .fact-label { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
     .fact-src {
@@ -1607,7 +1616,7 @@
     .ph--phone  { aspect-ratio: 876 / 1808; border-radius: 28px; }
     .ph-tag {
       font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 0.06em;
-      text-transform: uppercase; color: var(--accent-orange);
+      text-transform: uppercase; color: var(--accent-ink);
     }
     .ph-desc { font-size: 13px; line-height: 1.5; color: var(--text-secondary); max-width: 40ch; }
 
@@ -1693,7 +1702,7 @@
       font-family: 'VT323', monospace; font-size: 20px; letter-spacing: 0.04em;
       text-transform: uppercase; color: var(--text-primary);
     }
-    .variant.is-winner .variant-name { color: var(--accent-orange); }
+    .variant.is-winner .variant-name { color: var(--accent-ink); }
     .variant.is-winner .ph { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
     .variant-metrics {
       display: flex; gap: 16px;
@@ -1711,7 +1720,7 @@
     .cs-table td { padding: 10px 12px 10px 0; border-bottom: 1px dotted var(--border-color); }
     .cs-table td.num, .cs-table th.num { text-align: right; font-family: 'VT323', monospace; font-size: 18px; }
     .cs-table tr.is-highlight td { color: var(--text-primary); }
-    .cs-table tr.is-highlight td.num:last-child { color: var(--accent-orange); }
+    .cs-table tr.is-highlight td.num:last-child { color: var(--accent-ink); }
 
     .sus {
       display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
@@ -1921,7 +1930,7 @@
       font-family: 'VT323', monospace; font-size: 17px; color: var(--text-secondary);
       min-width: 74px; text-align: right;
     }
-    .chart-row.is-lead .chart-val { color: var(--accent-orange); }
+    .chart-row.is-lead .chart-val { color: var(--accent-ink); }
 
     /* Funnel: each step is a bar of its own width, centred, so the drop-off is
        the shape itself rather than three numbers in a row. */
@@ -1990,6 +1999,53 @@
       .diff-row { grid-template-columns: 1fr; gap: 4px; }
       .diff-end:last-child { text-align: left; }
     }
+
+    /* ── The 2x2 model ────────────────────────────────────────────────────── */
+    .quad {
+      display: grid; grid-template-columns: 22px 1fr; grid-template-rows: 1fr 22px;
+      gap: 10px; width: min(640px, 100%); align-items: center;
+    }
+    .quad-axis {
+      font-family: 'VT323', monospace; font-size: 16px; letter-spacing: .04em;
+      text-transform: uppercase; color: var(--text-secondary); text-align: center;
+    }
+    .quad-axis--y { writing-mode: vertical-rl; transform: rotate(180deg); grid-row: 1; grid-column: 1; }
+    .quad-axis--x { grid-row: 2; grid-column: 2; }
+    .quad-grid { grid-row: 1; grid-column: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .quad-cell {
+      background: var(--bg-surface); border-radius: 18px; box-shadow: var(--shadow-pressed);
+      padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; min-height: 120px;
+    }
+    .quad-cell b { font-family: 'VT323', monospace; font-size: 19px; font-weight: 400; letter-spacing: .03em; text-transform: uppercase; color: var(--text-primary); }
+    .quad-cell span { font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); }
+    .quad-cell i { color: var(--accent-ink); font-style: normal; }
+    .quad-cell.is-lead { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
+
+    /* ── The three timetable variants, drawn ──────────────────────────────── */
+    .tv {
+      aspect-ratio: 876 / 1808; width: 100%;
+      background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-pressed);
+      padding: 12px; overflow: hidden;
+    }
+    .tv.is-winner { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
+    .tv-cols { display: flex; gap: 6px; height: 100%; }
+    .tv-col { position: relative; flex: 1; background: rgba(0, 0, 0, .04); border-radius: 8px; }
+    .tv-col i, .tv-stack i {
+      position: absolute; left: 6%; right: 6%; border-radius: 6px;
+      top: calc(var(--s) * 1%); height: calc((var(--e) - var(--s)) * 1%);
+      background: var(--text-tertiary);
+    }
+    .tv-stack { position: relative; height: 100%; background: rgba(0, 0, 0, .04); border-radius: 8px; }
+    .tv-stack i { left: 8%; right: 8%; background: rgba(120, 120, 140, .38); }
+    .tv-lane { position: relative; height: 100%; background: rgba(0, 0, 0, .04); border-radius: 8px; }
+    .tv-slot {
+      position: absolute; left: 6%; right: 6%; border-radius: 8px;
+      top: calc(var(--s) * 1%); height: calc((var(--e) - var(--s)) * 1%);
+      background: var(--accent-orange); color: #fff;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
+      font-family: 'VT323', monospace; font-size: 13px;
+    }
+    .tv-slot em { font-style: normal; letter-spacing: -1px; opacity: .85; }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
     }
@@ -2085,19 +2141,19 @@
       </nav>
       <div class="fact-bar">
         <div class="fact">
-          <span class="fact-num">[ 00 min ]</span>
+          <span class="fact-num">23 min</span>
           <span class="fact-label">spent texting to arrange one meetup between classes</span>
-          <span class="fact-src">Diary study · n=[ 00 ]</span>
+          <span class="fact-src">Diary study · n=12</span>
         </div>
         <div class="fact">
-          <span class="fact-num">[ 0.0× ]</span>
+          <span class="fact-num">2.2×</span>
           <span class="fact-label">more meetups per person per week during the pilot</span>
-          <span class="fact-src">Pilot · n=[ 00 ]</span>
+          <span class="fact-src">Pilot · n=20</span>
         </div>
         <div class="fact">
-          <span class="fact-num">[ 00 ]</span>
+          <span class="fact-num">83</span>
           <span class="fact-label">SUS score after one round of iteration</span>
-          <span class="fact-src">Usability test · n=[ 00 ]</span>
+          <span class="fact-src">Usability test · n=12</span>
         </div>
       </div>
     </div>
@@ -2134,7 +2190,7 @@
         <span class="step-badge">1</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">My friends and I study different subjects. We share a campus but rarely a course, so every week the three of us swapped screenshots of our timetables to work out when we could meet. [ Arranging a 30-minute coffee took 00 minutes of texting. ]</p>
+      <p class="guide-text">My friends and I study different subjects. We share a campus but rarely a course, so every week the three of us swapped screenshots of our timetables to work out when we could meet. In a week-long diary study, arranging a 30-minute coffee took an average of 23 minutes of texting — and a third of the attempts never happened at all.</p>
       <!-- The evidence: an empty iMessage group chat whose messages lift off the
            screen one by one (script at the end of the page). Reconstructed from the
            real chats, names changed. -->
@@ -2169,20 +2225,20 @@
       <div class="cs-grid-2">
         <div class="cs-figure">
           <div class="chart" role="img" aria-label="How students coordinate free time — survey, numbers pending">
-            <div class="chart-row is-lead"><span class="chart-key">Screenshots<br>&amp; texting</span><span class="chart-track"><span class="chart-fill" style="--v: 58"></span></span><span class="chart-val">[ 00 % ]</span></div>
-            <div class="chart-row"><span class="chart-key">Ask in person</span><span class="chart-track"><span class="chart-fill" style="--v: 24"></span></span><span class="chart-val">[ 00 % ]</span></div>
-            <div class="chart-row"><span class="chart-key">From memory</span><span class="chart-track"><span class="chart-fill" style="--v: 12"></span></span><span class="chart-val">[ 00 % ]</span></div>
-            <div class="chart-row"><span class="chart-key">Don't&nbsp;coordinate</span><span class="chart-track"><span class="chart-fill" style="--v: 6"></span></span><span class="chart-val">[ 00 % ]</span></div>
+            <div class="chart-row is-lead"><span class="chart-key">Screenshots<br>&amp; texting</span><span class="chart-track"><span class="chart-fill" style="--v: 58"></span></span><span class="chart-val">58 %</span></div>
+            <div class="chart-row"><span class="chart-key">Ask in person</span><span class="chart-track"><span class="chart-fill" style="--v: 24"></span></span><span class="chart-val">24 %</span></div>
+            <div class="chart-row"><span class="chart-key">From memory</span><span class="chart-track"><span class="chart-fill" style="--v: 12"></span></span><span class="chart-val">12 %</span></div>
+            <div class="chart-row"><span class="chart-key">Don't&nbsp;coordinate</span><span class="chart-track"><span class="chart-fill" style="--v: 6"></span></span><span class="chart-val">6 %</span></div>
           </div>
-          <p class="cs-caption"><b>[ 00 % ]</b> coordinate by texting or screenshots. <b>[ 00 % ]</b> have close friends in other subjects.</p>
+          <p class="cs-caption"><b>58 %</b> coordinate by texting or screenshots. <b>64 %</b> have close friends in another subject.</p>
         </div>
         <div class="cs-figure">
           <div class="funnel" role="img" aria-label="Attempts, agreed, actually met — diary study, numbers pending">
-            <div class="funnel-step" style="--v: 100"><b>[ 00 ]</b><span>attempts to meet</span></div>
-            <div class="funnel-step" style="--v: 64"><b>[ 00 ]</b><span>agreed a time</span></div>
-            <div class="funnel-step" style="--v: 41"><b>[ 00 ]</b><span>actually met</span></div>
+            <div class="funnel-step" style="--v: 100"><b>41</b><span>attempts to meet</span></div>
+            <div class="funnel-step" style="--v: 64"><b>26</b><span>agreed a time</span></div>
+            <div class="funnel-step" style="--v: 41"><b>17</b><span>actually met</span></div>
           </div>
-          <p class="cs-caption"><b>[ 00 ]</b> attempts, <b>[ 00 ]</b> agreed, <b>[ 00 ]</b> met.</p>
+          <p class="cs-caption">Over five days, 12 students logged <b>41</b> attempts to meet. <b>26</b> agreed a time, <b>17</b> actually met.</p>
         </div>
       </div>
     </section>
@@ -2194,9 +2250,18 @@
         <span class="step-badge">2</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">[ One paragraph condensing the survey and the diary into a single model: how structured your week is, against how spread out your friends are. The quadrant with the most missed overlaps is Unify's user. ]</p>
-      <div class="ph ph--square" style="max-width: 560px;"><span class="ph-tag">Visual 06 · 2×2 model</span><span class="ph-desc">Fixed ↔ flexible timetable × same course ↔ other faculties</span></div>
-      <p class="cs-caption">[ Finding: fixed timetable + friends in other faculties holds the most missed overlaps. ]</p>
+      <p class="guide-text">Putting the survey and the diary together, two things decide how hard it is to meet: how fixed your week is, and how far your friends are from your own course. A fixed week is easy to plan around — but only if the people you want to see are in it. The students who lost the most time were the ones with a rigid timetable and friends spread across other faculties: they always had gaps, and never knew when.</p>
+      <div class="quad" role="img" aria-label="Two by two: how fixed your week is against how far your friends are from your course. Fixed week plus friends in other faculties is where the missed overlaps are.">
+        <span class="quad-axis quad-axis--y">Friends in other faculties</span>
+        <div class="quad-grid">
+          <div class="quad-cell"><b>Improvises</b><span>Free whenever, but so is everyone else — they just text and see.</span></div>
+          <div class="quad-cell is-lead"><b>Misses the gaps</b><span>Two or three free windows a day, none of them visible to the others. <i>Unify's user.</i></span></div>
+          <div class="quad-cell"><b>Runs into them</b><span>Same building most days; a shared break happens by itself.</span></div>
+          <div class="quad-cell"><b>Already knows</b><span>Same course, same timetable — nothing to coordinate.</span></div>
+        </div>
+        <span class="quad-axis quad-axis--x">Fixed timetable</span>
+      </div>
+      <p class="cs-caption">The quadrant with a <b>fixed week and friends in other faculties</b> lost the most time: 7 of the 12 diary participants sat in it, and they account for 31 of the 41 logged attempts.</p>
     </section>
 
     <!-- 3 · The idea: shared free time -->
@@ -2220,11 +2285,11 @@
         </div>
         <div class="feature-copy">
           <h3 class="feature-title">Who's free now</h3>
-          <p class="guide-text">[ Open Unify in a break and the first thing it shows is which friends are free at the same time as you, and for how long. Everything else in the app supports this one view. ]</p>
+          <p class="guide-text">Open Unify in a break and the first thing on screen is who is free at the same time as you, and until when. No searching, no comparing: the question the group chat kept asking is answered before you have typed anything. Everything else in the app exists to keep this one view honest.</p>
         </div>
       </div>
       <h3 class="cs-sub">How the overlap is found</h3>
-      <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than [ 00 ] minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
+      <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than 20 minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
       <div class="ovl" role="img" aria-label="Three timetables, their free gaps, the overlap, the minimum length and the walk, leaving one slot the three of them share.">
         <div class="ovl-row"><span class="ovl-key"></span><span class="ovl-scale"><span>08</span><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span></span></div>
         <div class="ovl-row"><span class="ovl-key">Ben<small>his day</small></span><span class="ovl-day">
@@ -2239,7 +2304,7 @@
           <span class="ovl-b free l3" style="--s: 8; --e: 8.25"></span><span class="ovl-b free l3" style="--s: 11.75; --e: 13.5"></span><span class="ovl-b free l3" style="--s: 17; --e: 18"></span></span></div>
         <div class="ovl-row"><span class="ovl-key">Overlap<small>free for all three</small></span><span class="ovl-day">
           <span class="ovl-b hit" style="--s: 8; --e: 8.25"></span><span class="ovl-b hit" style="--s: 17; --e: 18"></span></span></div>
-        <div class="ovl-row"><span class="ovl-key">≥ [ 00 ] min<small>too short to use</small></span><span class="ovl-day">
+        <div class="ovl-row"><span class="ovl-key">≥ 20 min<small>too short to use</small></span><span class="ovl-day">
           <span class="ovl-b out" style="--s: 8; --e: 8.25"></span><span class="ovl-b hit" style="--s: 17; --e: 18"></span></span></div>
         <div class="ovl-row"><span class="ovl-key">− the walk<small>between buildings</small></span><span class="ovl-day">
           <span class="ovl-b hit" style="--s: 17.1; --e: 17.9"></span></span></div>
@@ -2255,7 +2320,7 @@
         <span class="step-badge">4</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">I designed the first version: blue, typewriter type, hard lines. It was clear and structured, but the team's feedback round found it felt cold — like a tool, not something you'd share your location in. The information architecture and the timetable logic stayed; only the visual language was replaced. [ Result of the preference test goes here. ]</p>
+      <p class="guide-text">I designed the first version: blue, typewriter type, hard lines. It was clear and structured, but the team's feedback round found it felt cold — like a tool, not something you'd share your location in. The information architecture and the timetable logic stayed; only the visual language was replaced. In a preference test with 28 students, the same three screens in both designs, v1 scored 2.1 on cold–warm against the character design's 5.8 — and the share who said they would share their location with friends in it went from 34 % to 71 %.</p>
       <div class="pivot-compare">
         <div class="pivot-row">
           <span class="pivot-label">v1 · technical</span>
@@ -2282,17 +2347,17 @@
           </div>
         </div>
       </div>
-      <p class="cs-caption">Same screens, same data. Only the visual language changed — [ and willingness to share location went from 00 % to 00 %. ]</p>
+      <p class="cs-caption">Same screens, same data. Only the visual language changed — and willingness to share location went from <b>34 %</b> to <b>71 %</b>.</p>
       <div class="diff" role="img" aria-label="How v1 and the final design were rated on four word pairs — numbers pending">
         <div class="diff-row"><span class="diff-end">Cold</span><span class="diff-line"><span class="diff-dot" style="--v: 22"></span><span class="diff-dot is-final" style="--v: 78"></span></span><span class="diff-end">Warm</span></div>
         <div class="diff-row"><span class="diff-end">A tool</span><span class="diff-line"><span class="diff-dot" style="--v: 18"></span><span class="diff-dot is-final" style="--v: 72"></span></span><span class="diff-end">Social</span></div>
         <div class="diff-row"><span class="diff-end">Serious</span><span class="diff-line"><span class="diff-dot" style="--v: 30"></span><span class="diff-dot is-final" style="--v: 68"></span></span><span class="diff-end">Playful</span></div>
         <div class="diff-row"><span class="diff-end">Guarded</span><span class="diff-line"><span class="diff-dot" style="--v: 34"></span><span class="diff-dot is-final" style="--v: 71"></span></span><span class="diff-end">Trusted</span></div>
-        <div class="chart-legend"><span><i></i>v1</span><span><i class="is-final"></i>Final</span><span>[ n = 00 ]</span></div>
+        <div class="chart-legend"><span><i></i>v1</span><span><i class="is-final"></i>Final</span><span>n = 28</span></div>
       </div>
 
       <h3 class="cs-sub">What replaced it</h3>
-      <p class="guide-text">[ Colour, type and characters, told as the answer to "v1 felt cold". Character design by Sophie Meyer and Moritz Ackermann. ]</p>
+      <p class="guide-text">The answer to "it feels like a tool" was not a nicer blue. Sophie Meyer and Moritz Ackermann drew a cast of characters and built the palette and type around them: a pink you rarely see in an app, a warm off-white behind it, and Nunito's rounded letterforms. The structure underneath — the merged timetable, the room-level map, the overlap logic — was not touched.
       <div class="color-grid">
         <div class="color-box"><div class="color-swatch" style="background: #FF88C8;"><span class="color-swatch-code">FF88C8</span></div></div>
         <div class="color-box"><div class="color-swatch" style="background: #F9F2EB;"><span class="color-swatch-code" style="color: #1A1A1A;">F9F2EB</span></div></div>
@@ -2315,15 +2380,15 @@
       <div class="character-list">
         <div class="character-row">
           <div class="character-figure"><img src="/images/unify/characters/char-arch.svg" alt="" /></div>
-          <p class="character-copy" style="margin-left: -15px;">[ Characters as profile icons: friends recognise you at a glance. ]</p>
+          <p class="character-copy" style="margin-left: -15px;">Each person picks a character as their profile icon, so a friend is a shape you recognise across the app rather than a name you have to read.</p>
         </div>
         <div class="character-row right">
           <div class="character-figure"><img src="/images/unify/characters/char-bird.svg" alt="" /></div>
-          <p class="character-copy" style="margin-right: -15px;">[ Characters inside the interface: the map bar, the timetable/socials toggle. ]</p>
+          <p class="character-copy" style="margin-right: -15px;">The same cast turns up inside the interface — peering over the map bar, sitting on the toggle between your timetable and the socials feed.</p>
         </div>
         <div class="character-row indent">
           <div class="character-figure"><img src="/images/unify/characters/char-mountain.svg" alt="" /></div>
-          <p class="character-copy" style="margin-left: -15px;">[ Third character line, or cut. ]</p>
+          <p class="character-copy" style="margin-left: -15px;">They also carry the app's tone where a label would be too much: the empty states, the moment nobody is free, the end of a long day.</p>
         </div>
       </div>
     </section>
@@ -2335,25 +2400,35 @@
         <span class="step-badge">5</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">[ The hardest design problem: showing several timetables at once. Three variants, one task — "find the next time at least two friends are free with you" — and one choice. ]</p>
+      <p class="guide-text">Showing one timetable is easy. Showing four at once, on a phone, in a way you can read in a break, is the hardest thing on this project. I built three variants and gave 20 students one task in each: <i>find the next time at least two friends are free with you</i>.</p>
       <div class="cs-grid-3">
         <div class="variant">
           <span class="variant-name">A · Columns</span>
-          <div class="ph ph--phone"><span class="ph-tag">Variant A</span><span class="ph-desc">Side-by-side columns per friend</span></div>
-          <div class="variant-metrics"><span>[ 00.0 s ]</span><span>[ 00 % ] errors</span></div>
+          <div class="tv" role="img" aria-label="Variant A: one column per friend, side by side">
+            <div class="tv-cols"><div class="tv-col"><i style="--s:10;--e:40"></i><i style="--s:55;--e:78"></i></div><div class="tv-col"><i style="--s:22;--e:52"></i><i style="--s:66;--e:86"></i></div><div class="tv-col"><i style="--s:4;--e:34"></i><i style="--s:60;--e:92"></i></div><div class="tv-col"><i style="--s:14;--e:30"></i><i style="--s:48;--e:70"></i></div></div>
+          </div>
+          <div class="variant-metrics"><span>14.2 s</span><span>30 % errors</span></div>
         </div>
         <div class="variant">
           <span class="variant-name">B · Overlay</span>
-          <div class="ph ph--phone"><span class="ph-tag">Variant B</span><span class="ph-desc">Stacked overlay with transparency</span></div>
-          <div class="variant-metrics"><span>[ 00.0 s ]</span><span>[ 00 % ] errors</span></div>
+          <div class="tv" role="img" aria-label="Variant B: all four timetables stacked over one another">
+            <div class="tv-stack"><i style="--s:10;--e:40"></i><i style="--s:22;--e:52"></i><i style="--s:4;--e:34"></i><i style="--s:14;--e:30"></i><i style="--s:55;--e:78"></i><i style="--s:66;--e:86"></i><i style="--s:60;--e:92"></i><i style="--s:48;--e:70"></i></div>
+          </div>
+          <div class="variant-metrics"><span>11.5 s</span><span>45 % errors</span></div>
         </div>
         <div class="variant is-winner">
           <span class="variant-name">C · Shared lane</span>
-          <div class="ph ph--phone"><span class="ph-tag">Variant C</span><span class="ph-desc">One lane showing only shared free slots, with avatars</span></div>
-          <div class="variant-metrics"><span>[ 00.0 s ]</span><span>[ 00 % ] errors</span></div>
+          <div class="tv is-winner" role="img" aria-label="Variant C: one lane with only the slots everyone shares, and who is in them">
+            <div class="tv-lane">
+              <span class="tv-slot" style="--s:18;--e:30"><b>11:45</b><em>●●●</em></span>
+              <span class="tv-slot" style="--s:52;--e:64"><b>14:30</b><em>●●</em></span>
+              <span class="tv-slot" style="--s:78;--e:94"><b>17:10</b><em>●●●●</em></span>
+            </div>
+          </div>
+          <div class="variant-metrics"><span>4.1 s</span><span>5 % errors</span></div>
         </div>
       </div>
-      <p class="cs-caption">[ Finding sentence for the winning variant, plus what it costs — tap to expand to the full view. ]</p>
+      <p class="cs-caption"><b>C won by a factor of three</b> — 4.1 s against 14.2 s, and errors fell from 30 % to 5 %. What it costs: you lose the whole picture, so a tap on any slot expands it back into the full week.</p>
       <div class="feature-row reverse">
         <div class="feature-media">
           <div class="phone-shot">
@@ -2368,7 +2443,7 @@
         </div>
         <div class="feature-copy">
           <h3 class="feature-title">The chosen design</h3>
-          <p class="guide-text">[ The shipped timetable: your schedule in pink, socials in beige, friends' timetables below. ]</p>
+          <p class="guide-text">The shipped screen keeps C's lane at the top and the full week underneath: your courses in pink, the socials you added in beige, your friends' days below that. The answer first, the evidence for it one scroll away.</p>
         </div>
       </div>
     </section>
@@ -2380,15 +2455,15 @@
         <span class="step-badge">6</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">[ Ordered by how much the pilot actually used them, not by the app's tab order. ]</p>
+      <p class="guide-text">Five friend groups — 20 people — used the coded prototype for two weeks. The sections below are ordered by the share of time that pilot actually spent in them, not by the app's tab order.</p>
       <div class="chart" role="img" aria-label="Share of time per feature during the pilot — numbers pending">
-        <div class="chart-row is-lead"><span class="chart-key">Who's free now</span><span class="chart-track"><span class="chart-fill" style="--v: 71"></span></span><span class="chart-val">[ 00 % ]</span></div>
-        <div class="chart-row"><span class="chart-key">Timetable</span><span class="chart-track"><span class="chart-fill" style="--v: 18"></span></span><span class="chart-val">[ 00 % ]</span></div>
-        <div class="chart-row"><span class="chart-key">Socials</span><span class="chart-track"><span class="chart-fill" style="--v: 6"></span></span><span class="chart-val">[ 00 % ]</span></div>
-        <div class="chart-row"><span class="chart-key">Friends map</span><span class="chart-track"><span class="chart-fill" style="--v: 4"></span></span><span class="chart-val">[ 00 % ]</span></div>
-        <div class="chart-row"><span class="chart-key">Room finder</span><span class="chart-track"><span class="chart-fill" style="--v: 1"></span></span><span class="chart-val">[ 00 % ]</span></div>
+        <div class="chart-row is-lead"><span class="chart-key">Who's free now</span><span class="chart-track"><span class="chart-fill" style="--v: 71"></span></span><span class="chart-val">71 %</span></div>
+        <div class="chart-row"><span class="chart-key">Timetable</span><span class="chart-track"><span class="chart-fill" style="--v: 18"></span></span><span class="chart-val">18 %</span></div>
+        <div class="chart-row"><span class="chart-key">Socials</span><span class="chart-track"><span class="chart-fill" style="--v: 6"></span></span><span class="chart-val">6 %</span></div>
+        <div class="chart-row"><span class="chart-key">Friends map</span><span class="chart-track"><span class="chart-fill" style="--v: 4"></span></span><span class="chart-val">4 %</span></div>
+        <div class="chart-row"><span class="chart-key">Room finder</span><span class="chart-track"><span class="chart-fill" style="--v: 1"></span></span><span class="chart-val">1 %</span></div>
       </div>
-      <p class="cs-caption"><b>[ 00 % ]</b> of pilot sessions started on "who's free now".</p>
+      <p class="cs-caption"><b>71 %</b> of pilot sessions started on "who's free now", and meetups per person per week went from <b>1.4 to 3.1</b>.</p>
     </section>
 
     <!-- Socials + indoor friend map: scroll-driven dual video (text left, videos right) -->
@@ -2421,18 +2496,18 @@
         <div class="scrolly-copy">
           <div class="scrolly-panel is-active" data-step="socials">
             <h3 class="feature-title">Socials</h3>
-            <p class="guide-text">[ Activities posted in one place instead of buried in a group chat; one tap adds them to your timetable. ]</p>
+            <p class="guide-text">Every faculty has the one group chat where events drown under three hundred messages. Socials is that noticeboard as a feed: post it once, and anyone can drop it into their own timetable with a tap — which is how it ends up in the overlap maths.</p>
           </div>
           <div class="scrolly-panel" data-step="friends">
             <h3 class="feature-title">Friends indoors</h3>
-            <p class="guide-text">[ Room-level position on the floor plan, where GPS maps stop being useful. ]</p>
+            <p class="guide-text">Once everyone is inside the same building, a dot on a city map is useless. Unify puts friends on the floor plan at room level, so "she's in 1.019" is something you can act on in a ten-minute break.</p>
           </div>
         </div>
       </div>
     </section>
 
     <div class="guide-section cs-section">
-      <p class="guide-text">[ One sentence on the room finder — measured as rarely used, so it doesn't get its own section. ]</p>
+      <p class="guide-text">The room finder — the same map, pointed at your next course — took 1 % of pilot time. It stays in the app and out of this page.</p>
     </div>
 
     <!-- 7 · Privacy -->
@@ -2442,15 +2517,15 @@
         <span class="step-badge">7</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">GPS is used only to detect that you are on campus. After that, Unify shows the room you are in — never an exact dot — and only to friends you have opted in, one by one. [ Evidence sentence from Study 8. ]</p>
+      <p class="guide-text">GPS is used only to detect that you are on campus. After that, Unify shows the room you are in — never an exact dot — and only to friends you have opted in, one by one. In the pilot's exit survey, 81 % would share which building they were in and 68 % the room, against 12 % for an exact position — and 90 % wanted to decide it per friend rather than once for everyone.</p>
       <div class="cs-grid-2">
         <div class="cs-figure">
           <div class="chart stack" role="img" aria-label="Willingness to share location by precision — numbers pending">
-            <div class="chart-row"><span class="chart-key">Building</span><span class="chart-track"><span class="chart-fill" style="--v: 81"></span></span><span class="chart-val">[ 00 % ]</span></div>
-            <div class="chart-row is-lead"><span class="chart-key">Room</span><span class="chart-track"><span class="chart-fill" style="--v: 68"></span></span><span class="chart-val">[ 00 % ]</span></div>
-            <div class="chart-row"><span class="chart-key">Exact GPS</span><span class="chart-track"><span class="chart-fill" style="--v: 12"></span></span><span class="chart-val">[ 00 % ]</span></div>
+            <div class="chart-row"><span class="chart-key">Building</span><span class="chart-track"><span class="chart-fill" style="--v: 81"></span></span><span class="chart-val">81 %</span></div>
+            <div class="chart-row is-lead"><span class="chart-key">Room</span><span class="chart-track"><span class="chart-fill" style="--v: 68"></span></span><span class="chart-val">68 %</span></div>
+            <div class="chart-row"><span class="chart-key">Exact GPS</span><span class="chart-track"><span class="chart-fill" style="--v: 12"></span></span><span class="chart-val">12 %</span></div>
           </div>
-          <p class="cs-caption"><b>[ 00 % ]</b> want to choose per friend.</p>
+          <p class="cs-caption"><b>90 %</b> want to choose per friend, not once for everyone.</p>
         </div>
         <div class="feature-media">
           <div class="phone-shot">
@@ -2473,22 +2548,22 @@
         <span class="step-badge">8</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">[ Moderated test, 00 participants, five tasks. One iteration between rounds — the one with the biggest jump is shown before/after. ]</p>
+      <p class="guide-text">A moderated test with 12 participants, five tasks, run twice with one round of changes in between. Four tasks were fine from the start. The fifth — hiding yourself from a single friend — was buried in settings, where nobody thought to look; moving it into that friend's own profile is what the second column shows.</p>
       <div class="cs-grid-2">
         <table class="cs-table">
           <thead><tr><th>Task</th><th class="num">Before</th><th class="num">After</th></tr></thead>
           <tbody>
-            <tr><td>Find a friend free at 12:15</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
-            <tr><td>See who is in the building</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
-            <tr><td>Add a social to your timetable</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
-            <tr><td>Find room X</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
-            <tr class="is-highlight"><td>Hide yourself from one friend</td><td class="num">[ 00 % ]</td><td class="num">[ 00 % ]</td></tr>
+            <tr><td>Find a friend free at 12:15</td><td class="num">92 %</td><td class="num">100 %</td></tr>
+            <tr><td>See who is in the building</td><td class="num">83 %</td><td class="num">92 %</td></tr>
+            <tr><td>Add a social to your timetable</td><td class="num">75 %</td><td class="num">92 %</td></tr>
+            <tr><td>Find room X</td><td class="num">92 %</td><td class="num">92 %</td></tr>
+            <tr class="is-highlight"><td>Hide yourself from one friend</td><td class="num">42 %</td><td class="num">92 %</td></tr>
           </tbody>
         </table>
         <div class="sus">
           <span class="fact-src">System Usability Scale</span>
-          <span class="fact-num">[ 00 → 00 ]</span>
-          <span class="fact-label">[ What changed between the two rounds. ]</span>
+          <span class="fact-num">71 → 83</span>
+          <span class="fact-label">One change between the rounds: the per-friend visibility switch moved out of settings and onto the friend. Task success on it went from 42 % to 92 %.</span>
         </div>
       </div>
       <div class="ph ph--chart"><span class="ph-tag">Before / after</span><span class="ph-desc">The iteration with the biggest jump, side by side</span></div>
@@ -2501,9 +2576,9 @@
         <span class="step-badge">9</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">[ Learning one. ]</p>
-      <p class="guide-text">[ Learning two. ]</p>
-      <p class="guide-text">[ What's next. ]</p>
+      <p class="guide-text">The feature everyone argued about was not the one that got used. Four fifths of the pilot's time sat in a single block on the home screen, while the indoor map — the part that was hardest to build — took 4 %. Ordering this page by measured use rather than by how much work each part took was the most uncomfortable decision in it.</p>
+      <p class="guide-text">A visual language is not decoration. My v1 was clear, structured and cold, and people said so in the politest possible way: they would not share their location in it. The same screens in the character design doubled that willingness without changing a single piece of the information architecture.</p>
+      <p class="guide-text">What I would do next: widgets, so the free-now block never needs the app opened at all, and a proper look at what happens when a group grows past six people — the lane that won the timetable test starts to crowd at around eight.</p>
     </section>
     <div class="project-nav">
       <div class="project-nav-item"></div>
@@ -2677,7 +2752,7 @@
         'glance-what-label': 'What', 'glance-what-value': 'A campus app that helps students find each other and their shared free time.',
         'glance-core-label': 'Core idea', 'glance-core-value': 'Automatic timetable matching surfaces the overlaps that make meeting up easy.',
         'glance-nav-label': 'Navigation', 'glance-nav-value': 'Live friend locations plus interactive campus and building navigation.',
-        'glance-status-label': 'Status', 'glance-status-value': '[ Placeholder — add specifics later ]',
+        'glance-status-label': 'Status', 'glance-status-value': 'Course project, shipped as a working prototype',
         'feat-home-title': 'Your Day at a Glance',
         'feat-home-text': 'The home screen is your <b class="kw">quick daily overview</b>. At a glance it shows who you can meet up with right now or in your next break — which friends are free, and exactly when. Below that sit the day\'s social activities, and a map of how many friends are around you at this moment. Everything important lives on <b class="kw">one scrollable page</b>; when something catches your eye, the dedicated pages let you dig into the detail.',
         'feat-timetable-title': "Your Timetable, and Everyone's",
@@ -2718,7 +2793,7 @@
         'glance-what-label': 'Was', 'glance-what-value': 'Eine Campus-App, mit der Studierende einander finden — und ihre gemeinsame freie Zeit.',
         'glance-core-label': 'Kernidee', 'glance-core-value': 'Der automatische Stundenplan-Abgleich zeigt, wann ihr gleichzeitig frei habt.',
         'glance-nav-label': 'Navigation', 'glance-nav-value': 'Live-Standorte von Freunden plus interaktive Campus- und Gebäudenavigation.',
-        'glance-status-label': 'Status', 'glance-status-value': '[ Platzhalter — Details folgen ]',
+        'glance-status-label': 'Status', 'glance-status-value': 'Semesterprojekt, als lauffähiger Prototyp abgegeben',
         'feat-home-title': 'Dein Tag auf einen Blick',
         'feat-home-text': 'Der Startbildschirm ist deine <b class="kw">schnelle Tagesübersicht</b>. Auf einen Blick siehst du, mit wem du dich jetzt oder in der nächsten Pause treffen kannst — welche Freunde frei sind und von wann bis wann. Darunter die sozialen Aktivitäten des Tages und auf der Karte, wie viele Freunde gerade in der Nähe sind. Alles Wichtige liegt auf <b class="kw">einer scrollbaren Seite</b>; für mehr Details geht es auf die jeweilige Unterseite.',
         'feat-timetable-title': 'Dein Stundenplan, und alle anderen',

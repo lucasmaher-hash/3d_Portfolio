@@ -266,6 +266,23 @@ headless screenshots: `captureBeyondViewport` fires a resize). Runs only while o
 `prefers-reduced-motion` it shows the first messages, still. Below 640px: 3:4 stage, 54cqw phone,
 86cqw column.
 
+> ⚠ **EVERY FIGURE ON THE DRAFT PAGE IS INVENTED** (2026-09-25). Lucas asked for it filled in so he
+> could judge the finished layout, so the placeholders were replaced with plausible stand-ins —
+> 23 min, 41/26/17, 58 %, n=28, 14.2/11.5/4.1 s, 71 %, 1.4 → 3.1, SUS 71 → 83, the task table, the
+> quadrant's "7 of 12". The full list is in an HTML comment at the top of `unify2d1.html`. **None
+> of it may survive into `unify2d.html`**: every number is either replaced with a real result or
+> the section it sits in goes. The page is unlinked and carries the DRAFT pill for exactly this.
+
+**The accent on the draft page is the app's pink, not the site orange** — `--accent-orange` is
+overridden to `#FF88C8` (the hero character) at the top of the case-study block, with
+`--accent-ink: #D24C92` for anything at label size, since #FF88C8 on the page grey is too pale to
+read small. The fact bar is bare numbers on the page: no card, no raised shadow (Lucas).
+
+**Two more visuals are markup**: `.quad` (the research 2×2, the live quadrant ringed in pink) and
+`.tv` (the three merged-timetable variants — A columns, B overlay, C the shared lane that won,
+drawn rather than screenshotted). The only `.ph` placeholders left are the sketch collage and the
+before/after shot, which both need real assets.
+
 **Charts are MARKUP, not images** (2026-09-25, the first of the plan's visuals to be built):
 `.chart` (horizontal bars — Problem's "how students coordinate" and the pilot's share of time),
 `.funnel` (attempts → agreed → met), `.chart.stack` (willingness by precision) and `.diff` (the
