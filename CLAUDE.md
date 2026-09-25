@@ -191,6 +191,23 @@ around the phone — all rejected):
   column grows half a new message upward and half downward and the stack's centre stays on the
   phone's middle, while messages still arrive at its bottom edge. Measured: centre at exactly 50%
   of the screen in every at-rest sample, at 1440 and 390.
+- **Every run OPENS on the first message alone** (2026-09-25): Lucas's own blue "when's your next
+  break??", 3x size, centred on the phone's screen, held 2s, then it travels to its own place in
+  the column (right, small) and the rest follow below it. One WAAPI keyframe list does in–hold–move.
+  Two traps: measure the BUBBLE, not the message box (the box is a flex item and stretches to the
+  whole column, so its centre is already the screen's and the move comes out as zero), and scale
+  about the bubble's centre by setting `transform-origin` to it. The factor is
+  `min(3, stageWidth*.92 / bubbleWidth)` — on a phone the bubble is already most of the width, so
+  it lands near 1.9x. A tail hangs .42em past the bubble, so half of that is added back to centre
+  the shape optically. Measured: bubble centre exactly on the screen centre at 1440 and 390.
+- **Any start is a start from the top.** Scrolling the stage out of view, or leaving the tab, calls
+  `stop()`, which clears the column; coming back plays the run again from the opener. Safari stops
+  firing timers for an occluded window, so a tab left for VS Code used to come back frozen on a
+  frame — `visibilitychange`, `pageshow` and a `focus` listener all restart it rather than resume.
+- **A leaving message is pinned where it stood BEFORE the new message was appended.** The append
+  re-lays the centred column (everything jumps half a message up), so a rect read after it gave the
+  leaving message that jump while the others glided — the small upward twitch each image made
+  before fading. `add()` snapshots every rect first and `dropOldest(at)` uses the snapshot.
 - **The run ends with a WIPE.** Once every message has had its turn the whole stack fades out
   together (520ms, 70ms apart), the column empties, and after a beat the chat starts again from
   the first message and builds back up. `tick()` is a self-scheduling `setTimeout`, not an

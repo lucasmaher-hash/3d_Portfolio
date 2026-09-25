@@ -3349,10 +3349,10 @@
       var MSGS = [
         // side: Anna and Sophia answer from the left, Ben from the right —
         // grey either way; only mine (out) is blue.
-        { who: 'Anna',   text: "when's your next break??" },
+        { out: true,     text: "when's your next break??" },
         { who: 'Ben',    right: true, img: 'tt-ben',    text: 'idk, check mine' },
         { who: 'Sophia', img: 'tt-sophia', text: 'mine, materials till 13:00 😑' },
-        { out: true,     img: 'tt-me',     text: 'and mine. mensa next break?' },
+        { out: true,     img: 'tt-me',     text: 'and mine. mensa?' },
         { who: 'Anna',   text: "which break tho 😅 can't read all of these" },
         { who: 'Ben',    right: true, text: "12:15? i've got 45 min" },
         { who: 'Sophia', text: "that's exactly when I'm still in class" },
@@ -3361,9 +3361,10 @@
         { who: 'Sophia · next day', text: 'sorry just saw this — are you guys still at the mensa?' }
       ];
       var STEP = 2600, GLIDE = 1100, POP = 560, FADE = 450, WIPE = 520, PAUSE = 700;
+      var IN = 450, HOLD = 2000, MOVE = 750, INTRO = IN + HOLD + MOVE;   // the opening message
       var TARGET = .70, HARD = .78;                   // share of the screen's height
       var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var k = 0, timer = null, wipedAt = -1;
+      var k = 0, timer = null, onScreen = false;
 
       function make(m) {
         var el = document.createElement('div');
@@ -3387,10 +3388,15 @@
       }
       function screenHeight() { return screenEl.getBoundingClientRect().height; }
 
-      function dropOldest() {
+      // `at` is where the message sat BEFORE the new one was appended. Without
+      // it the rect is read after the column has already re-laid out — a centred
+      // column jumps everything half a message up — and the leaving message,
+      // pinned to the stage, kept that jump while the others glided: the little
+      // upward twitch each image made before fading.
+      function dropOldest(at) {
         var c = kids()[0];
         if (!c) return;
-        var st = stage.getBoundingClientRect(), r = c.getBoundingClientRect();
+        var st = stage.getBoundingClientRect(), r = at || c.getBoundingClientRect();
         // Hand it to the STAGE at the spot it occupies. Inside the column it
         // would keep moving with the layout — the column is centred, so every
         // add and every drop shifts its box — and a message on its way out
@@ -3410,6 +3416,37 @@
         setTimeout(function () { c.remove(); }, FADE + 60);
       }
 
+      // Every run opens on the first message alone, large, in the middle of the
+      // phone. It holds there for two seconds and then travels to its own place
+      // in the column — left, and small — and the rest of the chat follows it.
+      function intro() {
+        var m0out = !!(MSGS[0].out || MSGS[0].right);
+        var el = make(MSGS[0]); k = 1;
+        track.appendChild(el);
+        var er = el.getBoundingClientRect(), sc = screenEl.getBoundingClientRect(), st = stage.getBoundingClientRect();
+        // Measure the BUBBLE, not the message box: the box is a flex item and
+        // stretches to the whole column, so its centre is already the screen's
+        // and the move would come out as zero. Scaling about the bubble's own
+        // centre keeps the maths to one step.
+        var b = (el.querySelector('.b') || el).getBoundingClientRect();
+        el.style.transformOrigin = (b.left + b.width / 2 - er.left) + 'px ' + (b.top + b.height / 2 - er.top) + 'px';
+        // 3x, unless that would run past the stage — on a phone the bubble is
+        // already most of its width, so the factor comes down to what fits.
+        var f = Math.min(3, (st.width * .92) / Math.max(b.width, 1));
+        // The tail hangs .42em past the bubble on its own side, so the shape's
+        // optical centre is half that off the box's centre.
+        var tail = parseFloat(getComputedStyle(el.querySelector('.b')).fontSize) * .21 * (m0out ? -1 : 1);
+        var dx = (sc.left + sc.width / 2) - (b.left + b.width / 2) + tail * f;
+        var dy = (sc.top + sc.height / 2) - (b.top + b.height / 2);
+        var big = 'translate(' + dx + 'px, ' + dy + 'px) scale(' + f + ')';
+        el.animate([
+          { opacity: 0, transform: 'translate(' + dx + 'px, ' + dy + 'px) scale(' + f * .9 + ')', easing: 'cubic-bezier(.2, .9, .3, 1)' },
+          { opacity: 1, transform: big, offset: IN / INTRO, easing: 'linear' },
+          { opacity: 1, transform: big, offset: (IN + HOLD) / INTRO, easing: 'cubic-bezier(.5, 0, .2, 1)' },
+          { opacity: 1, transform: 'translate(0, 0) scale(1)' }
+        ], { duration: INTRO, fill: 'backwards' });
+      }
+
       function add(animate) {
         var el = make(MSGS[k % MSGS.length]); k++;
         // Watch one message that is staying: whatever it does when the column
@@ -3417,10 +3454,12 @@
         // working the offset out — a centred column moves by half the new
         // message, and by half of anything that leaves in the same step.
         var ref = track.lastElementChild, before = ref ? ref.getBoundingClientRect().top : 0;
+        var was = kids().map(function (c) { return [c, c.getBoundingClientRect()]; });   // where everyone stands now
         track.appendChild(el);
         if (!animate) return;
+        function spotOf(c) { for (var i = 0; i < was.length; i++) if (was[i][0] === c) return was[i][1]; }
         // Anything pushed past the cap leaves in the same step.
-        for (var guard = 0; guard < 6 && kids().length > 1 && stackHeight() > screenHeight() * HARD; guard++) dropOldest();
+        for (var guard = 0; guard < 6 && kids().length > 1 && stackHeight() > screenHeight() * HARD; guard++) dropOldest(spotOf(kids()[0]));
         var shift = (ref && !ref.dataset.leaving) ? before - ref.getBoundingClientRect().top : 0;
         if (shift) {                                  // hold them, then glide them up
           track.style.transition = 'none';
@@ -3436,10 +3475,8 @@
                    { duration: POP, delay: shift ? GLIDE * .78 : 0, easing: 'cubic-bezier(.3, 1.2, .5, 1)', fill: 'backwards' });
       }
 
-      function fill() {                               // open with the stack already at ~70%
-        Array.prototype.slice.call(stage.querySelectorAll('.imsg-msg[data-leaving]')).forEach(function (c) { c.remove(); });
-        track.innerHTML = ''; k = 0; wipedAt = -1;
-        track.style.transition = 'none'; track.style.transform = 'translateY(0)';
+      function fill() {                               // the still, for reduced motion
+        clear();
         while (k < MSGS.length) {
           add(false);
           if (stackHeight() > screenHeight() * TARGET) { track.lastChild.remove(); k--; break; }
@@ -3462,24 +3499,45 @@
         return total;
       }
       function tick() {
-        if (k > 0 && k % MSGS.length === 0 && wipedAt !== k) {   // the run is over
-          wipedAt = k;
-          timer = setTimeout(tick, wipe() + PAUSE);
+        if (k === 0) {                                  // a fresh run
+          intro();
+          timer = setTimeout(tick, INTRO + 400);
+          return;
+        }
+        if (k % MSGS.length === 0) {                    // the run is over
+          var t = wipe(); k = 0;
+          timer = setTimeout(tick, t + PAUSE);
           return;
         }
         add(true);
         timer = setTimeout(tick, STEP);
       }
-      function start() { if (!timer) timer = setTimeout(tick, STEP); }
-      function stop()  { clearTimeout(timer); timer = null; }
+      function clear() {
+        Array.prototype.slice.call(stage.querySelectorAll('.imsg-msg[data-leaving]')).forEach(function (c) { c.remove(); });
+        track.innerHTML = ''; k = 0;
+        track.style.transition = 'none'; track.style.transform = 'translateY(0)';
+      }
+      // Every start is a start from the top: scrolling past it and coming back,
+      // or coming back to the tab, plays the chat again rather than picking up
+      // mid-run on a frame that froze while the tab was in the background.
+      function start() { if (timer) return; clear(); timer = setTimeout(tick, 200); }
+      function stop()  { clearTimeout(timer); timer = null; clear(); }
 
-      fill();
-      if (reduce) return;
-      new IntersectionObserver(function (e) { e[0].isIntersecting ? start() : stop(); }).observe(stage);
-      document.addEventListener('visibilitychange', function () { if (document.hidden) stop(); });
-      var lastW = stage.offsetWidth;                  // refill only when the width really changes —
+      if (reduce) { fill(); return; }
+      new IntersectionObserver(function (e) {
+        onScreen = e[0].isIntersecting;
+        onScreen ? start() : stop();
+      }, { threshold: .2 }).observe(stage);
+      // Safari stops firing timers for an occluded window, so a tab left behind
+      // for VS Code came back frozen on whatever frame it had. Restart on the
+      // way back rather than trying to resume.
+      function replay() { if (!onScreen) return; stop(); start(); }
+      document.addEventListener('visibilitychange', function () { document.hidden ? stop() : replay(); });
+      addEventListener('pageshow', replay);
+      addEventListener('focus', function () { if (onScreen && !timer) start(); });   // Safari app-switch fires this, not always visibilitychange
+      var lastW = stage.offsetWidth;                  // restart only when the width really changes —
       addEventListener('resize', function () {        // a phone's URL bar fires resize on every scroll
-        if (stage.offsetWidth !== lastW) { lastW = stage.offsetWidth; fill(); }
+        if (stage.offsetWidth !== lastW) { lastW = stage.offsetWidth; stop(); if (onScreen) start(); }
       });
     })();
   </script>
