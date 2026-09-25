@@ -258,7 +258,7 @@
     .meta-label {
       font-family: 'VT323', monospace;
       font-size: 24px;
-      color: var(--accent-orange);
+      color: var(--accent-ink);   /* pink type is always the readable ink, never the pale fill */
       text-transform: uppercase;
     }
 
@@ -1647,7 +1647,7 @@
       font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 0.06em;
       text-transform: uppercase; color: var(--text-secondary);
     }
-    .pivot-label b { color: var(--accent-orange); font-weight: 400; }
+    .pivot-label b { color: var(--accent-ink); font-weight: 400; }
     .pivot-screens {
       display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: clamp(14px, 2.4vw, 28px); align-items: start; justify-items: center;
