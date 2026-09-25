@@ -1831,18 +1831,19 @@
 
     /* The lifted conversation: a column wider than the phone, centred on it, so
        incoming messages hang off its left edge and yours off its right, over the
-       screen and the frame. The column hangs from the screen's top third and
-       grows downward; once a new message would not fit, the oldest eases out and
-       the column glides up by exactly its height. Nothing is clipped or masked:
-       a message on screen is always whole. */
+       screen and the frame. The column is BOTTOM-ANCHORED: the newest message
+       always lands on the same line just above the input field and the stack
+       grows upward, filling about 70% of the screen. Nothing is clipped or
+       masked — a message is either fully there or gone, it only ever eases
+       between the two. */
     .imsg-lifted {
-      position: absolute; left: 50%; top: 33%; bottom: 13%; z-index: 3;   /* first bubble at the screen's top third */
+      position: absolute; left: 50%; bottom: 13%; z-index: 3;
       width: 54cqw; transform: translateX(-50%);
     }
     .imsg-track {
-      position: absolute; left: 0; right: 0; top: 0;
+      position: relative;
       display: flex; flex-direction: column; gap: 1.45cqw;
-      padding: 0 1.3cqw 1.8cqw;   /* room for the shadows */
+      padding: 0 1.3cqw;
       will-change: transform;
     }
     .imsg-msg { display: flex; flex-direction: column; align-items: flex-start; gap: .45cqw; max-width: 35cqw; }
@@ -1876,8 +1877,8 @@
     @media (max-width: 640px) {
       .imsg-stage { aspect-ratio: 3 / 4; margin-inline: -20px; width: calc(100% + 40px); }
       .imsg-phone { width: 54cqw; }
-      .imsg-lifted { width: 92cqw; top: 33%; bottom: 16%; }
-      .imsg-track { gap: 2.9cqw; padding: 0 2.6cqw 3.4cqw; }
+      .imsg-lifted { width: 92cqw; bottom: 19%; }   /* the phone is proportionally taller here, so the line sits higher in the stage */
+      .imsg-track { gap: 2.9cqw; padding: 0 2.6cqw; }
       .imsg-msg { max-width: 70cqw; gap: 1cqw; }
       .imsg-msg .b { font-size: 4cqw; }
       .imsg-float-from { font-size: 3.1cqw; }
@@ -3312,22 +3313,24 @@
   </script>
   <script>
     // ── Problem: the lifted group chat ────────────────────────────────────────
-    // The conversation plays as a column lifted off the empty chat: every STEP a
-    // message is added at the bottom and pops in from its side. The column hangs
-    // from the top, so it only moves when the new message does not fit: then the
-    // oldest is taken out of the flow, faded out where it stands, and the column
-    // glides up by exactly the height that freed — so the top message always sits
-    // around the screen's top third and a tall image leaving never opens a gap.
-    // A message is never shown half-cut or half-faded. Loops; runs only on screen.
+    // The conversation plays as a column lifted off the empty chat. It is
+    // BOTTOM-ANCHORED: every STEP the next message lands on the same line just
+    // above the input field and the whole stack glides up by its height, so the
+    // stack fills about 70% of the screen (TARGET) and grows upward from there.
+    // Past HARD the oldest is taken out of the flow and eased out where it
+    // stands — with the stack hanging from its bottom, nothing else has to move
+    // for it. A message is never half-anything at rest: it eases in whole once
+    // the glide has carried the others out of its way, and eases out whole.
+    // Loops; runs only while the stage is on screen.
     (function () {
       var stage = document.querySelector('.imsg-stage');
       if (!stage) return;
-      var box = stage.querySelector('.imsg-lifted'), track = stage.querySelector('.imsg-track');
+      var track = stage.querySelector('.imsg-track');
+      var screenEl = stage.querySelector('.phone-shot-screen');
       var IMG = '/images/unify/problem/';
       // Each image's own size goes on the <img>, so its box has its final height
       // the moment it is added. Without it the image is 0 tall until it loads:
-      // the column glides up by the wrong amount and jumps when it arrives, and
-      // the first fill overshoots the top of the stage once they all load.
+      // the column glides by the wrong amount and jumps when it arrives.
       var SIZE = { 'tt-jamie': [858, 396], 'tt-sophia': [858, 595], 'tt-me': [742, 270] };
       Object.keys(SIZE).forEach(function (n) { new Image().src = IMG + n + '.webp'; });   // warm the cache
       var MSGS = [
@@ -3342,7 +3345,8 @@
         { who: 'Anna',   text: 'are you even going to class today?' },
         { who: 'Sophia · next day', text: 'sorry just saw this, are you guys still at lunch?' }
       ];
-      var STEP = 2600, GLIDE = 1100, POP = 600;
+      var STEP = 2600, GLIDE = 1100, POP = 560, FADE = 450;
+      var TARGET = .70, HARD = .78;                   // share of the screen's height
       var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
       var k = 0, timer = null;
 
@@ -3355,48 +3359,62 @@
         return el;
       }
       function gap() { return parseFloat(getComputedStyle(track).rowGap) || 0; }
-      // Only the messages still IN THE FLOW count: one on its way out is taken
-      // out of the flow and would otherwise keep the column looking full.
-      function flowHeight() {
-        var kids = Array.prototype.slice.call(track.children).filter(function (c) { return !c.dataset.leaving; });
-        var last = kids[kids.length - 1];
-        return last ? last.offsetTop + last.offsetHeight : 0;
+      function kids() {
+        return Array.prototype.slice.call(track.children).filter(function (c) { return !c.dataset.leaving; });
       }
-      function dropOldest() {                         // out of the flow, fades where it stands
-        var c = track.firstElementChild;
-        if (!c) return 0;
-        var r = c.getBoundingClientRect(), t = track.getBoundingClientRect(), h = c.offsetHeight + gap();
+      // Top of the first to bottom of the last. Measured from the rects, so the
+      // glide's transform — which moves them all alike — cancels out, and a
+      // message on its way out (absolutely positioned) does not count.
+      function stackHeight() {
+        var k2 = kids();
+        if (!k2.length) return 0;
+        return k2[k2.length - 1].getBoundingClientRect().bottom - k2[0].getBoundingClientRect().top;
+      }
+      function screenHeight() { return screenEl.getBoundingClientRect().height; }
+
+      function dropOldest() {
+        var c = kids()[0];
+        if (!c) return;
+        var t = track.getBoundingClientRect(), r = c.getBoundingClientRect();
+        // Pin it by its BOTTOM: the stack hangs from its own bottom edge, so
+        // that distance is the one the layout keeps when it leaves the flow.
         c.dataset.leaving = '1';
         c.style.position = 'absolute'; c.style.margin = '0';
-        c.style.top = (r.top - t.top) + 'px'; c.style.left = (r.left - t.left) + 'px'; c.style.width = r.width + 'px';
-        c.animate([{ opacity: 1, transform: 'translateY(0) scale(1)' },
-                   { opacity: 0, transform: 'translateY(-10px) scale(.96)' }],
-                  { duration: GLIDE * .7, easing: 'cubic-bezier(.4, 0, .6, 1)', fill: 'forwards' });
-        setTimeout(function () { c.remove(); }, GLIDE + 60);
-        return h;
+        c.style.left = (r.left - t.left) + 'px';
+        c.style.bottom = (t.bottom - r.bottom) + 'px';
+        c.style.width = r.width + 'px';
+        c.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.95)' }],
+                  { duration: FADE, easing: 'cubic-bezier(.4, 0, .7, 1)', fill: 'forwards' });
+        setTimeout(function () { c.remove(); }, FADE + 60);
       }
+
       function add(animate) {
         var el = make(MSGS[k % MSGS.length]); k++;
         track.appendChild(el);
         if (!animate) return;
-        var shift = 0;
-        for (var guard = 0; guard < 6 && flowHeight() > box.offsetHeight && track.children.length > 1; guard++) shift += dropOldest();
-        if (shift) {                                  // glide up by what the leaving message freed
-          track.style.transition = 'none';
-          track.style.transform = 'translateY(' + shift + 'px)';
-          void track.offsetWidth;
-          track.style.transition = 'transform ' + GLIDE + 'ms cubic-bezier(.45, 0, .2, 1)';
-          track.style.transform = 'translateY(0)';
-        }
-        el.animate([{ opacity: 0, transform: 'translateY(12px) scale(.86)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }],
-                   { duration: POP, delay: shift ? GLIDE * .45 : 0, easing: 'cubic-bezier(.34, 1.3, .5, 1)', fill: 'backwards' });
+        var h = el.offsetHeight + gap();
+        // Hold the stack where it was, then let it glide up by the new
+        // message's height — the push that opens the space underneath.
+        track.style.transition = 'none';
+        track.style.transform = 'translateY(' + h + 'px)';
+        void track.offsetWidth;
+        track.style.transition = 'transform ' + GLIDE + 'ms cubic-bezier(.45, 0, .2, 1)';
+        track.style.transform = 'translateY(0)';
+        // Anything pushed past the cap leaves at the same time.
+        for (var guard = 0; guard < 6 && kids().length > 1 && stackHeight() > screenHeight() * HARD; guard++) dropOldest();
+        // …and the new one eases in whole, only once the glide has all but
+        // finished, so it is never seen sitting low over the input field.
+        el.animate([{ opacity: 0, transform: 'translateY(8px) scale(.92)' },
+                    { opacity: 1, transform: 'translateY(0) scale(1)' }],
+                   { duration: POP, delay: GLIDE * .78, easing: 'cubic-bezier(.3, 1.2, .5, 1)', fill: 'backwards' });
       }
-      function fill() {                             // start with the column already full
+
+      function fill() {                               // open with the stack already at ~70%
         track.innerHTML = ''; k = 0;
         track.style.transition = 'none'; track.style.transform = 'translateY(0)';
-        while (k < MSGS.length) {                     // as many as fit whole
+        while (k < MSGS.length) {
           add(false);
-          if (flowHeight() > box.offsetHeight) { track.lastChild.remove(); k--; break; }
+          if (stackHeight() > screenHeight() * TARGET) { track.lastChild.remove(); k--; break; }
         }
       }
       function start() { if (!timer) timer = setInterval(function () { add(true); }, STEP); }

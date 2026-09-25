@@ -183,19 +183,30 @@ Lucas's WhatsApp-mockup reference): one iPhone 17 frame showing an EMPTY "HM Gro
 bar, header, input — no messages on the screen), and over it `.imsg-lifted`, a column wider than
 the phone (54cqw vs 27cqw; 92cqw on a phone; each message capped at 35cqw / 70cqw so a wider column spreads them outward instead of widening them) so incoming bubbles hang off the phone's left edge and Lucas's off the
 right. The conversation (Jamie / Anna / Sophia / me, English, written by Claude from the real
-WhatsApp chats and captioned as a reconstruction) plays in it: every 2.6s the script appends the
-next message at the bottom, the track glides up by its height (1.1s) while the new one pops in from
-its side. **The column hangs from the screen's TOP THIRD and grows downward** (per Lucas): it only
-moves when the new message does not fit — then the oldest is taken OUT OF THE FLOW (absolutely
-positioned where it stands), faded out there, and the column glides up by exactly the height that
-freed. So the top bubble always sits around a third down and a tall image leaving never opens a gap.
-Heights are measured with `flowHeight()`, not `scrollHeight`: a leaving message is still a child and
-would keep the column looking full. WAAPI keyframes use px, not `cqw` (a `cqw` length there is
-silently dropped). **Nothing is clipped or masked** (per Lucas: a message on screen is always whole): a
-message whose final spot would be above the column's top eases out as a whole during the glide and is
-then removed; the new one fades in whole at the bottom. The column sits between the phone's nav bar
-and input (desktop top 18% / bottom 14%, phone 25% / 17%). Messages are 30% larger than the first
-version (bubble text 1.72cqw, timetables 24.7cqw). It loops forever. A timetable image is always grouped with its sender's text in one message
+WhatsApp chats and captioned as a reconstruction) plays in it. **Rebuilt 2026-09-25 to Lucas's
+brief, after three earlier attempts** (top-anchored column, masked top edge, floating bubbles
+around the phone — all rejected):
+- **Bottom-anchored.** `.imsg-lifted` has `bottom: 13%` (19% below 640px — the phone is
+  proportionally taller in that stage) and NO top/height, so the newest message always lands on
+  the same line just above the input field and the stack grows upward. Measured at rest: the last
+  bubble's bottom sits at 88.5% of the screen's height at both widths.
+- **~70% of the screen, soft cap.** `TARGET = .70` is what the opening fill reaches; the oldest
+  only leaves past `HARD = .78` (Lucas: a soft cap, don't drop a message early). Both are shares
+  of `.phone-shot-screen`'s measured height, so they follow the phone at any size.
+- **Every step:** append at the bottom → the track glides up by exactly that message's height
+  (`translateY(h)` → 0, 1.1s) → anything past the cap leaves → the new one eases in at `GLIDE*.78`,
+  i.e. only once the glide has all but finished, or it is seen sitting low over the input field.
+- **A message is never half-anything at rest** (Lucas's main complaint): no mask, no clipping, no
+  partial fades; it eases in whole (0.56s) and out whole (0.45s). Verified over 54 samples at 1440
+  and 390: zero elements between 2% and 98% opacity in any at-rest frame.
+- **A leaving message is pinned by its BOTTOM** (`position: absolute; bottom: trackBottom -
+  itsBottom`), not its top: the stack hangs from its own bottom edge, so that is the distance the
+  layout keeps. Pinned by `top` it jumps down by its own height the moment it leaves the flow.
+  With bottom anchoring nothing else has to move when it goes, so there is no compensating glide.
+- `stackHeight()` measures first-child-top to last-child-bottom from the RECTS, so the glide's
+  transform (which moves them all alike) cancels out and a leaving message does not count.
+
+A timetable image is always grouped with its sender's text in one message
 (`public/images/unify/problem/tt-jamie|tt-sophia|tt-me.webp`; `tt-me` keeps a faint dark gradient
 bottom-right from the WhatsApp photo bubble — replace it if the original screenshot turns up).
 The status bar shares the nav bar's grey (#F7F7F8) and has real signal / Wi-Fi / battery glyphs.
