@@ -309,6 +309,17 @@ numbers chain — 62 % text, 73 % of those never met (45 % of everyone), plus th
 tried = the 83 % in the headline. **This replaced the earlier four-row bar chart and the
 attempts/agreed/met funnel**, both dropped.
 
+**The three pink stats moved out of the hero too** (2026-09-26, same session as the sidebar
+move — Lucas: proof belongs later, not up front). `.fact-bar` is unchanged CSS, just relocated:
+`.pilot-stats` wraps it with the same kicker/heading pair as the Problem statbar (`.stat-kicker` +
+`.stat-head`), and sits in "The idea" section right after the "who's free now" showcase and before
+"How the overlap is found" — the numbers next to the feature they are evidence for, not before it.
+The hero (`#top`) now carries only the lead line. **The three numbers themselves changed too**,
+since this is no longer a before/after (Problem) vs after (Results) split but one PILOT-only
+snapshot: 2.2× more meetups/week, 68% less time spent arranging one, 20 students across 5 friend
+groups. Chain them if the real pilot numbers ever land: 1.4 → 3.1 meetups already matches
+Supporting features' caption, and 23 → 7 min matches the Problem section's 23 min baseline.
+
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
 under the lead line, six words and five arrows competing with the fact bar right under it. Same

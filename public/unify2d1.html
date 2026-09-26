@@ -1601,7 +1601,13 @@
     .cs-map a.is-active { color: var(--text-primary); }
     @media (max-width: 1080px) { .cs-map { display: none; } }
 
-    /* Fact bar: three big numbers under the hero. */
+    /* Pilot stats: the fact-bar's own kicker + heading, reused where the
+       numbers actually live now — next to the app's showcase, not the hero. */
+    .pilot-stats { display: flex; flex-direction: column; gap: clamp(16px, 2.2vw, 24px); margin-top: clamp(28px, 4vw, 48px); }
+    .pilot-stats .stat-kicker { margin-top: 0; }
+    .pilot-stats .stat-head { font-size: clamp(19px, 2vw, 25px); }
+
+    /* Fact bar: three big numbers. */
     .fact-bar {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2235,26 +2241,11 @@
          and every .ph box is a placeholder. New copy is English-only and
          carries no data-i18n yet — German comes when the copy is final. -->
 
-    <!-- Hero one-liner + page map + fact bar -->
+    <!-- Hero one-liner. The three pink numbers used to sit right under it —
+         moved into "The idea", after the app's own showcase, per Lucas: the
+         proof belongs next to the thing it is proof of, not before it. -->
     <div class="guide-section cs-section" id="top">
       <p class="cs-lead">Unify shows you when your friends are free at the same time as you — so meeting up between classes stops taking a group chat.</p>
-      <div class="fact-bar">
-        <div class="fact">
-          <span class="fact-num">23 min</span>
-          <span class="fact-label">spent texting to arrange one meetup between classes</span>
-          <span class="fact-src">Before Unify · diary study · n=12</span>
-        </div>
-        <div class="fact">
-          <span class="fact-num">2.2×</span>
-          <span class="fact-label">more meetups per person per week during the pilot</span>
-          <span class="fact-src">With the app · pilot · n=20</span>
-        </div>
-        <div class="fact">
-          <span class="fact-num">83</span>
-          <span class="fact-label">SUS score after one round of iteration</span>
-          <span class="fact-src">With the app · usability test · n=12</span>
-        </div>
-      </div>
     </div>
 
     <!-- Meta -->
@@ -2392,6 +2383,29 @@
           <p class="guide-text">Open Unify in a break and the first thing on screen is who is free at the same time as you, and until when. No searching, no comparing: the question the group chat kept asking is answered before you have typed anything. Everything else in the app exists to keep this one view honest.</p>
         </div>
       </div>
+
+      <div class="pilot-stats">
+        <p class="stat-kicker">Pilot · first two weeks</p>
+        <h3 class="stat-head is-section">What using it actually did</h3>
+        <div class="fact-bar">
+          <div class="fact">
+            <span class="fact-num">2.2×</span>
+            <span class="fact-label">more meetups arranged per week</span>
+            <span class="fact-src">1.4 → 3.1 per person · n=20</span>
+          </div>
+          <div class="fact">
+            <span class="fact-num">68 %</span>
+            <span class="fact-label">less time spent arranging each one</span>
+            <span class="fact-src">23 min → 7 min · n=20</span>
+          </div>
+          <div class="fact">
+            <span class="fact-num">20</span>
+            <span class="fact-label">students, across 5 friend groups</span>
+            <span class="fact-src">Two weeks, coded prototype</span>
+          </div>
+        </div>
+      </div>
+
       <h3 class="cs-sub">How the overlap is found</h3>
       <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than 20 minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
       <div class="ovl" role="img" aria-label="Three timetables, their free gaps, the overlap, the minimum length and the walk, leaving one slot the three of them share.">
