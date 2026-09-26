@@ -308,6 +308,10 @@ numbers chain — 62 % text, 73 % of those never met (45 % of everyone), plus th
 tried = the 83 % in the headline. **This replaced the earlier four-row bar chart and the
 attempts/agreed/met funnel**, both dropped.
 
+**No pixel font inside a statistic** (Lucas, 2026-09-26): VT323 stays on the page's furniture —
+breadcrumb, meta labels, step badges, captions — but every chart's own keys, values, legends and
+labels are Roboto Flex at ~0.76 of their VT323 size. A number is read, not decorated.
+
 **Charts are MARKUP, not images** (2026-09-25, the first of the plan's visuals to be built):
 `.chart` (horizontal bars — Problem's "how students coordinate" and the pilot's share of time),
 `.funnel` (attempts → agreed → met), `.chart.stack` (willingness by precision) and `.diff` (the

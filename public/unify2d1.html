@@ -10,7 +10,7 @@
   <!-- Unlinked draft of the Unify case study. Nothing on the site links here; keep it out of search too.
        ⚠ EVERY NUMBER ON THIS PAGE IS INVENTED. They were written 2026-09-25 so Lucas could see the
        finished layout, and they must ALL be replaced with real results before this goes live:
-       23 min diary average · 62/38 % split, 73 % of them never met, 83 % overall · the three quotes ·
+       23 min diary average · 32/68 % split, 47 % of the texters never met, 83 % overall · the quotes ·
        n=120 survey, n=12 diary, n=28 preference test, n=20 pilot, n=12 usability ·
        2.1 → 5.8 warmth, 24 of 28 preferred · 14.2/11.5/4.1 s and 30/45/5 % variants ·
        71/18/6/4/1 % feature use · 1.4 → 3.1 meetups ·
@@ -1701,14 +1701,14 @@
     /* Timetable variants A / B / C with their metrics underneath. */
     .variant { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
     .variant-name {
-      font-family: 'VT323', monospace; font-size: 20px; letter-spacing: 0.04em;
+      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 15.2px; letter-spacing: 0.04em;
       text-transform: uppercase; color: var(--text-primary);
     }
     .variant.is-winner .variant-name { color: var(--accent-ink); }
     .variant.is-winner .ph { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
     .variant-metrics {
       display: flex; gap: 16px;
-      font-family: 'VT323', monospace; font-size: 17px; color: var(--text-secondary);
+      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 12.9px; color: var(--text-secondary);
     }
 
     /* Results: task success before / after one iteration. */
@@ -1919,7 +1919,7 @@
     .chart { display: flex; flex-direction: column; gap: 10px; width: 100%; }
     .chart-row { display: grid; grid-template-columns: minmax(84px, 26%) 1fr auto; align-items: center; gap: 12px; }
     .chart-key {
-      font-family: 'VT323', monospace; font-size: 16px; letter-spacing: .04em;
+      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 12.2px; letter-spacing: .04em;
       text-transform: uppercase; color: var(--text-primary); line-height: 1.15;
     }
     .chart-track { position: relative; height: 22px; border-radius: 999px; background: var(--bg-surface); box-shadow: var(--shadow-pressed); }
@@ -1929,7 +1929,7 @@
     }
     .chart-row.is-lead .chart-fill { background: var(--accent-orange); }
     .chart-val {
-      font-family: 'VT323', monospace; font-size: 17px; color: var(--text-secondary);
+      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 12.9px; color: var(--text-secondary);
       min-width: 74px; text-align: right;
     }
     .chart-row.is-lead .chart-val { color: var(--accent-ink); }
@@ -1944,13 +1944,13 @@
       display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
     }
     .funnel-step:last-child { box-shadow: var(--shadow-raised-sm), 0 0 0 2px var(--accent-orange); }
-    .funnel-step b { font-family: 'VT323', monospace; font-size: 20px; font-weight: 400; color: var(--text-primary); }
+    .funnel-step b { font-family: 'Roboto Flex', sans-serif; font-size: 15.2px; font-weight: 400; color: var(--text-primary); }
     .funnel-step span { font-size: 12.5px; color: var(--text-secondary); }
 
     /* Semantic differential: one line per word pair, a dot for each design. */
     .diff { display: flex; flex-direction: column; gap: 16px; }
     .diff-row { display: grid; grid-template-columns: minmax(70px, 18%) 1fr minmax(70px, 18%); align-items: center; gap: 12px; }
-    .diff-end { font-family: 'VT323', monospace; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary); }
+    .diff-end { font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 12.2px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary); }
     .diff-end:last-child { text-align: right; }
     .diff-line { position: relative; height: 12px; }
     .diff-line::before { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 2px; background: var(--text-tertiary); border-radius: 2px; }
@@ -1961,7 +1961,7 @@
     }
     .diff-dot.is-final { background: var(--accent-orange); }
     .chart-legend {
-      display: flex; gap: 18px; font-family: 'VT323', monospace; font-size: 16px;
+      display: flex; gap: 18px; font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 12.2px;
       letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary);
     }
     .chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--text-secondary); margin-right: 6px; }
@@ -1973,7 +1973,7 @@
        placed with two custom properties, --s and --e, in hours. */
     .ovl { display: flex; flex-direction: column; gap: 12px; width: 100%; }
     .ovl-row { display: grid; grid-template-columns: minmax(96px, 22%) 1fr; align-items: center; gap: 12px; }
-    .ovl-key { font-family: 'VT323', monospace; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-primary); }
+    .ovl-key { font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 12.2px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-primary); }
     .ovl-key small { display: block; font-family: 'Roboto Flex', sans-serif; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--text-secondary); }
     .ovl-day { position: relative; height: 26px; border-radius: 8px; background: var(--bg-surface); box-shadow: var(--shadow-pressed); }
     .ovl-b {
@@ -1984,13 +1984,13 @@
     .ovl-b.free { background: rgba(255, 92, 0, .28); }
     .ovl-b.hit  { background: var(--accent-orange); }
     .ovl-b.out  { background: var(--text-tertiary); opacity: .55; }
-    .ovl-scale { display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 14px; color: var(--text-secondary); }
+    .ovl-scale { display: flex; justify-content: space-between; font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 10.6px; color: var(--text-secondary); }
     /* three lanes inside one row, so the gaps of the three days can be read
        apart instead of blending into one another */
     .ovl-b.l1 { top: 3px; height: 6px; bottom: auto; }
     .ovl-b.l2 { top: 10px; height: 6px; bottom: auto; }
     .ovl-b.l3 { top: 17px; height: 6px; bottom: auto; }
-    .ovl-note { font-family: 'VT323', monospace; font-size: 16px; color: var(--text-secondary); }
+    .ovl-note { font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 12.2px; color: var(--text-secondary); }
     @media (max-width: 640px) {
       .chart-row { grid-template-columns: 1fr auto; }
       .chart-row .chart-track { grid-column: 1 / -1; grid-row: 2; }
@@ -2015,7 +2015,7 @@
       background: var(--bg-surface); border-radius: 18px; box-shadow: var(--shadow-pressed);
       padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; min-height: 120px;
     }
-    .quad-cell b { font-family: 'VT323', monospace; font-size: 19px; font-weight: 400; letter-spacing: .03em; text-transform: uppercase; color: var(--text-primary); }
+    .quad-cell b { font-family: 'Roboto Flex', sans-serif; font-size: 14.4px; font-weight: 400; letter-spacing: .03em; text-transform: uppercase; color: var(--text-primary); }
     .quad-cell span { font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); }
     .quad-cell i { color: var(--accent-ink); font-style: normal; }
     .quad-cell.is-lead { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
@@ -2042,7 +2042,7 @@
       top: calc(var(--s) * 1%); height: calc((var(--e) - var(--s)) * 1%);
       background: var(--accent-orange); color: #fff;
       display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
-      font-family: 'VT323', monospace; font-size: 13px;
+      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 9.9px;
     }
     .tv-slot em { font-style: normal; letter-spacing: -1px; opacity: .85; }
 
@@ -2056,7 +2056,7 @@
 
     /* ── A finding, stated: kicker, headline, one line of detail ──────────── */
     .stat-kicker {
-      font-family: 'VT323', monospace; font-size: 17px; letter-spacing: .06em;
+      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 12.9px; letter-spacing: .06em;
       text-transform: uppercase; color: var(--text-secondary);
       margin-top: clamp(56px, 6vw, 84px);   /* twice the air again, under the phone */
     }
@@ -2080,7 +2080,7 @@
       display: flex; align-items: center; gap: 8px; padding: 0 18px;
       font-size: 13.5px; color: var(--text-secondary); white-space: nowrap; overflow: hidden;
     }
-    .statbar-seg b { font-family: 'VT323', monospace; font-size: 22px; font-weight: 400; color: var(--text-secondary); }
+    .statbar-seg b { font-family: 'Roboto Flex', sans-serif; font-size: 16.7px; font-weight: 400; color: var(--text-secondary); }
     .statbar-seg.is-main { background: var(--accent-orange); color: #4a2338; border-radius: 16px; }
     .statbar-seg.is-main b { color: #4a2338; }
     /* the brace: two ticks and a rule under the span it names */
@@ -2097,7 +2097,7 @@
       transform: translateX(-50%); text-align: center; white-space: nowrap;
       font-size: 13px; line-height: 1.5; color: var(--text-primary);
     }
-    .statbar-brace-text b { font-family: 'VT323', monospace; font-size: 21px; font-weight: 400; color: var(--text-primary); }
+    .statbar-brace-text b { font-family: 'Roboto Flex', sans-serif; font-size: 16.0px; font-weight: 400; color: var(--text-primary); }
 
     /* ── Quotes from the other side of the bar ────────────────────────────── */
     .voices { display: flex; flex-direction: column; gap: clamp(14px, 2vw, 22px); }
@@ -2303,12 +2303,12 @@
              under it, then the bar it comes from. -->
         <p class="stat-kicker">Survey · 120 students · before Unify</p>
         <h3 class="stat-head">83 % of students never actually meet a friend from another course between classes</h3>
-        <p class="stat-sub">62 % try to arrange it by texting or swapping timetable screenshots — <b>but 73 % of them said their last attempt never turned into a meetup</b>. The remaining 38 % have stopped trying altogether.</p>
+        <p class="stat-sub">Only 32 % still try to arrange it by texting or swapping timetable screenshots — <b>and 47 % of them said their last attempt never turned into a meetup</b>. The other 68 % have stopped trying altogether.</p>
 
-        <div class="statbar" role="img" aria-label="Of everyone asked, 62 % coordinate by texting or screenshots and 38 % do not try. 73 % of the texting group never met, which with the ones who never tried is 83 % of everyone.">
+        <div class="statbar" role="img" aria-label="Of everyone asked, 32 % coordinate by texting or screenshots and 68 % do not try. 47 % of the texting group never met, which with the ones who never tried is 83 % of everyone.">
           <div class="statbar-track">
-            <span class="statbar-seg is-main" style="--w: 62"><b>62 %</b> text or swap screenshots</span>
-            <span class="statbar-seg" style="--w: 38"><b>38 %</b> don't try</span>
+            <span class="statbar-seg is-main" style="--w: 32"><b>32 %</b> text or swap screenshots</span>
+            <span class="statbar-seg" style="--w: 68"><b>68 %</b> don't try</span>
           </div>
           <div class="statbar-brace" style="--from: 17; --to: 100">
             <span class="statbar-brace-line"></span>
@@ -2317,7 +2317,7 @@
         </div>
 
         <!-- The other side of the bar, in their own words. -->
-        <h3 class="stat-head is-section">Why the 38 % stopped trying</h3>
+        <h3 class="stat-head is-section">Why the 68 % stopped trying</h3>
         <p class="guide-text">I went back to nine of the students who said they no longer try to arrange anything between classes. <b>Not one of them said they didn't want to meet.</b> They said it costs more than it is worth: “I'd meet them if I knew when — working it out takes longer than the break does.” <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
         <p class="guide-text">The second thing they all said was about the size of the window. “By the time everyone has answered, I'm already in the next lecture.” <b>For forty minutes it isn't worth the back and forth</b> — so, as one of them put it, “we say next week, and next week never comes.”</p>
       </div>
