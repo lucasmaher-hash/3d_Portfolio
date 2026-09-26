@@ -1574,15 +1574,32 @@
       max-width: 36ch;
     }
 
-    /* Page map: announces the structure, links to each section. */
+    /* Page map: a fixed sidebar, after Jessica Im's reference — off the hero,
+       so the hero itself only carries the line and the three numbers. Hidden
+       until the reader has scrolled past the hero, tracks the section in view.
+       Desktop only: six lines plus a back link is exactly the clutter a phone
+       doesn't have room for. */
     .cs-map {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
-      font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 0.04em;
-      text-transform: uppercase; color: var(--text-secondary);
+      position: fixed; left: clamp(20px, 3vw, 40px); bottom: 96px; z-index: 40;
+      display: flex; flex-direction: column; gap: 10px;
+      opacity: 0; pointer-events: none; transform: translateY(6px);
+      transition: opacity 300ms ease, transform 300ms ease;
     }
-    .cs-map a { color: var(--text-primary); text-decoration: none; }
-    .cs-map a:hover { color: var(--accent-ink); }
-    .cs-map span[aria-hidden] { color: var(--accent-ink); }
+    .cs-map.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .cs-map-back {
+      font-family: 'VT323', monospace; font-size: 15px; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--text-secondary); text-decoration: none;
+      margin-bottom: 4px;
+    }
+    .cs-map-back:hover { color: var(--text-primary); }
+    .cs-map a {
+      font-family: 'VT323', monospace; font-size: 16px; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--text-tertiary); text-decoration: none;
+      transition: color 200ms ease;
+    }
+    .cs-map a:hover { color: var(--text-secondary); }
+    .cs-map a.is-active { color: var(--text-primary); }
+    @media (max-width: 1080px) { .cs-map { display: none; } }
 
     /* Fact bar: three big numbers under the hero. */
     .fact-bar {
@@ -2168,6 +2185,18 @@
 
   <div class="page-wrapper">
 
+    <!-- Fixed section sidebar, off the hero (see .cs-map). Fades in once the
+         hero has scrolled past, tracks whichever section is in view. -->
+    <nav class="cs-map" aria-label="Page sections">
+      <a class="cs-map-back" href="#top">↑ Unify</a>
+      <a href="#problem">Problem</a>
+      <a href="#research">Research</a>
+      <a href="#idea">Idea</a>
+      <a href="#pivot">Pivot</a>
+      <a href="#timetable">Timetable</a>
+      <a href="#results">Results</a>
+    </nav>
+
     <!-- Hero: extended blob runs off the top-right; header sits bottom-left.
          Blob exported from Figma; pupils track the cursor. -->
     <div class="hero-top">
@@ -2209,14 +2238,6 @@
     <!-- Hero one-liner + page map + fact bar -->
     <div class="guide-section cs-section" id="top">
       <p class="cs-lead">Unify shows you when your friends are free at the same time as you — so meeting up between classes stops taking a group chat.</p>
-      <nav class="cs-map" aria-label="Page map">
-        <a href="#problem">Problem</a><span aria-hidden="true">→</span>
-        <a href="#research">Research</a><span aria-hidden="true">→</span>
-        <a href="#idea">Idea</a><span aria-hidden="true">→</span>
-        <a href="#pivot">Pivot</a><span aria-hidden="true">→</span>
-        <a href="#timetable">Timetable</a><span aria-hidden="true">→</span>
-        <a href="#results">Results</a>
-      </nav>
       <div class="fact-bar">
         <div class="fact">
           <span class="fact-num">23 min</span>
@@ -3850,6 +3871,51 @@
       addEventListener('resize', function () {        // a phone's URL bar fires resize on every scroll
         if (stage.offsetWidth !== lastW) { lastW = stage.offsetWidth; stop(); if (onScreen) start(); }
       });
+    })();
+  </script>
+  <script>
+    // ── Fixed section sidebar: visible once past the hero, tracks scroll ────
+    (function () {
+      var map = document.querySelector('.cs-map');
+      if (!map) return;
+      var hero = document.getElementById('top');
+      var links = Array.prototype.slice.call(map.querySelectorAll('a[href^="#"]'));
+      var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); })
+                          .filter(Boolean);
+
+      // Visible only once the hero has scrolled out of view — the sidebar
+      // exists so the hero can be uncluttered, so it has no reason to show
+      // while the hero itself is still on screen.
+      function syncVisibility() {
+        var r = hero.getBoundingClientRect();
+        map.classList.toggle('is-visible', r.bottom < 80);
+      }
+      addEventListener('scroll', syncVisibility, { passive: true });
+      addEventListener('resize', syncVisibility);
+      syncVisibility();
+
+      // Active section = whichever one's top has most recently crossed a line
+      // a third of the way down the viewport — reading position, not the
+      // section that happens to fill the most pixels.
+      var active = null;
+      function syncActive() {
+        var line = innerHeight * 0.35;
+        var current = sections[0];
+        for (var i = 0; i < sections.length; i++) {
+          if (sections[i].getBoundingClientRect().top <= line) current = sections[i];
+        }
+        if (current === active) return;
+        active = current;
+        links.forEach(function (a) {
+          a.classList.toggle('is-active', a.getAttribute('href') === '#' + current.id);
+        });
+      }
+      var ticking = false;
+      addEventListener('scroll', function () {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(function () { syncActive(); ticking = false; });
+      }, { passive: true });
+      syncActive();
     })();
   </script>
 </body>

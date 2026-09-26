@@ -309,6 +309,19 @@ numbers chain — 62 % text, 73 % of those never met (45 % of everyone), plus th
 tried = the 83 % in the headline. **This replaced the earlier four-row bar chart and the
 attempts/agreed/met funnel**, both dropped.
 
+**The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
+reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
+under the lead line, six words and five arrows competing with the fact bar right under it. Same
+class, new job: `.cs-map` is now `position: fixed`, bottom-left, with a "↑ Unify" back link above
+the six section links. Hidden (`opacity/pointer-events`) until the hero (`#top`) has scrolled out
+of view — `hero.getBoundingClientRect().bottom < 80` on scroll — so it never competes with the
+hero it exists to declutter. The active link is whichever section's top has most recently crossed
+35% down the viewport (a reading-position line, not "biggest on screen"), rAF-throttled. **Desktop
+only** (`display: none` below 1080px) — six lines plus a back link is exactly the clutter a phone's
+`.mobile-menu` already exists to avoid. Sits left of the `#scroll-track` (right edge) and clear of
+the fixed `.draft-flag` pill (bottom-left, `bottom: 16px`) — the sidebar's own `bottom: 96px` sits
+above it.
+
 **No pixel font inside a statistic** (Lucas, 2026-09-26): VT323 stays on the page's furniture —
 breadcrumb, meta labels, step badges, captions — but every chart's own keys, values, legends and
 labels are Roboto Flex at ~0.76 of their VT323 size. A number is read, not decorated.
