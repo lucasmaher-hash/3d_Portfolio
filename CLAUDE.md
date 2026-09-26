@@ -295,11 +295,12 @@ drawn rather than screenshotted). The only `.ph` placeholders left are the sketc
 before/after shot, which both need real assets.
 
 **The Problem section's evidence is one bar, after Jessica Im's tax case study** (2026-09-26,
-Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, one
-line of detail with the key phrase bold, then `.statbar` — a single track split into the share who
+Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, then `.statbar` — a single track split into the share who
 coordinate by texting (pink) and the share who have stopped trying (empty), with a thick black `.statbar-brace`
-under everything that came to nothing — the failed texting AND the ones who never tried — naming
-the headline's own figure. `--from`/`--to` place the
+under everything that came to nothing — the failed texting AND the ones who never tried — carrying
+the headline's figure and the sentence that explains it. **There is no paragraph between the
+headline and the bar** (Lucas: "do you even need it") — it only repeated what the bar already
+says; the one fact it held that the bar does not show moved into the brace's own label. `--from`/`--to` place the
 brace in percent of the whole bar, so it can name any span. Under it, the interviews with the people who
 stopped trying, as PROSE with the key phrases in `<b>` (three quote cards were tried and dropped —
 per Lucas it reads like the rest of the site this way). The headline and its line run the full

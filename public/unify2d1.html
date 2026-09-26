@@ -2094,10 +2094,10 @@
     }
     .statbar-brace-text {
       position: absolute; top: 50px; left: calc((var(--from) + (var(--to) - var(--from)) / 2) * 1%);
-      transform: translateX(-50%); text-align: center; white-space: nowrap;
-      font-size: 13px; line-height: 1.5; color: var(--text-primary);
+      transform: translateX(-50%); text-align: center; width: min(48ch, 72%);
+      font-size: 13px; line-height: 1.55; color: var(--text-secondary);
     }
-    .statbar-brace-text b { font-family: 'Roboto Flex', sans-serif; font-size: 16.0px; font-weight: 400; color: var(--text-primary); }
+    .statbar-brace-text b { font-family: 'Roboto Flex', sans-serif; font-size: 15px; font-weight: 400; color: var(--text-primary); }
 
     /* ── Quotes from the other side of the bar ────────────────────────────── */
     .voices { display: flex; flex-direction: column; gap: clamp(14px, 2vw, 22px); }
@@ -2118,7 +2118,7 @@
       .statbar-track { height: 54px; }
       .statbar-seg { padding: 0 12px; font-size: 11.5px; }
       .statbar-seg b { font-size: 18px; }
-      .statbar-brace-text { white-space: normal; width: 64%; font-size: 12px; }
+      .statbar-brace-text { width: 86%; font-size: 12px; }
     }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
@@ -2303,8 +2303,7 @@
              under it, then the bar it comes from. -->
         <p class="stat-kicker">Survey · 120 students · before Unify</p>
         <h3 class="stat-head">83 % of students never actually meet a friend from another course between classes</h3>
-        <p class="stat-sub">Only 32 % still try to arrange it by texting or swapping timetable screenshots — <b>and 47 % of them said their last attempt never turned into a meetup</b>. The other 68 % have stopped trying altogether.</p>
-
+  
         <div class="statbar" role="img" aria-label="Of everyone asked, 32 % coordinate by texting or screenshots and 68 % do not try. 47 % of the texting group never met, which with the ones who never tried is 83 % of everyone.">
           <div class="statbar-track">
             <span class="statbar-seg is-main" style="--w: 32"><b>32 %</b> text or swap screenshots</span>
@@ -2312,7 +2311,7 @@
           </div>
           <div class="statbar-brace" style="--from: 17; --to: 100">
             <span class="statbar-brace-line"></span>
-            <p class="statbar-brace-text"><b>83 % never met anyone</b></p>
+            <p class="statbar-brace-text"><b>83 % never met anyone</b> — the 68 % who stopped trying, plus the half whose texting went nowhere</p>
           </div>
         </div>
 
