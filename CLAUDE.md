@@ -294,6 +294,17 @@ read small. The fact bar is bare numbers on the page: no card, no raised shadow 
 drawn rather than screenshotted). The only `.ph` placeholders left are the sketch collage and the
 before/after shot, which both need real assets.
 
+**The Problem section's evidence is one bar, after Jessica Im's tax case study** (2026-09-26,
+Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, one
+line of detail with the key phrase bold, then `.statbar` — a single track split into the share who
+coordinate by texting (pink) and the share who have stopped trying (empty), with a `.statbar-brace`
+under the part of the texting share whose attempts never became a meetup. `--from`/`--to` place the
+brace in percent of the whole bar, so it can name any span. Under it, `.voices`: three quotes from
+the people who stopped trying, which is the section's answer to "why not just text them?". The
+numbers chain — 62 % text, 73 % of those never met (45 % of everyone), plus the 38 % who never
+tried = the 83 % in the headline. **This replaced the earlier four-row bar chart and the
+attempts/agreed/met funnel**, both dropped.
+
 **Charts are MARKUP, not images** (2026-09-25, the first of the plan's visuals to be built):
 `.chart` (horizontal bars — Problem's "how students coordinate" and the pilot's share of time),
 `.funnel` (attempts → agreed → met), `.chart.stack` (willingness by precision) and `.diff` (the

@@ -10,7 +10,7 @@
   <!-- Unlinked draft of the Unify case study. Nothing on the site links here; keep it out of search too.
        ⚠ EVERY NUMBER ON THIS PAGE IS INVENTED. They were written 2026-09-25 so Lucas could see the
        finished layout, and they must ALL be replaced with real results before this goes live:
-       23 min diary average · 41/26/17 funnel · 58/24/12/6 % coordination · 64 % other subjects ·
+       23 min diary average · 62/38 % split, 73 % of them never met, 83 % overall · the three quotes ·
        n=120 survey, n=12 diary, n=28 preference test, n=20 pilot, n=12 usability ·
        2.1 → 5.8 warmth, 24 of 28 preferred · 14.2/11.5/4.1 s and 30/45/5 % variants ·
        71/18/6/4/1 % feature use · 1.4 → 3.1 meetups ·
@@ -2044,6 +2044,71 @@
       font-family: 'VT323', monospace; font-size: 13px;
     }
     .tv-slot em { font-style: normal; letter-spacing: -1px; opacity: .85; }
+
+    /* ── A finding, stated: kicker, headline, one line of detail ──────────── */
+    .stat-kicker {
+      font-family: 'VT323', monospace; font-size: 17px; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--text-secondary);
+    }
+    .stat-head {
+      font-family: 'Roboto Flex', sans-serif; font-weight: 300;
+      font-size: clamp(22px, 2.5vw, 32px); line-height: 1.25;
+      color: var(--text-primary); max-width: 26ch; margin-top: -6px;
+    }
+    .stat-sub { font-size: 14.4px; line-height: 1.7; color: var(--text-secondary); max-width: 62ch; margin-top: -8px; }
+    .stat-sub b { color: var(--text-primary); font-weight: 500; }
+
+    /* ── One bar, two parts, and a brace under the part that matters ──────── */
+    .statbar { width: 100%; }
+    .statbar-track {
+      display: flex; height: 62px; border-radius: 16px; overflow: hidden;
+      background: var(--bg-surface); box-shadow: var(--shadow-pressed);
+    }
+    .statbar-seg {
+      width: calc(var(--w) * 1%);
+      display: flex; align-items: center; gap: 8px; padding: 0 18px;
+      font-size: 13.5px; color: var(--text-secondary); white-space: nowrap; overflow: hidden;
+    }
+    .statbar-seg b { font-family: 'VT323', monospace; font-size: 22px; font-weight: 400; color: var(--text-secondary); }
+    .statbar-seg.is-main { background: var(--accent-orange); color: #4a2338; border-radius: 16px; }
+    .statbar-seg.is-main b { color: #4a2338; }
+    /* the brace: two ticks and a rule under the span it names */
+    .statbar-brace { position: relative; height: 84px; }
+    .statbar-brace-line {
+      position: absolute; top: 0; left: calc(var(--from) * 1%); width: calc((var(--to) - var(--from)) * 1%);
+      height: 14px; border: 1.5px solid var(--text-tertiary); border-top: none; border-radius: 0 0 8px 8px;
+    }
+    .statbar-brace-line::after {
+      content: ""; position: absolute; left: 50%; top: 100%; width: 1.5px; height: 12px; background: var(--text-tertiary);
+    }
+    .statbar-brace-text {
+      position: absolute; top: 34px; left: calc((var(--from) + (var(--to) - var(--from)) / 2) * 1%);
+      transform: translateX(-50%); text-align: center; white-space: nowrap;
+      font-size: 13px; line-height: 1.5; color: var(--text-secondary);
+    }
+    .statbar-brace-text b { font-family: 'VT323', monospace; font-size: 19px; font-weight: 400; color: var(--text-primary); }
+
+    /* ── Quotes from the other side of the bar ────────────────────────────── */
+    .voices { display: flex; flex-direction: column; gap: clamp(14px, 2vw, 22px); }
+    .voice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); }
+    .voice {
+      margin: 0; background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-pressed);
+      padding: clamp(18px, 2vw, 26px); display: flex; flex-direction: column; gap: 12px;
+    }
+    .voice p { font-size: 14.4px; line-height: 1.6; color: var(--text-primary); }
+    .voice cite {
+      font-family: 'VT323', monospace; font-style: normal; font-size: 16px;
+      letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary);
+    }
+    @media (max-width: 860px) {
+      .voice-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .statbar-track { height: 54px; }
+      .statbar-seg { padding: 0 12px; font-size: 11.5px; }
+      .statbar-seg b { font-size: 18px; }
+      .statbar-brace-text { white-space: normal; width: 64%; font-size: 12px; }
+    }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
     }
@@ -2220,23 +2285,31 @@
         <div class="imsg-lifted"><div class="imsg-track"></div></div>
       </div>
       <p class="cs-caption"><b>Three timetables, three screenshots</b> — and the comparing is still done by hand.</p>
-      <div class="cs-grid-2">
-        <div class="cs-figure">
-          <div class="chart" role="img" aria-label="How students coordinate free time — survey, numbers pending">
-            <div class="chart-row is-lead"><span class="chart-key">Screenshots<br>&amp; texting</span><span class="chart-track"><span class="chart-fill" style="--v: 58"></span></span><span class="chart-val">58 %</span></div>
-            <div class="chart-row"><span class="chart-key">Ask in person</span><span class="chart-track"><span class="chart-fill" style="--v: 24"></span></span><span class="chart-val">24 %</span></div>
-            <div class="chart-row"><span class="chart-key">From memory</span><span class="chart-track"><span class="chart-fill" style="--v: 12"></span></span><span class="chart-val">12 %</span></div>
-            <div class="chart-row"><span class="chart-key">Don't&nbsp;coordinate</span><span class="chart-track"><span class="chart-fill" style="--v: 6"></span></span><span class="chart-val">6 %</span></div>
-          </div>
-          <p class="cs-caption">Before Unify: <b>58 %</b> coordinate by texting or screenshots, and <b>64 %</b> have close friends in another subject.</p>
+      <!-- The finding, stated: a headline carrying the number, one paragraph
+           under it, then the bar it comes from. -->
+      <p class="stat-kicker">Survey · 120 students · before Unify</p>
+      <h3 class="stat-head">83 % of students never actually meet a friend from another course between classes</h3>
+      <p class="stat-sub">62 % try to arrange it by texting or swapping timetable screenshots — <b>but 73 % of them said their last attempt never turned into a meetup</b>. The remaining 38 % have stopped trying altogether.</p>
+
+      <div class="statbar" role="img" aria-label="Of everyone asked, 62 % coordinate by texting or screenshots and 38 % do not try. 73 % of the texting group never met, which with the ones who never tried is 83 % of everyone.">
+        <div class="statbar-track">
+          <span class="statbar-seg is-main" style="--w: 62"><b>62 %</b> text or swap screenshots</span>
+          <span class="statbar-seg" style="--w: 38"><b>38 %</b> don't try</span>
         </div>
-        <div class="cs-figure">
-          <div class="funnel" role="img" aria-label="Attempts, agreed, actually met — diary study, numbers pending">
-            <div class="funnel-step" style="--v: 100"><b>41</b><span>attempts to meet</span></div>
-            <div class="funnel-step" style="--v: 64"><b>26</b><span>agreed a time</span></div>
-            <div class="funnel-step" style="--v: 41"><b>17</b><span>actually met</span></div>
-          </div>
-          <p class="cs-caption">Before Unify, over five days, 12 students logged <b>41</b> attempts to meet: <b>26</b> agreed a time, <b>17</b> actually met — <b>1.4</b> meetups per person per week.</p>
+        <div class="statbar-brace" style="--from: 17; --to: 62">
+          <span class="statbar-brace-line"></span>
+          <p class="statbar-brace-text"><b>73 % of them never met</b><br>45 % of everyone asked</p>
+        </div>
+      </div>
+
+      <!-- The other side of the bar, in their own words. -->
+      <div class="voices">
+        <h3 class="cs-sub">Why the 38 % stopped trying</h3>
+        <p class="guide-text">I went back to nine of the students who said they no longer try to arrange anything between classes. Not one of them said they didn't want to meet.</p>
+        <div class="voice-grid">
+          <blockquote class="voice"><p>“I'd meet them if I knew when. Working it out takes longer than the break does.”</p><cite>3rd semester, industrial design</cite></blockquote>
+          <blockquote class="voice"><p>“By the time everyone has answered, I'm already in the next lecture.”</p><cite>2nd semester, architecture</cite></blockquote>
+          <blockquote class="voice"><p>“For 40 minutes it's just not worth the back and forth. So we say next week, and next week never comes.”</p><cite>4th semester, communication design</cite></blockquote>
         </div>
       </div>
     </section>
