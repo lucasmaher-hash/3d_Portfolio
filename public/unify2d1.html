@@ -2072,7 +2072,7 @@
     /* ── One bar, two parts, and a brace under the part that matters ──────── */
     .statbar { width: 100%; }
     .statbar-track {
-      display: flex; height: clamp(58px, 5.4vw, 76px); border-radius: 16px; overflow: hidden;
+      display: flex; height: clamp(64px, 7vw, 96px); border-radius: 16px; overflow: hidden;
       background: var(--bg-surface); box-shadow: var(--shadow-pressed);
     }
     .statbar-seg {
@@ -2080,14 +2080,14 @@
       display: flex; align-items: center; gap: 10px; padding: 0 20px;
       /* as large as the headline's own ramp, one step down: a label in the bar
          should read like part of the sentence, not like a caption */
-      font-size: clamp(15px, 1.6vw, 20px); color: var(--text-secondary);
+      font-size: clamp(22px, 2.5vw, 32px); color: var(--text-secondary);
       white-space: nowrap; overflow: hidden;
     }
-    .statbar-seg b { font-family: 'Roboto Flex', sans-serif; font-size: clamp(15px, 1.6vw, 20px); font-weight: 400; color: var(--text-secondary); }
+    .statbar-seg b { font-family: 'Roboto Flex', sans-serif; font-size: clamp(22px, 2.5vw, 32px); font-weight: 400; color: var(--text-secondary); }
     .statbar-seg.is-main { background: var(--accent-orange); color: #4a2338; border-radius: 16px; }
     .statbar-seg.is-main b { color: #4a2338; }
     /* the brace: two ticks and a rule under the span it names */
-    .statbar-brace { position: relative; height: 112px; }
+    .statbar-brace { position: relative; height: 128px; }
     .statbar-brace-line {
       position: absolute; top: 0; left: calc(var(--from) * 1%); width: calc((var(--to) - var(--from)) * 1%);
       height: 26px; border: 2.5px solid var(--text-primary); border-top: none; border-radius: 0 0 6px 6px;
@@ -2096,11 +2096,11 @@
       content: ""; position: absolute; left: 50%; top: 100%; width: 2.5px; height: 12px; background: var(--text-primary);
     }
     .statbar-brace-text {
-      position: absolute; top: 50px; left: calc((var(--from) + (var(--to) - var(--from)) / 2) * 1%);
+      position: absolute; top: 54px; left: calc((var(--from) + (var(--to) - var(--from)) / 2) * 1%);
       transform: translateX(-50%); text-align: center; white-space: nowrap;
-      font-size: clamp(14px, 1.5vw, 19px); line-height: 1.45; color: var(--text-secondary);
+      font-size: clamp(22px, 2.5vw, 32px); line-height: 1.45; color: var(--text-secondary);
     }
-    .statbar-brace-text b { font-family: 'Roboto Flex', sans-serif; font-size: clamp(14px, 1.5vw, 19px); font-weight: 400; color: var(--text-primary); }
+    .statbar-brace-text b { font-family: 'Roboto Flex', sans-serif; font-size: clamp(22px, 2.5vw, 32px); font-weight: 400; color: var(--text-primary); }
 
     /* ── Quotes from the other side of the bar ────────────────────────────── */
     .voices { display: flex; flex-direction: column; gap: clamp(14px, 2vw, 22px); }
@@ -2118,11 +2118,11 @@
       .voice-grid { grid-template-columns: minmax(0, 1fr); }
     }
     @media (max-width: 640px) {
-      .statbar-track { height: 54px; }
-      .statbar-seg { padding: 0 12px; font-size: 13px; }
+      .statbar-track { height: 58px; }
+      .statbar-seg { padding: 0 12px; font-size: 15px; }
       .statbar-seg.is-main .seg-words { display: none; }   /* 32 % of a phone's width is the number alone */
       .statbar-seg b { font-size: 18px; }
-      .statbar-brace-text { font-size: 13px; }
+      .statbar-brace-text { font-size: 15px; }
     }
     @media (max-width: 860px) {
       .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }

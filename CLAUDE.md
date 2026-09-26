@@ -295,7 +295,7 @@ drawn rather than screenshotted). The only `.ph` placeholders left are the sketc
 before/after shot, which both need real assets.
 
 **The Problem section's evidence is one bar, after Jessica Im's tax case study** (2026-09-26,
-Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, then `.statbar` — a single track split into the share who
+Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, then `.statbar` — its labels and the brace text set at the HEADLINE’s own ramp, `clamp(22px, 2.5vw, 32px)` (Lucas asked twice; caption-sized numbers read as a footnote) — a single track split into the share who
 coordinate by texting (pink) and the share who have stopped trying (empty), with a thick black `.statbar-brace`
 under everything that came to nothing — the failed texting AND the ones who never tried — carrying
 the headline's figure, nothing else. **There is no paragraph between the
