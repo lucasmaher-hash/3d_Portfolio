@@ -317,6 +317,7 @@
     }
 
     .guide-text + .guide-text { margin-top: -8px; }
+    .guide-text b { color: var(--text-primary); font-weight: 500; }   /* picked-out phrases, as elsewhere on the site */
 
     /* ── At a glance ── */
     .glance-list {
@@ -2053,9 +2054,9 @@
     .stat-head {
       font-family: 'Roboto Flex', sans-serif; font-weight: 300;
       font-size: clamp(22px, 2.5vw, 32px); line-height: 1.25;
-      color: var(--text-primary); max-width: 26ch; margin-top: -6px;
+      color: var(--text-primary); margin-top: -6px;   /* full content width, like the reference */
     }
-    .stat-sub { font-size: 14.4px; line-height: 1.7; color: var(--text-secondary); max-width: 62ch; margin-top: -8px; }
+    .stat-sub { font-size: 14.4px; line-height: 1.7; color: var(--text-secondary); margin-top: -8px; }
     .stat-sub b { color: var(--text-primary); font-weight: 500; }
 
     /* ── One bar, two parts, and a brace under the part that matters ──────── */
@@ -2076,17 +2077,17 @@
     .statbar-brace { position: relative; height: 84px; }
     .statbar-brace-line {
       position: absolute; top: 0; left: calc(var(--from) * 1%); width: calc((var(--to) - var(--from)) * 1%);
-      height: 14px; border: 1.5px solid var(--text-tertiary); border-top: none; border-radius: 0 0 8px 8px;
+      height: 14px; border: 2.5px solid var(--text-primary); border-top: none; border-radius: 0 0 6px 6px;
     }
     .statbar-brace-line::after {
-      content: ""; position: absolute; left: 50%; top: 100%; width: 1.5px; height: 12px; background: var(--text-tertiary);
+      content: ""; position: absolute; left: 50%; top: 100%; width: 2.5px; height: 12px; background: var(--text-primary);
     }
     .statbar-brace-text {
       position: absolute; top: 34px; left: calc((var(--from) + (var(--to) - var(--from)) / 2) * 1%);
       transform: translateX(-50%); text-align: center; white-space: nowrap;
-      font-size: 13px; line-height: 1.5; color: var(--text-secondary);
+      font-size: 13px; line-height: 1.5; color: var(--text-primary);
     }
-    .statbar-brace-text b { font-family: 'VT323', monospace; font-size: 19px; font-weight: 400; color: var(--text-primary); }
+    .statbar-brace-text b { font-family: 'VT323', monospace; font-size: 21px; font-weight: 400; color: var(--text-primary); }
 
     /* ── Quotes from the other side of the bar ────────────────────────────── */
     .voices { display: flex; flex-direction: column; gap: clamp(14px, 2vw, 22px); }
@@ -2296,22 +2297,16 @@
           <span class="statbar-seg is-main" style="--w: 62"><b>62 %</b> text or swap screenshots</span>
           <span class="statbar-seg" style="--w: 38"><b>38 %</b> don't try</span>
         </div>
-        <div class="statbar-brace" style="--from: 17; --to: 62">
+        <div class="statbar-brace" style="--from: 17; --to: 100">
           <span class="statbar-brace-line"></span>
-          <p class="statbar-brace-text"><b>73 % of them never met</b><br>45 % of everyone asked</p>
+          <p class="statbar-brace-text"><b>83 % never met anyone</b></p>
         </div>
       </div>
 
       <!-- The other side of the bar, in their own words. -->
-      <div class="voices">
-        <h3 class="cs-sub">Why the 38 % stopped trying</h3>
-        <p class="guide-text">I went back to nine of the students who said they no longer try to arrange anything between classes. Not one of them said they didn't want to meet.</p>
-        <div class="voice-grid">
-          <blockquote class="voice"><p>“I'd meet them if I knew when. Working it out takes longer than the break does.”</p><cite>3rd semester, industrial design</cite></blockquote>
-          <blockquote class="voice"><p>“By the time everyone has answered, I'm already in the next lecture.”</p><cite>2nd semester, architecture</cite></blockquote>
-          <blockquote class="voice"><p>“For 40 minutes it's just not worth the back and forth. So we say next week, and next week never comes.”</p><cite>4th semester, communication design</cite></blockquote>
-        </div>
-      </div>
+      <h3 class="cs-sub">Why the 38 % stopped trying</h3>
+      <p class="guide-text">I went back to nine of the students who said they no longer try to arrange anything between classes. <b>Not one of them said they didn't want to meet.</b> They said it costs more than it is worth: “I'd meet them if I knew when — working it out takes longer than the break does.” <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
+      <p class="guide-text">The second thing they all said was about the size of the window. “By the time everyone has answered, I'm already in the next lecture.” <b>For forty minutes it isn't worth the back and forth</b> — so, as one of them put it, “we say next week, and next week never comes.”</p>
     </section>
 
     <!-- 2 · Research → one model -->
