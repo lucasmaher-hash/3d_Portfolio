@@ -2046,6 +2046,13 @@
     }
     .tv-slot em { font-style: normal; letter-spacing: -1px; opacity: .85; }
 
+    /* The finding and the interviews run in a narrower column than the phone
+       above them: the section's own side padding again, so twice it in total. */
+    .stat-block {
+      display: flex; flex-direction: column; gap: clamp(20px, 3vw, 28px);
+      padding-inline: clamp(0px, 8vw, 80px);
+    }
+
     /* ── A finding, stated: kicker, headline, one line of detail ──────────── */
     .stat-kicker {
       font-family: 'VT323', monospace; font-size: 17px; letter-spacing: .06em;
@@ -2287,27 +2294,32 @@
         </div>
         <div class="imsg-lifted"><div class="imsg-track"></div></div>
       </div>
-      <!-- The finding, stated: a headline carrying the number, one paragraph
-           under it, then the bar it comes from. -->
-      <p class="stat-kicker">Survey · 120 students · before Unify</p>
-      <h3 class="stat-head">83 % of students never actually meet a friend from another course between classes</h3>
-      <p class="stat-sub">62 % try to arrange it by texting or swapping timetable screenshots — <b>but 73 % of them said their last attempt never turned into a meetup</b>. The remaining 38 % have stopped trying altogether.</p>
+      <!-- The finding and the interviews sit in their own column: twice the
+           section's side padding on a desktop, flush on a phone. The chat stage
+           above stays full width. -->
+      <div class="stat-block">
+        <!-- The finding, stated: a headline carrying the number, one paragraph
+             under it, then the bar it comes from. -->
+        <p class="stat-kicker">Survey · 120 students · before Unify</p>
+        <h3 class="stat-head">83 % of students never actually meet a friend from another course between classes</h3>
+        <p class="stat-sub">62 % try to arrange it by texting or swapping timetable screenshots — <b>but 73 % of them said their last attempt never turned into a meetup</b>. The remaining 38 % have stopped trying altogether.</p>
 
-      <div class="statbar" role="img" aria-label="Of everyone asked, 62 % coordinate by texting or screenshots and 38 % do not try. 73 % of the texting group never met, which with the ones who never tried is 83 % of everyone.">
-        <div class="statbar-track">
-          <span class="statbar-seg is-main" style="--w: 62"><b>62 %</b> text or swap screenshots</span>
-          <span class="statbar-seg" style="--w: 38"><b>38 %</b> don't try</span>
+        <div class="statbar" role="img" aria-label="Of everyone asked, 62 % coordinate by texting or screenshots and 38 % do not try. 73 % of the texting group never met, which with the ones who never tried is 83 % of everyone.">
+          <div class="statbar-track">
+            <span class="statbar-seg is-main" style="--w: 62"><b>62 %</b> text or swap screenshots</span>
+            <span class="statbar-seg" style="--w: 38"><b>38 %</b> don't try</span>
+          </div>
+          <div class="statbar-brace" style="--from: 17; --to: 100">
+            <span class="statbar-brace-line"></span>
+            <p class="statbar-brace-text"><b>83 % never met anyone</b></p>
+          </div>
         </div>
-        <div class="statbar-brace" style="--from: 17; --to: 100">
-          <span class="statbar-brace-line"></span>
-          <p class="statbar-brace-text"><b>83 % never met anyone</b></p>
-        </div>
+
+        <!-- The other side of the bar, in their own words. -->
+        <h3 class="stat-head is-section">Why the 38 % stopped trying</h3>
+        <p class="guide-text">I went back to nine of the students who said they no longer try to arrange anything between classes. <b>Not one of them said they didn't want to meet.</b> They said it costs more than it is worth: “I'd meet them if I knew when — working it out takes longer than the break does.” <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
+        <p class="guide-text">The second thing they all said was about the size of the window. “By the time everyone has answered, I'm already in the next lecture.” <b>For forty minutes it isn't worth the back and forth</b> — so, as one of them put it, “we say next week, and next week never comes.”</p>
       </div>
-
-      <!-- The other side of the bar, in their own words. -->
-      <h3 class="stat-head is-section">Why the 38 % stopped trying</h3>
-      <p class="guide-text">I went back to nine of the students who said they no longer try to arrange anything between classes. <b>Not one of them said they didn't want to meet.</b> They said it costs more than it is worth: “I'd meet them if I knew when — working it out takes longer than the break does.” <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
-      <p class="guide-text">The second thing they all said was about the size of the window. “By the time everyone has answered, I'm already in the next lecture.” <b>For forty minutes it isn't worth the back and forth</b> — so, as one of them put it, “we say next week, and next week never comes.”</p>
     </section>
 
     <!-- 2 · Research → one model -->
