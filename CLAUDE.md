@@ -325,7 +325,12 @@ and the sidebar link text; `id="research"` was left alone, it's just a URL slug)
 ("what would be a more suitable header") meant the h3 sub-headline, which became "What it had to
 do"; this second ask was the SECTION title itself — and "Requirements" fits there because
 section-titles across the page are short nouns already ("The idea", "Supporting features"), unlike
-sub-headlines, which are full declarative sentences. Different element, different rule.
+sub-headlines, which are full declarative sentences. Different element, different rule. **The whole block
+(kicker → headline → req-card) is wrapped in `.stat-block`** — the same reusable inset Problem's own
+finding/interviews use — rather than sitting flush at the section's own padding like the header row
+does; Lucas caught that Requirements' content wasn't matching Problem's extra 80px inset above it.
+Verified: both sections' content now start at the identical x-offset (271px at 1440), no overflow
+at 390.
 
 **The Problem section's evidence is one bar, after Jessica Im's tax case study** (2026-09-26,
 Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, then `.statbar` — its labels and the brace text set at the HEADLINE’s own ramp, `clamp(22px, 2.5vw, 32px)` (Lucas asked twice; caption-sized numbers read as a footnote) — a single track split into the share who
