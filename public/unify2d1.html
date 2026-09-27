@@ -2016,38 +2016,36 @@
       .diff-end:last-child { text-align: left; }
     }
 
-    /* ── The 2x2 model ────────────────────────────────────────────────────── */
-    /* Rebuilt 2026-09-26: a 2x2 only reads on its own if BOTH ends of BOTH axes
-       are named — the old version named just one pole per axis ("Fixed
-       timetable" under the grid, "Friends in other faculties" beside it) and
-       relied on a paragraph above it to supply the missing poles in prose.
-       Naming all four here is what lets that paragraph go: the section now
-       opens kicker → headline (states the finding, matching Problem's
-       pattern) straight into the diagram. */
-    .quad { display: flex; flex-direction: column; gap: 10px; width: min(640px, 100%); }
-    .quad-body { display: flex; gap: 14px; align-items: stretch; }
-    .quad-pole {
-      font-family: 'VT323', monospace; font-size: 14.5px; letter-spacing: .04em;
-      text-transform: uppercase; color: var(--text-secondary); line-height: 1.25;
+    /* ── Research, take two: three requirements, not a positioning model ───── */
+    /* The 2x2 quadrant (2026-09-26, first attempt) is gone — per Lucas it read
+       as a generic positioning-deck move, out of step with a page that deals
+       everywhere else in real chat messages and real quotes. This turns the
+       same research into three product requirements instead: what Problem's
+       numbers and interviews PROVED the app had to do, each claim backed by
+       one line pulled from evidence already on the page (or new, labelled).
+       One pressed card, three rows, hairline-separated — the same idiom the
+       mobile meta grid already uses for label/value rows. */
+    .req-card {
+      background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-pressed);
+      padding: 4px clamp(20px, 3vw, 30px);
     }
-    .quad-ypoles {
-      display: flex; flex-direction: column; justify-content: space-between;
-      width: 84px; flex: none; text-align: right; padding: 2px 0;
+    .req-row {
+      display: flex; gap: clamp(16px, 2.4vw, 28px); align-items: baseline;
+      padding: clamp(18px, 2.6vw, 26px) 0;
     }
-    .quad-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .quad-xpoles { display: flex; justify-content: space-between; padding-left: 98px; }
-    .quad-cell {
-      background: var(--bg-surface); border-radius: 18px; box-shadow: var(--shadow-pressed);
-      padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; min-height: 120px;
+    .req-row + .req-row { border-top: 1px solid var(--border-color); }
+    .req-num {
+      flex: none; width: 2ch;
+      font-family: 'OCR-A-BT', monospace; font-size: clamp(20px, 2vw, 26px);
+      letter-spacing: -0.02em; color: var(--accent-ink);
     }
-    .quad-cell b { font-family: 'Roboto Flex', sans-serif; font-size: 14.4px; font-weight: 400; letter-spacing: .03em; text-transform: uppercase; color: var(--text-primary); }
-    .quad-cell span { font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); }
-    .quad-cell i { color: var(--accent-ink); font-style: normal; }
-    .quad-cell.is-lead { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
-    @media (max-width: 640px) {
-      .quad-ypoles { width: 62px; }
-      .quad-xpoles { padding-left: 76px; }
+    .req-body { display: flex; flex-direction: column; gap: 6px; }
+    .req-claim {
+      font-family: 'Roboto Flex', sans-serif; font-weight: 500; font-size: clamp(16px, 1.6vw, 19px);
+      color: var(--text-primary);
     }
+    .req-evidence { font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); }
+    .req-evidence b { color: var(--text-primary); font-weight: 500; }
 
     /* ── The three timetable variants, drawn ──────────────────────────────── */
     .tv {
@@ -2354,20 +2352,30 @@
       </div>
       <div class="dot-divider"></div>
       <p class="stat-kicker">Synthesis · survey + diary study</p>
-      <h3 class="stat-head">One kind of student accounts for most of the missed meetups: a fixed timetable, and friends in other faculties</h3>
-      <div class="quad" role="img" aria-label="Two by two: flexible to fixed timetable on one axis, same faculty to other faculties on the other. The fixed-timetable, other-faculties quadrant is where the missed overlaps concentrate.">
-        <div class="quad-body">
-          <div class="quad-ypoles"><span class="quad-pole">Other<br>faculties</span><span class="quad-pole">Same<br>faculty</span></div>
-          <div class="quad-grid">
-            <div class="quad-cell"><b>Improvises</b><span>Free whenever, but so is everyone else — they just text and see.</span></div>
-            <div class="quad-cell is-lead"><b>Misses the gaps</b><span>Two or three free windows a day, none of them visible to the others. <i>Unify's user.</i></span></div>
-            <div class="quad-cell"><b>Runs into them</b><span>Same building most days; a shared break happens by itself.</span></div>
-            <div class="quad-cell"><b>Already knows</b><span>Same course, same timetable — nothing to coordinate.</span></div>
+      <h3 class="stat-head">Three things the research made non-negotiable</h3>
+      <div class="req-card" role="list" aria-label="Three requirements the research established, each with its evidence">
+        <div class="req-row" role="listitem">
+          <span class="req-num">01</span>
+          <div class="req-body">
+            <p class="req-claim">Answer inside the break, not after it</p>
+            <p class="req-evidence">“For forty minutes it isn't worth the back and forth.” The window is the constraint — not willingness.</p>
           </div>
         </div>
-        <div class="quad-xpoles"><span class="quad-pole">Flexible</span><span class="quad-pole">Fixed timetable</span></div>
+        <div class="req-row" role="listitem">
+          <span class="req-num">02</span>
+          <div class="req-body">
+            <p class="req-claim">Work across faculties, not just one course</p>
+            <p class="req-evidence"><b>64 %</b> of students have a close friend outside their own course — exactly why a shared timetable never already existed. Survey · n=120</p>
+          </div>
+        </div>
+        <div class="req-row" role="listitem">
+          <span class="req-num">03</span>
+          <div class="req-body">
+            <p class="req-claim">Cost nothing to check</p>
+            <p class="req-evidence">The <b>68 %</b> who stopped trying didn't stop wanting to meet — checking cost more than the break was worth.</p>
+          </div>
+        </div>
       </div>
-      <p class="cs-caption">7 of the 12 diary participants sat in that quadrant, accounting for <b>31 of the 41</b> logged attempts.</p>
     </section>
 
     <!-- 3 · The idea: shared free time -->

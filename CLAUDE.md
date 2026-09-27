@@ -289,25 +289,30 @@ overridden to `#FF88C8` (the hero character) at the top of the case-study block,
 the page map arrows — since #FF88C8 on the page grey is too pale to
 read small. The fact bar is bare numbers on the page: no card, no raised shadow (Lucas).
 
-**Two more visuals are markup**: `.quad` (the research 2×2, the live quadrant ringed in pink) and
-`.tv` (the three merged-timetable variants — A columns, B overlay, C the shared lane that won,
-drawn rather than screenshotted). The only `.ph` placeholders left are the sketch collage and the
-before/after shot, which both need real assets.
+**One more visual is markup**: `.tv` (the three merged-timetable variants — A columns, B overlay,
+C the shared lane that won, drawn rather than screenshotted). The only `.ph` placeholders left are
+the sketch collage and the before/after shot, which both need real assets.
 
-**Research was rebuilt 2026-09-26** (Lucas: "redo the research part"). What was wrong: the 2×2
-named only ONE pole per axis ("Fixed timetable" under the grid, "Friends in other faculties"
-beside it) and leaned on a paragraph above it to supply the other two poles in prose — so the
-diagram couldn't be read on its own, and the section didn't open with a kicker+headline the way
-Problem and the pilot stats now do, making it the one section still in a different voice. Fixed
-by naming all four poles directly on the diagram (`.quad-ypoles` "Other faculties" / "Same
-faculty", `.quad-xpoles` "Flexible" / "Fixed timetable" — both flex rows/columns of two
-`.quad-pole` spans, not the single rotated `.quad-axis` label from before) and replacing the
-paragraph with the same kicker → headline → visual → one-line caption shape Problem uses: the
-headline now states the finding itself ("One kind of student accounts for most of the missed
-meetups…"), so the diagram illustrates a claim already made rather than being the only place the
-claim exists. `#research .stat-kicker` zeroes the kicker's normal margin-top (tuned in Problem for
-the gap under its phone; here the kicker sits right after the dot-divider, so it only needs the
-section's own flex gap). Verified at 1440 and 390: axis poles readable at both widths, no overflow.
+**Research went through two rebuilds on 2026-09-26, and the first is now only in git history.**
+Attempt one replaced the original one-pole-per-axis 2×2 with a properly four-poled version
+(`.quad-ypoles`/`.quad-xpoles`, both ends of both axes named directly on the diagram instead of in
+a paragraph above it) plus a kicker+headline opener matching Problem's shape. **Lucas rejected the
+whole approach on sight** — a positioning quadrant read as generic-deck, out of step with a page
+that deals everywhere else in real chat messages and real quotes — so all `.quad*` CSS and markup
+is gone, not just patched.
+
+**What replaced it: three product requirements, not a user-positioning model.** Same kicker
+("Synthesis · survey + diary study") and headline opener as before, but the body is `.req-card` —
+one pressed neumorphic card holding three hairline-separated rows (the same idiom the mobile meta
+grid already uses for label/value rows), each an OCR-A-BT index (01/02/03), a bold claim stating
+what the research proved the app had to do, and one line of evidence underneath. The evidence
+deliberately reuses numbers and a quote ALREADY on the page — 68% (Problem's headline stat) and the
+"forty minutes" interview line — so Research reads as reasoning FROM Problem's findings rather than
+a fresh, disconnected dataset; only the 64%-other-faculties figure is new here (labelled `Survey ·
+n=120`, distinct from Problem's own 120-student survey questions). Chosen from four sketched
+options (a single sharper stat; a narrated diagnosis walking one stalled meetup using the chat's
+own Ben/Anna/Sophia; a workarounds-vs-reality comparison) — Lucas picked the requirements list.
+Verified at 1440 and 390: no overflow, hairlines and index numbers hold at both widths.
 
 **The Problem section's evidence is one bar, after Jessica Im's tax case study** (2026-09-26,
 Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, then `.statbar` — its labels and the brace text set at the HEADLINE’s own ramp, `clamp(22px, 2.5vw, 32px)` (Lucas asked twice; caption-sized numbers read as a footnote) — a single track split into the share who
