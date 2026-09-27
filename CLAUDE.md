@@ -438,15 +438,15 @@ that canon, and a rejected v1 shown once as a comparison device, not toured on i
 own complaint: three sections were all effectively re-showing the same screens from different
 angles — Idea's v1 stills + closing carousel, Pivot's v1-vs-final comparison, and a color/
 typography/character deep-dive also inside Pivot. The fix was a real cut, not a reshuffle:
-- **Idea lost ALL its screens.** The two `.feature-row`s that showed `v1-home`/`v1-timetable`
+- **Idea lost ALL its real screens** (superseded a few hours later the same day — see
+  "`.wf-frame`: two constructed wireframes" below, which put a visual back under "Who's free now",
+  just not a real v1 screenshot). The two `.feature-row`s that showed `v1-home`/`v1-timetable`
   stills, and the closing `.v1-carousel` ("the whole first version, working"), are gone. Both
-  points ("Who's free now", "How the overlap is found") are now plain `.cs-sub` + `.guide-text`,
-  identical in treatment to "The constraints" a section above. The one visual Idea keeps is the
-  `.ovl` overlap diagram — the single asset in the section that is actually unique to it and
-  proves the mechanism rather than illustrating the concept with a screenshot. Idea's job is now
-  purely "does the logic work", answered by the diagram; it no longer also tries to be "here's an
-  early build of it", which is Pivot's job and was the exact duplication Lucas flagged (the same
-  `v1-home`/`v1-timetable` images were appearing twice, a few hundred px of scroll apart).
+  points ("Who's free now", "How the overlap is found") were, briefly, plain `.cs-sub` +
+  `.guide-text`, identical in treatment to "The constraints" a section above. The `.ovl` overlap
+  diagram is still Idea's proof of the mechanism; Idea's job is "does the logic work", not "here's
+  an early build of it", which is Pivot's job and was the exact duplication Lucas flagged (the
+  same `v1-home`/`v1-timetable` images were appearing twice, a few hundred px of scroll apart).
 - **Pivot's color/typography/character exhibit — three swatch cards, three typography specimen
   pills, three illustrated character rows (`.color-grid`, `.typography-grid`, `.character-list`)
   — collapsed into one `.guide-text` paragraph** under "What replaced it", with two small
@@ -477,6 +477,62 @@ typography/character deep-dive also inside Pivot. The fix was a real cut, not a 
   under "3D Mode: Camera Controls" for why that matters): no overflow either width, inline swatches
   render correctly against the page's grey background, zero console errors from the now-dormant
   carousel script, div/section tag counts balanced.
+
+**`.wf-frame`: two CONSTRUCTED wireframes under "Who's free now", built the same day as the cut
+above, after Lucas pointed at a Jessica Im case-study screenshot as the exact reference** (two
+screens sharing one dotted-grid canvas, one arrow between them, no side text — his instruction was
+literally "two screens on one shared frame, one arrow inbetween, header and text below"). This is
+NOT a reversal of the "Idea lost all its screens" cut above — the two `.feature-row`s and the
+`.v1-carousel` that came back out were real v1 SCREENSHOTS, which is what made them duplicate
+Pivot. `.wf-frame`'s two panels are hand-built markup recreating the SHAPE of two v1 screens
+("Connect now" and the Stundenplan/timetable list) from Lucas's own screenshots of them, not the
+screenshots themselves — monochrome, simplified, existing only to explain why the app has two
+views. Nothing here appears again in Pivot, so the duplication problem doesn't recur.
+- **Copy above it was rewritten to state the reason for two views directly** ("I wanted two ways
+  into the same overlap, not one screen doing both jobs...") rather than describing only the first
+  view, since the wireframes now do double duty as evidence for both halves of that sentence.
+- **`.wf-frame`**: a `role="img"` wrapper (same idiom as `.ovl`/`.tv`/`.diff` elsewhere on this
+  page) holding a dot-grid canvas (`radial-gradient(circle, rgba(0,0,0,.08) 1px, transparent
+  1.5px) 0 0 / 16px 16px` over `var(--bg-surface)`, inside a pressed neumorphic well) — the same
+  "graph paper" cue the Jessica Im reference uses to signal *sketch*, not *screenshot*. Two
+  `.wf-screen` cards (`#fff` background, thin `var(--border-color)` border, no phone bezel — these
+  are wireframes of screens, not device mockups) sit in a flex row with an SVG arrow between,
+  `align-items: flex-end` on the row so the arrow's height matches the "open Calendar" button's
+  position at the bottom of the first card rather than sitting mid-height. Below 640px the row
+  becomes a column and the arrow rotates 90° to point down.
+- **Content is real, not abstracted to grey bars** — "Connect now" keeps its actual v1 copy (Zoe /
+  Paul / Luis / Tom bubbles, the 11:30–12:00 range, "open Calendar"), and the Stundenplan panel
+  keeps its actual tabs/day-selector/row structure ("Interface Design", times, room numbers).
+  Matches how the Jessica Im reference itself works — real simplified copy, not Balsamiq-style
+  placeholder bars — and keeps the panels legible as "this is what those two screens are" rather
+  than abstract boxes. The one deliberate accent thread tying the two panels together is `var(
+  --accent-ink)` (this page's pink, not the site orange) on exactly the connecting parts: the Zoe
+  bubble's border (the friend the glance is built around), the open-Calendar button, the arrow, and
+  the Timetable tab + the one highlighted row it lands on — everything else is grayscale.
+  `.wf-connect-title` uses OCR-A-BT (the typewriter face v1 actually used) as a small nod to "this
+  is v1", even though nothing else in the wireframe tries to be period-accurate.
+- **Bubble stacking order needed an explicit fix**: the small "Paul" bubble at the top visually
+  overlapped the big central "Zoe" circle, and because DOM/paint order put `--zoe` after
+  `--paul1`, Zoe painted over Paul's text. Fixed with `z-index: 1` on `--zoe` and `z-index: 2` on
+  the four smaller bubbles — simpler than reordering the markup, and it generalizes if a bubble's
+  position is nudged later.
+- ⚠ **Known issue, not yet fixed (Lucas: "ignore mobile for now"): on a phone, `.wf-screen`'s text
+  is unreadable.** The card's own background is a hardcoded `#fff` (correct — it must always be a
+  literal light UI mockup, not a "screen" that repaints itself when the page goes dark, the same
+  reasoning as "SkeuKit exhibits keep their own light material" in the dark-mode section above),
+  but its text colour comes from `var(--text-primary)`/`--text-secondary`/`--border-color`, which
+  `dark-mobile.css` swaps to light greys (`#E8E8E9`/`#99999C`/`#404045`) below 640px. Light grey
+  text on a hardcoded white card is close to invisible. **The fix, when picked back up:** declare
+  the light-mode values of those three tokens locally on `.wf-screen` itself (`--text-primary:
+  #1A1A1A; --text-secondary: #8E8E93; --text-tertiary: #c7c7cc; --border-color: #6f6f6f;` — the
+  same values `:root` uses in light mode) — custom-property inheritance means every descendant
+  reads `.wf-screen`'s own value rather than `:root[data-theme="dark"]`'s, no `!important` or
+  specificity fight needed, and it costs nothing on desktop where the tokens already match. Do NOT
+  fix this by touching `dark-mobile.css` — that would risk every OTHER dark-mode-aware element on
+  the page; scope the fix to `.wf-screen` only, exactly like the SkeuKit precedent.
+- Verified on desktop only (1440) over CDP: bubble stacking fixed, arrow aligns with the
+  open-Calendar button's height, zero console errors. Mobile (390, touch-emulated) was screenshotted
+  and the dark-mode contrast bug above was found and left as-is per Lucas's instruction.
 
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
