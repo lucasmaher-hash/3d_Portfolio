@@ -305,7 +305,14 @@ is gone, not just patched.
 ("Synthesis · survey + diary study") and headline opener as before, but the body is `.req-card` —
 one pressed neumorphic card holding three hairline-separated rows (the same idiom the mobile meta
 grid already uses for label/value rows), each an OCR-A-BT index (01/02/03), a bold claim stating
-what the research proved the app had to do, and one line of evidence underneath. The evidence
+what the research proved the app had to do, and one line of evidence underneath. **No card** (Lucas, follow-up:
+"cut the separate frame") — `.req-card`'s background/shadow/padding are gone; the hairlines between
+rows (`.req-row + .req-row`) are what separates the three now, sitting as plain text on the page
+like everything else. The headline was also renamed from "Three things the research made
+non-negotiable" to **"What it had to do"** — shorter, and a first-person-adjacent phrase rather
+than a labelled list (Lucas floated "Requirements" as a plain label; that read too close to the
+generic-deck tone the quadrant was rejected for, so the declarative-sentence voice the rest of the
+page's headlines use — "Why the 68% stopped trying," etc. — won instead). The evidence
 deliberately reuses numbers and a quote ALREADY on the page — 68% (Problem's headline stat) and the
 "forty minutes" interview line — so Research reads as reasoning FROM Problem's findings rather than
 a fresh, disconnected dataset; only the 64%-other-faculties figure is new here (labelled `Survey ·
