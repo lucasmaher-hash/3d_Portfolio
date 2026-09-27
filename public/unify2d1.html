@@ -1597,6 +1597,9 @@
     .pilot-stats { display: flex; flex-direction: column; gap: clamp(16px, 2.2vw, 24px); margin-top: clamp(28px, 4vw, 48px); }
     .pilot-stats .stat-kicker { margin-top: 0; }
     .pilot-stats .stat-head { font-size: clamp(19px, 2vw, 25px); }
+    /* Research's kicker sits right after the dot-divider (no phone above it to
+       clear, unlike Problem's), so it keeps just the section's own flex gap. */
+    #research .stat-kicker { margin-top: 0; }
 
     /* Fact bar: three big numbers. */
     .fact-bar {
@@ -2014,17 +2017,25 @@
     }
 
     /* ── The 2x2 model ────────────────────────────────────────────────────── */
-    .quad {
-      display: grid; grid-template-columns: 22px 1fr; grid-template-rows: 1fr 22px;
-      gap: 10px; width: min(640px, 100%); align-items: center;
+    /* Rebuilt 2026-09-26: a 2x2 only reads on its own if BOTH ends of BOTH axes
+       are named — the old version named just one pole per axis ("Fixed
+       timetable" under the grid, "Friends in other faculties" beside it) and
+       relied on a paragraph above it to supply the missing poles in prose.
+       Naming all four here is what lets that paragraph go: the section now
+       opens kicker → headline (states the finding, matching Problem's
+       pattern) straight into the diagram. */
+    .quad { display: flex; flex-direction: column; gap: 10px; width: min(640px, 100%); }
+    .quad-body { display: flex; gap: 14px; align-items: stretch; }
+    .quad-pole {
+      font-family: 'VT323', monospace; font-size: 14.5px; letter-spacing: .04em;
+      text-transform: uppercase; color: var(--text-secondary); line-height: 1.25;
     }
-    .quad-axis {
-      font-family: 'VT323', monospace; font-size: 16px; letter-spacing: .04em;
-      text-transform: uppercase; color: var(--text-secondary); text-align: center;
+    .quad-ypoles {
+      display: flex; flex-direction: column; justify-content: space-between;
+      width: 84px; flex: none; text-align: right; padding: 2px 0;
     }
-    .quad-axis--y { writing-mode: vertical-rl; transform: rotate(180deg); grid-row: 1; grid-column: 1; }
-    .quad-axis--x { grid-row: 2; grid-column: 2; }
-    .quad-grid { grid-row: 1; grid-column: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .quad-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .quad-xpoles { display: flex; justify-content: space-between; padding-left: 98px; }
     .quad-cell {
       background: var(--bg-surface); border-radius: 18px; box-shadow: var(--shadow-pressed);
       padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; min-height: 120px;
@@ -2033,6 +2044,10 @@
     .quad-cell span { font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); }
     .quad-cell i { color: var(--accent-ink); font-style: normal; }
     .quad-cell.is-lead { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
+    @media (max-width: 640px) {
+      .quad-ypoles { width: 62px; }
+      .quad-xpoles { padding-left: 76px; }
+    }
 
     /* ── The three timetable variants, drawn ──────────────────────────────── */
     .tv {
@@ -2338,18 +2353,21 @@
         <span class="step-badge">2</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">Putting the survey and the diary together, two things decide how hard it is to meet: how fixed your week is, and how far your friends are from your own course. A fixed week is easy to plan around — but only if the people you want to see are in it. The students who lost the most time were the ones with a rigid timetable and friends spread across other faculties: they always had gaps, and never knew when.</p>
-      <div class="quad" role="img" aria-label="Two by two: how fixed your week is against how far your friends are from your course. Fixed week plus friends in other faculties is where the missed overlaps are.">
-        <span class="quad-axis quad-axis--y">Friends in other faculties</span>
-        <div class="quad-grid">
-          <div class="quad-cell"><b>Improvises</b><span>Free whenever, but so is everyone else — they just text and see.</span></div>
-          <div class="quad-cell is-lead"><b>Misses the gaps</b><span>Two or three free windows a day, none of them visible to the others. <i>Unify's user.</i></span></div>
-          <div class="quad-cell"><b>Runs into them</b><span>Same building most days; a shared break happens by itself.</span></div>
-          <div class="quad-cell"><b>Already knows</b><span>Same course, same timetable — nothing to coordinate.</span></div>
+      <p class="stat-kicker">Synthesis · survey + diary study</p>
+      <h3 class="stat-head">One kind of student accounts for most of the missed meetups: a fixed timetable, and friends in other faculties</h3>
+      <div class="quad" role="img" aria-label="Two by two: flexible to fixed timetable on one axis, same faculty to other faculties on the other. The fixed-timetable, other-faculties quadrant is where the missed overlaps concentrate.">
+        <div class="quad-body">
+          <div class="quad-ypoles"><span class="quad-pole">Other<br>faculties</span><span class="quad-pole">Same<br>faculty</span></div>
+          <div class="quad-grid">
+            <div class="quad-cell"><b>Improvises</b><span>Free whenever, but so is everyone else — they just text and see.</span></div>
+            <div class="quad-cell is-lead"><b>Misses the gaps</b><span>Two or three free windows a day, none of them visible to the others. <i>Unify's user.</i></span></div>
+            <div class="quad-cell"><b>Runs into them</b><span>Same building most days; a shared break happens by itself.</span></div>
+            <div class="quad-cell"><b>Already knows</b><span>Same course, same timetable — nothing to coordinate.</span></div>
+          </div>
         </div>
-        <span class="quad-axis quad-axis--x">Fixed timetable</span>
+        <div class="quad-xpoles"><span class="quad-pole">Flexible</span><span class="quad-pole">Fixed timetable</span></div>
       </div>
-      <p class="cs-caption">The quadrant with a <b>fixed week and friends in other faculties</b> lost the most time: 7 of the 12 diary participants sat in it, and they account for 31 of the 41 logged attempts.</p>
+      <p class="cs-caption">7 of the 12 diary participants sat in that quadrant, accounting for <b>31 of the 41</b> logged attempts.</p>
     </section>
 
     <!-- 3 · The idea: shared free time -->

@@ -294,6 +294,21 @@ read small. The fact bar is bare numbers on the page: no card, no raised shadow 
 drawn rather than screenshotted). The only `.ph` placeholders left are the sketch collage and the
 before/after shot, which both need real assets.
 
+**Research was rebuilt 2026-09-26** (Lucas: "redo the research part"). What was wrong: the 2×2
+named only ONE pole per axis ("Fixed timetable" under the grid, "Friends in other faculties"
+beside it) and leaned on a paragraph above it to supply the other two poles in prose — so the
+diagram couldn't be read on its own, and the section didn't open with a kicker+headline the way
+Problem and the pilot stats now do, making it the one section still in a different voice. Fixed
+by naming all four poles directly on the diagram (`.quad-ypoles` "Other faculties" / "Same
+faculty", `.quad-xpoles` "Flexible" / "Fixed timetable" — both flex rows/columns of two
+`.quad-pole` spans, not the single rotated `.quad-axis` label from before) and replacing the
+paragraph with the same kicker → headline → visual → one-line caption shape Problem uses: the
+headline now states the finding itself ("One kind of student accounts for most of the missed
+meetups…"), so the diagram illustrates a claim already made rather than being the only place the
+claim exists. `#research .stat-kicker` zeroes the kicker's normal margin-top (tuned in Problem for
+the gap under its phone; here the kicker sits right after the dot-divider, so it only needs the
+section's own flex gap). Verified at 1440 and 390: axis poles readable at both widths, no overflow.
+
 **The Problem section's evidence is one bar, after Jessica Im's tax case study** (2026-09-26,
 Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, then `.statbar` — its labels and the brace text set at the HEADLINE’s own ramp, `clamp(22px, 2.5vw, 32px)` (Lucas asked twice; caption-sized numbers read as a footnote) — a single track split into the share who
 coordinate by texting (pink) and the share who have stopped trying (empty), with a thick black `.statbar-brace`
