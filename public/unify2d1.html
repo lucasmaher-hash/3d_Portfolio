@@ -1575,23 +1575,14 @@
     }
 
     /* Page map: a fixed sidebar, after Jessica Im's reference — off the hero,
-       so the hero itself only carries the line and the three numbers. Hidden
-       until the reader has scrolled past the hero, tracks the section in view.
-       Desktop only: six lines plus a back link is exactly the clutter a phone
-       doesn't have room for. */
+       so the hero itself only carries the line and the three numbers. Stays on
+       screen at every scroll position, including at the very top (Lucas) — no
+       fade/visibility gate any more. Desktop only: six lines is exactly the
+       clutter a phone doesn't have room for. */
     .cs-map {
       position: fixed; left: clamp(20px, 3vw, 40px); bottom: 96px; z-index: 40;
       display: flex; flex-direction: column; gap: 10px;
-      opacity: 0; pointer-events: none; transform: translateY(6px);
-      transition: opacity 300ms ease, transform 300ms ease;
     }
-    .cs-map.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
-    .cs-map-back {
-      font-family: 'VT323', monospace; font-size: 15px; letter-spacing: 0.04em;
-      text-transform: uppercase; color: var(--text-secondary); text-decoration: none;
-      margin-bottom: 4px;
-    }
-    .cs-map-back:hover { color: var(--text-primary); }
     .cs-map a {
       font-family: 'VT323', monospace; font-size: 16px; letter-spacing: 0.04em;
       text-transform: uppercase; color: var(--text-tertiary); text-decoration: none;
@@ -2191,10 +2182,10 @@
 
   <div class="page-wrapper">
 
-    <!-- Fixed section sidebar, off the hero (see .cs-map). Fades in once the
-         hero has scrolled past, tracks whichever section is in view. -->
+    <!-- Fixed section sidebar, off the hero (see .cs-map). Stays on screen at
+         every scroll position (Lucas: including at the very top), tracks
+         whichever section is currently in view, and smooth-scrolls on click. -->
     <nav class="cs-map" aria-label="Page sections">
-      <a class="cs-map-back" href="#top">↑ Unify</a>
       <a href="#problem">Problem</a>
       <a href="#research">Research</a>
       <a href="#idea">Idea</a>
@@ -3887,25 +3878,30 @@
     })();
   </script>
   <script>
-    // ── Fixed section sidebar: visible once past the hero, tracks scroll ────
+    // ── Fixed section sidebar: on screen throughout, tracks scroll, smooth-scrolls ──
     (function () {
       var map = document.querySelector('.cs-map');
       if (!map) return;
-      var hero = document.getElementById('top');
       var links = Array.prototype.slice.call(map.querySelectorAll('a[href^="#"]'));
       var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); })
                           .filter(Boolean);
 
-      // Visible only once the hero has scrolled out of view — the sidebar
-      // exists so the hero can be uncluttered, so it has no reason to show
-      // while the hero itself is still on screen.
-      function syncVisibility() {
-        var r = hero.getBoundingClientRect();
-        map.classList.toggle('is-visible', r.bottom < 80);
-      }
-      addEventListener('scroll', syncVisibility, { passive: true });
-      addEventListener('resize', syncVisibility);
-      syncVisibility();
+      // Clicking a chapter scrolls there smoothly instead of jumping — the
+      // site elsewhere always drives scrolling through scrollTo({ behavior:
+      // 'smooth' }), not the scroll-behavior CSS property (which would also
+      // smooth-scroll unrelated in-page jumps this page doesn't have, so it's
+      // no safer a shortcut). A small gap keeps the heading off the exact
+      // viewport edge.
+      var OFFSET = 24;
+      links.forEach(function (a) {
+        a.addEventListener('click', function (e) {
+          var target = document.querySelector(a.getAttribute('href'));
+          if (!target) return;
+          e.preventDefault();
+          var top = target.getBoundingClientRect().top + scrollY - OFFSET;
+          scrollTo({ top: top, behavior: 'smooth' });
+        });
+      });
 
       // Active section = whichever one's top has most recently crossed a line
       // a third of the way down the viewport — reading position, not the
