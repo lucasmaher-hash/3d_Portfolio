@@ -332,6 +332,21 @@ does; Lucas caught that Requirements' content wasn't matching Problem's extra 80
 Verified: both sections' content now start at the identical x-offset (271px at 1440), no overflow
 at 390.
 
+**Then a fourth pass threw out the kicker/headline/card entirely — this is what's LIVE now.** Lucas:
+plain text, uniform size, no pink, "just 4 sections for the short text and then each requirement."
+`#research` is now `<h2>` + badge + divider, then four plain `.guide-text` paragraphs and nothing
+else — no `.stat-block`, `.stat-kicker` or `.stat-head` in this section any more (those classes are
+still defined and still used elsewhere, just not here). The intro line ("Based on the research, I
+set three requirements for what the app had to do.") is its own paragraph; each requirement is one
+paragraph with its claim picked out via the SAME inline `<b>` the interview quotes above it already
+use — `.guide-text b` is colour/weight only, never a size change, which is exactly what keeps every
+line of the section visually identical. All the `.req-*` CSS from the card attempt is deleted, not
+just unused. **Padding note:** with no `.stat-block` wrapper, the paragraphs sit at the section's
+plain default padding (191px at 1440) rather than Problem's extra-inset 271px — and that turns out
+to be the CORRECT match now, not a regression: `#problem`'s own first paragraph (before its
+stat-block starts) is also at 191px, so Requirements now lines up with how every other plain-text
+section on the page behaves, not with Problem's specially-inset finding block.
+
 **The Problem section's evidence is one bar, after Jessica Im's tax case study** (2026-09-26,
 Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, then `.statbar` — its labels and the brace text set at the HEADLINE’s own ramp, `clamp(22px, 2.5vw, 32px)` (Lucas asked twice; caption-sized numbers read as a footnote) — a single track split into the share who
 coordinate by texting (pink) and the share who have stopped trying (empty), with a thick black `.statbar-brace`

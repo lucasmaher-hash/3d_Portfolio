@@ -1597,9 +1597,6 @@
     .pilot-stats { display: flex; flex-direction: column; gap: clamp(16px, 2.2vw, 24px); margin-top: clamp(28px, 4vw, 48px); }
     .pilot-stats .stat-kicker { margin-top: 0; }
     .pilot-stats .stat-head { font-size: clamp(19px, 2vw, 25px); }
-    /* Research's kicker sits right after the dot-divider (no phone above it to
-       clear, unlike Problem's), so it keeps just the section's own flex gap. */
-    #research .stat-kicker { margin-top: 0; }
 
     /* Fact bar: three big numbers. */
     .fact-bar {
@@ -2016,34 +2013,12 @@
       .diff-end:last-child { text-align: left; }
     }
 
-    /* ── Research, take two: three requirements, not a positioning model ───── */
-    /* The 2x2 quadrant (2026-09-26, first attempt) is gone — per Lucas it read
-       as a generic positioning-deck move, out of step with a page that deals
-       everywhere else in real chat messages and real quotes. This turns the
-       same research into three product requirements instead: what Problem's
-       numbers and interviews PROVED the app had to do, each claim backed by
-       one line pulled from evidence already on the page (or new, labelled).
-       One pressed card, three rows, hairline-separated — the same idiom the
-       mobile meta grid already uses for label/value rows. */
-    /* No card — plain text on the page (Lucas), the hairlines alone do the
-       job of separating the three rows. */
-    .req-row {
-      display: flex; gap: clamp(16px, 2.4vw, 28px); align-items: baseline;
-      padding: clamp(18px, 2.6vw, 26px) 0;
-    }
-    .req-row + .req-row { border-top: 1px solid var(--border-color); }
-    .req-num {
-      flex: none; width: 2ch;
-      font-family: 'OCR-A-BT', monospace; font-size: clamp(20px, 2vw, 26px);
-      letter-spacing: -0.02em; color: var(--accent-ink);
-    }
-    .req-body { display: flex; flex-direction: column; gap: 6px; }
-    .req-claim {
-      font-family: 'Roboto Flex', sans-serif; font-weight: 500; font-size: clamp(16px, 1.6vw, 19px);
-      color: var(--text-primary);
-    }
-    .req-evidence { font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); }
-    .req-evidence b { color: var(--text-primary); font-weight: 500; }
+    /* ── Requirements: three tries, this is the third ────────────────────────
+       1. A 2x2 positioning quadrant — rejected as generic-deck.
+       2. A numbered card (pink OCR-A-BT index, bold claim, smaller evidence
+          line) — rejected too: Lucas wanted no card, no size hierarchy, no
+          pink, just plain paragraphs. That's what's live now (see the section
+          markup) — .guide-text throughout, no dedicated CSS of its own. */
 
     /* ── The three timetable variants, drawn ──────────────────────────────── */
     .tv {
@@ -2349,35 +2324,15 @@
         <span class="step-badge">2</span>
       </div>
       <div class="dot-divider"></div>
-      <!-- Same inset as Problem's own finding/interviews block (Lucas): reuses
-           .stat-block rather than a second copy of the same padding rule. -->
-      <div class="stat-block">
-        <p class="stat-kicker">Synthesis · survey + diary study</p>
-        <h3 class="stat-head">What it had to do</h3>
-        <div class="req-card" role="list" aria-label="Three requirements the research established, each with its evidence">
-          <div class="req-row" role="listitem">
-            <span class="req-num">01</span>
-            <div class="req-body">
-              <p class="req-claim">Answer inside the break, not after it</p>
-              <p class="req-evidence">“For forty minutes it isn't worth the back and forth.” The window is the constraint — not willingness.</p>
-            </div>
-          </div>
-          <div class="req-row" role="listitem">
-            <span class="req-num">02</span>
-            <div class="req-body">
-              <p class="req-claim">Work across faculties, not just one course</p>
-              <p class="req-evidence"><b>64 %</b> of students have a close friend outside their own course — exactly why a shared timetable never already existed. Survey · n=120</p>
-            </div>
-          </div>
-          <div class="req-row" role="listitem">
-            <span class="req-num">03</span>
-            <div class="req-body">
-              <p class="req-claim">Cost nothing to check</p>
-              <p class="req-evidence">The <b>68 %</b> who stopped trying didn't stop wanting to meet — checking cost more than the break was worth.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Rebuilt again 2026-09-26 (Lucas: plain text, no kicker, no card, no
+           size hierarchy). Four .guide-text paragraphs, same size and colour
+           as any other paragraph on the page — the intro, then one per
+           requirement, the claim picked out with the SAME inline <b> the
+           interview quotes above already use (colour/weight only, not size). -->
+      <p class="guide-text">Based on the research, I set three requirements for what the app had to do.</p>
+      <p class="guide-text"><b>Answer inside the break, not after it.</b> “For forty minutes it isn't worth the back and forth.” The window is the constraint — not willingness.</p>
+      <p class="guide-text"><b>Work across faculties, not just one course.</b> 64 % of students have a close friend outside their own course — exactly why a shared timetable never already existed. Survey · n=120.</p>
+      <p class="guide-text"><b>Cost nothing to check.</b> The 68 % who stopped trying didn't stop wanting to meet — checking cost more than the break was worth.</p>
     </section>
 
     <!-- 3 · The idea: shared free time -->
