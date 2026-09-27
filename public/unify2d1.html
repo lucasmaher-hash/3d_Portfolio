@@ -1671,7 +1671,14 @@
     .cs-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); align-items: start; }
     .cs-figure { display: flex; flex-direction: column; gap: 14px; }
 
-    /* Pivot: v1 and the final design on the SAME three screens. */
+    /* Pivot: v1 and the final design on the SAME three screens.
+       UNUSED as of 2026-09-27, see CLAUDE.md — Pivot's phone-framed v1 row
+       (`.pivot-compare` > `.pivot-row` > `.pivot-screens`) was replaced by
+       the scattered `.v1-collage` below, and everything from here down to
+       `.pivot-screens .phone-shot` (the whole "v1 screens in an iPhone
+       frame" system: `.v1-screen`/`.v1-still`/`.v1-window`/`.v1-bar`/
+       `.v1-carousel`) has no markup left referencing it. Kept, not deleted,
+       same convention as the other dormant blocks tracked in CLAUDE.md. */
     .pivot-compare { display: flex; flex-direction: column; gap: clamp(24px, 4vw, 44px); }
     .pivot-row { display: flex; flex-direction: column; gap: 14px; }
     .pivot-label {
@@ -1726,6 +1733,67 @@
     .v1-carousel > .phone-shot { cursor: pointer; }
     .v1-carousel > .phone-shot[data-slot="0"] { cursor: default; }
     .pivot-screens .phone-shot { width: 100%; max-width: 220px; }
+
+    /* ── v1 in detail: a non-linear collage of the real v1 screens ──────────
+       Replaces the old phone-framed 3-screen row above (now unused). No
+       phone bezel this time — plain rotated photo-like cards scattered on a
+       dot-grid canvas, matching the Jessica Im "audit" reference Lucas
+       pointed to rather than this page's usual phone-mockup idiom. One crop
+       per screen: v1-home.webp/v1-timetable.webp are tall scrolling
+       captures, so `object-fit: cover; object-position: top` crops each to
+       its top screen, the same technique `.v1-still` already used for the
+       building exports (which are already single-screen images). A single
+       shared aspect-ratio box (3/4) is used for all five regardless of the
+       source image's own ratio, so the scatter reads as one consistent set
+       of "photos" rather than five different-shaped crops. */
+    .v1-collage {
+      display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center;
+      gap: clamp(22px, 3.4vw, 40px);
+      width: 100%;
+      padding: clamp(40px, 6vw, 68px) clamp(24px, 5vw, 56px);
+      border-radius: 24px;
+      background:
+        radial-gradient(circle, rgba(0, 0, 0, .08) 1px, transparent 1.5px) 0 0 / 16px 16px,
+        var(--bg-surface);
+      box-shadow: var(--shadow-pressed);
+    }
+    .v1-collage-card {
+      width: clamp(140px, 15vw, 190px);
+      aspect-ratio: 3 / 4;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 18px 32px rgba(0, 0, 0, .18), 0 4px 10px rgba(0, 0, 0, .10);
+    }
+    .v1-collage-card img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+    /* The three building-map cards are screen RECORDINGS, not scrolling web
+       exports like home/timetable — they carry black letterbox bars top and
+       bottom, with the actual floor plan sitting vertically centred, not at
+       the top. `top` cropped straight into the dead letterbox space (visible
+       as a near-black or near-solid-blue card). Centring the crop instead
+       catches the actual content on all three. */
+    .v1-collage-card:nth-child(3) img,
+    .v1-collage-card:nth-child(4) img,
+    .v1-collage-card:nth-child(5) img { object-position: center; }
+    /* Rotation + vertical offset per card is what reads as "scattered", not a
+       grid — z-index on the centre card so it visually sits in front, the
+       way a photo dropped last on a table would. */
+    .v1-collage-card:nth-child(1) { transform: rotate(-4deg) translateY(14px); }
+    .v1-collage-card:nth-child(2) { transform: rotate(3deg) translateY(-10px); }
+    .v1-collage-card:nth-child(3) { transform: rotate(-2deg); width: clamp(160px, 17vw, 220px); z-index: 2; }
+    .v1-collage-card:nth-child(4) { transform: rotate(4deg) translateY(20px); }
+    .v1-collage-card:nth-child(5) { transform: rotate(-3deg) translateY(-16px); }
+    @media (max-width: 640px) {
+      /* Two per row, not one — the first pass clamped cards to ~148px, which
+         with the 20px gap and 18px side padding came out to 316px against
+         only ~314px of actual inner width (measured: .v1-collage's own
+         `clientWidth` minus its padding), 2px over. flex-wrap dutifully
+         wrapped every card to its own line. Sized with real margin this
+         time, not recomputed to the exact edge. */
+      .v1-collage { padding: 24px 16px; gap: 16px; }
+      .v1-collage-card { width: clamp(100px, 32vw, 136px); }
+      .v1-collage-card:nth-child(3) { width: clamp(112px, 36vw, 154px); }
+    }
 
     /* Timetable variants A / B / C with their metrics underneath. */
     .variant { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
@@ -2562,37 +2630,25 @@
         <span class="step-badge">4</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">I designed the first version: blue, typewriter type, hard lines. It was clear and structured, but the team's feedback round found it felt cold — like a tool, not something you'd share your location in. The information architecture and the timetable logic stayed; only the visual language was replaced. In a preference test with 28 students — the same three screens in both designs, order randomised — v1 scored 2.1 on cold–warm against the character design's 5.8, and 24 of the 28 picked the character version as the one they would actually open between classes.</p>
-      <div class="pivot-compare">
-        <div class="pivot-row">
-          <span class="pivot-label">v1 · technical</span>
-          <!-- Plain static row, 1:1 with the final row below it (home / timetable /
-               friends-on-the-map) — the full 5-screen carousel now lives in "The
-               idea", as "here's the whole first version, working." Here the point
-               is only the visual comparison, so it matches the final row's count. -->
-          <div class="pivot-screens">
-            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen">
-              <div class="v1-window"><img src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
-              <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
-            </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable screen">
-              <div class="v1-window"><img class="v1-clear-island" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
-              <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
-            </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-            <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-friends.webp" alt="Unify v1 building map with the friends list open" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-          </div>
-        </div>
+      <p class="guide-text">I designed the first version: blue, typewriter type, hard lines. The information architecture and the timetable logic — the merged view, the room-level map, the overlap logic — were already right here; only the visual language was about to change.</p>
+
+      <!-- v1 in detail, non-linear (2026-09-27, replacing the old phone-framed
+           3-screen row + the removed final-design comparison and .diff chart —
+           see CLAUDE.md for the full history). Real crops of the actual v1
+           exports, scattered and rotated on a shared dot-grid canvas, no phone
+           bezel — closer to the Jessica Im "audit" reference Lucas pointed to
+           than to this page's usual phone-mockup treatment. No per-screen
+           labels (Lucas: keep it to plain screens, no annotations). -->
+      <div class="v1-collage" role="img" aria-label="Five screens from the v1 design, scattered: the home screen, the timetable, and the building map in its floor-switcher, friends-list and full-screen states.">
+        <div class="v1-collage-card"><img src="/images/unify/v1/v1-home.webp" alt="" /></div>
+        <div class="v1-collage-card"><img src="/images/unify/v1/v1-timetable.webp" alt="" /></div>
+        <div class="v1-collage-card"><img src="/images/unify/v1/v1-building.webp" alt="" /></div>
+        <div class="v1-collage-card"><img src="/images/unify/v1/v1-building-friends.webp" alt="" /></div>
+        <div class="v1-collage-card"><img src="/images/unify/v1/v1-building-open.webp" alt="" /></div>
       </div>
-      <!-- The "Final · character-based" comparison row, its caption, and the
-           .diff semantic-differential chart (the "sliders") were removed
-           2026-09-27, Lucas — this whole visualization is being rebuilt
-           (a non-linear collage of the actual v1 screens, no phone frame,
-           closer to a Jessica Im reference he shared), not just retouched.
-           This is a first, narrow step: delete the three final-design
-           screens and the chart; everything else here (the intro paragraph
-           above, the v1 row, "What replaced it" below) is untouched pending
-           that larger rebuild. .diff's CSS is left in place, unused — see
-           the other UNUSED blocks tracked in CLAUDE.md. -->
+
+      <h3 class="cs-sub">It felt like a tool</h3>
+      <p class="guide-text">It was clear and structured, but the team's feedback round said the same thing back: cold, technical — not something you'd share your location in. So the visual language was replaced; nothing else was.</p>
 
       <h3 class="cs-sub">What replaced it</h3>
       <!-- Compressed 2026-09-27 from a full color/typography/character exhibit

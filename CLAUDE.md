@@ -586,10 +586,63 @@ same convention as every other dormant block tracked in this file. **`.chart-row
 "Testing and results" further down the page, so don't mark them dormant if touching this area
 again. Verified over CDP: div/section tags balanced, zero console errors, Pivot now runs heading →
 intro → v1 row → "What replaced it" with no orphaned caption or empty gap where the deleted content
-was. **Next step, not done yet:** build the scattered v1 collage (all 5 exports, one crop each,
-`v1-home`/`v1-timetable` need a representative frame cropped from their tall scrolling captures
-since they're not single screenshots) plus the heading + decision paragraph beneath it, per the
-plan above.
+was.
+
+**The scattered v1 collage was then built — `.v1-collage`, replacing the old phone-framed v1 row
+entirely (2026-09-27, same session, Lucas: "do the collage").** Pivot now runs: intro paragraph
+(trimmed — the preference-test numbers came out here, per Lucas's earlier answer to drop them) →
+`.v1-collage` (all 5 v1 screens, scattered, no phone bezel) → `h3` "It felt like a tool" + paragraph
+(the decision to pivot, qualitative only) → "What replaced it" (untouched). The old
+`.pivot-compare`/`.pivot-row`/`.pivot-label`/`.pivot-screens` grid and the whole "v1 screens in an
+iPhone frame" system (`.v1-screen`/`.v1-still`/`.v1-window`/`.v1-bar`/`.v1-carousel`) have no
+markup referencing them any more — marked `UNUSED as of 2026-09-27` at their definitions and kept,
+not deleted, same convention as every other dormant block in this file.
+- **`.v1-collage`**: a `role="img"` dot-grid canvas (same idiom as `.wf-frame`) holding five
+  `.v1-collage-card`s in a `flex-wrap: wrap` row — NOT absolute positioning. Each card is a plain
+  `<img>` in a `3/4`-aspect-ratio box (`object-fit: cover`), no iPhone frame, with a
+  `rotate(±2–4deg)` + `translateY` transform per `nth-child` for the "scattered photos on a table"
+  look, and the centre card (3rd) sized larger with `z-index: 2` so it reads as sitting on top of
+  the others. Flex-wrap (rather than fixed absolute coordinates) was the deliberate choice for
+  responsiveness: it reflows to fewer per row on narrow screens for free, instead of needing a
+  second, hand-tuned mobile layout with new coordinates.
+- **No per-screen annotation labels** (Lucas's answer to the planning question) — plain screens
+  only, the heading + paragraph below do the explaining.
+- **The three "building" screens needed `object-position: center`, not the default `top`, and this
+  cost a real debugging pass.** `v1-building.webp`/`v1-building-friends.webp`/
+  `v1-building-open.webp` are screen RECORDINGS (not scrolling web exports like home/timetable) and
+  carry black letterbox bars top and bottom, with the actual floor-plan/friends-list content sitting
+  vertically centred in the frame, not at the top. `object-position: top` (the default used for
+  home/timetable, where it's correct — those really do start at the screen's top) cropped straight
+  into the dead letterbox space instead, rendering as a near-solid black or near-solid blue card
+  with only a sliver of real content peeking in at the bottom. Diagnosed by opening the raw
+  `.webp` files directly in PIL and looking at where the actual UI sits within the 720×1565 frame
+  (content roughly y 330–1010 of 1565, i.e. genuinely centred, not top-anchored) — fixed by
+  overriding `object-position: center` via `:nth-child(3) img, :nth-child(4) img, :nth-child(5) img`
+  rather than changing the shared rule, since home/timetable still need `top`. **Rule going
+  forward: `object-position` for a cropped screen asset depends on whether the source is a
+  scrolling export (content starts at true screen top) or a screen recording with letterboxing
+  (content sits centred) — check which before assuming `top` is correct.**
+- **Mobile wrapped to ONE card per row instead of two, and the cause was a 2px arithmetic miss, not
+  a real layout bug.** First mobile pass sized cards at `clamp(108px, 38vw, 150px)` with a 20px gap
+  inside 18px side padding; at 390px viewport, `.v1-collage`'s own `clientWidth` (measured via CDP,
+  not assumed) came out to 350px, minus 18+18 padding = 314px of real inner width, while two
+  148px-ish cards plus the 20px gap needed 316px — 2px over, so `flex-wrap` dutifully wrapped every
+  single card to its own line instead of pairing them. **Diagnosed by measuring, not guessing**:
+  `getBoundingClientRect()` on the rotated cards initially looked like ~160–170px wide, which read
+  as "close to the 150px cap, so sizing must be fine" — the real trap is that a CSS `transform:
+  rotate()` inflates an element's *axis-aligned bounding box* well past its actual CSS width, so
+  bounding-rect measurements on a rotated element are the wrong signal for "is this the size I set."
+  `getComputedStyle(el).width` on the same elements confirmed the true values (148.188px, matching
+  the clamp exactly) — that's when the 2px gap in the arithmetic, not the CSS itself, turned out to
+  be the actual bug. Fixed with real margin rather than shaving the exact edge: mobile cards are now
+  `clamp(100px, 32vw, 136px)` (centre card `clamp(112px, 36vw, 154px)`), gap `16px`, padding
+  `24px 16px`. **Rule going forward: never measure a rotated element's size via
+  `getBoundingClientRect()` — read `getComputedStyle().width` instead, and when sizing anything
+  meant to fit N-per-row, measure the actual container `clientWidth` rather than assuming it equals
+  the viewport width minus a remembered padding figure.**
+- Verified over CDP at 1440 and 390 (touch-emulated): collage renders with all 5 screens showing
+  real content (not letterbox), 2 cards per row on mobile with visible margin to spare, zero console
+  errors, section flows intro → collage → "It felt like a tool" → "What replaced it" with no gaps.
 
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
