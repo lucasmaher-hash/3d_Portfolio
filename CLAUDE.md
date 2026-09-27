@@ -319,7 +319,13 @@ a fresh, disconnected dataset; only the 64%-other-faculties figure is new here (
 n=120`, distinct from Problem's own 120-student survey questions). Chosen from four sketched
 options (a single sharper stat; a narrated diagnosis walking one stalled meetup using the chat's
 own Ben/Anna/Sophia; a workarounds-vs-reality comparison) — Lucas picked the requirements list.
-Verified at 1440 and 390: no overflow, hairlines and index numbers hold at both widths.
+Verified at 1440 and 390: no overflow, hairlines and index numbers hold at both widths. **The
+section's own h2/nav name changed too** — "Research" → "Requirements" (both the `.section-title`
+and the sidebar link text; `id="research"` was left alone, it's just a URL slug). Lucas's first ask
+("what would be a more suitable header") meant the h3 sub-headline, which became "What it had to
+do"; this second ask was the SECTION title itself — and "Requirements" fits there because
+section-titles across the page are short nouns already ("The idea", "Supporting features"), unlike
+sub-headlines, which are full declarative sentences. Different element, different rule.
 
 **The Problem section's evidence is one bar, after Jessica Im's tax case study** (2026-09-26,
 Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, then `.statbar` — its labels and the brace text set at the HEADLINE’s own ramp, `clamp(22px, 2.5vw, 32px)` (Lucas asked twice; caption-sized numbers read as a footnote) — a single track split into the share who
