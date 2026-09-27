@@ -2343,15 +2343,17 @@
         <span class="step-badge">3</span>
       </div>
       <div class="dot-divider"></div>
+      <!-- These are v1: blue, technical, the first thing that existed. The pivot
+           to the character design comes later — here the point is only that the
+           idea itself already worked. Static stills, not the scrolling carousel
+           treatment: each is its own claim, not part of a set to browse. -->
       <div class="feature-row">
         <div class="feature-media">
           <div class="phone-shot">
-            <div class="phone-shot-screen">
-              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="homepage">
-                <source src="/videos/unify/homepage_freenow.mov" type="video/quicktime" />
-                <source src="/videos/unify/homepage_freenow.mov" type="video/mp4" />
-              </video>
-            </div>
+            <div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, showing who is free now">
+              <div class="v1-window"><img src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
+              <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
+            </div></div>
             <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
           </div>
         </div>
@@ -2361,8 +2363,22 @@
         </div>
       </div>
 
-      <h3 class="cs-sub" style="margin-top: clamp(48px, 8vw, 96px);">How the overlap is found</h3>
-      <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than 20 minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
+      <div class="feature-row reverse" style="margin-top: clamp(48px, 8vw, 96px);">
+        <div class="feature-media">
+          <div class="phone-shot">
+            <div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable screen">
+              <div class="v1-window"><img class="v1-clear-island" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
+              <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
+            </div></div>
+            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+          </div>
+        </div>
+        <div class="feature-copy">
+          <h3 class="feature-title">How the overlap is found</h3>
+          <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than 20 minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
+        </div>
+      </div>
+
       <div class="ovl" role="img" aria-label="Three timetables, their free gaps, the overlap, the minimum length and the walk, leaving one slot the three of them share.">
         <div class="ovl-row"><span class="ovl-key"></span><span class="ovl-scale"><span>08</span><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span></span></div>
         <div class="ovl-row"><span class="ovl-key">Ben<small>his day</small></span><span class="ovl-day">
@@ -2383,7 +2399,22 @@
           <span class="ovl-b hit" style="--s: 17.1; --e: 17.9"></span></span></div>
       </div>
       <p class="cs-caption">Three timetables, one slot left: <b>17:10–17:50</b>. Finding it by hand is what the group chat was for.</p>
-      <div class="ph ph--chart"><span class="ph-tag">Visual 08 · Sketches</span><span class="ph-desc">Scanned sketches and early flows</span></div>
+
+      <h3 class="cs-sub" style="margin-top: clamp(48px, 8vw, 96px);">The whole first version, working</h3>
+      <p class="guide-text">This is v1 end to end — five screens, all functional: home, the timetable, and the building map with its floor switcher and friends list. The interaction and the timetable logic were already right here; only the visual language was about to change.</p>
+      <div class="v1-carousel is-folded" aria-label="Unify v1 screens">
+        <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, scrolling">
+          <div class="v1-window"><img src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
+          <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
+        </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+        <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable, scrolling">
+          <div class="v1-window"><img class="v1-clear-island" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
+          <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
+        </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+        <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building.webp" alt="Unify v1 building map with floor switcher" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+        <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-friends.webp" alt="Unify v1 building map with the friends list open" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+        <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-open.webp" alt="Unify v1 floor plan, full screen" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
+      </div>
     </section>
 
     <!-- 4 · The pivot: v1 → character design -->
@@ -2397,18 +2428,20 @@
       <div class="pivot-compare">
         <div class="pivot-row">
           <span class="pivot-label">v1 · technical</span>
-          <div class="v1-carousel is-folded" aria-label="Unify v1 screens">
-            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, scrolling">
+          <!-- Plain static row, 1:1 with the final row below it (home / timetable /
+               friends-on-the-map) — the full 5-screen carousel now lives in "The
+               idea", as "here's the whole first version, working." Here the point
+               is only the visual comparison, so it matches the final row's count. -->
+          <div class="pivot-screens">
+            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen">
               <div class="v1-window"><img src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
               <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
             </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable, scrolling">
+            <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable screen">
               <div class="v1-window"><img class="v1-clear-island" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
               <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
             </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-            <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building.webp" alt="Unify v1 building map with floor switcher" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
             <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-friends.webp" alt="Unify v1 building map with the friends list open" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-            <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-open.webp" alt="Unify v1 floor plan, full screen" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
           </div>
         </div>
         <div class="pivot-row">

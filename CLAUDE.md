@@ -394,14 +394,42 @@ duplicate, not just a redundant feel. The block, its `.fact-bar` instance, and t
 `.pilot-stats` CSS are gone. Nothing replaced it — see the next note for what's going into the
 space instead.
 
-**The polished "who's free now" screen recording in Idea is next in line to go**, for the mirror-
-image reason: it's the FINISHED, final, character-based UI, shown before Pivot has told the reader
-that design was ever anything else — which flattens Pivot's whole "I designed the first version:
-blue, technical, cold" reveal, since the reader has already seen the "after". The plan to replace
-it: a rough, deliberately low-fidelity wireframe of the same "who's free now" concept — greyscale,
-no character/pink styling, so it demonstrates the MECHANISM without pre-empting the visual pivot.
-This also finally fills `Visual 08 - Sketches` (the `.ph` placeholder already sitting at the bottom
-of this section, plan section 6, open since the page was scaffolded) — not started yet as of this note.
+**The polished "who's free now" screen recording in Idea is gone, replaced with v1 stills — done
+2026-09-27.** Same mirror-image reason as the pilot-stats removal above: the recording was the
+FINISHED, final, character-based UI, shown before Pivot has told the reader that design was ever
+anything else — which flattened Pivot's whole "I designed the first version: blue, technical, cold"
+reveal, since the reader had already seen the "after". A fresh low-fidelity wireframe was floated
+as the replacement but dropped in favour of the v1 screens that already exist (see "v1 screens
+(pivot section)" above) — inventing a sixth set of screens just for Idea would have meant explaining
+two different "early" versions before Pivot ever shows the real one. **"Who's free now" now pairs
+with `v1-home`, "How the overlap is found" pairs with `v1-timetable`** — the two `.feature-row`
+blocks that used to hold the recording and the bare diagram now each carry a `.phone-shot` built
+from the same `.v1-screen`/`.v1-window`/`.v1-bar` markup the carousel uses for those two screens,
+just outside `.v1-carousel` so nothing scrolls: **static by omission**, not a separate flag — only
+the carousel's own script (`document.querySelector('.v1-carousel')`, singular) drives the WAAPI
+scroll on `.v1-window img`, so a copy of the same markup sitting outside that one `.v1-carousel`
+element is simply never touched by it and renders as a plain top-cropped still. The two rows
+alternate sides (`.feature-row` then `.feature-row.reverse`), matching the rhythm of every other
+feature pairing on the page. **The section now closes with the full five-screen `.v1-carousel`**
+(moved here from Pivot — see the note below), introduced by "The whole first version, working": home,
+timetable, and the three building-map stills, autoplaying and folding exactly as documented above.
+This is also what finally fills the old `Visual 08 · Sketches` placeholder — real v1 screens instead
+of invented wireframes, and it means every v1 asset used in Idea is one already built for the
+carousel, not a new set of screens to design and explain.
+
+**Pivot's v1 comparison shrank from the full five-screen carousel to a plain static three-screen
+row, 1:1 with the final row — done 2026-09-27, same pass as the Idea change above.** With the
+carousel now living in Idea as "the whole first version, working", Pivot no longer needed to also
+carry all five v1 screens — its own job is narrower: a side-by-side of v1 vs. final on the SAME
+screens, and a 5-vs-3 mismatch undercut that "same screens" claim on sight. Pivot's v1 `.pivot-row`
+now uses `.pivot-screens` (the same grid the final row already used) holding exactly three
+`.phone-shot`s — `v1-home`, `v1-timetable`, `v1-building-friends` — chosen to match the final row's
+home / timetable / map-with-friends triplet one for one. `v1-building-friends` (the friends list
+open over the floor plan) was picked over the plain `v1-building`/`v1-building-open` stills
+specifically because the final row's third screen is the map-with-friends view (`data-vid="map-
+friends"`), and the comparison only works if both sides are showing the same screen. The home and
+timetable v1 stills reuse the exact same `.v1-screen` markup as Idea's — static outside the
+carousel, same reasoning as above.
 
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
