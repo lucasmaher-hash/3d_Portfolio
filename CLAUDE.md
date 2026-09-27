@@ -325,7 +325,16 @@ and the sidebar link text; `id="research"` was left alone, it's just a URL slug)
 ("what would be a more suitable header") meant the h3 sub-headline, which became "What it had to
 do"; this second ask was the SECTION title itself — and "Requirements" fits there because
 section-titles across the page are short nouns already ("The idea", "Supporting features"), unlike
-sub-headlines, which are full declarative sentences. Different element, different rule. **The whole block
+sub-headlines, which are full declarative sentences. Different element, different rule. **Renamed again 2026-09-27, this time for good** — Lucas reached for
+the German word Rahmenbedingungen (boundary/framework conditions) to describe the section, and it
+is a better fit than "Requirements" ever was: these are conditions the RESEARCH imposed, that the
+design then had to satisfy — not a feature spec the designer wrote. `h2` is now "The constraints",
+matching the "The X" pattern every sibling section already uses (Problem/Idea/Pivot) and that
+"Requirements" and "Research" before it had both broken; the sidebar link is the short form
+"Constraints" (no "The"), same as the other five links. The intro line and all three leads were
+reframed from "does X" to "had to X" — "Based on the research, I set three requirements" became
+"Before I designed anything, the research set three constraints the app had to work inside" — so
+the voice matches: these were found, not decided. **The whole block
 (kicker → headline → req-card) is wrapped in `.stat-block`** — the same reusable inset Problem's own
 finding/interviews use — rather than sitting flush at the section's own padding like the header row
 does; Lucas caught that Requirements' content wasn't matching Problem's extra 80px inset above it.
