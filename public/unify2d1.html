@@ -1978,7 +1978,13 @@
     .funnel-step b { font-family: 'Roboto Flex', sans-serif; font-size: 15.2px; font-weight: 400; color: var(--text-primary); }
     .funnel-step span { font-size: 12.5px; color: var(--text-secondary); }
 
-    /* Semantic differential: one line per word pair, a dot for each design. */
+    /* Semantic differential: one line per word pair, a dot for each design.
+       UNUSED as of 2026-09-27, see CLAUDE.md — the chart it belonged to (the
+       "sliders" in Pivot) was removed along with the final-design comparison
+       row; kept in case a chart like this is wanted again. `.chart-legend`
+       below is unused for the same reason (nothing else on this page uses
+       it — the shared `.chart-row`/`.chart-key`/etc. classes used by
+       "Testing and results" are separate and still live). */
     .diff { display: flex; flex-direction: column; gap: 16px; }
     .diff-row { display: grid; grid-template-columns: minmax(70px, 18%) 1fr minmax(70px, 18%); align-items: center; gap: 12px; }
     .diff-end { font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 12.2px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary); }
@@ -2576,23 +2582,17 @@
             <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-friends.webp" alt="Unify v1 building map with the friends list open" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
           </div>
         </div>
-        <div class="pivot-row">
-          <span class="pivot-label"><b>Final</b> · character-based</span>
-          <div class="pivot-screens">
-            <div class="phone-shot"><div class="phone-shot-screen"><video class="phone-shot-video" autoplay loop muted playsinline data-vid="homepage"><source src="/videos/unify/homepage_screen.mov" type="video/mp4" /></video></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-            <div class="phone-shot"><div class="phone-shot-screen"><video class="phone-shot-video" autoplay loop muted playsinline data-vid="timetable"><source src="/videos/unify/timetable_screen.mov" type="video/mp4" /></video></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-            <div class="phone-shot"><div class="phone-shot-screen"><video class="phone-shot-video" autoplay loop muted playsinline data-vid="map-friends"><source src="/videos/unify/map-friends_screen.mov" type="video/mp4" /></video></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-          </div>
-        </div>
       </div>
-      <p class="cs-caption">Same screens, same data. Only the visual language changed — and it went from the one nobody wanted to open to the one <b>24 of 28</b> would.</p>
-      <div class="diff" role="img" aria-label="How v1 and the final design were rated on four word pairs — numbers pending">
-        <div class="diff-row"><span class="diff-end">Cold</span><span class="diff-line"><span class="diff-dot" style="--v: 22"></span><span class="diff-dot is-final" style="--v: 78"></span></span><span class="diff-end">Warm</span></div>
-        <div class="diff-row"><span class="diff-end">A tool</span><span class="diff-line"><span class="diff-dot" style="--v: 18"></span><span class="diff-dot is-final" style="--v: 72"></span></span><span class="diff-end">Social</span></div>
-        <div class="diff-row"><span class="diff-end">Serious</span><span class="diff-line"><span class="diff-dot" style="--v: 30"></span><span class="diff-dot is-final" style="--v: 68"></span></span><span class="diff-end">Playful</span></div>
-        <div class="diff-row"><span class="diff-end">Generic</span><span class="diff-line"><span class="diff-dot" style="--v: 29"></span><span class="diff-dot is-final" style="--v: 74"></span></span><span class="diff-end">Ours</span></div>
-        <div class="chart-legend"><span><i></i>v1</span><span><i class="is-final"></i>Final</span><span>n = 28</span></div>
-      </div>
+      <!-- The "Final · character-based" comparison row, its caption, and the
+           .diff semantic-differential chart (the "sliders") were removed
+           2026-09-27, Lucas — this whole visualization is being rebuilt
+           (a non-linear collage of the actual v1 screens, no phone frame,
+           closer to a Jessica Im reference he shared), not just retouched.
+           This is a first, narrow step: delete the three final-design
+           screens and the chart; everything else here (the intro paragraph
+           above, the v1 row, "What replaced it" below) is untouched pending
+           that larger rebuild. .diff's CSS is left in place, unused — see
+           the other UNUSED blocks tracked in CLAUDE.md. -->
 
       <h3 class="cs-sub">What replaced it</h3>
       <!-- Compressed 2026-09-27 from a full color/typography/character exhibit

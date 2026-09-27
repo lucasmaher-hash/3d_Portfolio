@@ -562,6 +562,35 @@ Pivot, with no diagram at all in Idea any more. `.ovl`'s CSS is marked `/* UNUSE
 back for this or another section. Verified over CDP: div/section tags balanced, zero console
 errors, section flows directly from the wireframe frame into "The pivot" with no leftover gap.
 
+**Pivot's v1-vs-final comparison row, its caption, and the `.diff` semantic-differential chart
+("the sliders") are gone — first step of a larger rebuild, done narrow on purpose (2026-09-27).**
+Lucas is happy with Idea end to end (see above) but not with how Pivot visualizes the old design —
+he wants something closer to a Jessica Im "audit" reference he shared: a non-linear collage of the
+actual v1 screens (no phone frame this time, real image crops scattered across a shared canvas),
+followed by a plain heading + paragraph stating the decision to pivot. That collage is NOT built
+yet — **this commit is only the deletion**, explicitly scoped down by Lucas mid-conversation
+("doesn't mean you have to redo everything below it... for now just delete the three final
+character based screens and the sliders below") after he'd already answered planning questions for
+the fuller rebuild (no per-screen annotation labels; drop the preference-test numbers/chart
+entirely rather than keep them; use all 5 v1 exports, one crop each, for the eventual collage).
+Removed: the `.pivot-row` holding the three final-design videos (`homepage_screen.mov` /
+`timetable_screen.mov` / `map-friends_screen.mov`), the `<p class="cs-caption">` describing that
+comparison ("Same screens, same data... 24 of 28..."), and the whole `.diff` chart block. **Left
+untouched, deliberately** (nothing "under it" was redone): the intro paragraph above (still
+carries the "28 students / 2.1 vs 5.8 / 24 of 28" stats — those numbers are Lucas's call to drop
+when the fuller rebuild happens, not assumed here), the v1 `.pivot-row` (still 3 static screens in
+`.pivot-screens`), and "What replaced it" below. `.diff`/`.diff-row`/`.diff-dot`/`.diff-end`/
+`.chart-legend` are marked `/* UNUSED as of 2026-09-27, see CLAUDE.md */` and kept, not deleted —
+same convention as every other dormant block tracked in this file. **`.chart-row`/`.chart-key`/
+`.chart-track`/`.chart-fill`/`.chart-val` are NOT unused** — those shared classes are also used by
+"Testing and results" further down the page, so don't mark them dormant if touching this area
+again. Verified over CDP: div/section tags balanced, zero console errors, Pivot now runs heading →
+intro → v1 row → "What replaced it" with no orphaned caption or empty gap where the deleted content
+was. **Next step, not done yet:** build the scattered v1 collage (all 5 exports, one crop each,
+`v1-home`/`v1-timetable` need a representative frame cropped from their tall scrolling captures
+since they're not single screenshots) plus the heading + decision paragraph beneath it, per the
+plan above.
+
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
 under the lead line, six words and five arrows competing with the fact bar right under it. Same
