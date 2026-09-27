@@ -375,6 +375,25 @@ Supporting features' caption, and 23 → 7 min matches the Problem section's 23 
 `.fact-src` line under each of the three was dropped** (Lucas) — the SUS box in Results still has
 one (`System Usability Scale`), so `.fact-src` itself stays; only the three pilot stats lost theirs.
 
+**`.pilot-stats` was removed from Idea entirely on 2026-09-27** (Lucas, after I flagged it myself
+on request — "honest opinion, isn't this too early"). Two real problems, not just pacing: (1) a
+two-week PILOT can only exist once the finished app has already been built and shipped, so results
+data sitting under "the idea" — before Pivot, before the timetable design, before anything about
+HOW it was built — read chronologically backwards; (2) its headline number, 2.2x, was a second
+form of the SAME fact Supporting Features already states as "1.4 to 3.1 meetups" — an actual
+duplicate, not just a redundant feel. The block, its `.fact-bar` instance, and the now-orphaned
+`.pilot-stats` CSS are gone. Nothing replaced it — see the next note for what's going into the
+space instead.
+
+**The polished "who's free now" screen recording in Idea is next in line to go**, for the mirror-
+image reason: it's the FINISHED, final, character-based UI, shown before Pivot has told the reader
+that design was ever anything else — which flattens Pivot's whole "I designed the first version:
+blue, technical, cold" reveal, since the reader has already seen the "after". The plan to replace
+it: a rough, deliberately low-fidelity wireframe of the same "who's free now" concept — greyscale,
+no character/pink styling, so it demonstrates the MECHANISM without pre-empting the visual pivot.
+This also finally fills `Visual 08 - Sketches` (the `.ph` placeholder already sitting at the bottom
+of this section, plan section 6, open since the page was scaffolded) — not started yet as of this note.
+
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
 under the lead line, six words and five arrows competing with the fact bar right under it. Same

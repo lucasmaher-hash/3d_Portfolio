@@ -1592,11 +1592,10 @@
     .cs-map a.is-active { color: var(--text-primary); }
     @media (max-width: 1080px) { .cs-map { display: none; } }
 
-    /* Pilot stats: the fact-bar's own kicker + heading, reused where the
-       numbers actually live now — next to the app's showcase, not the hero. */
-    .pilot-stats { display: flex; flex-direction: column; gap: clamp(16px, 2.2vw, 24px); margin-top: clamp(28px, 4vw, 48px); }
-    .pilot-stats .stat-kicker { margin-top: 0; }
-    .pilot-stats .stat-head { font-size: clamp(19px, 2vw, 25px); }
+    /* .pilot-stats removed 2026-09-27 — it sat under "The idea" as results
+       data (a two-week pilot can't exist before the app does), and its
+       headline stat duplicated Supporting Features' own "1.4 → 3.1 meetups"
+       caption. See CLAUDE.md. */
 
     /* Fact bar: three big numbers. */
     .fact-bar {
@@ -2357,25 +2356,6 @@
         <div class="feature-copy">
           <h3 class="feature-title">Who's free now</h3>
           <p class="guide-text">Open Unify in a break and the first thing on screen is who is free at the same time as you, and until when. No searching, no comparing: the question the group chat kept asking is answered before you have typed anything. Everything else in the app exists to keep this one view honest.</p>
-        </div>
-      </div>
-
-      <div class="pilot-stats">
-        <p class="stat-kicker">Pilot · first two weeks</p>
-        <h3 class="stat-head is-section">What using it actually did</h3>
-        <div class="fact-bar">
-          <div class="fact">
-            <span class="fact-num">2.2×</span>
-            <span class="fact-label">more meetups arranged per week</span>
-          </div>
-          <div class="fact">
-            <span class="fact-num">68 %</span>
-            <span class="fact-label">less time spent arranging each one</span>
-          </div>
-          <div class="fact">
-            <span class="fact-num">20</span>
-            <span class="fact-label">students, across 5 friend groups</span>
-          </div>
         </div>
       </div>
 
