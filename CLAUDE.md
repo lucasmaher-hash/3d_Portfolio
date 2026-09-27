@@ -431,6 +431,53 @@ friends"`), and the comparison only works if both sides are showing the same scr
 timetable v1 stills reuse the exact same `.v1-screen` markup as Idea's — static outside the
 carousel, same reasoning as above.
 
+**Idea/Pivot/design-system were fighting each other — resolved 2026-09-27 by giving each section
+exactly one job, researched against how well-regarded UX case studies actually sequence this
+(problem → process/pivot → final solution → results, with no standalone "design system" beat in
+that canon, and a rejected v1 shown once as a comparison device, not toured on its own).** Lucas's
+own complaint: three sections were all effectively re-showing the same screens from different
+angles — Idea's v1 stills + closing carousel, Pivot's v1-vs-final comparison, and a color/
+typography/character deep-dive also inside Pivot. The fix was a real cut, not a reshuffle:
+- **Idea lost ALL its screens.** The two `.feature-row`s that showed `v1-home`/`v1-timetable`
+  stills, and the closing `.v1-carousel` ("the whole first version, working"), are gone. Both
+  points ("Who's free now", "How the overlap is found") are now plain `.cs-sub` + `.guide-text`,
+  identical in treatment to "The constraints" a section above. The one visual Idea keeps is the
+  `.ovl` overlap diagram — the single asset in the section that is actually unique to it and
+  proves the mechanism rather than illustrating the concept with a screenshot. Idea's job is now
+  purely "does the logic work", answered by the diagram; it no longer also tries to be "here's an
+  early build of it", which is Pivot's job and was the exact duplication Lucas flagged (the same
+  `v1-home`/`v1-timetable` images were appearing twice, a few hundred px of scroll apart).
+- **Pivot's color/typography/character exhibit — three swatch cards, three typography specimen
+  pills, three illustrated character rows (`.color-grid`, `.typography-grid`, `.character-list`)
+  — collapsed into one `.guide-text` paragraph** under "What replaced it", with two small
+  `.inline-swatch` chips (14px rounded squares, `vertical-align: middle`, inline in the sentence)
+  standing in for the pink and off-white. The facts survive (pink, off-white, Nunito, characters
+  reused across the UI, structure untouched) but now read as the RATIONALE for the pivot — the
+  reason the look changed — rather than as an independent design-system specimen sheet competing
+  with Supporting Features' own final-app showcase. This is the piece the case-study research
+  flagged hardest: no standard case-study structure gives a colors/type/illustration breakdown its
+  own section unless the design system IS the deliverable being pitched, which Unify's isn't.
+- **`.v1-carousel` and `.color-grid`/`.typography-grid`/`.character-list` (plus their character
+  float keyframes and mobile overrides) are UNUSED but NOT deleted** — every relevant block is
+  commented `/* UNUSED as of 2026-09-27, see CLAUDE.md */` at its definition (CSS) or top of its
+  IIFE (the carousel's JS — its `document.querySelector('.v1-carousel')` now always returns null
+  and the function returns immediately; verified zero console errors). Kept rather than removed
+  because both are real, finished engineering (the carousel especially — fold/unfold, autoplay,
+  swipe, WAAPI scroll) that may be wanted again if a future pass decides a design-system section
+  does earn its place after all; deleting and later rebuilding would cost more than the dead
+  weight costs now. If a future session is certain neither is coming back, they're safe to remove
+  — search for the `UNUSED as of 2026-09-27` comments to find every piece.
+- **What each section's job is now, post-cut:** Idea → does the concept/logic work (diagram only).
+  Pivot → why did the look change (v1-vs-final comparison + preference-test data + the rationale
+  paragraph, screens shown exactly once). Supporting Features → does the finished app work, shown
+  in full (untouched by this pass — it was never part of the redundancy, since it's the only
+  section showing the final app's actual feature set rather than re-litigating why it looks the
+  way it does).
+- Verified over CDP at 1440 and 390 (with touch emulation on mobile — see the CDP testing note
+  under "3D Mode: Camera Controls" for why that matters): no overflow either width, inline swatches
+  render correctly against the page's grey background, zero console errors from the now-dormant
+  carousel script, div/section tag counts balanced.
+
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
 under the lead line, six words and five arrows competing with the fact bar right under it. Same

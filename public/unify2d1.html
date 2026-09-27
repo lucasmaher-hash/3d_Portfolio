@@ -900,7 +900,21 @@
       letter-spacing: -0.04em;
     }
 
-    /* Color palette boxes */
+    /* A tiny colour reference sitting inline in a sentence — see "What replaced
+       it" in Pivot. Replaces the full color-grid/typography-grid/character-list
+       exhibit below, which is now unused on this page (kept, not deleted: see
+       CLAUDE.md — it may come back if the design-system detail ever earns its
+       own section again). */
+    .inline-swatch {
+      display: inline-block;
+      width: 0.85em; height: 0.85em;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin: 0 1px -0.05em;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Color palette boxes — UNUSED as of 2026-09-27, see CLAUDE.md */
     .color-grid {
       display: flex;
       gap: clamp(20px, 4vw, 40px);
@@ -947,7 +961,8 @@
       letter-spacing: 0.05em;
     }
 
-    /* Typography cards. Every stop of the desktop treatment is 30% down from
+    /* UNUSED as of 2026-09-27, see CLAUDE.md.
+       Typography cards. Every stop of the desktop treatment is 30% down from
        where it started (card 160 -> 112px tall, preview 72 -> 50px, and so on
        through the padding, gaps and labels), so the three pills scale as one
        piece. The <=640px block further down re-specs these cards for phones —
@@ -1009,7 +1024,8 @@
       line-height: 1;
     }
 
-    /* Character design section — staggered character + text rows */
+    /* UNUSED as of 2026-09-27, see CLAUDE.md.
+       Character design section — staggered character + text rows */
     .character-list {
       display: flex;
       flex-direction: column;
@@ -1745,7 +1761,9 @@
 
 
 
-    /* v1 carousel: five phones on five slots (-2..2), the middle one largest.
+    /* UNUSED as of 2026-09-27 (see CLAUDE.md) — the only .v1-carousel instance
+       was removed from "The idea"; kept here since the component may be reused.
+       v1 carousel: five phones on five slots (-2..2), the middle one largest.
        Every 3s the whole row steps one slot to the right; the phone leaving
        the right edge fades out and comes back in on the far left, so it
        loops. Geometry is pure CSS per data-slot; the script only changes
@@ -2343,42 +2361,17 @@
         <span class="step-badge">3</span>
       </div>
       <div class="dot-divider"></div>
-      <!-- These are v1: blue, technical, the first thing that existed. The pivot
-           to the character design comes later — here the point is only that the
-           idea itself already worked. Static stills, not the scrolling carousel
-           treatment: each is its own claim, not part of a set to browse. -->
-      <div class="feature-row">
-        <div class="feature-media">
-          <div class="phone-shot">
-            <div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, showing who is free now">
-              <div class="v1-window"><img src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
-              <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
-            </div></div>
-            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-          </div>
-        </div>
-        <div class="feature-copy">
-          <h3 class="feature-title">Who's free now</h3>
-          <p class="guide-text">Open Unify in a break and the first thing on screen is who is free at the same time as you, and until when. No searching, no comparing: the question the group chat kept asking is answered before you have typed anything. Everything else in the app exists to keep this one view honest.</p>
-        </div>
-      </div>
+      <!-- No screens here on purpose (2026-09-27, see CLAUDE.md) — the point of
+           this section is the CONCEPT and whether the logic works, and it had
+           started re-showing the exact v1 stills Pivot needs for its before/
+           after comparison a few hundred pixels later. Pivot is now the only
+           place v1 screens appear; this section leans entirely on the overlap
+           diagram, the one visual that is actually unique to it. -->
+      <h3 class="cs-sub">Who's free now</h3>
+      <p class="guide-text">Open Unify in a break and the first thing on screen is who is free at the same time as you, and until when. No searching, no comparing: the question the group chat kept asking is answered before you have typed anything. Everything else in the app exists to keep this one view honest.</p>
 
-      <div class="feature-row reverse" style="margin-top: clamp(48px, 8vw, 96px);">
-        <div class="feature-media">
-          <div class="phone-shot">
-            <div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable screen">
-              <div class="v1-window"><img class="v1-clear-island" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
-              <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
-            </div></div>
-            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-          </div>
-        </div>
-        <div class="feature-copy">
-          <h3 class="feature-title">How the overlap is found</h3>
-          <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than 20 minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
-        </div>
-      </div>
-
+      <h3 class="cs-sub" style="margin-top: clamp(48px, 8vw, 96px);">How the overlap is found</h3>
+      <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than 20 minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
       <div class="ovl" role="img" aria-label="Three timetables, their free gaps, the overlap, the minimum length and the walk, leaving one slot the three of them share.">
         <div class="ovl-row"><span class="ovl-key"></span><span class="ovl-scale"><span>08</span><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span></span></div>
         <div class="ovl-row"><span class="ovl-key">Ben<small>his day</small></span><span class="ovl-day">
@@ -2399,22 +2392,6 @@
           <span class="ovl-b hit" style="--s: 17.1; --e: 17.9"></span></span></div>
       </div>
       <p class="cs-caption">Three timetables, one slot left: <b>17:10–17:50</b>. Finding it by hand is what the group chat was for.</p>
-
-      <h3 class="cs-sub" style="margin-top: clamp(48px, 8vw, 96px);">The whole first version, working</h3>
-      <p class="guide-text">This is v1 end to end — five screens, all functional: home, the timetable, and the building map with its floor switcher and friends list. The interaction and the timetable logic were already right here; only the visual language was about to change.</p>
-      <div class="v1-carousel is-folded" aria-label="Unify v1 screens">
-        <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 home screen, scrolling">
-          <div class="v1-window"><img src="/images/unify/v1/v1-home.webp" width="720" alt="" /></div>
-          <img class="v1-bar" src="/images/unify/v1/v1-home-bar.webp" width="720" height="144" alt="" />
-        </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-        <div class="phone-shot"><div class="phone-shot-screen"><div class="v1-screen" role="img" aria-label="Unify v1 timetable, scrolling">
-          <div class="v1-window"><img class="v1-clear-island" src="/images/unify/v1/v1-timetable.webp" width="720" alt="" /></div>
-          <img class="v1-bar" src="/images/unify/v1/v1-timetable-bar.webp" width="720" height="144" alt="" />
-        </div></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-        <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building.webp" alt="Unify v1 building map with floor switcher" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-        <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-friends.webp" alt="Unify v1 building map with the friends list open" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-        <div class="phone-shot"><div class="phone-shot-screen"><img class="v1-still" src="/images/unify/v1/v1-building-open.webp" alt="Unify v1 floor plan, full screen" /></div><img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" /></div>
-      </div>
     </section>
 
     <!-- 4 · The pivot: v1 → character design -->
@@ -2463,40 +2440,14 @@
       </div>
 
       <h3 class="cs-sub">What replaced it</h3>
-      <p class="guide-text">The answer to "it feels like a tool" was not a nicer blue. Sophie Meyer and Moritz Ackermann drew a cast of characters and built the palette and type around them: a pink you rarely see in an app, a warm off-white behind it, and Nunito's rounded letterforms. The structure underneath — the merged timetable, the room-level map, the overlap logic — was not touched.
-      <div class="color-grid">
-        <div class="color-box"><div class="color-swatch" style="background: #FF88C8;"><span class="color-swatch-code">FF88C8</span></div></div>
-        <div class="color-box"><div class="color-swatch" style="background: #F9F2EB;"><span class="color-swatch-code" style="color: #1A1A1A;">F9F2EB</span></div></div>
-        <div class="color-box"><div class="color-swatch" style="background: #1A1A1A;"><span class="color-swatch-code">1A1A1A</span></div></div>
-      </div>
-      <div class="typography-grid">
-        <div class="typography-card">
-          <div class="typography-info"><span class="typography-label">Header</span><span class="typography-spec">72px  ·  bold</span></div>
-          <div class="typography-preview" style="font-size: clamp(25px, 4.2vw, 50px); font-weight: 800;">soccer match</div>
-        </div>
-        <div class="typography-card">
-          <div class="typography-info"><span class="typography-label">Body text</span><span class="typography-spec">48px  ·  bold</span></div>
-          <div class="typography-preview" style="font-size: clamp(20px, 2.8vw, 34px); font-weight: 700;">bring all your friends</div>
-        </div>
-        <div class="typography-card">
-          <div class="typography-info"><span class="typography-label">Info text</span><span class="typography-spec">48px  ·  light</span></div>
-          <div class="typography-preview" style="font-size: clamp(28px, 4vw, 48px); font-weight: 300;">from 15:00 - 17:00</div>
-        </div>
-      </div>
-      <div class="character-list">
-        <div class="character-row">
-          <div class="character-figure"><img src="/images/unify/characters/char-arch.svg" alt="" /></div>
-          <p class="character-copy" style="margin-left: -15px;">Each person picks a character as their profile icon, so a friend is a shape you recognise across the app rather than a name you have to read.</p>
-        </div>
-        <div class="character-row right">
-          <div class="character-figure"><img src="/images/unify/characters/char-bird.svg" alt="" /></div>
-          <p class="character-copy" style="margin-right: -15px;">The same cast turns up inside the interface — peering over the map bar, sitting on the toggle between your timetable and the socials feed.</p>
-        </div>
-        <div class="character-row indent">
-          <div class="character-figure"><img src="/images/unify/characters/char-mountain.svg" alt="" /></div>
-          <p class="character-copy" style="margin-left: -15px;">They also carry the app's tone where a label would be too much: the empty states, the moment nobody is free, the end of a long day.</p>
-        </div>
-      </div>
+      <!-- Compressed 2026-09-27 from a full color/typography/character exhibit
+           (three swatch cards, three typography specimen pills, three
+           illustrated character rows) down to this one paragraph — see
+           CLAUDE.md. It was a standalone design-system section competing with
+           Supporting Features' own final-app showcase; here the same facts
+           work as the RATIONALE for the pivot, which is the only job this
+           section has. -->
+      <p class="guide-text">The answer to "it feels like a tool" was not a nicer blue. Sophie Meyer and Moritz Ackermann drew a cast of characters and built the palette and type around them: a pink you rarely see in an app <span class="inline-swatch" style="background: #FF88C8;"></span>, a warm off-white behind it <span class="inline-swatch" style="background: #F9F2EB;"></span>, and Nunito's rounded letterforms in place of the typewriter type. The same cast turns up inside the interface itself — on the map bar, on the mode toggle, in the empty states — so a friend becomes a shape you recognise rather than a name you read. The structure underneath — the merged timetable, the room-level map, the overlap logic — was never touched.</p>
     </section>
 
     <!-- 5 · Designing the merged timetable -->
@@ -3481,6 +3432,9 @@
 
   <script>
     // ── v1 carousel ───────────────────────────────────────────────────────────
+    // UNUSED as of 2026-09-27 (see CLAUDE.md) — no .v1-carousel is in the page
+    // any more, so `car` below is always null and this returns immediately.
+    // Kept in case the component is wanted again; harmless no-op meanwhile.
     // Five phones on five slots (-2..2). It advances on its own, one slot to the
     // right, after each screen has had its turn in the middle: 3s for a still,
     // the full scroll for home and timetable, which only play while they are in
