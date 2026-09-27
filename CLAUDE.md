@@ -547,6 +547,21 @@ doesn't recur.
   this pass, per Lucas ("ignore mobile for now") — but per the point above, the specific bug found
   there earlier no longer has a mechanism to occur.
 
+**"How the overlap is found" — its own `h3`, paragraph and the `.ovl` diagram — is gone, folded
+into one plain paragraph right under the wireframes (2026-09-27, same day as the wireframe rebuild
+above).** Lucas: fold the mechanism explanation into the "Who's free now" text rather than giving
+it a separate heading and diagram. The two original sentences became one, opening with a bold lead
+— `<p class="guide-text"><b>The overlap is found by</b> reading the gaps…</p>` — same `.guide-text`
+size as the paragraph above the wireframes, no size step-down; `<b>` inside `.guide-text` already
+renders as the page's established "picked-out phrase" style (`font-weight: 500`, primary-ink
+colour — see the `.guide-text b` rule), so no new CSS was needed for the "thicker font" lead-in.
+Section now runs: heading → intro paragraph → wireframes → mechanism paragraph → straight into
+Pivot, with no diagram at all in Idea any more. `.ovl`'s CSS is marked `/* UNUSED as of
+2026-09-27, see CLAUDE.md */` at its definition and left in place (same convention as
+`.v1-carousel`/`.color-grid` etc. above) rather than deleted, in case a future pass wants a diagram
+back for this or another section. Verified over CDP: div/section tags balanced, zero console
+errors, section flows directly from the wireframe frame into "The pivot" with no leftover gap.
+
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
 under the lead line, six words and five arrows competing with the fact bar right under it. Same

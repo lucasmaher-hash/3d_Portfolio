@@ -2128,6 +2128,9 @@
     }
 
     /* ── The overlap, step by step ────────────────────────────────────────────
+       UNUSED as of 2026-09-27, see CLAUDE.md — "How the overlap is found"
+       (the section this diagram illustrated) was folded into one paragraph
+       under the wireframes above; kept in case a diagram is wanted again.
        A day from 08:00 to 18:00 on every row, so the rows can be read straight
        down: three timetables, then what the app does with them. Blocks are
        placed with two custom properties, --s and --e, in hours. */
@@ -2538,28 +2541,12 @@
         </div>
       </div>
 
-      <h3 class="cs-sub" style="margin-top: clamp(48px, 8vw, 96px);">How the overlap is found</h3>
-      <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than 20 minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
-      <div class="ovl" role="img" aria-label="Three timetables, their free gaps, the overlap, the minimum length and the walk, leaving one slot the three of them share.">
-        <div class="ovl-row"><span class="ovl-key"></span><span class="ovl-scale"><span>08</span><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span></span></div>
-        <div class="ovl-row"><span class="ovl-key">Ben<small>his day</small></span><span class="ovl-day">
-          <span class="ovl-b busy" style="--s: 9.75; --e: 12.25"></span><span class="ovl-b busy" style="--s: 13; --e: 16.25"></span></span></div>
-        <div class="ovl-row"><span class="ovl-key">Sophia<small>her day</small></span><span class="ovl-day">
-          <span class="ovl-b busy" style="--s: 10; --e: 13"></span><span class="ovl-b busy" style="--s: 14; --e: 15.5"></span></span></div>
-        <div class="ovl-row"><span class="ovl-key">Me<small>my day</small></span><span class="ovl-day">
-          <span class="ovl-b busy" style="--s: 8.25; --e: 11.75"></span><span class="ovl-b busy" style="--s: 13.5; --e: 17"></span></span></div>
-        <div class="ovl-row"><span class="ovl-key">Gaps<small>free, per person</small></span><span class="ovl-day">
-          <span class="ovl-b free l1" style="--s: 8; --e: 9.75"></span><span class="ovl-b free l1" style="--s: 12.25; --e: 13"></span><span class="ovl-b free l1" style="--s: 16.25; --e: 18"></span>
-          <span class="ovl-b free l2" style="--s: 8; --e: 10"></span><span class="ovl-b free l2" style="--s: 13; --e: 14"></span><span class="ovl-b free l2" style="--s: 15.5; --e: 18"></span>
-          <span class="ovl-b free l3" style="--s: 8; --e: 8.25"></span><span class="ovl-b free l3" style="--s: 11.75; --e: 13.5"></span><span class="ovl-b free l3" style="--s: 17; --e: 18"></span></span></div>
-        <div class="ovl-row"><span class="ovl-key">Overlap<small>free for all three</small></span><span class="ovl-day">
-          <span class="ovl-b hit" style="--s: 8; --e: 8.25"></span><span class="ovl-b hit" style="--s: 17; --e: 18"></span></span></div>
-        <div class="ovl-row"><span class="ovl-key">≥ 20 min<small>too short to use</small></span><span class="ovl-day">
-          <span class="ovl-b out" style="--s: 8; --e: 8.25"></span><span class="ovl-b hit" style="--s: 17; --e: 18"></span></span></div>
-        <div class="ovl-row"><span class="ovl-key">− the walk<small>between buildings</small></span><span class="ovl-day">
-          <span class="ovl-b hit" style="--s: 17.1; --e: 17.9"></span></span></div>
-      </div>
-      <p class="cs-caption">Three timetables, one slot left: <b>17:10–17:50</b>. Finding it by hand is what the group chat was for.</p>
+      <!-- "How the overlap is found" (h3 + text + the .ovl diagram) removed
+           2026-09-27, Lucas — folded into one plain paragraph under the
+           wireframes instead of its own heading + diagram. .ovl's CSS is
+           left in place, unused, same convention as the other dormant
+           blocks noted in this file (see CLAUDE.md). -->
+      <p class="guide-text"><b>The overlap is found by</b> reading the gaps between everyone's timetables, keeping only the stretches every friend has free at once, dropping anything shorter than 20 minutes, and taking the walk between buildings off both ends — the thing the group chat used to work out by eye.</p>
     </section>
 
     <!-- 4 · The pivot: v1 → character design -->
