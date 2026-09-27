@@ -2332,14 +2332,16 @@
         </div>
 
         <!-- The other side of the bar, in their own words. -->
-        <h3 class="stat-head is-section">Why the 68 % stopped trying</h3>
+        <h3 class="stat-head is-section" style="margin-top: clamp(28.8px, 4.32vw, 50.4px);">Why the 68 % stopped trying</h3>
         <p class="guide-text">I went back to nine of the students who said they no longer try to arrange anything between classes. <b>Not one of them said they didn't want to meet.</b> They said it costs more than it is worth: “I'd meet them if I knew when — working it out takes longer than the break does.” <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
         <p class="guide-text">The second thing they all said was about the size of the window. “By the time everyone has answered, I'm already in the next lecture.” <b>For forty minutes it isn't worth the back and forth</b> — so, as one of them put it, “we say next week, and next week never comes.”</p>
       </div>
     </section>
 
     <!-- 2 · Research → one model -->
-    <section class="guide-section cs-section" id="research">
+    <!-- +80% of the usual section gap above this one, specifically (Lucas) —
+         .cs-section + .cs-section stays the shared default for every other pair. -->
+    <section class="guide-section cs-section" id="research" style="padding-top: clamp(28.8px, 5.4vw, 57.6px);">
       <div class="section-heading-row">
         <h2 class="section-title">Research</h2>
         <span class="step-badge">2</span>
@@ -2391,22 +2393,19 @@
           <div class="fact">
             <span class="fact-num">2.2×</span>
             <span class="fact-label">more meetups arranged per week</span>
-            <span class="fact-src">1.4 → 3.1 per person · n=20</span>
           </div>
           <div class="fact">
             <span class="fact-num">68 %</span>
             <span class="fact-label">less time spent arranging each one</span>
-            <span class="fact-src">23 min → 7 min · n=20</span>
           </div>
           <div class="fact">
             <span class="fact-num">20</span>
             <span class="fact-label">students, across 5 friend groups</span>
-            <span class="fact-src">Two weeks, coded prototype</span>
           </div>
         </div>
       </div>
 
-      <h3 class="cs-sub">How the overlap is found</h3>
+      <h3 class="cs-sub" style="margin-top: clamp(48px, 8vw, 96px);">How the overlap is found</h3>
       <p class="guide-text">Each day arrives as a list of blocks. Unify reads the gaps between them, keeps only the stretches every friend has free at once, drops anything shorter than 20 minutes, and takes the walk between buildings off both ends. What is left is a slot you can actually use — the thing the group chat was trying to work out by eye.</p>
       <div class="ovl" role="img" aria-label="Three timetables, their free gaps, the overlap, the minimum length and the walk, leaving one slot the three of them share.">
         <div class="ovl-row"><span class="ovl-key"></span><span class="ovl-scale"><span>08</span><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span></span></div>

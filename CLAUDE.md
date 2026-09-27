@@ -318,7 +318,9 @@ The hero (`#top`) now carries only the lead line. **The three numbers themselves
 since this is no longer a before/after (Problem) vs after (Results) split but one PILOT-only
 snapshot: 2.2× more meetups/week, 68% less time spent arranging one, 20 students across 5 friend
 groups. Chain them if the real pilot numbers ever land: 1.4 → 3.1 meetups already matches
-Supporting features' caption, and 23 → 7 min matches the Problem section's 23 min baseline.
+Supporting features' caption, and 23 → 7 min matches the Problem section's 23 min baseline. **The
+`.fact-src` line under each of the three was dropped** (Lucas) — the SUS box in Results still has
+one (`System Usability Scale`), so `.fact-src` itself stays; only the three pilot stats lost theirs.
 
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
@@ -332,6 +334,15 @@ only** (`display: none` below 1080px) — six lines plus a back link is exactly 
 `.mobile-menu` already exists to avoid. Sits left of the `#scroll-track` (right edge) and clear of
 the fixed `.draft-flag` pill (bottom-left, `bottom: 16px`) — the sidebar's own `bottom: 96px` sits
 above it.
+
+**Four gaps were widened individually, by name, not by touching a shared rule** (Lucas: 80% above
+"Why the 68% stopped trying" and above Research, 300% above "How the overlap is found"). Each is an
+inline `style="margin-top: …"` / `padding-top: …"` on that one element, because the class it would
+otherwise inherit from is shared with something that must NOT move: `.stat-head.is-section` is also
+"What using it actually did" a few sections down, `.cs-sub` is also "What replaced it" in the Pivot
+section, and `.cs-section + .cs-section` is the shared gap between every pair of top-level sections.
+Values are the base clamp scaled by the requested factor — e.g. Research's `padding-top` is the
+default `clamp(16px, 3vw, 32px)` × 1.8 = `clamp(28.8px, 5.4vw, 57.6px)`.
 
 **No pixel font inside a statistic** (Lucas, 2026-09-26): VT323 stays on the page's furniture —
 breadcrumb, meta labels, step badges, captions — but every chart's own keys, values, legends and
