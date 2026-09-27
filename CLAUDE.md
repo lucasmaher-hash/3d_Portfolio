@@ -484,10 +484,11 @@ screens sharing one dotted-grid canvas, one arrow between them, no side text —
 literally "two screens on one shared frame, one arrow inbetween, header and text below"). This is
 NOT a reversal of the "Idea lost all its screens" cut above — the two `.feature-row`s and the
 `.v1-carousel` that came back out were real v1 SCREENSHOTS, which is what made them duplicate
-Pivot. `.wf-frame`'s two panels are hand-built markup recreating the SHAPE of two v1 screens
-("Connect now" and the Stundenplan/timetable list) from Lucas's own screenshots of them, not the
-screenshots themselves — monochrome, simplified, existing only to explain why the app has two
-views. Nothing here appears again in Pivot, so the duplication problem doesn't recur.
+Pivot. `.wf-frame`'s two panels are hand-built markup recreating two v1 screens ("Connect now" and
+the Stundenplan/timetable list) from Lucas's own screenshots of them, not the screenshot files
+themselves — same colours and shapes as v1 (see the second rebuild note below), existing only to
+explain why the app has two views. Nothing here appears again in Pivot, so the duplication problem
+doesn't recur.
 - **Copy above it was rewritten to state the reason for two views directly** ("I wanted two ways
   into the same overlap, not one screen doing both jobs...") rather than describing only the first
   view, since the wireframes now do double duty as evidence for both halves of that sentence.
@@ -504,35 +505,47 @@ views. Nothing here appears again in Pivot, so the duplication problem doesn't r
   Paul / Luis / Tom bubbles, the 11:30–12:00 range, "open Calendar"), and the Stundenplan panel
   keeps its actual tabs/day-selector/row structure ("Interface Design", times, room numbers).
   Matches how the Jessica Im reference itself works — real simplified copy, not Balsamiq-style
-  placeholder bars — and keeps the panels legible as "this is what those two screens are" rather
-  than abstract boxes. The one deliberate accent thread tying the two panels together is `var(
-  --accent-ink)` (this page's pink, not the site orange) on exactly the connecting parts: the Zoe
-  bubble's border (the friend the glance is built around), the open-Calendar button, the arrow, and
-  the Timetable tab + the one highlighted row it lands on — everything else is grayscale.
-  `.wf-connect-title` uses OCR-A-BT (the typewriter face v1 actually used) as a small nod to "this
-  is v1", even though nothing else in the wireframe tries to be period-accurate.
+  placeholder bars.
+- **Rebuilt a second time the same day, from a grey/pink abstraction to the ACTUAL v1 colours —
+  Lucas: "the wireframes are totally off, not accurate", then "use the design from the actual v1
+  blue version".** The first pass had used a monochrome grey wireframe idiom with a pink accent
+  thread (matching this page's `.ovl`/`.tv`/`.diff` diagrams), which was the wrong call here: those
+  diagrams are ABSTRACTIONS the page invents to explain data, but these two panels are supposed to
+  read as "this is what v1 looked like", so they need v1's own colours, not the page's diagram
+  language. Fixed by sampling the real files rather than eyeballing: opened
+  `public/images/unify/v1/v1-home.webp` in PIL, scanned pixels on the "Zoe" bubble's fill and on
+  the "Connect now" letterforms, and got a consistent `rgb(32, 16, 255)` both places —
+  `--v1-blue: #2010FF`, declared once on `.wf-frame` so every child inherits it. Every shape was
+  corrected to match too, cross-checked with side-by-side crops of the real exports next to
+  screenshots of the rebuild: the thick **black card border** (`5px solid #000`, not a thin grey
+  outline — real v1 screens are framed this way), solid `--v1-blue` FILL on the bubbles and the
+  active tab/day/row (not outline-only), and the Stundenplan's last row bleeding edge-to-edge solid
+  blue with rounded bottom corners matching the card's own radius (`.wf-sp-rows` gives back its
+  own side padding as a negative margin so only that one row can reach it — see the CSS comment).
+  `.wf-connect-title` and every other label now uses OCR-A-BT throughout (v1's own typewriter
+  face), not just the one heading. **This also incidentally fixed the dark-mode contrast bug from
+  the first pass** — see below.
+- **Hardcoding white/black/`--v1-blue` rather than the page's `--text-*`/`--border-color` tokens
+  is deliberate, and doubles as the dark-mode fix flagged (and left unfixed) after the first pass.**
+  These panels must always render as the literal light v1 UI regardless of theme — same reasoning
+  as "SkeuKit exhibits keep their own light material" in the dark-mode section above — and unlike
+  the first pass, nothing in this version references `var(--text-primary)`/`--text-secondary`/
+  `--border-color`, the three tokens `dark-mobile.css` swaps to light greys below 640px. So the
+  mobile-dark-mode readability bug the first pass had (light grey text going near-invisible on the
+  hardcoded white card) cannot recur here — verify this holds if the wireframe is ever extended
+  with a new element, by grepping the new CSS for `var(--text-` or `var(--border-color)` before
+  shipping it.
 - **Bubble stacking order needed an explicit fix**: the small "Paul" bubble at the top visually
   overlapped the big central "Zoe" circle, and because DOM/paint order put `--zoe` after
   `--paul1`, Zoe painted over Paul's text. Fixed with `z-index: 1` on `--zoe` and `z-index: 2` on
   the four smaller bubbles — simpler than reordering the markup, and it generalizes if a bubble's
   position is nudged later.
-- ⚠ **Known issue, not yet fixed (Lucas: "ignore mobile for now"): on a phone, `.wf-screen`'s text
-  is unreadable.** The card's own background is a hardcoded `#fff` (correct — it must always be a
-  literal light UI mockup, not a "screen" that repaints itself when the page goes dark, the same
-  reasoning as "SkeuKit exhibits keep their own light material" in the dark-mode section above),
-  but its text colour comes from `var(--text-primary)`/`--text-secondary`/`--border-color`, which
-  `dark-mobile.css` swaps to light greys (`#E8E8E9`/`#99999C`/`#404045`) below 640px. Light grey
-  text on a hardcoded white card is close to invisible. **The fix, when picked back up:** declare
-  the light-mode values of those three tokens locally on `.wf-screen` itself (`--text-primary:
-  #1A1A1A; --text-secondary: #8E8E93; --text-tertiary: #c7c7cc; --border-color: #6f6f6f;` — the
-  same values `:root` uses in light mode) — custom-property inheritance means every descendant
-  reads `.wf-screen`'s own value rather than `:root[data-theme="dark"]`'s, no `!important` or
-  specificity fight needed, and it costs nothing on desktop where the tokens already match. Do NOT
-  fix this by touching `dark-mobile.css` — that would risk every OTHER dark-mode-aware element on
-  the page; scope the fix to `.wf-screen` only, exactly like the SkeuKit precedent.
-- Verified on desktop only (1440) over CDP: bubble stacking fixed, arrow aligns with the
-  open-Calendar button's height, zero console errors. Mobile (390, touch-emulated) was screenshotted
-  and the dark-mode contrast bug above was found and left as-is per Lucas's instruction.
+- Verified on desktop (1440) over CDP against side-by-side crops of the real
+  `v1-home.webp`/`v1-timetable.webp` exports: colour (`#2010FF` sampled both places), card border,
+  bubble fills, tab/day/row shapes and the full-bleed last row all match; bubble stacking fixed,
+  arrow aligns with the open-Calendar button's height, zero console errors. Mobile not re-verified
+  this pass, per Lucas ("ignore mobile for now") — but per the point above, the specific bug found
+  there earlier no longer has a mechanism to occur.
 
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
