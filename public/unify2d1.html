@@ -1618,7 +1618,13 @@
        headline stat duplicated Supporting Features' own "1.4 → 3.1 meetups"
        caption. See CLAUDE.md. */
 
-    /* Fact bar: three big numbers. */
+    /* Fact bar: three big numbers.
+       UNUSED as of 2026-09-29, see CLAUDE.md — `.fact-bar`/`.fact` lost their
+       last instance when the pilot stats came out of "The idea" (2026-09-27),
+       and `.fact-num`/`.fact-label`/`.fact-src` outlived that only because the
+       SUS card in Testing and results borrowed them. That card is gone too now
+       (its number folded into the note under the task table), so the whole
+       group is dormant. Kept, not deleted, same convention as the rest. */
     .fact-bar {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1826,11 +1832,21 @@
       color: var(--text-primary); padding: 10px 12px 10px 0;
       border-bottom: 1px solid var(--border-color);
     }
-    .cs-table td { padding: 10px 12px 10px 0; border-bottom: 1px dotted var(--border-color); }
+    /* text-align is explicit because the table now lives inside .res-block,
+       which centres its children's text — without this the task names centre
+       in their column while the `th` above them stays left, which reads as a
+       broken column rather than a deliberate one. `.num` cells override to
+       right below. */
+    .cs-table td { padding: 10px 12px 10px 0; border-bottom: 1px dotted var(--border-color); text-align: left; }
     .cs-table td.num, .cs-table th.num { text-align: right; font-family: 'VT323', monospace; font-size: 18px; }
     .cs-table tr.is-highlight td { color: var(--text-primary); }
     .cs-table tr.is-highlight td.num:last-child { color: var(--accent-ink); }
 
+    /* UNUSED as of 2026-09-29, see CLAUDE.md — the SUS card was the last raised
+       neumorphic panel in Testing and results and the odd one out once both
+       halves of that section moved into the flat, centred .res-block shape;
+       its 71 -> 83 now sits as a picked-out number in the note under the task
+       table. Kept, not deleted. */
     .sus {
       display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
       background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-raised-sm);
@@ -1859,13 +1875,16 @@
        right with no crossings and no collisions. Both the mask (below) and
        every leader-line coordinate are derived from this same start angle;
        change it and all of them have to move together. */
-    .pie-block {
-      /* Centred heading, centred text, heading above the chart — the two
-         TEMPORARY toggles that let Lucas compare those against left-aligned
-         text and a heading below are gone; these are the settings he kept.
-         The generous margin-top is the "3x the spacing above the header" he
-         asked for: 3x this block's own internal gap. Its counterpart below
-         the text is the inline margin-top on the next .cs-sub heading. */
+    /* One shared shape for BOTH halves of "Testing and results" (2026-09-29):
+       heading, then the evidence, then a plain note under it, centred in a
+       column narrower than the section. The pie uses it and so does the task
+       table, so the two movements of that section read as a matched pair
+       instead of one centred chart followed by a full-width two-column grid.
+       Centred heading, centred text, heading above — the TEMPORARY toggles
+       that let Lucas compare those against left-aligned text and a heading
+       below are gone; these are the settings he kept. The generous margin-top
+       is the "3x the spacing" he asked for: 3x this block's own internal gap. */
+    .res-block {
       display: flex; flex-direction: column; align-items: center; text-align: center;
       gap: clamp(20px, 3vw, 28px);
       max-width: 720px;
@@ -1873,7 +1892,7 @@
     }
     /* .cs-sub carries its own margin-top for use in normal flow; inside this
        flex column the `gap` already does that job, so it's zeroed. */
-    .pie-block > .cs-sub { margin-top: 0; }
+    .res-block > .cs-sub { margin-top: 0; }
 
     /* The stage is exactly the circle's box; the labels and their leader
        lines hang outside it (overflow visible), so the PIE ITSELF is what's
@@ -1906,11 +1925,11 @@
       color: var(--text-secondary);
     }
     .pie-label b { color: var(--text-primary); font-weight: 500; }
-    /* Plain-text takeaway under the chart — deliberately NOT a .cs-caption
-       (VT323, small, decorative): Lucas asked for "normal plain text form,
-       no fancy design", so it's .guide-text as-is. Widened from 46ch (Lucas:
-       "widen the text below") — .pie-block went 560px -> 720px to make room. */
-    .pie-note { max-width: 64ch; }
+    /* Plain-text takeaway under each piece of evidence — deliberately NOT a
+       .cs-caption (VT323, small, decorative): Lucas asked for "normal plain
+       text form, no fancy design", so it's .guide-text as-is. Widened from
+       46ch — .res-block went 560px -> 720px to make room. */
+    .res-note { max-width: 64ch; }
 
     /* The pie fills in by SWEEPING open, clockwise, rather than simply fading
        or popping in. `--reveal` (0–100) is registered so the browser can
@@ -2955,13 +2974,13 @@
 
            2026-09-29: the cohort is now stated ONCE, here, for the whole
            section (Lucas: "so you don't need to restate the user amount each
-           time"). It used to appear in .pie-note AND in "The final design"'s
+           time"). It used to appear in the pie's note AND in "The final design"'s
            intro AND implicitly a third time as a separate "12 participants"
            moderated test further down — three different framings of what is
            one study. Everything below this paragraph now belongs to it. -->
       <p class="guide-text">Five friend groups — twenty students in all — used the coded prototype for three weeks. Everything below comes out of those three weeks: what the app recorded while they used it, and the interviews I ran with them at the end.</p>
 
-      <div class="pie-block">
+      <div class="res-block">
         <h3 class="cs-sub">Where the time went</h3>
         <!-- Leader-line coordinates are derived from the gradient's own start
              angle (106.4deg) — see the .pie-stage CSS note. Per slice: a point
@@ -2980,23 +2999,24 @@
           <span class="pie-label" style="top: 65.9%;">Room finder <b>1 %</b></span>
           <span class="pie-label" style="top: 87.9%;">Who's free now <b>76 %</b></span>
         </div>
-        <p class="guide-text pie-note">Almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
+        <p class="guide-text res-note">Almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
       </div>
 
-      <!-- Reframed 2026-09-29: this used to open "A moderated test with 12
-           participants", inventing a second cohort alongside the pilot's 20.
-           Same five tasks, same people, run in the first week and the last —
-           which is also what makes the before/after columns and the SUS pair
-           legible without a second methodology paragraph. The heading was
-           added to match the page's rhythm (every other block of this size
-           has a .cs-sub over it) and names the finding rather than the
-           method, like "It felt like a tool" / "Why the 68% stopped trying". -->
-      <!-- 3x the previous clamp(28px, 5vw, 48px) — the "spacing below the
-           text" half of Lucas's ask; its counterpart above the pie's heading
-           is .pie-block's own margin-top. -->
-      <h3 class="cs-sub" style="margin-top: clamp(84px, 15vw, 144px);">The one nobody could find</h3>
-      <p class="guide-text">Five tasks, run in the first week and again in the last, with one change in between. Four were fine from the start. The fifth — hiding yourself from a single friend — was buried in settings, where nobody thought to look: <b>"I assumed that lived on the person, not in a menu."</b> Moving it onto that friend's own profile is what the second column shows.</p>
-      <div class="cs-grid-2">
+      <!-- Second movement, same shape as the pie above it (2026-09-29):
+           heading -> the evidence -> a plain note under it, all in a centred
+           .res-block. It used to be a full-width .cs-grid-2 putting the table
+           beside a raised neumorphic .sus card, with its explanatory paragraph
+           ABOVE — three different idioms in one section. The SUS pair is now a
+           picked-out number inside the note (it was a second before/after
+           sitting next to a table that already had before/after columns), and
+           the paragraph moved under the table so both halves read the same way.
+
+           The table itself is kept as-is: its `.is-highlight` last row already
+           does the page's "one accent row carries the finding, grey for the
+           rest" job, so unlike the A/B/C variant grid that was cut earlier,
+           this one is already consistent with the page's chart convention. -->
+      <div class="res-block">
+        <h3 class="cs-sub">The one nobody could find</h3>
         <table class="cs-table">
           <thead><tr><th>Task</th><th class="num">Week 1</th><th class="num">Week 3</th></tr></thead>
           <tbody>
@@ -3007,13 +3027,10 @@
             <tr class="is-highlight"><td>Hide yourself from one friend</td><td class="num">42 %</td><td class="num">92 %</td></tr>
           </tbody>
         </table>
-        <div class="sus">
-          <span class="fact-src">System Usability Scale</span>
-          <span class="fact-num">71 → 83</span>
-          <span class="fact-label">Measured at the start of the three weeks and again at the end, either side of that one change.</span>
-        </div>
+        <p class="guide-text res-note">Five tasks, run in the first week and again in the last. Four were fine from the start. The fifth — hiding yourself from a single friend — was buried in settings, where nobody thought to look: <b>"I assumed that lived on the person, not in a menu."</b> Moving it onto that friend's own profile took it from <b>42 % to 92 %</b>, and carried the System Usability Scale for the whole prototype from <b>71 to 83</b>.</p>
       </div>
-      <div class="ph ph--chart"><span class="ph-tag">Before / after</span><span class="ph-desc">The settings screen and the friend's profile, side by side</span></div>
+
+      <div class="ph ph--chart" style="margin-top: clamp(60px, 9vw, 84px);"><span class="ph-tag">Before / after</span><span class="ph-desc">The settings screen and the friend's profile, side by side</span></div>
     </section>
 
     <!-- 7 · What we learned + next -->

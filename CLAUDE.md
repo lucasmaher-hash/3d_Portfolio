@@ -873,6 +873,41 @@ come from that plus interviews, "so you don't need to restate the user amount ea
 - Verified over CDP at 1440: section reads framing → pie → heading → paragraph → table/SUS →
   placeholder, no duplicated cohort claims anywhere on the page, zero console errors.
 
+**Then the second half was rebuilt to mirror the first, same day — the section is now two matched
+movements instead of a centred chart followed by a full-width two-column grid.** Lucas: "restructure
+/ reimagine it so it fits the new layout and rest of page."
+- **One shared block shape, used twice: `.res-block`** (renamed from `.pie-block`, which was doing
+  the job already but under a pie-specific name). Both halves are now **heading → the evidence →
+  a plain note under it**, centred in a 720px column: `Where the time went` → pie → note, and
+  `The one nobody could find` → task table → note. `.pie-note` was renamed `.res-note` for the same
+  reason. The explanatory paragraph for the table used to sit ABOVE it; it moved below so both
+  halves read the same way round.
+- **The `.sus` card is gone and its number folded into prose.** It was the last raised neumorphic
+  panel in the section and the obvious odd one out once everything else went flat and centred — and
+  it was a *second* before/after (71 → 83) sitting beside a table that already had before/after
+  columns. `71 to 83` is now a `<b>` figure in the note under the table, alongside `42 % to 92 %`.
+  `.cs-grid-2`'s only instance went with it.
+- **The task table was kept, deliberately, unlike the A/B/C variant grid cut earlier.** Four of its
+  five rows show a task that barely moved, which is the same "grid where only one row carries the
+  finding" shape that got the `.tv` variants cut — but this table already resolves that the way the
+  page's own chart convention says to: `.is-highlight` on the failing row renders its result in the
+  accent while the rest stay grey. It's the page's "one accent, grey for the rest" rule applied to a
+  table, so it stays.
+- **`.cs-table td` needed an explicit `text-align: left`.** Inside `.res-block` the cells inherited
+  the block's `text-align: center`, so task names centred in their column while the `th` above them
+  stayed left — which reads as a broken column, not a styled one. The `.num` cells still override to
+  right. **Worth remembering generally: moving a table into a centred container silently re-aligns
+  every cell that doesn't set its own alignment.**
+- **Now dormant, marked `UNUSED` and kept per the usual convention**: `.sus`, and the whole
+  `.fact-bar`/`.fact`/`.fact-num`/`.fact-label`/`.fact-src` group — the latter had outlived the
+  removal of the pilot stats from "The idea" only because the SUS card borrowed three of its
+  classes.
+- Verified over CDP at 1440: both halves render as matched heading/evidence/note blocks, table
+  columns align correctly, zero console errors.
+- ⚠ Still unresolved in this section: the `.ph` before/after well at the end (wants two real
+  screenshots of the settings → profile change), and whether the page should explain why Socials is
+  absent from the usage chart.
+
 **"What we learned"'s opening paragraph was reworded, not left alone, and its badge and the
 Results/Learned badges all shifted down by one** (Results 7→6, Learned 8→7 — Pivot stays 4, "The
 final design" is the new 5). The paragraph used to say "ordering THIS PAGE by measured use... was
