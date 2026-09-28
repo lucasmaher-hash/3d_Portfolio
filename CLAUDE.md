@@ -792,6 +792,56 @@ above/below toggle was added so Lucas can compare heading placement live.**
   chart+legend centred between them; clicking "Header below" moves the heading down between the
   chart and the paragraph and updates the active-button styling; zero console errors either state.
 
+**Third pass on the pie, 2026-09-29: Socials dropped from the data, the legend block replaced by
+labels attached to each slice with leader lines, the pie centred, and left-alignment demoted from
+default to a second toggle.**
+- **Socials is gone from the chart — data only, not the feature.** Lucas: "it wasn't used in the
+  prototype." It was 6%, so the remaining four were renormalised back to 100: 71/18/4/1 of 94 →
+  **76/19/4/1**. The Socials FEATURE still appears everywhere else (its screen recording is half of
+  the Timetable+Socials pairing in "The final design"), and `.pie-note`'s list of "everything else"
+  dropped its mention to match. ⚠ **Open question flagged to Lucas, not yet answered:** a reader
+  meets Socials as a shipped feature and then doesn't find it in the usage chart. Whether the page
+  should say why (one clause — "Socials wasn't in the pilot build") or stay silent is his call; no
+  claim was invented either way.
+- **The legend list became per-slice labels with leader lines** (`.pie-label` + a `.pie-lines`
+  SVG), replacing `.pie-legend`, which was deleted rather than marked dormant — it was a handful of
+  lines written the same session and directly superseded, not an established component worth
+  keeping on the pile. The pie is now what's centred on the page; the labels hang off its right
+  side, outside `.pie-stage`'s box (`overflow: visible`), so they don't shift the circle off-centre.
+- **`from 106.4deg` on the conic-gradient is load-bearing geometry, not styling.** The three small
+  slices (19/4/1%) are adjacent, so wherever their combined 24% arc sits, their labels stack on top
+  of each other. Rotating the gradient so that arc spans absolute 20°→106.4° puts all three on the
+  RIGHT of the circle, *and* leaves the big pink slice's arc (106.4°→380°) crossing the lower right
+  as well — so all four labels sit on the right, no crossings, no collisions. **The mask that drives
+  the sweep animation had to take the same `from 106.4deg`**, or the reveal starts mid-slice instead
+  of on a boundary. If that start angle is ever changed, the mask AND every leader-line coordinate
+  move with it.
+- **Leader-line coordinates are derived, not eyeballed.** The SVG uses `viewBox="0 0 100 100"`
+  mapped onto the circle's own box, so every coordinate is a percentage of the pie and the geometry
+  is just `x = 50 + 50·sin θ`, `y = 50 − 50·cos θ` (θ clockwise from 12 o'clock — the same
+  convention `conic-gradient` uses). Each polyline is three points: a point on that slice's arc → a
+  short radial step outward (r = 59 instead of 50) → horizontal to the labels' shared left edge at
+  x = 118. Each `.pie-label`'s inline `top` is the y of its own line's horizontal segment, so label
+  and line always line up. `vector-effect: non-scaling-stroke` keeps the hairline at 1px whatever
+  size the pie renders. **Connection points don't have to be slice midpoints** — that's what makes
+  this work: the pink slice is connected at 130°, well off its midpoint, purely because that's where
+  there was room on the right.
+- **Labels and lines fade in with the sweep** (opacity, 0.5s, 0.9s delay, via
+  `.pie-chart.is-visible ~ .pie-lines` / `~ .pie-label`) — without it they sit pointing at an empty
+  circle for the animation's full 1.6s, which reads as a half-finished render rather than an
+  entrance. Reduced-motion forces them visible with no transition, same as the chart itself.
+- **Left-alignment went from default back to a toggle.** Lucas reverted the "links bündig" default
+  ⇒ `.pie-block` is centred again (`align-items: center; text-align: center`), and `.is-left`
+  restores the left-aligned version on demand. `.pie-stage` carries `align-self: center` so the
+  circle stays centred in BOTH modes. The toggle bar now holds two independent groups (`[data-pos]`
+  for header above/below, `[data-align]` for centred/left); each marks its own active button so they
+  can't clear each other's state. **All of it is still TEMPORARY** — grep `TEMPORARY` for the four
+  pieces to delete (CSS block, markup, script, and the `.is-header-below` / `.is-left` rules).
+- Verified over CDP at 1440: all four labels land on the right with clean spacing and no crossings,
+  pie centre sits dead centre of the page, both toggles work independently, mid-sweep frame shows
+  the wedge growing with labels still hidden, settled frame shows all four slices and labels, zero
+  console errors. Mobile still untouched this session (see the warning above).
+
 **"What we learned"'s opening paragraph was reworded, not left alone, and its badge and the
 Results/Learned badges all shifted down by one** (Results 7→6, Learned 8→7 — Pivot stays 4, "The
 final design" is the new 5). The paragraph used to say "ordering THIS PAGE by measured use... was

@@ -1837,58 +1837,91 @@
       padding: clamp(20px, 3vw, 32px);
     }
 
-    /* Pie chart: pure CSS via conic-gradient, no canvas/SVG/JS. Stops are
-       hardcoded cumulative degrees for the five fixed shares (71/18/6/4/1%)
-       rather than computed from custom properties — this chart has one
-       instance and isn't meant to be a reusable component the way .chart/
-       .ovl/.tv are, so there was nothing to gain from the extra indirection.
-       If the numbers ever change, recompute: deg = cumulative% * 3.6.
-       Colours are the app's own (pink / near-black / cream), not this
-       chart's earlier accent+grey scheme — see the inline conic-gradient
-       for which colour is which slice; the legend dots carry the same
-       colours so the two stay in sync without a separate lookup. */
+    /* Pie chart: pure CSS via conic-gradient, no canvas. Stops are hardcoded
+       cumulative degrees for the four fixed shares (76/19/4/1%) rather than
+       computed from custom properties — this chart has one instance and
+       isn't meant to be a reusable component the way .chart/.ovl/.tv are, so
+       there was nothing to gain from the extra indirection. If the numbers
+       ever change, recompute: deg = cumulative% * 3.6.
+       Colours are the app's own (pink / near-black / greys / cream).
+
+       SOCIALS WAS DROPPED 2026-09-29 (Lucas: "it wasn't used in the
+       prototype"). It was 6%; the remaining four were renormalised to sum to
+       100 again — 71/18/4/1 of 94 -> 76/19/4/1. The Socials FEATURE still
+       exists everywhere else on the page; only its usage-data slice is gone.
+
+       `from 106.4deg` is load-bearing, not decoration. The three small slices
+       (19/4/1%) are adjacent, so wherever their arc lands, their labels land
+       on top of each other. Rotating the whole gradient so that 24% arc spans
+       absolute 20deg -> 106.4deg puts all three on the RIGHT side of the
+       circle, and leaves the big pink slice's arc (106.4 -> 380/20) crossing
+       the lower right as well — so every one of the four labels can sit on the
+       right with no crossings and no collisions. Both the mask (below) and
+       every leader-line coordinate are derived from this same start angle;
+       change it and all of them have to move together. */
     .pie-block {
-      /* Block sits centred on the page (max-width + margin auto), but the
-         header/paragraph text inside reads left-aligned ("links bündig",
-         Lucas) — align-items default (stretch) gives the header and .pie-note
-         the block's full width to align left against, while .pie-chart-wrap
-         keeps its own internal `justify-content: center` so the chart+legend
-         pairing still centres as a unit within that same width. */
-      display: flex; flex-direction: column;
+      /* Centred by default (Lucas reverted the left-aligned version); the
+         TEMPORARY toggle's .is-left class switches it back for comparison. */
+      display: flex; flex-direction: column; align-items: center; text-align: center;
       gap: clamp(20px, 3vw, 28px);
       max-width: 720px; margin: 0 auto;
     }
-    /* Explicit order so the TEMPORARY toggle below can swap the header and
-       the chart without touching markup order — see the toggle's own
-       comment further down for why this exists and when to remove it. */
+    .pie-block.is-left { align-items: stretch; text-align: left; }
+    /* Explicit order so the TEMPORARY toggle can swap the header and the
+       chart without touching markup order — see the toggle's own comment
+       further down for why this exists and when to remove it. */
     .pie-block > .cs-sub { order: 1; margin-top: 0; }
-    .pie-chart-wrap { order: 2; display: flex; align-items: center; gap: clamp(24px, 4vw, 48px); flex-wrap: wrap; justify-content: center; }
+    .pie-stage { order: 2; }
     .pie-note { order: 3; }
     .pie-block.is-header-below > .cs-sub { order: 2; }
-    .pie-block.is-header-below .pie-chart-wrap { order: 1; }
-    /* +35% over the original clamp(140px, 16vw, 200px), per Lucas. */
-    .pie-chart { width: clamp(189px, 21.6vw, 270px); height: clamp(189px, 21.6vw, 270px); border-radius: 50%; flex: none; }
-    .pie-legend { display: flex; flex-direction: column; gap: 10px; list-style: none; padding: 0; margin: 0; text-align: left; }
-    .pie-legend li {
-      display: flex; align-items: center; gap: 10px;
-      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 13px; color: var(--text-secondary);
+    .pie-block.is-header-below .pie-stage { order: 1; }
+
+    /* The stage is exactly the circle's box; the labels and their leader
+       lines hang outside it (overflow visible), so the PIE ITSELF is what's
+       centred on the page, per Lucas — not the pie+labels group. align-self
+       keeps that true in .is-left mode too, where the block stops centring
+       its children. */
+    .pie-stage {
+      position: relative;
+      width: clamp(189px, 21.6vw, 270px);
+      aspect-ratio: 1;
+      align-self: center;
     }
-    .pie-legend li i { width: 11px; height: 11px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1); }
-    .pie-legend li b { color: var(--text-primary); font-weight: 500; margin-left: auto; padding-left: 24px; }
+    .pie-chart { width: 100%; height: 100%; border-radius: 50%; }
+    /* viewBox is 0 0 100 100 mapped onto the circle's own box, so every
+       coordinate below is a percentage of the pie — x = 50 + 50*sin(angle),
+       y = 50 - 50*cos(angle), angle measured clockwise from 12 o'clock, the
+       same convention conic-gradient uses. Each polyline is: a point on the
+       slice's arc -> a short radial step outward -> horizontal to the labels'
+       shared left edge. non-scaling-stroke keeps the hairline 1px however
+       large the pie renders. */
+    .pie-lines {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      overflow: visible; pointer-events: none;
+      fill: none; stroke: var(--text-tertiary); stroke-width: 1;
+    }
+    .pie-lines polyline { vector-effect: non-scaling-stroke; }
+    .pie-label {
+      position: absolute; left: 120%;
+      transform: translateY(-50%);
+      white-space: nowrap; text-align: left;
+      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .pie-label b { color: var(--text-primary); font-weight: 500; }
     /* Plain-text takeaway under the chart — deliberately NOT a .cs-caption
        (VT323, small, decorative): Lucas asked for "normal plain text form,
-       no fancy design", so it's .guide-text as-is, just centred by the
-       .pie-block parent. Widened from 46ch (Lucas: "widen the text below")
-       — .pie-block itself also went 560px -> 720px so there's room. */
+       no fancy design", so it's .guide-text as-is. Widened from 46ch (Lucas:
+       "widen the text below") — .pie-block went 560px -> 720px to make room. */
     .pie-note { max-width: 64ch; }
 
-    /* ── TEMPORARY test control — header above/below the pie chart ──────────
-       Lucas asked to compare both positions live; NOT a finished feature.
-       Remove this whole block (CSS + the .pie-header-toggle markup + its
-       tiny script) once he picks one, and delete the now-unneeded
-       .pie-block.is-header-below rules above at the same time. */
+    /* ── TEMPORARY test controls — header above/below, text centred/left ────
+       Lucas asked to compare both, live; NOT finished features. Once he picks,
+       remove: this CSS block, the .pie-header-toggle markup, its <script>, and
+       the .pie-block.is-header-below / .pie-block.is-left rules above. Grep
+       TEMPORARY to find all four. */
     .pie-header-toggle {
-      display: flex; gap: 8px; justify-content: center;
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; align-items: center;
       margin: 0 auto clamp(12px, 2vw, 20px); max-width: 720px;
     }
     .pie-header-toggle button {
@@ -1898,13 +1931,17 @@
       border: 1px dashed var(--accent-ink);
     }
     .pie-header-toggle button.is-active { color: var(--accent-ink); background: rgba(255, 136, 200, .12); }
+    .pie-toggle-sep { width: 1px; height: 18px; background: var(--text-tertiary); margin: 0 6px; }
 
-    /* The pie fills in by SWEEPING open from the top, clockwise, rather than
-       simply fading or popping in. `--reveal` (0–100) is registered so the
-       browser can animate it like a plain number; a `mask` built from the
-       SAME angle formula as the chart's own conic-gradient stops (deg =
-       percent * 3.6) reveals the wedge up to that angle and hides the rest,
-       so the sweep uncovers real colour rather than crossfading over it.
+    /* The pie fills in by SWEEPING open, clockwise, rather than simply fading
+       or popping in. `--reveal` (0–100) is registered so the browser can
+       animate it like a plain number; a `mask` built from the SAME angle
+       formula as the chart's own conic-gradient stops (deg = percent * 3.6)
+       reveals the wedge up to that angle and hides the rest, so the sweep
+       uncovers real colour rather than crossfading over it.
+       `from 106.4deg` MUST match the background gradient's own start angle
+       (see the long note above) — otherwise the sweep begins mid-slice and
+       the reveal no longer follows the slice boundaries.
        Browsers without @property support see the pie appear at full colour
        immediately (the transition simply can't run) — acceptable
        degradation, not a broken state. */
@@ -1915,13 +1952,22 @@
     }
     .pie-chart {
       --reveal: 0;
-      -webkit-mask: conic-gradient(#000 calc(var(--reveal) * 3.6deg), transparent 0deg);
-      mask: conic-gradient(#000 calc(var(--reveal) * 3.6deg), transparent 0deg);
+      -webkit-mask: conic-gradient(from 106.4deg, #000 calc(var(--reveal) * 3.6deg), transparent 0deg);
+      mask: conic-gradient(from 106.4deg, #000 calc(var(--reveal) * 3.6deg), transparent 0deg);
       transition: --reveal 1.6s cubic-bezier(.4, 0, .2, 1);
     }
     .pie-chart.is-visible { --reveal: 100; }
+    /* The labels and their leader lines fade in WITH the sweep rather than
+       sitting there from the start pointing at an empty circle — delayed to
+       .9s so they arrive as the 1.6s sweep is finishing. General sibling
+       combinator because .is-visible lands on .pie-chart, and both the svg
+       and the labels follow it inside .pie-stage. */
+    .pie-lines, .pie-label { opacity: 0; transition: opacity .5s ease .9s; }
+    .pie-chart.is-visible ~ .pie-lines,
+    .pie-chart.is-visible ~ .pie-label { opacity: 1; }
     @media (prefers-reduced-motion: reduce) {
       .pie-chart { --reveal: 100 !important; transition: none !important; }
+      .pie-lines, .pie-label { opacity: 1 !important; transition: none !important; }
     }
 
     /* UNUSED as of 2026-09-27 (see CLAUDE.md) — the only .v1-carousel instance
@@ -2930,28 +2976,38 @@
            methodology sentence it used to carry moved into .pie-note
            instead, which was widened to make room for it. -->
 
-      <!-- TEMPORARY: lets Lucas compare the heading above vs. below the
-           chart live. Remove this whole <div> plus its script and the
-           .is-header-below CSS once he's picked one — see the CSS comment
-           by .pie-header-toggle for the full removal list. -->
+      <!-- TEMPORARY: lets Lucas compare heading above vs. below and centred
+           vs. left-aligned text, live. Remove this whole block plus its
+           script and the .is-header-below/.is-left CSS once he's picked —
+           see the CSS comment by .pie-header-toggle for the removal list. -->
       <div class="pie-header-toggle">
         <button type="button" class="is-active" data-pos="above">Header above</button>
         <button type="button" data-pos="below">Header below</button>
+        <span class="pie-toggle-sep"></span>
+        <button type="button" class="is-active" data-align="center">Text centred</button>
+        <button type="button" data-align="left">Text left</button>
       </div>
 
       <div class="pie-block" id="pie-block">
         <h3 class="cs-sub">Where the time went</h3>
-        <div class="pie-chart-wrap" role="img" aria-label="Share of pilot time per feature: who's free now 71%, timetable 18%, socials 6%, friends map 4%, room finder 1%.">
-          <div class="pie-chart" id="usage-pie" style="background: conic-gradient(#FF88C8 0deg 255.6deg, #1A1A1A 255.6deg 320.4deg, #8E8E93 320.4deg 342deg, #F9F2EB 342deg 356.4deg, #C7C7CC 356.4deg 360deg);"></div>
-          <ul class="pie-legend">
-            <li><i style="background: #FF88C8;"></i>Who's free now<b>71 %</b></li>
-            <li><i style="background: #1A1A1A;"></i>Timetable<b>18 %</b></li>
-            <li><i style="background: #8E8E93;"></i>Socials<b>6 %</b></li>
-            <li><i style="background: #F9F2EB;"></i>Friends map<b>4 %</b></li>
-            <li><i style="background: #C7C7CC;"></i>Room finder<b>1 %</b></li>
-          </ul>
+        <!-- Leader-line coordinates are derived from the gradient's own start
+             angle (106.4deg) — see the .pie-stage CSS note. Per slice: a point
+             on its arc, a radial step out, then horizontal to x=118. Labels sit
+             at the matching `top` so each one lines up with its own line. -->
+        <div class="pie-stage" role="img" aria-label="Share of pilot time per feature: who's free now 76%, timetable 19%, friends map 4%, room finder 1%.">
+          <div class="pie-chart" id="usage-pie" style="background: conic-gradient(from 106.4deg, #FF88C8 0deg 273.6deg, #1A1A1A 273.6deg 342deg, #8E8E93 342deg 356.4deg, #F9F2EB 356.4deg 360deg);"></div>
+          <svg class="pie-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="90.5,20.6 97.7,15.3 118,15.3" />
+            <polyline points="100,50.9 109,51 118,51" />
+            <polyline points="96.4,63.4 104.4,65.9 118,65.9" />
+            <polyline points="88.3,82.1 95.2,87.9 118,87.9" />
+          </svg>
+          <span class="pie-label" style="top: 15.3%;">Timetable <b>19 %</b></span>
+          <span class="pie-label" style="top: 51%;">Friends map <b>4 %</b></span>
+          <span class="pie-label" style="top: 65.9%;">Room finder <b>1 %</b></span>
+          <span class="pie-label" style="top: 87.9%;">Who's free now <b>76 %</b></span>
         </div>
-        <p class="guide-text pie-note">Five friend groups — 20 people — used the coded prototype for two weeks. Almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, socials, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
+        <p class="guide-text pie-note">Five friend groups — 20 people — used the coded prototype for two weeks. Almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
       </div>
 
       <p class="guide-text" style="margin-top: clamp(28px, 5vw, 48px);">A moderated test with 12 participants, five tasks, run twice with one round of changes in between. Four tasks were fine from the start. The fifth — hiding yourself from a single friend — was buried in settings, where nobody thought to look; moving it into that friend's own profile is what the second column shows.</p>
@@ -3427,17 +3483,28 @@
     })();
   </script>
   <script>
-    // ── TEMPORARY: pie header above/below toggle — see the CSS comment by
-    // .pie-header-toggle for the full removal list once Lucas has picked one.
+    // ── TEMPORARY: pie layout toggles (header above/below, text centred/left)
+    // — see the CSS comment by .pie-header-toggle for the full removal list
+    // once Lucas has picked. Each group marks its own active button, so the
+    // two toggles don't clear each other's state.
     (function () {
       var toggle = document.querySelector('.pie-header-toggle');
       var block = document.getElementById('pie-block');
       if (!toggle || !block) return;
+      function mark(sel, btn) {
+        toggle.querySelectorAll(sel).forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      }
       toggle.addEventListener('click', function (e) {
-        var btn = e.target.closest('button[data-pos]');
+        var btn = e.target.closest('button');
         if (!btn) return;
-        block.classList.toggle('is-header-below', btn.dataset.pos === 'below');
-        toggle.querySelectorAll('button').forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+        if (btn.dataset.pos) {
+          block.classList.toggle('is-header-below', btn.dataset.pos === 'below');
+          mark('[data-pos]', btn);
+        }
+        if (btn.dataset.align) {
+          block.classList.toggle('is-left', btn.dataset.align === 'left');
+          mark('[data-align]', btn);
+        }
       });
     })();
   </script>
