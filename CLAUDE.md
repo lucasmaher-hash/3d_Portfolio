@@ -644,6 +644,148 @@ not deleted, same convention as every other dormant block in this file.
   real content (not letterbox), 2 cards per row on mobile with visible margin to spare, zero console
   errors, section flows intro → collage → "It felt like a tool" → "What replaced it" with no gaps.
 
+**"Designing the merged timetable" and "Supporting features" — two separate sections — were merged
+into one, "The final design", and the usage-share data moved into "Testing and results" as a pie
+chart (2026-09-28, Lucas).** Lucas's own diagnosis: he liked the *idea* of "designing the merged
+timetable" (pick one hard decision, go deep) but not the execution — an abstract `.cs-grid-3` of
+three `.tv` diagrams (Columns / Overlay / Shared lane) with invented usability numbers, none of
+which showed the actual app. His fix, after a short back-and-forth on scope: drop the A/B/C
+comparison entirely and go straight to the real screens, in the order people actually used them,
+folding in what used to be the separate "Supporting features" section (which duplicated some of
+that same "here's the finished app" job) rather than keeping two sections that both show final
+screens. Two explicit decisions from him going in: **no annotation labels** anywhere in this
+section (kept to the wireframe/collage precedent from earlier in the page — plain screens, the
+prose does the explaining) was not asked here, but **the live page's actual scroll-driven
+sticky-pin mechanism should be rebuilt**, not faked with a static side-by-side, when I offered both
+options and recommended static for consistency with the rest of this draft — he wanted the real
+interaction. And the “which features got used most” data was moved to **Testing and results as a
+pie chart**, replacing its old bar-chart form, because "which features got used" reads as a results
+question, not a walkthrough one.
+
+**"The final design" (`id="features"`, reused from the old "Supporting features" section — see
+below for why the id didn't change) now runs: intro paragraph → Home/"Who's free now" (a
+`.feature-row` using `homepage_freenow.mov`, the same "who's free now" cut used on the live
+homepage hero) → Timetable+Socialplan (scroll-driven, mirrored: text left, videos right) → a map
+spotlight placeholder (angle explicitly not decided — see below) → Friends+Courses (scroll-driven,
+NOT mirrored: videos left, text right, matching the live page's own alternation) → Settings
+(`.feature-row.reverse`).**
+- **Timetable+Socialplan and Friends+Courses both reuse `.scrolly`/`initScrolly` as-is — zero JS
+  changes.** `initScrolly` was already generic (`document.querySelectorAll('.scrolly').forEach
+  (initScrolly)`, each instance's DOM queries scoped to that instance's own element), so adding a
+  SECOND `.scrolly` section on the page needed only markup. The one thing that had to move: the
+  mirror-layout rule that used to be scoped to `#support-scrolly` (Socials+Friends, the section
+  being replaced) is now scoped to `#timetable-socials-scrolly` instead — both the desktop rule and
+  its ≤860px restatement (see the "source order beats specificity" comment right above it, which
+  now names the new ids). `#friends-courses-scrolly` gets no such rule, same as its predecessor
+  `#nav-friends-scrolly` on the live page — that pairing was never mirrored.
+- **`map-courses_screen.mov`** (on disk, previously unused in this draft) is the "Courses" video —
+  the room finder, the same floor-plan feature pointed at your next class instead of a friend. Its
+  `.phone-shot-video[data-vid="map-courses"]` placement rule already existed from the Video Details
+  spec table earlier in this file, so no new CSS was needed for it either.
+- **The Timetable panel's copy was rewritten, not reused**, because the old "The chosen design" text
+  explicitly referenced the now-deleted A/B/C test ("C's lane", "the second column shows") — keeping
+  it verbatim would have left a dangling reference to a comparison the reader never sees any more. It
+  now describes the shipped design on its own terms.
+- **Socials and Friends-indoors copy is reused verbatim** from the old Supporting Features
+  scrolly — neither referenced the removed content, so there was nothing to fix.
+- **Settings' copy was trimmed** — it used to also cover the room finder ("took 1% of pilot time")
+  in one line; that line is gone now that Room finder/Courses has its own paired video above.
+- **The map spotlight is a deliberate placeholder**, in the established `.ph` idiom
+  (`<div class="ph ph--chart"><span class="ph-tag">Map spotlight · TBD</span>...`), not throwaway
+  copy — Lucas's angle for it ("why is indoor navigation actually hard") is still undecided as of
+  this note; he said "we'll talk about that later." Don't write speculative content into this slot;
+  wait for the actual brief.
+- **The id stayed `#features` on purpose**, even though the section's job and title both changed —
+  reusing it kept the sidebar (`.cs-map`, dynamically built off `<a href>`s, no hardcoded id list —
+  see its script) to a one-line edit (swap the `<a href="#timetable">Timetable</a>` link for
+  `<a href="#features">Design</a>`) instead of also hunting down every other anchor into the old
+  section. `id="timetable"` no longer exists anywhere on the page.
+
+**Testing and results gained a pie chart, first thing in the section, before the existing task
+table and SUS box — then revised twice more the same session (colour, size/layout, animation),
+all per Lucas.** `.pie-chart` is pure CSS — a `conic-gradient` on a circular div, with hardcoded
+cumulative-degree stops (`deg = cumulative% × 3.6`) rather than custom-property-driven ones, since
+this is a one-off single-instance chart, not a reusable component like `.chart`/`.ovl`/`.tv` — the
+extra indirection those use had nothing to buy here. A `.pie-legend` list carries the
+labels/percentages next to it, since the three smallest slices (6%, 4%, 1%) are too thin to label
+inside the pie itself.
+- **Colour — the app's own palette, not this page's usual chart convention.** The first version
+  used the generic "one accent, grey for the rest" rule every other chart on the page follows
+  (`var(--accent-ink)` + descending-opacity greys). Lucas asked instead for "the colors of the app —
+  pink, dark grey, creme etc.", so the five slices are now literal app colours in legend order:
+  `#FF88C8` pink (71%, Who's free now), `#1A1A1A` near-black (18%, Timetable), `#8E8E93` mid grey
+  (6%, Socials), `#F9F2EB` cream (4%, Friends map), `#C7C7CC` light grey (1%, Room finder) — pink and
+  cream from the app's actual palette (`--accent-ink`/the "What replaced it" swatches), the two greys
+  filling in for the slices too small to read in a single hue. This is a deliberate one-off exception
+  to the page's chart convention, not a new rule to reuse elsewhere.
+- **Size and layout.** `.pie-chart` is +35% over its first size (`clamp(140px,16vw,200px)` →
+  `clamp(189px, 21.6vw, 270px)`). The whole thing — chart, legend, and a new plain-text takeaway
+  paragraph below it — is wrapped in `.pie-block` (`flex-direction: column; align-items: center;
+  text-align: center; max-width: 560px; margin: 0 auto`), replacing the old left-aligned
+  `.pie-chart-wrap` sitting flush with the rest of the section's body text. The takeaway paragraph
+  (`.pie-note`) is deliberately plain `.guide-text` — Lucas: "no fancy design" — not a `.cs-caption`
+  (which is VT323, small, and reads as decorative furniture elsewhere on the page); it replaced the
+  old `.cs-caption` that used to sit under the chart.
+- **The sweep-in animation.** Lucas: the pie should start empty and the segments should "expand out
+  ... opening up from one side going one direction" rather than fading or popping in — a classic
+  pie-fill reveal. Built with a registered custom property, `@property --reveal { syntax:
+  '<number>'; inherits: false; initial-value: 0; }`, which is what lets a browser interpolate a
+  bare number smoothly instead of snapping (an un-registered custom property cannot be transitioned
+  at all — the browser treats every value change as instant). `--reveal` (0–100) feeds a `mask:
+  conic-gradient(#000 calc(var(--reveal) * 3.6deg), transparent 0deg)` on the SAME element as the
+  colour conic-gradient — the mask's angle formula is identical to the chart's own slice-angle
+  formula (`deg = percent × 3.6`), so the reveal sweeps clockwise from 12 o'clock and uncovers real
+  colour as it goes, rather than crossfading over an already-visible pie. `.pie-chart.is-visible`
+  sets `--reveal: 100`; a small `IntersectionObserver` (threshold 0.4) adds that class the first
+  time the chart scrolls into view and immediately disconnects — a fill-in that replayed on every
+  scroll past would read as a glitch, not an entrance. `transition: --reveal 1.6s cubic-bezier(.4,
+  0, .2, 1)` is the "easing in and out" Lucas asked for. Browsers without `@property` support (rare,
+  pre-2023 engines) simply see the pie at full colour immediately — the transition can't run, but
+  nothing breaks. `prefers-reduced-motion` forces `--reveal: 100 !important` and `transition: none
+  !important` directly on `.pie-chart`, so the finished pie shows regardless of whether JS ever adds
+  `.is-visible`.
+- Verified over CDP: a mid-animation screenshot (captured immediately after scroll-into-view) shows
+  a partial pink wedge mid-sweep exactly as designed; a screenshot taken 2.5s later (past the 1.6s
+  transition) shows the complete five-slice pie at full colour. Zero console errors either way.
+
+> ⚠ **Mobile was explicitly paused for this whole 2026-09-28 session** (Lucas: "stop doing mobile
+> for this session entirely, we'll focus on that later"). Everything from "The final design" merge
+> through the pie chart rebuild — the two new `.scrolly` sections, `.pie-block`, the sweep
+> animation — was verified on desktop (1440) only. **None of it has been checked at 390/touch yet**,
+> including whether `.pie-block`'s centred layout or the enlarged `.pie-chart` overflow at narrow
+> widths, or whether the mobile `.scrolly` stacked-fallback (see `initScrolly`'s `stacked` branch)
+> still shows both videos/panels correctly for the two new pairings. Do a full mobile pass before
+> calling this restructure done.
+
+**"What we learned"'s opening paragraph was reworded, not left alone, and its badge and the
+Results/Learned badges all shifted down by one** (Results 7→6, Learned 8→7 — Pivot stays 4, "The
+final design" is the new 5). The paragraph used to say "ordering THIS PAGE by measured use... was
+the most uncomfortable decision in it" — a claim that stopped being quite true the moment the map
+spotlight was added, since that spotlight is an explicit, deliberate EXCEPTION to strict usage-order
+(a 1%-of-pilot-time feature getting a dedicated deep dive because it's the hardest thing built, not
+because people used it). Reworded to "walking the app in that order, and making one deliberate
+exception for the part worth a closer look anyway, was the most uncomfortable call" — true either
+way the spotlight's eventual content lands, and it doesn't pre-empt what that content will argue
+(still TBD).
+
+**Marked UNUSED, not deleted, same convention as every other dormant block in this file**: the
+whole A/B/C comparison system — `.variant`/`.variant-name`/`.variant-metrics`/`.variant.is-winner`
+and `.tv`/`.tv-cols`/`.tv-col`/`.tv-stack`/`.tv-lane`/`.tv-slot` — and the old usage-share bar chart
+— `.chart`/`.chart-row`/`.chart-key`/`.chart-track`/`.chart-fill`/`.chart-val`. **Correction to an
+earlier note in this file**: a previous entry (from the `.diff`-removal pass) claimed
+`.chart-row`/etc. were "also used by Testing and results further down the page" and therefore not
+safe to mark unused — that was wrong even at the time it was written (grepped now to confirm: the
+bar chart's only markup instance was always the one in the old Supporting Features section, never
+in Results). Results has never contained a `.chart-row` — the pie chart is genuinely new there, not
+a restoration of something already present. `.cs-grid-3` (the 3-column grid the A/B/C cards sat in)
+was left unmarked — it's a one-line generic layout utility, not worth tracking as dormant
+infrastructure the way the more specific `.variant`/`.tv` systems are.
+
+Verified over CDP at 1440 and 390: both new `.scrolly` sections swap correctly on scroll (mirrored
+and non-mirrored), pie chart renders with correct proportions and legend, sidebar nav's "Design"
+link scrolls to and highlights the merged section, badges read 1/2/3/4/5/6/7 in order down the
+page, zero console errors, div/section/ul tag counts balanced.
+
 **The page map moved out of the hero into a fixed sidebar** (2026-09-26, after Jessica Im's
 reference; the plan flagged this as a "if the page has room" option). It was `.cs-map`, inline
 under the lead line, six words and five arrows competing with the fact bar right under it. Same
