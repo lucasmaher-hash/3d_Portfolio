@@ -759,8 +759,8 @@ inside the pie itself.
 > restructure done.
 
 **Same session, follow-up pass on the pie: a `.cs-sub` heading replaced the plain intro paragraph,
-the block's text was switched from centred to left-aligned ("links bündig"), and a TEMPORARY
-above/below toggle was added so Lucas can compare heading placement live.**
+and the block's alignment went through a compare-and-pick round (left-aligned, then a toggle, then
+centred for good — see the two notes below for where it landed).**
 - **Heading, not paragraph.** "Five friend groups — 20 people — used the coded prototype for two
   weeks. This is where the time went." (the plain intro line) is gone; `<h3 class="cs-sub">Where
   the time went</h3>` takes its place, same treatment as "It felt like a tool" / "What replaced it"
@@ -778,19 +778,14 @@ above/below toggle was added so Lucas can compare heading placement live.**
   leftover space — so it reads flush-left inside the 720px block for free. `.pie-chart-wrap` keeps
   its own internal `justify-content: center`, so the chart+legend pairing still visually centres as
   a unit even though its container is no longer itself centring things.
-- **`.pie-header-toggle` is explicitly TEMPORARY** — two dashed pink VT323 pills ("Header above" /
-  "Header below") above the pie block, wired to toggle `.pie-block.is-header-below`, which swaps
-  `order` values so the heading moves to sit between the chart and `.pie-note` instead of above the
-  chart. No new markup order was needed for this — `.pie-block > .cs-sub`, `.pie-chart-wrap`, and
-  `.pie-note` all got explicit `order` values (1/2/3) specifically so the toggle could renumber just
-  the heading's `order` rather than reordering DOM nodes with JS. **Remove entirely once Lucas
-  decides**: the `.pie-header-toggle` CSS block, its markup `<div>`, its `<script>` (right after the
-  pie's IntersectionObserver script), and the now-unneeded `.pie-block.is-header-below` override
-  rules — all four are flagged `TEMPORARY` in their own comments so a future pass can grep for that
-  word to find every piece.
-- Verified over CDP: default state (header above) renders heading + left-aligned paragraph with the
-  chart+legend centred between them; clicking "Header below" moves the heading down between the
-  chart and the paragraph and updates the active-button styling; zero console errors either state.
+- **A `.pie-header-toggle` was added to compare heading-above vs. heading-below, and later a second
+  group for centred vs. left text. Both are GONE as of 2026-09-29** — Lucas picked **centred text,
+  heading above**, and asked for the scaffolding removed. Nothing of it survives: the CSS block, the
+  markup, the `<script>`, the `.is-header-below`/`.is-left` rules and the `order: 1/2/3`
+  declarations that existed only so the toggle could renumber the heading without moving DOM nodes.
+  Worth knowing as precedent, though: a throwaway comparison toggle like this costs about 20 lines
+  when every piece is tagged `TEMPORARY` in its own comment, and grepping that one word found all
+  of them at removal time.
 
 **Third pass on the pie, 2026-09-29: Socials dropped from the data, the legend block replaced by
 labels attached to each slice with leader lines, the pie centred, and left-alignment demoted from
@@ -830,17 +825,53 @@ default to a second toggle.**
   `.pie-chart.is-visible ~ .pie-lines` / `~ .pie-label`) — without it they sit pointing at an empty
   circle for the animation's full 1.6s, which reads as a half-finished render rather than an
   entrance. Reduced-motion forces them visible with no transition, same as the chart itself.
-- **Left-alignment went from default back to a toggle.** Lucas reverted the "links bündig" default
-  ⇒ `.pie-block` is centred again (`align-items: center; text-align: center`), and `.is-left`
-  restores the left-aligned version on demand. `.pie-stage` carries `align-self: center` so the
-  circle stays centred in BOTH modes. The toggle bar now holds two independent groups (`[data-pos]`
-  for header above/below, `[data-align]` for centred/left); each marks its own active button so they
-  can't clear each other's state. **All of it is still TEMPORARY** — grep `TEMPORARY` for the four
-  pieces to delete (CSS block, markup, script, and the `.is-header-below` / `.is-left` rules).
+- **Left-alignment went from default back to a toggle, and then away entirely** — Lucas reverted the
+  "links bündig" default and, after comparing, settled on **centred**. `.pie-block` is
+  `align-items: center; text-align: center`, and `.pie-stage` carries `align-self: center` so the
+  circle stays centred regardless of what the block does with its other children.
+- **3x more air above and below the block** (Lucas, at the same time as removing the toggles):
+  `.pie-block`'s `margin-top` is `clamp(60px, 9vw, 84px)` — 3x its own internal `gap` — and the
+  "The one nobody could find" heading under it went from `clamp(28px, 5vw, 48px)` to
+  `clamp(84px, 15vw, 144px)`. The two halves of that spacing live in different places (one a block
+  margin, one an inline style on the next heading) because there's no single wrapper around both.
 - Verified over CDP at 1440: all four labels land on the right with clean spacing and no crossings,
-  pie centre sits dead centre of the page, both toggles work independently, mid-sweep frame shows
+  pie centre sits dead centre of the page, mid-sweep frame shows
   the wedge growing with labels still hidden, settled frame shows all four slices and labels, zero
   console errors. Mobile still untouched this session (see the warning above).
+
+**Testing and results was restructured around ONE stated cohort, 2026-09-29 (Lucas: the section
+should open by saying the prototype was used by 20 people for three weeks and that the findings
+come from that plus interviews, "so you don't need to restate the user amount each time").**
+- **The cohort was being stated three different ways.** `.pie-note` said "Five friend groups — 20
+  people — two weeks"; "The final design"'s intro said the same thing again a section earlier; and
+  the task-table paragraph opened "A moderated test with **12 participants**" — a fourth number
+  implying a second study that never existed. Now it's stated **once**, in a `.guide-text`
+  paragraph directly under the section's divider, and everything below belongs to it. Both
+  duplicates were cut: `.pie-note` opens straight on its finding, and "The final design"'s intro
+  now just points forward ("the numbers behind that order are in Testing and results").
+- **Three weeks, not two** — Lucas's number, changed everywhere it appeared.
+- **The task table was reattributed to the same cohort, not a separate moderated test.** Its
+  paragraph now reads "Five tasks, run in the first week and again in the last, with one change in
+  between", and the column headers changed **Before/After → Week 1/Week 3** so the table itself
+  carries that framing instead of relying on the prose. The SUS box's caption was cut down to
+  "Measured at the start of the three weeks and again at the end, either side of that one change"
+  — it used to repeat the 42%→92% figure that the table already shows two columns of.
+- **A `.cs-sub` heading was added over the second half** ("The one nobody could find"), because
+  every other block of that size on the page has one and this one was running headless straight out
+  of the pie. It names the finding rather than the method, matching "It felt like a tool" / "Why the
+  68% stopped trying".
+- **One invented interview quote was added** — "I assumed that lived on the person, not in a menu."
+  — in the `<b>` inline style the Problem section's interviews already use. Rationale: the new
+  framing names interviews as a source, but nothing in the section actually drew on them. ⚠ Like
+  every other figure on this page it is a **placeholder**, covered by the blanket invented-data
+  warning at the top of the file.
+- **"What we learned" got a consistency fix**: "Four fifths of the pilot's time" → "Three-quarters",
+  since dropping Socials moved the home-screen share from 71% to 76%.
+- ⚠ **Still a placeholder**: the `.ph` before/after well at the end of the section, now labelled
+  "The settings screen and the friend's profile, side by side" — it wants two real screenshots of
+  the iteration the whole second half is about.
+- Verified over CDP at 1440: section reads framing → pie → heading → paragraph → table/SUS →
+  placeholder, no duplicated cohort claims anywhere on the page, zero console errors.
 
 **"What we learned"'s opening paragraph was reworded, not left alone, and its badge and the
 Results/Learned badges all shifted down by one** (Results 7→6, Learned 8→7 — Pivot stays 4, "The

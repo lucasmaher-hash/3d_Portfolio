@@ -1860,27 +1860,24 @@
        every leader-line coordinate are derived from this same start angle;
        change it and all of them have to move together. */
     .pie-block {
-      /* Centred by default (Lucas reverted the left-aligned version); the
-         TEMPORARY toggle's .is-left class switches it back for comparison. */
+      /* Centred heading, centred text, heading above the chart — the two
+         TEMPORARY toggles that let Lucas compare those against left-aligned
+         text and a heading below are gone; these are the settings he kept.
+         The generous margin-top is the "3x the spacing above the header" he
+         asked for: 3x this block's own internal gap. Its counterpart below
+         the text is the inline margin-top on the next .cs-sub heading. */
       display: flex; flex-direction: column; align-items: center; text-align: center;
       gap: clamp(20px, 3vw, 28px);
-      max-width: 720px; margin: 0 auto;
+      max-width: 720px;
+      margin: clamp(60px, 9vw, 84px) auto 0;
     }
-    .pie-block.is-left { align-items: stretch; text-align: left; }
-    /* Explicit order so the TEMPORARY toggle can swap the header and the
-       chart without touching markup order — see the toggle's own comment
-       further down for why this exists and when to remove it. */
-    .pie-block > .cs-sub { order: 1; margin-top: 0; }
-    .pie-stage { order: 2; }
-    .pie-note { order: 3; }
-    .pie-block.is-header-below > .cs-sub { order: 2; }
-    .pie-block.is-header-below .pie-stage { order: 1; }
+    /* .cs-sub carries its own margin-top for use in normal flow; inside this
+       flex column the `gap` already does that job, so it's zeroed. */
+    .pie-block > .cs-sub { margin-top: 0; }
 
     /* The stage is exactly the circle's box; the labels and their leader
        lines hang outside it (overflow visible), so the PIE ITSELF is what's
-       centred on the page, per Lucas — not the pie+labels group. align-self
-       keeps that true in .is-left mode too, where the block stops centring
-       its children. */
+       centred on the page, per Lucas — not the pie+labels group. */
     .pie-stage {
       position: relative;
       width: clamp(189px, 21.6vw, 270px);
@@ -1914,24 +1911,6 @@
        no fancy design", so it's .guide-text as-is. Widened from 46ch (Lucas:
        "widen the text below") — .pie-block went 560px -> 720px to make room. */
     .pie-note { max-width: 64ch; }
-
-    /* ── TEMPORARY test controls — header above/below, text centred/left ────
-       Lucas asked to compare both, live; NOT finished features. Once he picks,
-       remove: this CSS block, the .pie-header-toggle markup, its <script>, and
-       the .pie-block.is-header-below / .pie-block.is-left rules above. Grep
-       TEMPORARY to find all four. */
-    .pie-header-toggle {
-      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; align-items: center;
-      margin: 0 auto clamp(12px, 2vw, 20px); max-width: 720px;
-    }
-    .pie-header-toggle button {
-      font-family: 'VT323', monospace; font-size: 14px; letter-spacing: .04em;
-      padding: 6px 14px; border-radius: 9999px; cursor: pointer;
-      background: var(--bg-surface); color: var(--text-secondary);
-      border: 1px dashed var(--accent-ink);
-    }
-    .pie-header-toggle button.is-active { color: var(--accent-ink); background: rgba(255, 136, 200, .12); }
-    .pie-toggle-sep { width: 1px; height: 18px; background: var(--text-tertiary); margin: 0 6px; }
 
     /* The pie fills in by SWEEPING open, clockwise, rather than simply fading
        or popping in. `--reveal` (0–100) is registered so the browser can
@@ -2822,7 +2801,10 @@
         <span class="step-badge">5</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">Five friend groups — 20 people — used the coded prototype for two weeks. What follows is the shipped design, mostly in the order they actually reached for it — the numbers behind that order are in Testing and results, further down.</p>
+      <!-- The cohort ("five friend groups, 20 people, three weeks") used to be
+           restated here as well; it now lives once, in Testing and results,
+           which is also where the numbers it produced live. -->
+      <p class="guide-text">What follows is the shipped design, mostly in the order people actually reached for it — the numbers behind that order are in Testing and results, further down.</p>
 
       <div class="feature-row">
         <div class="feature-media">
@@ -2970,25 +2952,16 @@
            results question, not a walkthrough question. .pie-chart is pure
            CSS (conic-gradient + a @property-animated mask for the sweep-in;
            see the CSS comment); the JS below is only the on-screen trigger.
-           The plain intro paragraph that used to sit here was replaced by
-           the .cs-sub heading below (Lucas), same treatment as "It felt
-           like a tool" / "What replaced it" elsewhere on the page — the
-           methodology sentence it used to carry moved into .pie-note
-           instead, which was widened to make room for it. -->
 
-      <!-- TEMPORARY: lets Lucas compare heading above vs. below and centred
-           vs. left-aligned text, live. Remove this whole block plus its
-           script and the .is-header-below/.is-left CSS once he's picked —
-           see the CSS comment by .pie-header-toggle for the removal list. -->
-      <div class="pie-header-toggle">
-        <button type="button" class="is-active" data-pos="above">Header above</button>
-        <button type="button" data-pos="below">Header below</button>
-        <span class="pie-toggle-sep"></span>
-        <button type="button" class="is-active" data-align="center">Text centred</button>
-        <button type="button" data-align="left">Text left</button>
-      </div>
+           2026-09-29: the cohort is now stated ONCE, here, for the whole
+           section (Lucas: "so you don't need to restate the user amount each
+           time"). It used to appear in .pie-note AND in "The final design"'s
+           intro AND implicitly a third time as a separate "12 participants"
+           moderated test further down — three different framings of what is
+           one study. Everything below this paragraph now belongs to it. -->
+      <p class="guide-text">Five friend groups — twenty students in all — used the coded prototype for three weeks. Everything below comes out of those three weeks: what the app recorded while they used it, and the interviews I ran with them at the end.</p>
 
-      <div class="pie-block" id="pie-block">
+      <div class="pie-block">
         <h3 class="cs-sub">Where the time went</h3>
         <!-- Leader-line coordinates are derived from the gradient's own start
              angle (106.4deg) — see the .pie-stage CSS note. Per slice: a point
@@ -3007,13 +2980,25 @@
           <span class="pie-label" style="top: 65.9%;">Room finder <b>1 %</b></span>
           <span class="pie-label" style="top: 87.9%;">Who's free now <b>76 %</b></span>
         </div>
-        <p class="guide-text pie-note">Five friend groups — 20 people — used the coded prototype for two weeks. Almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
+        <p class="guide-text pie-note">Almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
       </div>
 
-      <p class="guide-text" style="margin-top: clamp(28px, 5vw, 48px);">A moderated test with 12 participants, five tasks, run twice with one round of changes in between. Four tasks were fine from the start. The fifth — hiding yourself from a single friend — was buried in settings, where nobody thought to look; moving it into that friend's own profile is what the second column shows.</p>
+      <!-- Reframed 2026-09-29: this used to open "A moderated test with 12
+           participants", inventing a second cohort alongside the pilot's 20.
+           Same five tasks, same people, run in the first week and the last —
+           which is also what makes the before/after columns and the SUS pair
+           legible without a second methodology paragraph. The heading was
+           added to match the page's rhythm (every other block of this size
+           has a .cs-sub over it) and names the finding rather than the
+           method, like "It felt like a tool" / "Why the 68% stopped trying". -->
+      <!-- 3x the previous clamp(28px, 5vw, 48px) — the "spacing below the
+           text" half of Lucas's ask; its counterpart above the pie's heading
+           is .pie-block's own margin-top. -->
+      <h3 class="cs-sub" style="margin-top: clamp(84px, 15vw, 144px);">The one nobody could find</h3>
+      <p class="guide-text">Five tasks, run in the first week and again in the last, with one change in between. Four were fine from the start. The fifth — hiding yourself from a single friend — was buried in settings, where nobody thought to look: <b>"I assumed that lived on the person, not in a menu."</b> Moving it onto that friend's own profile is what the second column shows.</p>
       <div class="cs-grid-2">
         <table class="cs-table">
-          <thead><tr><th>Task</th><th class="num">Before</th><th class="num">After</th></tr></thead>
+          <thead><tr><th>Task</th><th class="num">Week 1</th><th class="num">Week 3</th></tr></thead>
           <tbody>
             <tr><td>Find a friend free at 12:15</td><td class="num">92 %</td><td class="num">100 %</td></tr>
             <tr><td>See who is in the building</td><td class="num">83 %</td><td class="num">92 %</td></tr>
@@ -3025,10 +3010,10 @@
         <div class="sus">
           <span class="fact-src">System Usability Scale</span>
           <span class="fact-num">71 → 83</span>
-          <span class="fact-label">One change between the rounds: the per-friend visibility switch moved out of settings and onto the friend. Task success on it went from 42 % to 92 %.</span>
+          <span class="fact-label">Measured at the start of the three weeks and again at the end, either side of that one change.</span>
         </div>
       </div>
-      <div class="ph ph--chart"><span class="ph-tag">Before / after</span><span class="ph-desc">The iteration with the biggest jump, side by side</span></div>
+      <div class="ph ph--chart"><span class="ph-tag">Before / after</span><span class="ph-desc">The settings screen and the friend's profile, side by side</span></div>
     </section>
 
     <!-- 7 · What we learned + next -->
@@ -3043,7 +3028,7 @@
            reworded 2026-09-28 to stay honest about that without pre-empting
            what the spotlight itself will argue (still TBD, see "The final
            design" above). -->
-      <p class="guide-text">The feature everyone argued about was not the one that got used. Four fifths of the pilot's time sat in a single block on the home screen, while the indoor map — the part that was hardest to build — barely registered in it. Walking the app in that order, and making one deliberate exception for the part worth a closer look anyway, was the most uncomfortable call in this whole page.</p>
+      <p class="guide-text">The feature everyone argued about was not the one that got used. Three-quarters of the pilot's time sat in a single block on the home screen, while the indoor map — the part that was hardest to build — barely registered in it. Walking the app in that order, and making one deliberate exception for the part worth a closer look anyway, was the most uncomfortable call in this whole page.</p>
       <p class="guide-text">A visual language is not decoration. My v1 was clear, structured and cold, and the feedback round said so in the politest possible way: it looked like something the university had issued. The same screens in the character design read as the group's own, and none of the information architecture underneath had changed.</p>
       <p class="guide-text">What I would do next: widgets, so the free-now block never needs the app opened at all, and a proper look at what happens when a group grows past six people — the lane that won the timetable test starts to crowd at around eight.</p>
     </section>
@@ -3480,32 +3465,6 @@
         io.disconnect();
       }, { threshold: .4 });
       io.observe(pie);
-    })();
-  </script>
-  <script>
-    // ── TEMPORARY: pie layout toggles (header above/below, text centred/left)
-    // — see the CSS comment by .pie-header-toggle for the full removal list
-    // once Lucas has picked. Each group marks its own active button, so the
-    // two toggles don't clear each other's state.
-    (function () {
-      var toggle = document.querySelector('.pie-header-toggle');
-      var block = document.getElementById('pie-block');
-      if (!toggle || !block) return;
-      function mark(sel, btn) {
-        toggle.querySelectorAll(sel).forEach(function (b) { b.classList.toggle('is-active', b === btn); });
-      }
-      toggle.addEventListener('click', function (e) {
-        var btn = e.target.closest('button');
-        if (!btn) return;
-        if (btn.dataset.pos) {
-          block.classList.toggle('is-header-below', btn.dataset.pos === 'below');
-          mark('[data-pos]', btn);
-        }
-        if (btn.dataset.align) {
-          block.classList.toggle('is-left', btn.dataset.align === 'left');
-          mark('[data-align]', btn);
-        }
-      });
     })();
   </script>
   <div id="scroll-track">
