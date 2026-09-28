@@ -750,12 +750,47 @@ inside the pie itself.
 
 > ⚠ **Mobile was explicitly paused for this whole 2026-09-28 session** (Lucas: "stop doing mobile
 > for this session entirely, we'll focus on that later"). Everything from "The final design" merge
-> through the pie chart rebuild — the two new `.scrolly` sections, `.pie-block`, the sweep
-> animation — was verified on desktop (1440) only. **None of it has been checked at 390/touch yet**,
-> including whether `.pie-block`'s centred layout or the enlarged `.pie-chart` overflow at narrow
-> widths, or whether the mobile `.scrolly` stacked-fallback (see `initScrolly`'s `stacked` branch)
-> still shows both videos/panels correctly for the two new pairings. Do a full mobile pass before
-> calling this restructure done.
+> through the pie chart rebuild and the header/toggle follow-up below — the two new `.scrolly`
+> sections, `.pie-block`, the sweep animation, the header toggle — was verified on desktop (1440)
+> only. **None of it has been checked at 390/touch yet**, including whether `.pie-chart` overflows
+> at narrow widths, whether `.pie-header-toggle`'s two buttons wrap awkwardly, or whether the
+> mobile `.scrolly` stacked-fallback (see `initScrolly`'s `stacked` branch) still shows both
+> videos/panels correctly for the two new pairings. Do a full mobile pass before calling this
+> restructure done.
+
+**Same session, follow-up pass on the pie: a `.cs-sub` heading replaced the plain intro paragraph,
+the block's text was switched from centred to left-aligned ("links bündig"), and a TEMPORARY
+above/below toggle was added so Lucas can compare heading placement live.**
+- **Heading, not paragraph.** "Five friend groups — 20 people — used the coded prototype for two
+  weeks. This is where the time went." (the plain intro line) is gone; `<h3 class="cs-sub">Where
+  the time went</h3>` takes its place, same treatment as "It felt like a tool" / "What replaced it"
+  elsewhere in the case study. The methodology half of that old sentence ("Five friend groups — 20
+  people...") wasn't dropped — it moved into `.pie-note` below, which is why that paragraph's
+  `max-width` had already gone to 64ch (room for the extra sentence) and `.pie-block` to 720px.
+- **Centred block, left-aligned text — these are two different things, and conflating them was the
+  bug in the previous pass.** `.pie-block` still sits centred ON THE PAGE (`max-width: 720px;
+  margin: 0 auto`), but the heading and `.pie-note` paragraph now read left-aligned, not centred
+  text, because centred multi-line prose is harder to read. The fix was `align-items: center;
+  text-align: center;` → deleted from `.pie-block` entirely (falling back to the flex default,
+  `align-items: stretch`, and the site's normal left `text-align`). This is what makes it work
+  without extra CSS on the children: a stretched flex item that hits its own `max-width` (true of
+  `.pie-note`, capped at 64ch) stays flush at the cross-start edge rather than centring in the
+  leftover space — so it reads flush-left inside the 720px block for free. `.pie-chart-wrap` keeps
+  its own internal `justify-content: center`, so the chart+legend pairing still visually centres as
+  a unit even though its container is no longer itself centring things.
+- **`.pie-header-toggle` is explicitly TEMPORARY** — two dashed pink VT323 pills ("Header above" /
+  "Header below") above the pie block, wired to toggle `.pie-block.is-header-below`, which swaps
+  `order` values so the heading moves to sit between the chart and `.pie-note` instead of above the
+  chart. No new markup order was needed for this — `.pie-block > .cs-sub`, `.pie-chart-wrap`, and
+  `.pie-note` all got explicit `order` values (1/2/3) specifically so the toggle could renumber just
+  the heading's `order` rather than reordering DOM nodes with JS. **Remove entirely once Lucas
+  decides**: the `.pie-header-toggle` CSS block, its markup `<div>`, its `<script>` (right after the
+  pie's IntersectionObserver script), and the now-unneeded `.pie-block.is-header-below` override
+  rules — all four are flagged `TEMPORARY` in their own comments so a future pass can grep for that
+  word to find every piece.
+- Verified over CDP: default state (header above) renders heading + left-aligned paragraph with the
+  chart+legend centred between them; clicking "Header below" moves the heading down between the
+  chart and the paragraph and updates the active-button styling; zero console errors either state.
 
 **"What we learned"'s opening paragraph was reworded, not left alone, and its badge and the
 Results/Learned badges all shifted down by one** (Results 7→6, Learned 8→7 — Pivot stays 4, "The

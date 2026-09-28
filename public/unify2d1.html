@@ -1848,11 +1848,24 @@
        for which colour is which slice; the legend dots carry the same
        colours so the two stay in sync without a separate lookup. */
     .pie-block {
-      display: flex; flex-direction: column; align-items: center; text-align: center;
+      /* Block sits centred on the page (max-width + margin auto), but the
+         header/paragraph text inside reads left-aligned ("links bündig",
+         Lucas) — align-items default (stretch) gives the header and .pie-note
+         the block's full width to align left against, while .pie-chart-wrap
+         keeps its own internal `justify-content: center` so the chart+legend
+         pairing still centres as a unit within that same width. */
+      display: flex; flex-direction: column;
       gap: clamp(20px, 3vw, 28px);
-      max-width: 560px; margin: 0 auto;
+      max-width: 720px; margin: 0 auto;
     }
-    .pie-chart-wrap { display: flex; align-items: center; gap: clamp(24px, 4vw, 48px); flex-wrap: wrap; justify-content: center; }
+    /* Explicit order so the TEMPORARY toggle below can swap the header and
+       the chart without touching markup order — see the toggle's own
+       comment further down for why this exists and when to remove it. */
+    .pie-block > .cs-sub { order: 1; margin-top: 0; }
+    .pie-chart-wrap { order: 2; display: flex; align-items: center; gap: clamp(24px, 4vw, 48px); flex-wrap: wrap; justify-content: center; }
+    .pie-note { order: 3; }
+    .pie-block.is-header-below > .cs-sub { order: 2; }
+    .pie-block.is-header-below .pie-chart-wrap { order: 1; }
     /* +35% over the original clamp(140px, 16vw, 200px), per Lucas. */
     .pie-chart { width: clamp(189px, 21.6vw, 270px); height: clamp(189px, 21.6vw, 270px); border-radius: 50%; flex: none; }
     .pie-legend { display: flex; flex-direction: column; gap: 10px; list-style: none; padding: 0; margin: 0; text-align: left; }
@@ -1865,8 +1878,26 @@
     /* Plain-text takeaway under the chart — deliberately NOT a .cs-caption
        (VT323, small, decorative): Lucas asked for "normal plain text form,
        no fancy design", so it's .guide-text as-is, just centred by the
-       .pie-block parent. */
-    .pie-note { max-width: 46ch; }
+       .pie-block parent. Widened from 46ch (Lucas: "widen the text below")
+       — .pie-block itself also went 560px -> 720px so there's room. */
+    .pie-note { max-width: 64ch; }
+
+    /* ── TEMPORARY test control — header above/below the pie chart ──────────
+       Lucas asked to compare both positions live; NOT a finished feature.
+       Remove this whole block (CSS + the .pie-header-toggle markup + its
+       tiny script) once he picks one, and delete the now-unneeded
+       .pie-block.is-header-below rules above at the same time. */
+    .pie-header-toggle {
+      display: flex; gap: 8px; justify-content: center;
+      margin: 0 auto clamp(12px, 2vw, 20px); max-width: 720px;
+    }
+    .pie-header-toggle button {
+      font-family: 'VT323', monospace; font-size: 14px; letter-spacing: .04em;
+      padding: 6px 14px; border-radius: 9999px; cursor: pointer;
+      background: var(--bg-surface); color: var(--text-secondary);
+      border: 1px dashed var(--accent-ink);
+    }
+    .pie-header-toggle button.is-active { color: var(--accent-ink); background: rgba(255, 136, 200, .12); }
 
     /* The pie fills in by SWEEPING open from the top, clockwise, rather than
        simply fading or popping in. `--reveal` (0–100) is registered so the
@@ -2892,9 +2923,24 @@
            chart it was — "which features got used the most" reads as a
            results question, not a walkthrough question. .pie-chart is pure
            CSS (conic-gradient + a @property-animated mask for the sweep-in;
-           see the CSS comment); the JS below is only the on-screen trigger. -->
-      <p class="guide-text">Five friend groups — 20 people — used the coded prototype for two weeks. This is where the time went.</p>
-      <div class="pie-block">
+           see the CSS comment); the JS below is only the on-screen trigger.
+           The plain intro paragraph that used to sit here was replaced by
+           the .cs-sub heading below (Lucas), same treatment as "It felt
+           like a tool" / "What replaced it" elsewhere on the page — the
+           methodology sentence it used to carry moved into .pie-note
+           instead, which was widened to make room for it. -->
+
+      <!-- TEMPORARY: lets Lucas compare the heading above vs. below the
+           chart live. Remove this whole <div> plus its script and the
+           .is-header-below CSS once he's picked one — see the CSS comment
+           by .pie-header-toggle for the full removal list. -->
+      <div class="pie-header-toggle">
+        <button type="button" class="is-active" data-pos="above">Header above</button>
+        <button type="button" data-pos="below">Header below</button>
+      </div>
+
+      <div class="pie-block" id="pie-block">
+        <h3 class="cs-sub">Where the time went</h3>
         <div class="pie-chart-wrap" role="img" aria-label="Share of pilot time per feature: who's free now 71%, timetable 18%, socials 6%, friends map 4%, room finder 1%.">
           <div class="pie-chart" id="usage-pie" style="background: conic-gradient(#FF88C8 0deg 255.6deg, #1A1A1A 255.6deg 320.4deg, #8E8E93 320.4deg 342deg, #F9F2EB 342deg 356.4deg, #C7C7CC 356.4deg 360deg);"></div>
           <ul class="pie-legend">
@@ -2905,7 +2951,7 @@
             <li><i style="background: #C7C7CC;"></i>Room finder<b>1 %</b></li>
           </ul>
         </div>
-        <p class="guide-text pie-note">Almost three-quarters of every pilot session opened on "who's free now" alone. Everything else — the full timetable, socials, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
+        <p class="guide-text pie-note">Five friend groups — 20 people — used the coded prototype for two weeks. Almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, socials, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
       </div>
 
       <p class="guide-text" style="margin-top: clamp(28px, 5vw, 48px);">A moderated test with 12 participants, five tasks, run twice with one round of changes in between. Four tasks were fine from the start. The fifth — hiding yourself from a single friend — was buried in settings, where nobody thought to look; moving it into that friend's own profile is what the second column shows.</p>
@@ -3378,6 +3424,21 @@
         io.disconnect();
       }, { threshold: .4 });
       io.observe(pie);
+    })();
+  </script>
+  <script>
+    // ── TEMPORARY: pie header above/below toggle — see the CSS comment by
+    // .pie-header-toggle for the full removal list once Lucas has picked one.
+    (function () {
+      var toggle = document.querySelector('.pie-header-toggle');
+      var block = document.getElementById('pie-block');
+      if (!toggle || !block) return;
+      toggle.addEventListener('click', function (e) {
+        var btn = e.target.closest('button[data-pos]');
+        if (!btn) return;
+        block.classList.toggle('is-header-below', btn.dataset.pos === 'below');
+        toggle.querySelectorAll('button').forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      });
     })();
   </script>
   <div id="scroll-track">
