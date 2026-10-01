@@ -982,6 +982,46 @@ cut: 10.6s → 16.6s of `homepage_screen.mov` (231 KB against 1.6 MB), those two
 measurement — mean per-pixel difference 3.8 of 255 between the first and last frame, so the loop seam does
 not read. Same dimensions as the source, so the `data-vid="homepage"` placement rules still apply.
 
+## to.morrow promo loop (`motion/`, Remotion, 2026-10-02)
+
+A 20 s / 1920×1080 / 30 fps silent motion graphic for the top of the to.morrow page, built in
+**Remotion 4** in its own folder `motion/` (own `package.json`, outside `public/`, so nothing in it
+deploys). Only the encoded result ships: `public/videos/to.morrow/tomorrow-promo.mp4` (x264 CRF 22,
+faststart, no audio, ~1.6 MB, SSIM 0.998 vs the CRF 16 master in `motion/out/`). **Not wired into
+the page yet.** `cd motion && npm run studio` to preview, `npm run render` to re-render.
+
+**Second version (2026-10-02, Lucas's feedback on the first):** no wordmark intro, and **no pixel
+type outside the phones** — headlines, panel titles and captions are the system face (the app's
+"Modern" style); W95FA survives only where the app itself draws it, inside the phone UI. The
+swipe is shown as **three panels, Today | Tomorrow | Soon**: open close-up on the two stacked
+tasks in Tomorrow (zoom 3.2, side panels out of frame), pull back to all three, then three flicks —
+Tomorrow → Today, Tomorrow → Soon, Soon → Tomorrow — each landing in a slot the destination list
+opens for it (rows below slide down on the layout spring; the source list closes its gap). Then a
+**hard cut** to a plain dark frame, "Never forget a task again.", and a **hard cut** to the two
+phones. The loop closes with light flooding out of the Lock Screen tick into frame 0.
+
+**Opening (third pass, same day):** the video starts on the name **"to.morrow" alone** on the bare
+canvas, held 1.5 s, in the system face at 1.35× and weight 620. Then the row builds itself around
+it — the plate widens out of a pill hugging the name, the name slides left into the title position
+while easing to 1× / weight 400 (the system font is variable, so the weight interpolates smoothly),
+the checkbox pops, the grip fades in, the second task slides out from underneath — and **that row is
+the first task flicked into Today**. All of it lives in `Row`, which now places its parts
+absolutely (`plateW/plateH/textT/textScale/textWeight/check/grip` on `TaskState`; every other row
+sits at the defaults), so there is no hand-off between a "logo" element and a "row" element.
+
+- **Everything is the app's real design system, rebuilt in CSS** from the three spec files at the
+  repo root (`shove95-skeukit-to-css.md`, `shove95-components-to-css.md`, `shove95-live-button.md`):
+  Slate light ("light blue") and Slate dark ("dark blue") palettes, glass / trough / bloom / card,
+  the full Live button, the pixel glyphs, W95FA on chrome only. `motion/src/sk.css` + `ui.tsx`.
+- **Springs are the app's own**, converted from SwiftUI response/damping: `k = (2π/response)²`,
+  `c = 4π·damping/response` (press .26/.68, layout .40/.86, present .52/.84).
+- **Nothing may animate via CSS transitions/keyframes** — Remotion renders frames independently,
+  so every moving value is computed from the frame number in `Promo.tsx`.
+- **The loop is seamless by construction**: the final flood reveals `<SwipeScene f={0} />`, i.e.
+  literally frame 0, and nothing in that scene moves before frame 18. Measured seam: mean pixel
+  diff 0.11/255.
+- English copy only.
+
 ## to.morrow page (`public/to-shove2d.html`)
 
 **The project is called `to.morrow`, not `morrow` (2026-09-08).** Every user-visible name

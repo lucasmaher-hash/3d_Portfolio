@@ -1,0 +1,21 @@
+{
+  "name": "tomorrow-motion",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Remotion source for the to.morrow promo loop (20s, 1920x1080, 30fps)",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render TomorrowPromo out/tomorrow-promo.mp4",
+    "still": "remotion still TomorrowPromo out/still.png"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.532",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.532"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  }
+}
