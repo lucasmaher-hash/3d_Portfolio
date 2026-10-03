@@ -611,6 +611,7 @@
     }
 
     .gallery-main-wrap {
+      position: relative;
       display: flex;
       flex-direction: column;
       width: 100%;
@@ -618,10 +619,50 @@
       margin: 0;
     }
 
+    /* Chevrons live INSIDE the image, at its left/right edges — hover-revealed
+       (desktop trackpad/mouse only, see the pointer:fine gate below) rather
+       than always-on, so they don't compete with the photo. Trackpad users
+       can also just swipe sideways over the image (wheel deltaX) — see the
+       gallery script's wheel listener. */
+    .gallery-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: none;
+      box-shadow: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 200ms ease, transform 150ms ease;
+      z-index: 2;
+      padding: 0;
+      color: #fff;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.55)) drop-shadow(0 0 6px rgba(0,0,0,0.25));
+    }
+    .gallery-nav-btn svg { width: 26px; height: 26px; display: block; }
+    .gallery-nav-btn.prev { left: 10px; }
+    .gallery-nav-btn.next { right: 10px; }
+    .gallery-nav-btn:hover { opacity: 1 !important; }
+    .gallery-nav-btn.prev:hover { transform: translateY(-50%) translateX(-2px); }
+    .gallery-nav-btn.next:hover { transform: translateY(-50%) translateX(2px); }
+
+    @media (hover: hover) and (pointer: fine) {
+      .gallery-main-wrap:hover .gallery-nav-btn { opacity: 1; }
+    }
+    @media (pointer: coarse) {
+      .gallery-nav-btn { display: none; }
+    }
+
     /* Frame matches the photos' own ~4:3 aspect so the full image always
        shows — no cropping — instead of forcing a wide box and letting
        object-fit: cover cut the top/bottom off taller-than-box images. */
     .gallery-main {
+      position: relative;
       background: var(--bg-surface);
       border-radius: 0;
       box-shadow: none;
@@ -636,6 +677,36 @@
     .gallery-main.fading { opacity: 0; }
     .gallery-main img,
     .gallery-main video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Trackpad wheel-drag on desktop reuses the SAME sliding track the mobile
+       pager uses (built once in JS with loop clones either end), just revealed
+       only while the gesture is live — so a two-finger swipe visibly drags the
+       photo sideways instead of committing sight-unseen. It stays `display:
+       none` (see the base rule further down) whenever no gesture is running. */
+    .gallery-main.wheel-dragging #gallery-active-img,
+    .gallery-main.wheel-dragging #gallery-active-video { display: none !important; }
+    .gallery-main.wheel-dragging.fading { opacity: 1; }
+    .gallery-main.wheel-dragging .gallery-track {
+      display: flex;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      will-change: transform;
+      /* Shorter than the phone's 460ms: this one is a SNAP onto the next
+         image the moment the swipe passes the threshold, not the tail of a
+         finger that has just let go. Must stay under the 420ms settle in the
+         script, which is what hands the frame back to the static <img>. */
+      transition: transform 340ms cubic-bezier(.22, .61, .36, 1);
+    }
+    .gallery-main.wheel-dragging .gallery-track.dragging { transition: none; }
+    .gallery-main.wheel-dragging .gallery-track img {
+      flex: 0 0 100%;
       width: 100%;
       height: 100%;
       object-fit: contain;
@@ -1463,6 +1534,12 @@
               <video id="gallery-active-video" autoplay loop muted playsinline style="display:none;"></video>
               <div class="gallery-track" id="gallery-track" aria-hidden="true"></div>
             </div>
+            <button type="button" class="gallery-nav-btn prev" id="gallery-prev" aria-label="Previous image">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="gallery-nav-btn next" id="gallery-next" aria-label="Next image">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
           </div>
           <div class="gallery-thumbs" id="gallery-thumbs"></div>
           <div class="gallery-dots" id="gallery-dots" role="tablist" aria-label="Galerie"></div>
@@ -1858,11 +1935,22 @@
           d.setAttribute('aria-selected', on ? 'true' : 'false');
           d.tabIndex = on ? 0 : -1;
         });
-        // Only keep the thumbnail strip in view for real user navigation. On the
-        // initial goTo(0) this would scroll the whole PAGE down to the gallery,
-        // which is why the page used to open mid-way instead of at the top.
-        if (!isInit) {
-          thumbsEl.children[current]?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+        // Keep the active thumbnail in view — by scrolling the STRIP itself,
+        // never via scrollIntoView(). That call is free to scroll any
+        // scrollable ancestor, including the document: with the strip sitting
+        // partly below the fold it walked the whole PAGE up a little on the
+        // first navigation and then sat still for every one after it (and on
+        // the initial goTo(0) it used to open the page mid-way down). Moving
+        // scrollLeft on the strip alone cannot touch the page, and it no-ops
+        // entirely at desktop widths, where all five thumbs already fit.
+        if (!isInit && thumbsEl.scrollWidth > thumbsEl.clientWidth + 1) {
+          const t = thumbsEl.children[current];
+          if (t) {
+            thumbsEl.scrollTo({
+              left: Math.max(0, t.offsetLeft - (thumbsEl.clientWidth - t.offsetWidth) / 2),
+              behavior: 'smooth',
+            });
+          }
         }
       }
 
@@ -2007,6 +2095,128 @@
         if (e.key === 'ArrowLeft')  goTo(current - 1, false, phys - 1);
         if (e.key === 'ArrowRight') goTo(current + 1, false, phys + 1);
       });
+
+      // ── Chevrons (click) ─────────────────────────────────────────────
+      document.getElementById('gallery-prev').addEventListener('click', () => {
+        goTo(current - 1, false, phys - 1);
+      });
+      document.getElementById('gallery-next').addEventListener('click', () => {
+        goTo(current + 1, false, phys + 1);
+      });
+
+      // ── Trackpad horizontal swipe (macOS two-finger scroll) ──────────────
+      // The image follows the fingers live — the same sliding track the mobile
+      // pager uses, revealed only for the gesture (see .wheel-dragging in the
+      // CSS) — and then SNAPS onto a whole image. It never rests part-way.
+      //
+      // A trackpad reports a sideways swipe as a wheel event with deltaX
+      // dominant over deltaY (a mouse wheel only ever sends deltaY, so this
+      // never fires from one).
+      //
+      // THE BUG THIS IS BUILT AROUND: macOS keeps sending wheel events for up
+      // to a second AFTER the fingers leave the trackpad — that is the kinetic
+      // scrolling the OS does for you, and there is no flag on the event that
+      // says "this one is momentum". So there is no reliable end-of-gesture to
+      // wait for, and the obvious design (accumulate until the events stop,
+      // then decide) both feels laggy and turns several pages from one flick,
+      // because the momentum tail keeps re-arming a fresh gesture.
+      //
+      // So the page turn is committed the INSTANT the drag passes the
+      // threshold, mid-gesture, and everything after it is swallowed by a LOCK
+      // that only lifts once the wheel has been quiet for QUIET_LOCK_MS — long
+      // enough to outlast the momentum tail. One swipe, one image, no matter
+      // how hard it is thrown.
+      const WHEEL_SENS   = 0.7;    // trackpad delta → pixels the image travels
+      const WHEEL_FRAC   = 0.18;   // fraction of the frame that turns the page
+      const WHEEL_MIN    = 40;
+      const QUIET_END_MS  = 130;   // no event for this long → fingers lifted
+      const QUIET_LOCK_MS = 260;   // ...and this long → momentum has died out too
+      // Momentum is generated by the OS, so it arrives as a steady stream that
+      // only ever DECAYS and never pauses. Either a pause or a rise in the
+      // deltas therefore means real fingers are back on the trackpad — which
+      // is what lets a deliberate second swipe break the lock immediately
+      // instead of being swallowed as more of the last swipe's tail.
+      const NEW_PUSH_GAP = 90;     // ms of silence only a finger lift explains
+      const NEW_PUSH_MIN = 10;     // ...and a floor, so tail noise can't qualify
+      const SNAP_MS = 420;         // must outlast the CSS snap (340ms)
+
+      let wheelState = 'idle';     // 'idle' | 'drag' | 'lock'
+      let wheelDx = 0, wheelTimer = null, wheelSettleTimer = null;
+      let wheelLastT = 0, wheelTailMin = Infinity, wheelSnapAt = 0;
+
+      // A wrapping move parks the track on a clone and relies on transitionend
+      // to swap it for the real slide — but the track gets display:none'd
+      // between gestures on desktop, and a display:none element fires no
+      // transitionend. So normalise here instead, or `phys` is left pointing
+      // at a clone and the next gesture asks for a slide that does not exist.
+      // The clone and the real slide are the same picture, so this is unseen.
+      function normalisePhys() {
+        if (phys !== current + 1) { phys = current + 1; jumpTrack(); }
+      }
+
+      // Hand the frame back to the static <img>.
+      function wheelSettle() {
+        normalisePhys();
+        mainEl.classList.remove('wheel-dragging');
+      }
+
+      function wheelQuiet() {
+        if (wheelState === 'drag') {
+          applyTrack(true);                    // never rest part-way: snap back
+          wheelSnapAt = performance.now();
+        }
+        wheelState = 'idle';
+        clearTimeout(wheelSettleTimer);
+        wheelSettleTimer = setTimeout(wheelSettle, Math.max(0, wheelSnapAt + SNAP_MS - performance.now()));
+      }
+
+      function wheelStartDrag() {
+        clearTimeout(wheelSettleTimer);
+        normalisePhys();      // a snap interrupted mid-wrap would leave a clone
+        wheelState = 'drag';
+        wheelDx = 0;
+        mainEl.classList.add('wheel-dragging');
+      }
+
+      mainEl.addEventListener('wheel', e => {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;   // vertical: let the page scroll
+        e.preventDefault();
+
+        const abs = Math.abs(e.deltaX);
+        const gap = e.timeStamp - wheelLastT;
+        wheelLastT = e.timeStamp;
+
+        // Re-arm on EVERY event, including the ones the lock ignores: that is
+        // what makes the lock outlast a long momentum tail instead of expiring
+        // in the middle of one.
+        clearTimeout(wheelTimer);
+        wheelTimer = setTimeout(wheelQuiet, wheelState === 'lock' ? QUIET_LOCK_MS : QUIET_END_MS);
+
+        if (wheelState === 'lock') {
+          if (gap <= NEW_PUSH_GAP && abs < Math.max(NEW_PUSH_MIN, wheelTailMin * 2.5)) {
+            wheelTailMin = Math.min(wheelTailMin, abs);
+            return;                            // still the last swipe's momentum
+          }
+          wheelState = 'idle';                 // fingers are back: start a new swipe now
+        }
+
+        if (wheelState === 'idle') wheelStartDrag();
+
+        const width = mainEl.clientWidth || 1;
+        // Clamped to one slide: there is exactly one clone beyond either end,
+        // so dragging further than that would pull bare frame into view.
+        wheelDx = Math.max(-width, Math.min(width, wheelDx - e.deltaX * WHEEL_SENS));
+
+        if (Math.abs(wheelDx) >= Math.max(WHEEL_MIN, width * WHEEL_FRAC)) {
+          const dir = wheelDx < 0 ? 1 : -1;
+          goTo(current + dir, false, phys + dir);   // snaps onto the whole next image
+          wheelState = 'lock';
+          wheelTailMin = abs;
+          wheelSnapAt = performance.now();
+          return;
+        }
+        applyTrack(false, wheelDx);          // untransitioned: follows the fingers 1:1
+      }, { passive: false });
 
       goTo(0, true);
     })();

@@ -5,8 +5,8 @@
   "description": "Remotion source for the to.morrow promo loop (20s, 1920x1080, 30fps)",
   "scripts": {
     "studio": "remotion studio",
-    "render": "remotion render TomorrowPromo out/tomorrow-promo.mp4",
-    "still": "remotion still TomorrowPromo out/still.png"
+    "render": "remotion render TomorrowPromoE out/promoE.mp4 --crf=16",
+    "still": "remotion still TomorrowPromoE out/still.png"
   },
   "dependencies": {
     "@remotion/cli": "4.0.532",

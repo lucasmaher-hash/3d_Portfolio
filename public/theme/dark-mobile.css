@@ -73,10 +73,8 @@
 
   /* ── Rules written with literal light-theme colours ──────────────────── */
 
-  /* 2D.html: project tags and the to.morrow tile's icon shadow. */
+  /* 2D.html: project tags; to-shove2d.html: the v1 screen strip's shadow. */
   [data-theme="dark"] .tag { box-shadow: var(--shadow-pressed); }
-  [data-theme="dark"] .morrow-icon-tile .app-icon,
-  [data-theme="dark"] .app-icon,
   [data-theme="dark"] .win-devices-inner { filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.55)); }
 
   /* about2d.html accordion rows + inset text, contact2d.html buttons. */

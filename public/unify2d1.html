@@ -1618,13 +1618,14 @@
        headline stat duplicated Supporting Features' own "1.4 → 3.1 meetups"
        caption. See CLAUDE.md. */
 
-    /* Fact bar: three big numbers.
-       UNUSED as of 2026-09-29, see CLAUDE.md — `.fact-bar`/`.fact` lost their
-       last instance when the pilot stats came out of "The idea" (2026-09-27),
-       and `.fact-num`/`.fact-label`/`.fact-src` outlived that only because the
-       SUS card in Testing and results borrowed them. That card is gone too now
-       (its number folded into the note under the task table), so the whole
-       group is dormant. Kept, not deleted, same convention as the rest. */
+    /* Fact bar: three big numbers. IN USE AGAIN as of 2026-09-29 — it was
+       dormant twice over (out of the hero 2026-09-26, out of "The idea"
+       2026-09-27) and is now the closing beat of "Testing and results", which
+       is the one place on the page where all three numbers have already been
+       earned by the sections above. Each number chains to a figure stated
+       elsewhere: 23 min from the Problem section's diary study, 2.2x is the
+       pie note's 1.4 -> 3.1 meetups, 83 is the task note's SUS. Change one and
+       change its twin. */
     .fact-bar {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3031,6 +3032,32 @@
       </div>
 
       <div class="ph ph--chart" style="margin-top: clamp(60px, 9vw, 84px);"><span class="ph-tag">Before / after</span><span class="ph-desc">The settings screen and the friend's profile, side by side</span></div>
+
+      <!-- The three hero stats, back (Lucas) — they were in the hero until
+           2026-09-26 and briefly in "The idea" until 2026-09-27, and were cut
+           both times for the same reason: they are RESULTS, and they sat above
+           the work that produced them. At the end of this section they finally
+           read in order. Each .fact-src names which study the number came from,
+           because they are not all from the same one — the 23 min predates the
+           app entirely — but none of them restates the cohort size, since the
+           paragraph at the top of this section already did. -->
+      <div class="fact-bar" style="margin-top: clamp(60px, 9vw, 84px);">
+        <div class="fact">
+          <span class="fact-num">23 min</span>
+          <span class="fact-label">spent texting to arrange one meetup between classes</span>
+          <span class="fact-src">Before Unify · diary study</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">2.2×</span>
+          <span class="fact-label">more meetups per person per week, 1.4 to 3.1</span>
+          <span class="fact-src">During the pilot</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">83</span>
+          <span class="fact-label">System Usability Scale, up from 71</span>
+          <span class="fact-src">After one iteration</span>
+        </div>
+      </div>
     </section>
 
     <!-- 7 · What we learned + next -->

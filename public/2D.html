@@ -202,58 +202,31 @@
       transform: scale(1.1);
     }
 
-    /* The to.morrow tile is the app's own icon, so it sits straight on the page
-       rather than on the raised neumorphic plate the other tiles use — the
-       icon already has its own shape and its own shadow, and a plate behind it
-       read as a second, competing object. The card keeps its size and link. */
-    .project-tile.morrow-icon-tile { background: transparent; box-shadow: none; }
-
-    /* +30%, then a further +15%, on every stop of the original
-       clamp(118px, 16vw, 220px). */
-    .morrow-icon-tile .app-icon { width: clamp(176px, 23.9vw, 329px); }
-
-    /* Two stacked images, cross-fading between the light and dark artwork.
-       Not a JS swap: only the light one is in flow, so it sets the box and
-       nothing reflows at the change, and the swap is one composited opacity
-       animation. 6s cycle = 3s a side, with 8% (~0.5s) of fade at each end,
-       which is what makes it dissolve rather than cut. */
-    .morrow-icon-tile .app-icon {
+    /* The to.morrow tile is the promo loop (2026-10-04) — the 16:9 cut of the
+       to-shove2d.html hero (that page uses a taller cut) — flat, with the
+       rounded corners of the other tiles but not their raised plate; it
+       replaced the app icon that sat straight on the page. The film is 16:9 and
+       the tiles here are 680/560, which would cut ~16% off each side and clip
+       the outer wells and the Live caption. So this tile is 3:2 instead, and
+       cover crops just ~8% off each side — nothing the loop shows is in that
+       margin (wells at 14–86% of the width, captions from 15%). Below 640px
+       it is 16/10 like every tile there, ~5% a side (restated in the last
+       640px block). */
+    .project-tile.morrow-video-tile {
       position: relative;
-      display: block;
-      /* drop-shadow, not box-shadow: the icon is a transparent squircle, so
-         this follows its rounded silhouette instead of drawing a rectangle
-         around it. Same tint as the design system's own shadow.
-
-         It lives on the WRAPPER, not on each <img>. Per-image it painted TWICE
-         during the cross-fade — the light one's shadow always renders, and the
-         dark one's is added on top at its current opacity, because the shadow
-         falls outside the icon where nothing covers it. Measured just past the
-         left edge: 210 with the dark image hidden, 206 mid-fade, 202 with it
-         fully in, against a 221 page. That darker band hugging the sides is
-         what read as the icon sitting in a frame, and why it looked fine right
-         after a reload: the animation restarts on the light image alone. Both
-         silhouettes are identical (verified: the two alpha channels are
-         byte-for-byte equal), so one shadow off the union is correct at every
-         point in the fade. */
-      filter: drop-shadow(0 14px 26px rgba(174, 174, 192, 0.55));
+      aspect-ratio: 3 / 2;
+      overflow: hidden;
+      /* Flat, not raised (Lucas): the film sits in the page like a picture. */
+      box-shadow: none;
     }
-    .morrow-icon-tile .app-icon img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    .morrow-icon-tile .app-icon-dark {
+    .morrow-video-tile video {
       position: absolute;
       inset: 0;
-      animation: icon-swap 6s ease-in-out infinite;
-    }
-    @keyframes icon-swap {
-      0%, 42%  { opacity: 0; }
-      50%, 92% { opacity: 1; }
-      100%     { opacity: 0; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .morrow-icon-tile .app-icon-dark { animation: none; opacity: 0; }
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #C7CCD4;
     }
 
     /* ── Mobile only: hero fills the screen, blob + title centred ──────── */
@@ -1113,15 +1086,10 @@
         --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
       }
 
-      /* to.morrow's tile is the app icon itself rather than a screenshot, so it
-         reads smaller than the other tiles at the same box size — 15% up on the
-         176px the base clamp floors at down here. Last 640px block in the file
-         on purpose: the .project-tile rules further up are the same specificity
-         and would otherwise win on source order. */
-      .morrow-icon-tile .app-icon { width: 202px; }
-      /* …and a little more air under it than the section's own 16px flex gap,
-         so the icon is not sitting on the word. */
-      .morrow-icon-tile { margin-bottom: 14px; }
+      /* to.morrow's video tile goes back to the 16/10 every tile has down here
+         (~5% cropped a side). Restated at the tile's own specificity — the base
+         .morrow-video-tile rule is (0,2,0) and would otherwise keep its 3:2. */
+      .project-tile.morrow-video-tile { aspect-ratio: 16 / 10; }
 
       /* Virtual Cooking's tile carries an inline `box-shadow: none` (the desktop
          render is a cut-out on a transparent ground, where a raised edge would
@@ -1444,11 +1412,12 @@
         <a href="/to-shove2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
       </div>
       <a href="/to-shove2d.html" style="display:block;">
-        <div class="project-tile morrow-icon-tile" style="display: flex; align-items: center; justify-content: center; cursor: pointer;">
-          <span class="app-icon" role="img" aria-label="Das App-Icon von to.morrow">
-            <img src="/images/to.morrow/app-icon-light.webp" width="640" height="640" alt="" />
-            <img class="app-icon-dark" src="/images/to.morrow/app-icon-dark.webp" width="640" height="640" alt="" />
-          </span>
+        <div class="project-tile morrow-video-tile" style="cursor: pointer;">
+          <!-- The promo loop, same file as the to.morrow page's hero. -->
+          <video autoplay muted loop playsinline width="1920" height="1080" poster="/images/to.morrow/promo-poster.webp"
+                 aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Demnächst verschoben, dann wird eine Aufgabe live geschaltet">
+            <source src="/videos/to.morrow/tomorrow-promo.mp4" type="video/mp4" />
+          </video>
         </div>
       </a>
     </div>

@@ -982,44 +982,190 @@ cut: 10.6s → 16.6s of `homepage_screen.mov` (231 KB against 1.6 MB), those two
 measurement — mean per-pixel difference 3.8 of 255 between the first and last frame, so the loop seam does
 not read. Same dimensions as the source, so the `data-vid="homepage"` placement rules still apply.
 
-## to.morrow promo loop (`motion/`, Remotion, 2026-10-02)
+## to.morrow promo loop (`motion/`, Remotion)
 
-A 20 s / 1920×1080 / 30 fps silent motion graphic for the top of the to.morrow page, built in
-**Remotion 4** in its own folder `motion/` (own `package.json`, outside `public/`, so nothing in it
-deploys). Only the encoded result ships: `public/videos/to.morrow/tomorrow-promo.mp4` (x264 CRF 22,
-faststart, no audio, ~1.6 MB, SSIM 0.998 vs the CRF 16 master in `motion/out/`). **Not wired into
-the page yet.** `cd motion && npm run studio` to preview, `npm run render` to re-render.
+A silent, seamlessly looping motion graphic — **the hero of the to.morrow page since
+2026-10-04** (see "to.morrow page" below) — **25.6 s, 1920×1080, 30 fps**, built in
+**Remotion 4** in its own folder `motion/` (own `package.json`, outside `public/`, so nothing in
+it deploys). `cd motion && npm run studio` to preview, `npm run render` renders the master
+(`TomorrowPromoE`, CRF 16) to `motion/out/promoE.mp4`. The web encode is
+`ffmpeg -i out/promoE.mp4 -c:v libx264 -crf 22 -preset slow -pix_fmt yuv420p -movflags +faststart -an`
+→ `public/videos/to.morrow/tomorrow-promo.mp4` (~1.3 MB), and its first frame is the poster,
+`public/images/to.morrow/promo-poster.webp` — **re-make both after every re-render**. Review
+renders also go to `~/Downloads/tomorrow-promo-E-go-live-button.mp4`.
 
-**Second version (2026-10-02, Lucas's feedback on the first):** no wordmark intro, and **no pixel
-type outside the phones** — headlines, panel titles and captions are the system face (the app's
-"Modern" style); W95FA survives only where the app itself draws it, inside the phone UI. The
-swipe is shown as **three panels, Today | Tomorrow | Soon**: open close-up on the two stacked
-tasks in Tomorrow (zoom 3.2, side panels out of frame), pull back to all three, then three flicks —
-Tomorrow → Today, Tomorrow → Soon, Soon → Tomorrow — each landing in a slot the destination list
-opens for it (rows below slide down on the layout spring; the source list closes its gap). Then a
-**hard cut** to a plain dark frame, "Never forget a task again.", and a **hard cut** to the two
-phones. The loop closes with light flooding out of the Lock Screen tick into frame 0.
+**`TomorrowPromoF` — an alternate, review only (2026-10-04), NOT on the page.** E plus one beat in
+the dark hold: "Go Live" alone for a moment, then " on important tasks" typed onto it letter by
+letter, read (1 s), backspaced away, and E carries on — 126 frames longer (29.8 s). Built as a
+**time warp of E** (`INS`, `insWarp` in Promo.tsx): the scene is frozen at `INS.at` for
+`INS.len` frames (under the dark nothing moves) and every later frame is E's frame minus
+`INS.len`, so nothing existing is retimed; the ring breathes on REAL time (`ext.bf`) so it never
+stalls, and the cut still measures ring 0.1px / text 0.25px. While the line is long the dark
+layer glides left (`INS_PAN` −189px, measured so ring + full line sit centred) and back as it is
+deleted. Review copy: `~/Downloads/tomorrow-promo-F-important-tasks.mp4`.
 
-**Opening (third pass, same day):** the video starts on the name **"to.morrow" alone** on the bare
-canvas, held 1.5 s, in the system face at 1.35× and weight 620. Then the row builds itself around
-it — the plate widens out of a pill hugging the name, the name slides left into the title position
-while easing to 1× / weight 400 (the system font is variable, so the weight interpolates smoothly),
-the checkbox pops, the grip fades in, the second task slides out from underneath — and **that row is
-the first task flicked into Today**. All of it lives in `Row`, which now places its parts
-absolutely (`plateW/plateH/textT/textScale/textWeight/check/grip` on `TaskState`; every other row
-sits at the defaults), so there is no hand-off between a "logo" element and a "row" element.
+**Only E is registered as the site's version** (Lucas picked it, 2026-10-04). The A–D compositions were
+removed from `Root.tsx` and their renders deleted; their branches (`variant` B/C, the `line` and
+`golive` transitions, `TextScene`) are still inside `Promo.tsx`, unused. The variant notes
+below are history.
 
-- **Everything is the app's real design system, rebuilt in CSS** from the three spec files at the
-  repo root (`shove95-skeukit-to-css.md`, `shove95-components-to-css.md`, `shove95-live-button.md`):
-  Slate light ("light blue") and Slate dark ("dark blue") palettes, glass / trough / bloom / card,
-  the full Live button, the pixel glyphs, W95FA on chrome only. `motion/src/sk.css` + `ui.tsx`.
-- **Springs are the app's own**, converted from SwiftUI response/damping: `k = (2π/response)²`,
-  `c = 4π·damping/response` (press .26/.68, layout .40/.86, present .52/.84).
+**Ground truth is the app's own source, not the `shove95-*.md` CSS ports.** The SwiftUI project
+lives at `~/Documents/creative-work/finished/GitHub:Claude:AI/to.morrow/` (SkeuKit/,
+Screens/Skeu/, ShoveWidgets/PinnedTaskLiveActivity.swift) with real simulator screenshots in
+`AppStore_screenshots_Shove.95/screenshots/`. The third pass (2026-10-03) rebuilt every component
+from that source — `motion/src/ui.tsx` (Glass, Trough, glyphs) and `motion/src/app.tsx` (task
+row, tab bar, top bar, Live box, Live switch / Go pill / bin, Lock Screen card) — and calibrated
+them against the screenshots with the `Lab` / `LabBox` compositions in `motion/src/Lab.tsx`
+(components at 3× laid over the same pixel positions as screenshot crops; `out/cmp.py` builds the
+side-by-sides). Things that comparison caught, all of which the md ports had wrong:
+- **Glass shadows must be `filter: drop-shadow`, not `box-shadow`.** SwiftUI shadows what a view
+  actually draws, and glass draws almost nothing (a rim, a 1% lens, a glow), so a resting checkbox
+  has essentially no shadow. A box-shadow cast from the whole disc put a dark pool under every one.
+- **The lens stack is back** (five 1%-white layers, inset, group-blurred) and the glow is
+  `plus-lighter`. At video scale both are visible.
+- **App inner shadows = inset box-shadow with spread r AND blur 2r** (the app strokes 2r round the
+  edge and blurs by r). Spread 0 made troughs too shallow.
+- **Type is SF Pro Text below 20pt and SF Pro Display from 20pt**, with Core Text's size tracking
+  added by hand (Chrome applies none): the 16.4pt row label measures −0.05em total including the
+  app's own −0.02em; the 22pt Live box +0.012em. `-apple-system` at video pixel sizes picks the
+  Display cut and comes out ~7% too narrow. Both cuts are installed in /Library/Fonts. Global
+  `-webkit-font-smoothing: antialiased` — iOS is grayscale-AA.
+- Grip = three 1.5pt bars, 18.7pt wide, 4.1pt pitch, inkFaint (SF `line.3.horizontal`, redrawn).
+  Row metrics are SkeuTaskRow's: 44pt touch square, 33.3 circle, 10.2 gap, 56.3 row, 58.9 pitch.
+- **Open checkboxes are a plain SVG ring** (`CheckRing`: one perfectly round 1.8pt line,
+  `#464B52` at 40%, nothing inside) — Lucas: the app's resting glass (a rim fading out toward the
+  top + a faint lens) never read as a clean circle at video size; prominent glass was tried and
+  rejected too. The E transition is then one ring whose colour and radius interpolate.
+- **The finger is a plain half-transparent white disc** (no glass), placed by transform.
+- **The wells were shrunk 20% (`PZ` 1.6 → 1.28, gap 48 → 38px, drag 140 → 112px)** to give the
+  headline room; the two close-ups (typed name, "Go Live") zoom in by `CLOSE` = 2.6 × 1.6 / PZ so
+  they are unchanged on screen. All three variants now sit wells-top 330–340px with `camY` = H/2.
+- `LiveGlyph` is SVG: as a CSS-bordered div with a centred child the border snapped to whole
+  pixels and the core did not, so the dot sat visibly off-centre at button size.
+- The Live box is a **trough** (recessed, `refH 64, fillStop .26, shadeScale .65, fillLift .55`),
+  not a raised card; the pill reads **"Go"** while typing, then **"Live"** with the accent glyph
+  and the whole content pulsing (SkeuPulse); the tab labels are W95FA, the rest of the phone UI
+  is system type.
+- **W95FA is rendered WITH antialiasing**, like every other text (2026-10-04, Lucas: "the pixel
+  font isn't quite right"). It used to carry `WebkitFontSmoothing: 'none'`, which looks crisp at
+  3× but at the video's ~1.15 px/pt rounds every font-pixel to 1 or 2 px, so "Personal" and the
+  tab labels came out visibly bold and lumpy. iOS draws this face grayscale-antialiased like any
+  other; with AA on, the Lab crop at 3× matches the simulator shot pixel for pixel and the
+  video-scale crop matches a downscaled screenshot in weight. Same file as the app (md5-identical
+  `W95FA.otf`), same ink (`220,229,245`).
+
+**Story (v3):** "to.morrow" is typed where a task title sits — no caret (Lucas) — with the camera
+close on it, no slide, and **no slat behind it at rest** — like every row it darkens only once
+held (Lucas); the camera then leaves it in **one continuous move** (focus and log-scale
+zoom on a single ease, `CAM_MOVE` 66–142) — an earlier pan-then-zoom read as two steps;
+the row builds round the name (checkbox pops, the held-row slat grows out of the text, grip)
+while the **Tomorrow well is cut into the page** (wells use the Live box's trough construction;
+titles only, no date line). Tomorrow is ONE vertical list — to.morrow, Plan trip to Asia, Pay
+semester fee, Call grandma, add — the rest rising in under it as the camera pulls back (an earlier
+pass stacked the second task under the first like a card deck; Lucas: they are list rows, one
+under the other). Only Tomorrow exists at first — **Today and Soon are cut in as the first task is
+flicked at each**. **Two** flicks (to.morrow → Soon, i.e. to the RIGHT, then Plan trip to Asia →
+Today — swapped 2026-10-04, Lucas; `M1`/`M2` in Promo.tsx. The Go Live close-up STAYS on the
+left, in Today, now under Plan trip to Asia (`GL_WELL` = `M2.well`); a third, Pay
+semester fee → Today, was cut 2026-10-04 and the gap between flicks shortened 85 → 68 frames —
+every later timing is now relative to `M2.land`, so A/B/C run 618 frames, D 667, E 639). Each
+flick goes first row → first row so a task only ever
+travels on **one straight horizontal line** (no arc, no tilt — Lucas: "shouldn't hop"): the finger
+pulls 140px on a cubic ease-in, lets go, and an **underdamped spring started at the release
+velocity** (`bounce()`, response .55 / damping .62) carries it ~40px past its slot and back — the
+"push/bounce into place". The destination list is shoved open on a livelier spring the moment the
+task reaches it; the source list closes up on the layout spring; every list ends in an "add" row. Hard cut to a plain dark frame, "Never forget a task again."; hard cut to
+two phones, each close-up **centring its phone** with the caption in the empty half beside it;
+type "Bring passport", tap Go, the Live ring travels to the Lock Screen, it is ticked off there;
+light floods out of the tick back to frame 0 (seam: mean pixel diff 0.06/255). Headlines and
+captions are system type — Lucas does not want pixel type outside the app chrome.
+
+- **Three naming variants (2026-10-03; A was kept, as E's base)** — one prop, three compositions
+  (`TomorrowPromo` = A, `TomorrowPromoB`, `TomorrowPromoC`; `npx remotion render <id> …`):
+  **A** the name inside each well; **B** the app's tab bar stretched under all three wells (one
+  trough, a segment under each well, the glass pill on Tomorrow); **C** each well with its own
+  small trough under it, like the Live tab's own trough in the app. B and C drop the in-well title
+  and use shorter wells (`GEO` in Promo.tsx). The tab a task lands in swells (the app's
+  SkeuLanding). Review copies: `~/Downloads/tomorrow-promo-{A,B,C}-….mp4`. Once one is chosen,
+  delete the other two variants rather than keeping the switch.
+- **A fourth composition, `TomorrowPromoD`, swaps the transition into the Live section**
+  (`transition: 'golive'`, built on A): instead of the cut to "Never forget a task again.", the
+  camera closes back in on Today's "add" row, a finger taps it, "go live" is typed as a new task,
+  then everything but those two words fades to the Live section's dark ground (the words turn
+  from light ink to dark-mode ink in place) and it cuts to the phones. "go live" stays up 48
+  frames after it is typed, then ~1.4 s alone on dark (Lucas, twice), so D is **765 frames
+  (25.5 s)**: the Live section
+  runs on a clock offset by `GOLIVE_HOLD` (45) rather than having its own timings. `GOLIVE` in
+  Promo.tsx holds the close-up's timings.
+- **`TomorrowPromoE`** (`transition: 'golive2'`, built on A, 737 frames / 24.6 s) — the typed
+  words become the button: "Go Live" is typed in Today's add row, the page goes dark around it,
+  and at the cut the Live section opens with its camera so far in on the phone's Go Live pill
+  that the pill's label lands on the exact pixels the typed words occupied (measured: within 1px;
+  `camButton()` solves the camera from the label's position, `LABEL_W` = 55.7pt measured off SF
+  Pro Text Medium). During the fade the words cross-fade into the label's own setting (medium,
+  −0.03em) so the cut cannot be seen. Then the pill, glyph, screen and phone build round the
+  label while the camera pulls back to the centred phone — solved AROUND THE LABEL (`camE`):
+  log-scale zoom, and the label's screen position glides in a straight line. (Blending two cameras'
+  focus points under a log zoom made the button swing sideways mid-move, and handing back to the
+  Live section's camera while its clock sat mid-way through its own zoom-in jumped — both read as
+  "a stutter"; the override now holds CAM_L until that camera reaches CAM_L itself.) The Live section's
+  clock is held during that with the Live box still EMPTY (the pill is forced to its "Go Live"
+  state meanwhile, `forceGo`) and resumes into typing "Bring passport" (Lucas). There is a 0.4 s
+  beat between tapping the add row and the first letter of "Go Live". The new task's
+  **checkbox does not fade with the page** (`CheckToLive`): its resting rim becomes the Live ring.
+  In E the Go Live pill's glyph is the app's ring + dot (NOT glass — a glass knob was tried and
+  rejected) at 28pt, its CENTRE placed exactly where the open box's centre sits relative to its
+  title (32.2pt left of the text), so the transition ONLY shrinks the circle 33.3 → 28pt, never
+  slides it (Lucas). Every circle — box rims and the ring — shares one line weight,
+  `CIRCLE_LINE` = 1.8pt (the box rim was 0.95, the ring 2.55; Lucas wanted them unified). The dot
+  pops in; ring AND dot breathe together (Lucas — a dot-only breath was tried and rejected), the
+  large end always the mark's own size (breathing past it from a ramping envelope read as
+  big-small-big; dark hold `E_CUT` = fade end + 74, ~2.5 s). **The breath never stops** (Lucas):
+  `eBreath(f0)` runs on E's own frame clock and is handed to the pill's knob after the cut
+  (`breathOv` → `knobBreath`) and on into the Live state, replacing `pulse(f - GO)` there, so
+  nothing resets at the cut or at the tap. **The box's 33.3 → 28pt resize IS the first breath's
+  way down** — one eased move from box to smallest (`E_BREATH.down` 39 frames), then an endless
+  cosine with 26-frame halves (both 30% slower than the first pass, Lucas). Run as
+  resize-then-breath, the resize stopped dead and the breath shrank it again, which Lucas saw as a
+  shrink in two stages. Measured: the ring's radius falls monotonically to its minimum; across the
+  cut radius/brightness are continuous (44.6/53 → 44.5/52) and the centroid holds to 0.2px.
+- **Open checkboxes sit 3pt right of centre in their touch square** (`BOX_NUDGE` / `BOX_LEFT` in
+  ui.tsx, Lucas): more air on their left, less before the title; row, title and wells unmoved.
+  The E pill's ring follows INSIDE the pill — `KNOB.pad` +3, `KNOB.gap` −3 — so the pill's size,
+  its label and `labelAnchor`/the camera are untouched. Re-measured across the cut afterwards:
+  ring 0.1px, text 0.25px; `CUT_FIX` did not need refitting.
+- **The opening checkbox is DRAWN on** (Lucas): `CheckRing`'s `draw` prop strokes the line
+  clockwise from 12 o'clock over 20 frames (`checkDraw` on the logo row), round caps, instead of
+  the old scale/fade pop. After the pill
+  has formed, the button sits alone for `E_SETTLE` = 30 frames (1 s, Lucas) before the phone
+  builds round it and the camera pulls back. E's close-up
+  has **no push-in** (D keeps its 7% drift): the words stay dead still until the pull-back.
+  "Go Live" is set like every task title (SF Pro Text Regular, −0.05em) — in the row, over the
+  dark, AND as E's pill label (the app's pill label is medium; Lucas wanted one weight).
+  **Measured across the cut: text ≤0.4px, ring ≤0.1px.** What it took — worth knowing before
+  touching any of it:
+  - **Layout offsets are rounded to whole CSS px BEFORE the camera transform magnifies them.** In
+    the close-up 1 world px ≈ 3.25 screen px, and inside the phone 1 phone px ≈ 4.2 screen px — so
+    `left/top` and flex positions jump in 3–4px steps on screen. Anything that must land precisely
+    is placed by `transform` (never rounded): `CheckToLive` sits in ONE fixed-size box positioned
+    by translate and only scales/redraws inside it (resizing the element each frame let its edges
+    snap and the circle's centre wandered ±2px — the "jitter").
+  - The pill's own layout can't be made exact that way, so its errors are measured off rendered
+    frames and absorbed on the swipe side: `CUT_FIX` (text −0.31 / ring +0.52,+0.18 world px,
+    applied by transform to the typed words, the words over the dark, and the ring), plus
+    `LABEL_W` 52.9pt, a −0.36pt `KNOB.gap` trim and a −0.54pt label nudge in the pill. Re-measure
+    with `out/cutcheck.sh` (or centroid-track frames cut−2…cut+4) after ANY change to the pill,
+    the row metrics, `PZ` or `CLOSE`. "Go Live" is typed in the
+  label's own setting (medium, −0.03em) so the fade to the light words is a pure colour change.
+  The pill reads
+  **"Go Live"** in every version from here on (Lucas) — the app's own code says "Go".
+- Phone status bar is placed against the frame's measured notch (88–302pt wide, 30.5pt deep):
+  time centred in the left ear, signal/Wi-Fi/battery in the right, centre line 22pt. The Lock
+  Screen has no home-indicator bar (Lucas); torch and camera are filled glyphs on 50pt dark discs.
+- Springs are the app's own, converted from SwiftUI response/damping:
+  `k = (2π/response)²`, `c = 4π·damping/response` (press .26/.68, layout .40/.86, present .52/.84).
 - **Nothing may animate via CSS transitions/keyframes** — Remotion renders frames independently,
   so every moving value is computed from the frame number in `Promo.tsx`.
-- **The loop is seamless by construction**: the final flood reveals `<SwipeScene f={0} />`, i.e.
-  literally frame 0, and nothing in that scene moves before frame 18. Measured seam: mean pixel
-  diff 0.11/255.
 - English copy only.
 
 ## to.morrow page (`public/to-shove2d.html`)
@@ -1029,8 +1175,9 @@ changed — the `<h1>`, `2D.html`'s landing tile, the Craft dropdown, the two ne
 project pages' prev/next titles, every `aria-label`, and the German copy in `glance-lead` and
 `problem-4` (markup AND the `TRANSLATIONS` values). The asset folders moved with it:
 `public/images/to.morrow/` and `public/videos/to.morrow/`. **The CSS class and keyframe names
-did NOT change** (`.morrow-shove`, `.morrow-devices`, `.morrow-icon-tile`,
-`@keyframes morrow-shove`) — a dot needs escaping in a selector, and they are internal. The
+did NOT change** (`.morrow-shove`, `.morrow-devices`, `.morrow-icon-tile` — the last since removed,
+`@keyframes morrow-shove`; the shove itself was removed 2026-10-04) — a dot needs escaping in a
+selector, and they are internal. The
 rename was `perl -pi -e 's/\bmorrow\b(?!-)/to.morrow/g'`: the `(?!-)` is what spares those
 class names, and `\b` is what spares the word "tomorrow".
 
@@ -1198,14 +1345,37 @@ row: one large centre card with four around it, `--card-w: min(36.4vw, 168px)`, 
 existing theme (`.color-slot--extra`, `aria-hidden`, empty `alt`) — `display: none` above
 640px, so the desktop fan is still the four themes the `aria-label` names.
 
-**Hero and App Store badge (2026-09-07).** The hero is the app's own icon at every width —
-the row of three screen mockups (`.morrow-devices-inner`) is gone, markup and CSS, and
-`/images/morrow/screen1–3.webp` are now **orphaned on disk** (nothing on the site references
-them). `.morrow-devices .hero-icon` has to state its own `width` (`min(38vw, 360px)`, 62vw
-capped at 300px on a phone) because `.app-icon` sizes itself from `--appstore-h`, a token
-that only exists inside `.appstore-row`. The **icon beside the App Store badge at the foot
-of the page is gone too** — it was the same artwork as the hero and only cost width — so
-`.appstore-row` is the badge alone. A **second copy of the badge now sits above At a
+**Hero: the promo loop (2026-10-04).** `.morrow-devices` holds one `<video class="hero-promo">`
+(autoplay, muted, loop, playsinline, poster = the loop's first frame) of
+`/videos/to.morrow/tomorrow-promo.mp4` — see "to.morrow promo loop" above for how it is made.
+It replaced the app icon that shoved across the column, and **the title's shove went with it**:
+`.morrow-shove`, `@keyframes morrow-shove`, the `--shove-x`/icon-width script, `.app-icon` /
+`.app-icon-dark` / `@keyframes icon-fade` and their reduced-motion lines are all deleted; the
+title is a plain `.title-row` like every other project page. It sits **flush and full frame**
+(Lucas — a rounded, raised card was tried first and rejected): `.morrow-devices` has no horizontal
+padding, so the video runs edge to edge between the page-wrapper's border lines (111 → 1329 at
+1440) and edge to edge of the screen below 860px, where those borders go; `aspect-ratio: 16/9`,
+no radius, no shadow. **Still not a `.hero`**: the video's headline sits near its top edge, so it must not run under the nav the way
+the other project pages' full-bleed heroes do; `.morrow-devices`' top padding clears the bar, and
+with no `.hero` the nav keeps its raised shadow from the first frame. Playback is handed to the
+page's existing play-while-on-screen observer like every other clip. Verified over CDP at 1440
+(1058×595, title right under it) and 390 touch (350×197): playing, looping, no overflow, no
+console errors (re-checked after the flush change: video box = wrapper inner box at both).
+
+**The landing tile on `2D.html` is the same loop** (2026-10-04, replacing the app icon there
+too): `.project-tile.morrow-video-tile`, on the raised plate every other tile uses, the `<video>`
+absolutely filling it with `object-fit: cover`. The film is 16:9 and the tiles are 680/560, which
+would cut ~16% a side and clip the outer wells and the Live caption, so this tile is **3:2**
+(~8% a side — nothing the loop shows sits in that margin: wells at 14–86% of the width, captions
+from 15%) and a little shorter than its neighbours (334 vs 413px at 1440). Below 640px it is
+16/10 like the default tiles (~5% a side), restated in that file's last 640px block because the
+base rule is (0,2,0). Verified over CDP at 1440 and 390: playing, ratios 1.5 / 1.6, no overflow,
+no errors. With that, `.app-icon` / `.morrow-icon-tile` / `icon-swap` are gone site-wide (their
+two dark-mode selectors in `dark-mobile.css` too), and `/images/to.morrow/app-icon-light|dark.webp`
+are **orphaned on disk**. `/images/morrow/screen1–3.webp` were already orphaned.
+
+**App Store badges.** The **icon beside the App Store badge at the foot of the page is gone** —
+so `.appstore-row` is the badge alone. A **second copy of the badge sits above At a
 Glance**, docked left by `.appstore-row--top` so it lines up with the heading instead of
 centring, and scaled to **72% of the foot badge** by overriding `--appstore-h` (the token is
 declared on `.appstore-row`, so the smaller one is `calc(<the same clamp> * 0.72)` and the
@@ -1215,39 +1385,7 @@ NOT on the `<a>`: the link owns a `:hover` transform, and an animation on the sa
 outranks it and suppresses its transition in Safari (the `animation`-vs-`:hover` trap in
 "Known Patterns & Gotchas"). Turned off under `prefers-reduced-motion`.
 
-**The hero icon rides the title's shove**, at every width: same `morrow-shove` keyframes,
-same 8s loop, so icon and word travel together. It is docked left (`margin-inline: 0`), not
-centred — centred, the glide would start from the middle and end past the right edge — and
-the script at the bottom of the file now measures `--shove-x` **per element** against its
-own parent (the icon's is `.morrow-devices`, the title's is the header column), because the
-two have different widths and different gutters. Measured: at 1440 both land flush left at
-191 and flush right at ~1250; at 390 the icon travels 108px and the title 228px, in phase.
-
-**The icon's light↔dark transition is a plain opacity cross-fade of the WHOLE square**
-(`icon-fade`), and it runs **while the icon is travelling**. Two directional versions were
-built and rejected on the way — a `clip-path` cut (read as a seam across the artwork) and a
-soft gradient mask slid across via `mask-position` — so do not reintroduce a sideways
-reveal. The loop is **8s, matching the shove's period**, and the fades are timed to the
-shove's GLIDES (37.5–50% and 87.5–100%), not its holds: the icon changes colour while it
-moves and is a settled colour whenever it is parked. Those numbers come from
-`@keyframes morrow-shove` — change that timing and these have to follow. Verified by
-sampling opacity and the icon's `left` together over a full loop. **This page only** —
-`2D.html`'s landing tile still cross-fades with its own `icon-swap`.
-
-**Icon and title are the same width, measured in JS, at every width.** `.project-title`'s
-clamp went up ~4% (`clamp(42px, 7.3vw, 100px)`, and the phone ramp went up 25% to
-`clamp(40px, 11.25vw, 70px)` — which is also how the phone ICON was made a quarter taller,
-since it is sized from the word) and the same script that writes `--shove-x`
-sets the icon's inline `width` to the title row's `offsetWidth` first — no pair of CSS
-values keeps an OCR-A-BT word and a vw-capped square equal across viewports, so it is
-measured. 347px each at 1440, 218px at 861, **152px each at 390** (phones were excluded at
-first, on the theory that matching a small title would shrink the hero to a thumbnail;
-Lucas asked for the match there too, and the pair lands at the same ~33% of its column
-either way, so the phone hero is the desktop one scaled down). The CSS widths
-(`min(38vw, 360px)`, `min(62vw, 300px)` on a phone) remain as the pre-JS fallback. Equal
-widths also mean an identical `--shove-x`, so icon and word travel in exact lockstep.
-
-**The gap between the icon and the title is `.header-section`**, a class on the header
+**The gap between the hero and the title is `.header-section`**, a class on the header
 `.section` — `padding-top: clamp(10px, 1.4vw, 20px)`, about a third of `.section`'s own
 padding, because this block follows a picture of the thing the title names rather than a
 divider. It is **restated inside the LAST `@media (max-width: 640px)` block**, the one
@@ -1256,10 +1394,9 @@ too, and the first attempt at this override sat before that later rule and lost 
 order — measured 32px where it had asked for 10. Same trap as the one below.
 
 **No breadcrumb on this page** (dropped 2026-09-07), unlike the other five project pages:
-with the icon hero directly above it, the `PORTFOLIO / PROJEKTE / MORROW` trail sat between
-the icon and the title and held the two apart. The element, its `.breadcrumb` rules and both
-`breadcrumb` translation keys are gone; **no spacing was changed** — the 56px that remains
-is `.section`'s own padding.
+with the hero directly above it, the `PORTFOLIO / PROJEKTE / MORROW` trail sat between the
+hero and the title and held the two apart. The element, its `.breadcrumb` rules and both
+`breadcrumb` translation keys are gone.
 
 **"Drei Formen" (`.dna-row`) is a centred column: heading, copy, then the three demos in a
 ROW under it** (2026-09-07; it was copy-left / three-demos-stacked-right before). Source
@@ -1317,31 +1454,12 @@ becomes `display: contents` so its two `<p>`s are direct children of `.dna-row`'
 and all four items then need an explicit `order` (1/2/3/4) — the default 0 would tie the
 heading and the stack. The gap between the paragraphs becomes `.dna-row`'s own 18px.
 
-**The first shove happens 0.7s after the page opens, and the delay that does it is NEGATIVE**
-(2026-09-08): `animation: morrow-shove 8s -2.3s infinite backwards` on both the title and the
-hero icon, and the same `-2.3s` on `icon-fade`, or the cross-fade drifts out of phase with the
-travel.
-
-**A POSITIVE 0.7s was tried first and does the opposite of what it reads like.** The keyframes
-already hold at 0% for their first 3s (37.5% of 8s), so waiting another 0.7s on top pushed the
-first glide out to **3.7s** and nothing whatsoever happened at 0.7 — a hold and a wait look
-identical, so the delay was invisible. `-2.3s` starts the loop already 2.3s in, leaving 0.7s of
-that hold still to run: the page opens parked, and 0.7s later the word glides. The number is
-`3.0s` (the glide's own offset) minus `0.7s` — **if `@keyframes morrow-shove` is ever retimed,
-recompute it.** `icon-fade` runs 37.5–50%, i.e. 3.0–4.0s raw, so at `-2.3s` it plays 0.7–1.7s
-after load: exactly across the first glide. Only the first cycle is short; every loop after it
-runs whole.
-
-**The positive delay also caused a real flicker, and the lesson outlives it.** During an
-animation's DELAY the element renders in its own **base style, not the first keyframe**.
-`.app-icon-dark` declared no `opacity`, so for the first 0.7s the dark icon sat at the initial
-`opacity: 1` — fully covering the light one — and then snapped transparent the instant the
-animation started. Fixed with **`animation-fill-mode: backwards`** plus an explicit `opacity: 0`
-on the base rule; both are still in place and still correct, though a negative delay has no
-delay window for the base style to show through, so the flicker cannot recur while the offset
-stays negative.
-**Rule: any animation with a POSITIVE `delay` needs `backwards` unless its 0% keyframe is
-already the element's resting style.**
+**Lesson from the removed title shove, still worth keeping:** a POSITIVE `animation-delay` on
+an animation whose keyframes start with a hold is invisible (a hold looks like a wait) — a
+NEGATIVE delay is how you start such a loop part-way in. And during a positive delay the element
+renders in its own **base style, not the first keyframe**, which flashed the hidden dark icon
+for 0.7s. **Rule: any animation with a POSITIVE `delay` needs `backwards` unless its 0%
+keyframe is already the element's resting style.**
 
 **`live-pair.mp4` loops SHORT of its own end** (`data-loop-end="13.3"`, 2026-09-11). The clip is
 14s and ends with **both phones dimming out**, the way a screen recording does when the display
@@ -1439,9 +1557,8 @@ old `problem-3` "n=1" disclaimer is gone — the honesty moved to the TestFlight
 **Two small mobile rules that are easy to lose:** `.centered-note` (the "Verschieben statt
 verwalten" block) is `text-align: left` below 640px — centred text under a left-docked
 heading has no edge to line up with in a 350px column — and on `2D.html` the to.morrow tile
-is the app icon itself rather than a screenshot, so it gets `width: 202px` (15% over the
-176px its base clamp floors at) plus 14px of extra margin under it, **in the last 640px
-block of that file**, since the `.project-tile` rules further up are equal specificity.
+is the promo video at 16/10, restated **in the last 640px block of that file** (see "Hero: the
+promo loop" above; it used to be the app icon at `width: 202px`).
 
 **A closing "Fazit und Ausblick" section** sits between the colour screens and the App Store
 badge (2026-09-07): three paragraphs at the section's own full width (**no `.media-copy`** —

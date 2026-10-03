@@ -130,10 +130,10 @@
     /* ── Header ── */
     .project-header { display: flex; flex-direction: column; gap: 16px; }
 
-    /* The icon hero sits directly on top of this header, and .section's own
+    /* The promo video sits directly on top of this header, and .section's own
        padding is written for a block that follows a divider, not one that
        follows a picture of the thing the title names. Roughly a third of it
-       here, so the word reads as belonging to the icon above it. Only the top
+       here, so the word reads as belonging to the video above it. Only the top
        is touched; the sides and the bottom stay on the shared rhythm. */
     .header-section { padding-top: clamp(10px, 1.4vw, 20px); }
 
@@ -189,11 +189,13 @@
        its raised shadow from the first frame, which is exactly what it
        does when a page has no .hero at all. */
     .morrow-devices {
-      /* Horizontal padding matches .section, so the icon's travel runs
-         between the same edges as the title and divider below it. The top
-         padding clears the fixed nav: the pill's bottom edge sits at ~88px
-         and its neumorphic shadow needs ~17px more below that. */
-      padding: clamp(116px, 11vw, 150px) clamp(40px, 8vw, 80px) 0;
+      /* No horizontal padding: the hero video runs flush to the card's own
+         border lines (Lucas). The top padding clears the fixed nav: the pill's
+         bottom edge sits at ~88px and its neumorphic shadow needs ~17px more
+         below that — and the video's own headline sits near its top edge, so
+         it must not run under the bar the way a full-bleed .hero image does on
+         the other project pages. */
+      padding: clamp(116px, 11vw, 150px) 0 0;
     }
 
     /* The v1 Windows row, in the same frame as the hero.
@@ -217,44 +219,36 @@
 
     .win-devices { margin-top: var(--block-gap); }
 
-    /* The hero IS the app icon, at every width (2026-09-07). It used to be a
-       row of three screen mockups with the icon swapped in below 640px only;
-       the row is gone, markup and rules, so this is no longer a swap and the
-       phone rule further down only changes the size.
-       Still scoped to .morrow-devices: .app-icon sets its own width from
-       --appstore-h further down the file, which is a token that only exists
-       inside .appstore-row, so the width has to be stated here. */
-    .morrow-devices .hero-icon {
+    /* The hero is the promo loop (2026-10-04) — it replaced the app icon that
+       shoved across the column with the title. Rendered in Remotion from
+       motion/ (see CLAUDE.md), 1920x1080, ~26s, silent, seamless loop.
+       Flush and full frame (Lucas): no card, no radius, no shadow — it runs
+       edge to edge between the page-wrapper's border lines, the way the other
+       project pages' heroes do (and edge to edge of the screen below 860px,
+       where those borders go). aspect-ratio reserves the box before the file
+       lands; the poster is the loop's own first frame, so nothing changes when
+       playback starts. The background is the frame's own colour, for the
+       moment before the poster paints. */
+    .hero-promo {
       display: block;
-      /* Pre-JS fallback only: the script at the bottom of the file overwrites
-         this with the measured width of the title, at every width, so icon and
-         word are exactly as wide as each other. */
-      width: min(38vw, 360px);
-      /* Docked left, not centred, because it now travels: it runs the same
-         8s loop as the title below it, flush left to flush right and back,
-         so the icon and the word shove together, at EVERY width. Its
-         --shove-x is measured against .morrow-devices the same way the
-         title's is measured against the header column — same script, one
-         entry per element, so each travels its own column's width minus its
-         own. Centred, the glide would start from the middle and end past the
-         right edge. */
-      margin-inline: 0;
-      will-change: transform;
-      /* The first shove happens 0.7s after the page opens.
-         The delay is NEGATIVE, and that is the whole trick. A POSITIVE 0.7s
-         was tried first and does the opposite of what it reads like: the
-         keyframes already hold at 0% for their first 3s (37.5% of 8s), so
-         waiting another 0.7s on top pushed the first glide out to 3.7s and
-         nothing whatsoever happened at 0.7 — the delay was invisible, because
-         a hold looks the same as a wait.
-         -2.3s starts the loop already 2.3s in, which leaves 0.7s of that hold
-         still to run: the page opens parked, and 0.7s later the word glides.
-         3.0s (the glide's own offset) minus 0.7s is where the number comes
-         from — if @keyframes morrow-shove is ever retimed, recompute it.
-         Only the first cycle is short; every loop after it runs whole.
-         The icon and its cross-fade carry the same number or they drift out
-         of phase with the travel. */
-      animation: morrow-shove 8s -2.3s infinite backwards;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      background: #C7CCD4;
+      /* The file is the TALL cut (1920x1276: the 16:9 film plus 196px of empty
+         canvas on top). Below 861px the box stays 16:9 and cover + bottom
+         crops exactly that band off again, so phones see the plain film. */
+      object-fit: cover;
+      object-position: 50% 100%;
+    }
+    /* Desktop (Lucas, 2026-10-04): no empty strip between the nav and the
+       video. The video starts at the card's top border and the tall cut's
+       extra canvas fills what was padding — the film itself only rises
+       ~25px at 1440 (196 video px = 124 css px against the old 150px gap).
+       That band is background only; the nav sits over it. */
+    @media (min-width: 861px) {
+      .morrow-devices { padding-top: 0; }
+      .hero-promo { aspect-ratio: 1920 / 1276; }
     }
 
     /* .guide-section is a flex column with one gap for everything, so the
@@ -334,69 +328,6 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-user-drag: none;
-    }
-
-    /* The hero icon's own images; the icon's shadow comes from .app-icon. */
-    .morrow-devices img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* ── Hero: "to.morrow" shoves itself across the header column ──────────
-       Snaps flush left, holds 3s, glides ~1s to flush right with a small
-       bounce, holds 3s, comes back — the app's own core gesture (a task
-       pushed to tomorrow, pulled back again) as the page's title. */
-    .morrow-shove {
-      /* fit-content is load-bearing: as a column-flex child this row would
-         otherwise stretch to the full header width, and translateX(-100%)
-         would then carry it a whole column off the page instead of one
-         word's width. */
-      width: fit-content;
-      position: relative;
-      will-change: transform;
-      /* 0.7s before the first shove, so the page settles and THEN the title
-         moves. An infinite animation's delay applies once, so only the first
-         loop waits and every later one follows straight on. The icon's
-         cross-fade carries the same delay, or the two fall out of phase. */
-      animation: morrow-shove 8s -2.3s infinite backwards;
-    }
-
-    /* 8s loop: hold 3s (37.5%), glide 1s (12.5%), hold 3s, glide 1s.
-
-       TRANSFORM ONLY. This used to animate `left` from 0% to 100% with a
-       matching translateX(-100%), which is elegant — the pair lands flush at
-       either edge whatever width the word renders at, with nothing to measure.
-       But `left` is a layout property: every frame of the glide relaid out the
-       header and repainted it off the compositor, which desktop absorbs and a
-       phone does not. Measured on a 390px viewport, that is what read as the
-       animation being broken.
-
-       The travel distance is measured once instead and written to --shove-x by
-       the script near the bottom of this file (column width minus word width),
-       so the keyframes move nothing but a composited transform. Same landing
-       positions, same curve, no layout per frame.
-
-       The timing function is set on the keyframes that START a glide — CSS
-       applies it to the segment running OUT of a keyframe, so the two holds are
-       untouched. EVERY keyframe repeats the transform in full and no offset is
-       listed twice: writing it the compact way, with a bare
-       `37.5% { animation-timing-function: … }` alongside a
-       `0%, 37.5% { transform: … }`, silently dropped the curve in Chrome and
-       the glide came out with no bounce at all.
-
-       The bounce is deliberately gentle, and the curve was picked by computing
-       its peak rather than eyeballing it: this one peaks at 1.0299, i.e. 20.8px
-       past the edge on the 1440px layout, which stays well inside the wrapper's
-       padding. A stock easeOutBack (0.34, 1.56, 0.64, 1) peaks at 1.098 = 54px
-       past the column, and 1.7 — the curve this page used at first —
-       overshoots 79px, far enough to read as a glitch. */
-    @keyframes morrow-shove {
-      0%     { transform: translateX(0);                   animation-timing-function: linear; }
-      37.5%  { transform: translateX(0);                   animation-timing-function: cubic-bezier(0.34, 1.3, 0.55, 1); }
-      50%    { transform: translateX(var(--shove-x, 0px)); animation-timing-function: linear; }
-      87.5%  { transform: translateX(var(--shove-x, 0px)); animation-timing-function: cubic-bezier(0.34, 1.3, 0.55, 1); }
-      100%   { transform: translateX(0); }
     }
 
     /* ── Meta grid ── */
@@ -1548,11 +1479,6 @@
          them would spread the icons without growing them. 0.855 x 1.6. */
       .icons-compare .ic-side { --z: 1.368; }
 
-      /* Pre-JS fallback again — the script matches this to the title as soon
-         as it runs. The icon shoves here too; the push is just shorter than on
-         a wide screen. Docking and animation are the base rule's. */
-      .morrow-devices .hero-icon { width: min(62vw, 300px); }
-
       /* The Live mark sat 20px off the paragraph under it — the same gap the
          column uses between unrelated blocks, so it read as attached to the
          wrong thing. It is an illustration with air around it, not a bullet. */
@@ -1565,12 +1491,7 @@
       #top-bar { height: 140px; }
       #top-bar.hide { transform: translateY(-90px); }
       .section { padding: 24px 20px; }
-      /* match .section's tighter mobile gutter so the phones stay aligned
-         with the header below them */
-      .morrow-devices { padding-left: 20px; padding-right: 20px; }
-      /* +25% on every stop. The hero icon is sized FROM this word (see the
-         script at the bottom of the file), so this is also what makes the icon
-         a quarter taller on a phone — the two cannot be changed apart. */
+      /* +25% on every stop. */
       .project-title { font-size: clamp(40px, 11.25vw, 70px); }
       .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
       .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
@@ -1638,69 +1559,6 @@
     @keyframes badge-pulse {
       0%, 100% { transform: scale(1);    }
       50%      { transform: scale(1.04); }
-    }
-
-    /* ── The app icon, WIPING between its light and dark artwork ──
-       Two stacked images rather than one image swapped in JS: only the light
-       one is in flow, so it sets the box and nothing reflows at the swap.
-
-       The dark layer fades in over the WHOLE square — one opacity on one
-       element, revealing the light artwork underneath. Two sideways versions
-       were built and rejected first (a clip-path cut, then a soft gradient
-       mask sliding across): a directional reveal is not what this wants, and
-       the hard one read as a seam across the artwork.
-
-       8 seconds, NOT the 6 it started at: that is the shove's period, so the
-       two loops stay in phase — and the fades are timed to the shove's
-       GLIDES, 37.5-50% and 87.5-100%, not to its holds. The icon changes
-       colour while it is travelling and is a settled colour whenever it is
-       parked, so the two motions read as one gesture. Both numbers come from
-       @keyframes morrow-shove; if that timing changes, change these with it. */
-    .app-icon {
-      position: relative;
-      display: block;
-      flex: none;
-      /* square, so its width IS its height */
-      width: var(--appstore-h);
-      /* drop-shadow, not box-shadow: the icon is a transparent squircle, so
-         this follows its silhouette instead of boxing it. On the WRAPPER
-         rather than on each <img>, or it paints twice through the cross-fade
-         and the doubled band reads as a frame around the icon — see the fuller
-         note on .morrow-icon-tile .app-icon in 2D.html. */
-      filter: drop-shadow(0 12px 22px rgba(174, 174, 192, 0.5));
-    }
-    .app-icon img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    .app-icon-dark {
-      position: absolute;
-      inset: 0;
-      /* The dark layer is HIDDEN at rest, and that has to be said twice.
-         During an animation's DELAY the element renders in its own base style,
-         not in the first keyframe — and this rule declared no opacity, so for
-         the first 0.7s the dark icon sat at the initial opacity: 1, fully
-         covering the light one, and then snapped to transparent the instant
-         the animation started. That snap is the flicker between the two
-         colours on first load; it only appeared once the 0.7s delay was added,
-         because with no delay there is no window for the base style to show.
-         `backwards` fills the delay with the 0% keyframe, which is the actual
-         fix; the explicit opacity: 0 is the belt to its braces, and it matches
-         what the reduced-motion block already forces. */
-      opacity: 0;
-      /* Same negative offset as the shove this is timed against — see the
-         note on .morrow-shove. The fade runs 37.5%-50%, i.e. 3.0s-4.0s of the
-         raw loop, so at -2.3s it plays 0.7s-1.7s after the page opens: exactly
-         across the first glide. */
-      animation: icon-fade 8s -2.3s ease-in-out infinite backwards;
-    }
-    @keyframes icon-fade {
-      /* Parked left, light -> fades to dark across the push right -> parked
-         right, dark -> fades back to light across the push home. */
-      0%, 37.5% { opacity: 0; }
-      50%, 87.5% { opacity: 1; }
-      100%      { opacity: 0; }
     }
 
     .project-nav {
@@ -2076,15 +1934,8 @@
       .fan-scrolly, .ic-scrolly { height: auto !important; }
       .fan-sticky, .ic-sticky { position: static !important; height: auto !important; }
       .color-card { animation: none !important; }
-      .app-icon-dark { animation: none !important; opacity: 0; }
       .appstore-badge { animation: none !important; transform: none !important; }
       .appstore-link:hover, .appstore-link:active { transform: none; }
-      .morrow-shove,
-      .morrow-devices .hero-icon {
-        animation: none !important;
-        left: 0 !important;
-        transform: none !important;
-      }
       .machine-overlay-btn,
       .hero-blob,
       .character-row,
@@ -2257,7 +2108,7 @@
       .guide-section { --pad-x: 20px; padding: 52px var(--pad-x); }
       /* Header/glance/meta blocks: slighter bump, they are shorter units. */
       .section { padding: 32px 20px; }
-      /* …except the header, which follows the icon hero rather than a border,
+      /* …except the header, which follows the hero video rather than a border,
          and wants to read as belonging to it. Restated HERE, not in the
          earlier 640px block: this .section rule is the same specificity and
          later in the file, so an earlier override loses on source order —
@@ -2908,36 +2759,35 @@
 
   <div class="page-wrapper">
 
-    <!-- Hero: the app's own icon, above the header. Intrinsic width/height
-         are on the images so the box reserves its space before the files
-         land and nothing below it jumps. Not lazy-loaded — this is the
-         top of the page. The row of three screen mockups that used to live
-         here was dropped on 2026-09-07; the icon is the whole hero now, at
-         every width. -->
+    <!-- Hero: the promo loop (2026-10-04), above the header — it replaced the
+         app icon that used to shove across the page with the title. Silent,
+         seamless loop; width/height + aspect-ratio reserve the box, and the
+         poster is the loop's own first frame. Not lazy — top of the page. The
+         play/pause-on-visibility script at the bottom of the file covers it
+         like every other clip here. -->
     <div class="morrow-devices">
-      <!-- The same artwork, and the same light/dark cross-fade, as the
-           landing tile. -->
-      <span class="app-icon hero-icon" role="img" aria-label="Das App-Icon von to.morrow">
-        <img src="/images/to.morrow/app-icon-light.webp" width="640" height="640" alt="" />
-        <img class="app-icon-dark" src="/images/to.morrow/app-icon-dark.webp" width="640" height="640" alt="" />
-      </span>
+      <video class="hero-promo" autoplay loop muted playsinline preload="auto" width="1920" height="1276"
+             poster="/images/to.morrow/promo-poster-hero.webp"
+             aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Demnächst verschoben, dann wird eine Aufgabe live geschaltet und erscheint auf dem Sperrbildschirm">
+        <source src="/videos/to.morrow/tomorrow-promo-hero.mp4" type="video/mp4" />
+      </video>
     </div>
 
     <!-- Header. Note there is deliberately no element with class "hero" on
          this page — see the .morrow-devices comment in the stylesheet for
-         why that matters to the nav bar's shadow. -->
+         why that matters to the nav bar's shadow. The hero video is
+         .hero-promo, not .hero, for exactly that reason. -->
     <div class="section header-section" style="border-bottom: none;">
       <!-- No breadcrumb here (dropped 2026-09-07), unlike the other project
-           pages: with the icon hero directly above it, the trail sat between
-           the icon and the title and held the two apart. Removing it is what
-           closes that gap — no spacing was touched. -->
+           pages: with the hero directly above it, the trail sat between the
+           hero and the title and held the two apart. -->
       <div class="project-header">
-        <!-- .title-row is left exactly as the other pages have it; the
-             movement is layered on with one extra class, so the header's
-             own geometry stays identical to theirs. No .accent-dot here —
+        <!-- .title-row exactly as the other pages have it. It used to carry a
+             .morrow-shove class that glided the word across the column; that
+             went with the shoving icon (2026-10-04). No .accent-dot here —
              the other pages' blinking orange dot is deliberately dropped
-             on this page. The divider below stays put; only the word moves. -->
-        <div class="title-row morrow-shove">
+             on this page. -->
+        <div class="title-row">
           <!-- The two o's are the Live mark itself — a stroked ring with a
                core at 42% of the diameter, the same construction as
                .live__mark further down. aria-label carries the real word, so
@@ -4158,58 +4008,6 @@
     })();
   </script>
 
-
-  <script>
-    // How far the title glides: the header column's content width minus the
-    // word's own width. Measured rather than expressed as left: 0% -> 100%
-    // with a matching translateX(-100%), which needed no measuring but
-    // animated a LAYOUT property — see the @keyframes comment.
-    // The hero icon rides the same keyframes, so it is measured the same way
-    // — against its own parent, which is a different element with a different
-    // gutter. One entry each rather than one shared number.
-    (function () {
-      var els = [document.querySelector('.morrow-shove'),
-                 document.querySelector('.morrow-devices .hero-icon')].filter(Boolean);
-      if (!els.length) return;
-      var title = els[0], icon = els[1];
-      var phone = window.matchMedia('(max-width: 640px)');
-      // The icon is measured FROM the word rather than given its own clamp: the
-      // word is OCR-A-BT at a clamp() size and the icon is a square, so no pair
-      // of CSS values keeps them in proportion at every viewport. On a desktop
-      // it is 85% of the word (Lucas's ratio — at 1:1 the pair read too heavy
-      // once the title became the nine-character "to.morrow"); on a phone it
-      // stays 1:1, where the word is small and the icon carries the hero.
-      var ICON_TO_TITLE_DESKTOP = 0.85;
-
-      function size() {
-        if (icon && title) {
-          var scale = phone.matches ? 1 : ICON_TO_TITLE_DESKTOP;
-          icon.style.width = Math.round(title.offsetWidth * scale) + 'px';
-          // CENTRED ON THE WORD, not docked to the same left edge: the two are
-          // different widths now, so the icon needs half the difference as a
-          // left margin. Both columns (.morrow-devices and the header .section)
-          // carry the same horizontal padding, so their content boxes start at
-          // the same x and half the difference is all it takes.
-          icon.style.marginLeft =
-            Math.max(0, Math.round((title.offsetWidth - icon.offsetWidth) / 2)) + 'px';
-        }
-        // ONE travel distance for both, measured on the TITLE's column: equal
-        // distances are what keep the two centres locked together for the whole
-        // shove. Give the icon its own (inner - iconWidth) and it would travel
-        // further than the word and arrive off-centre — the wider the gap
-        // between their widths, the worse. The icon therefore stops short of
-        // the right edge by exactly the same half-difference it starts with.
-        var col = title.parentElement;
-        var cs = getComputedStyle(col);
-        var inner = col.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-        var d = Math.max(0, Math.round(inner - title.offsetWidth));
-        els.forEach(function (el) { el.style.setProperty('--shove-x', d + 'px'); });
-      }
-      size();
-      window.addEventListener('resize', size);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
-    })();
-  </script>
 
   <script>
     // Pan the nine v1 screens at every width, looping, without taking the
