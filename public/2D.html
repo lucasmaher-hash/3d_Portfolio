@@ -1086,10 +1086,11 @@
         --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
       }
 
-      /* to.morrow's video tile goes back to the 16/10 every tile has down here
-         (~5% cropped a side). Restated at the tile's own specificity — the base
-         .morrow-video-tile rule is (0,2,0) and would otherwise keep its 3:2. */
-      .project-tile.morrow-video-tile { aspect-ratio: 16 / 10; }
+      /* On a phone the to.morrow tile plays the VERTICAL cut (4:5, re-laid for a
+         phone; picked by the <source media> in the markup) at exactly its own
+         shape, so nothing is cropped. Restated at the tile's own specificity —
+         the base .morrow-video-tile rule is (0,2,0) and would otherwise keep 3:2. */
+      .project-tile.morrow-video-tile { aspect-ratio: 4 / 5; }
 
       /* Virtual Cooking's tile carries an inline `box-shadow: none` (the desktop
          render is a cut-out on a transparent ground, where a raised edge would
@@ -1413,10 +1414,13 @@
       </div>
       <a href="/to-shove2d.html" style="display:block;">
         <div class="project-tile morrow-video-tile" style="cursor: pointer;">
-          <!-- The promo loop, same file as the to.morrow page's hero. -->
+          <!-- The promo loop: the landscape cut above 640px, the vertical (4:5) one
+               on a phone. Landscape FIRST, so a browser that ignores `media`
+               (pre-2023 Chrome) falls back to it everywhere. -->
           <video autoplay muted loop playsinline width="1920" height="1080" poster="/images/to.morrow/promo-poster.webp"
                  aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Demnächst verschoben, dann wird eine Aufgabe live geschaltet">
-            <source src="/videos/to.morrow/tomorrow-promo.mp4" type="video/mp4" />
+            <source src="/videos/to.morrow/tomorrow-promo.mp4" media="(min-width: 641px)" type="video/mp4" />
+            <source src="/videos/to.morrow/tomorrow-promo-mobile.mp4" type="video/mp4" />
           </video>
         </div>
       </a>

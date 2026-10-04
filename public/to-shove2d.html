@@ -255,15 +255,17 @@
       .morrow-devices { padding-top: 0; }
       .hero-promo { aspect-ratio: 1920 / 1276; }
     }
-    /* Phones (Lucas): the video pushed up to the top of the page and the whole
-       240px band behind the nav, and 10% cropped off each side so the film
-       reads larger. The box is 1536 x 1320 in video px — taller than the file
-       — so cover fits the full height and crops exactly 192px a side. At 390
-       wide the film's own top sits ~61px down, its headline just under the
-       nav pill. */
+    /* Phones (Lucas): a film of their own — the VERTICAL cut (4:5, re-laid for
+       a phone rather than cropped; motion/src/PromoV.tsx), picked by the
+       <source media> in the markup. This page gets its tall version: 1080 x
+       1530, i.e. 180px of empty canvas on top, so the video starts at the top
+       of the page and runs up under the nav while the film's own captions
+       (from 122px down its frame) stay clear of it — at 390 wide the band is
+       ~65px, the first caption starts ~109px down. Shown whole: the box is the
+       file's exact shape. */
     @media (max-width: 640px) {
       .morrow-devices { padding-top: 0; }
-      .hero-promo { aspect-ratio: 1536 / 1320; }
+      .hero-promo { aspect-ratio: 1080 / 1530; }
     }
 
     /* .guide-section is a flex column with one gap for everything, so the
@@ -2785,7 +2787,12 @@
       <video class="hero-promo" autoplay loop muted playsinline preload="auto" width="1920" height="1320"
              poster="/images/to.morrow/promo-poster-hero.webp"
              aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Demnächst verschoben, dann wird eine Aufgabe live geschaltet und erscheint auf dem Sperrbildschirm">
-        <source src="/videos/to.morrow/tomorrow-promo-hero.mp4" type="video/mp4" />
+        <!-- Picked once, at load: wider than a phone gets the landscape tall cut,
+             a phone the vertical tall cut. The landscape one is FIRST so a browser
+             that ignores `media` (pre-2023 Chrome) falls back to it everywhere
+             rather than showing the portrait film on a desktop. -->
+        <source src="/videos/to.morrow/tomorrow-promo-hero.mp4" media="(min-width: 641px)" type="video/mp4" />
+        <source src="/videos/to.morrow/tomorrow-promo-mobile-hero.mp4" type="video/mp4" />
       </video>
     </div>
 

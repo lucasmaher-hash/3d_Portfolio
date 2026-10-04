@@ -1034,6 +1034,33 @@ left a light strip at the bottom; the height has to be restated (`H + ext`). The
 see more above, so during the pull-back from the pill the phone's top (status bar, "Personal")
 passes through the band for ~0.8 s; at rest it is background only.
 
+**Vertical cut — `TomorrowPromoV` (`motion/src/PromoV.tsx`), 2026-10-04 — what PHONES get (≤640px).**
+A phone version of F at **4:5, 1080×1350**, 29.5 s, same story and timing. Chosen over 9:16
+because the page does not need the whole screen (4:5 is the tallest feed format that still leaves
+room around it) and 1080 wide keeps the UI's own pixels. `PromoV.tsx` is a **copy** of Promo.tsx
+with the layout rebuilt, so the landscape film is untouched — changes to the story must be made in
+both. What differs: lists 13% larger (`PZ` 1.45), so only two fit — the wide shot frames the PAIR a
+task moves between (`panX`: Tomorrow+Soon for the first flick, Today+Tomorrow for the second, one
+eased move each, tied to the flick); the headline is stacked in two lines above the lists;
+captions sit centred ABOVE their phone (`CAM_L/R` put the phone low, `PHONE_S` 1.1), never beside
+it; the Go Live close-up is 3.9 px/pt with the camera centred on ring + words (`CL_OFF` 5) and
+the long line centred (`INS_PAN` −259); its own `CUT_FIX` {textY 0.42, ringX 0.59} — measured
+across its cut: text identical in y, 0.23px in x, ring ≤0.1px. Copy at
+`~/Desktop/tomorrow-promo-vertical-4x5.mp4`. Two web files, encoded like the landscape ones:
+- `TomorrowPromoV` (1080×1350) → `public/videos/to.morrow/tomorrow-promo-mobile.mp4` — the
+  landing tile on a phone, shown at exactly 4:5.
+- `TomorrowPromoVTall` (`PromoVTall`, `EXT_V` = 180px of empty canvas on top, 1080×1530) →
+  `tomorrow-promo-mobile-hero.mp4` — the to.morrow page's phone hero, so it runs up under the nav
+  while the film's own captions (from 122px down its frame) stay clear: at 390 wide the band is
+  ~65px and the first caption starts ~109px down, under a nav pill that ends at ~77px.
+Both pages pick the file with `<source media="(min-width: 641px)">` + a plain `<source>`: the
+LANDSCAPE source comes first, so a browser that ignores `media` (pre-2023 Chrome) falls back to
+it everywhere instead of putting the portrait film on a desktop. The pick happens once, at load.
+The posters stay the landscape ones (frame 0 is an empty canvas in both cuts). Verified over CDP:
+390 touch → `tomorrow-promo-mobile-hero.mp4` in a 390×553 box from y=1, and
+`tomorrow-promo-mobile.mp4` in a 350×438 (0.800) tile; 1440 → the landscape files as before;
+all playing, no overflow, no console errors.
+
 **Only F is the site's version.** The A–D compositions were removed from `Root.tsx` and their
 renders deleted; E stays registered (F is built on it). Their branches (`variant` B/C, the `line`
 and `golive` transitions, `TextScene`) are still inside `Promo.tsx`, unused. The variant notes
@@ -1390,9 +1417,9 @@ shows the file's bottom edge and picks how much band and side by the BOX's shape
   border and 196px of band sit under the nav (box wider than the file → cover crops the top 44
   rows). The film itself only rose ~25px at 1440.
 - **641–860px**: `16/9` with the old nav-clearing top padding — exactly the plain film.
-- **≤640px**: `aspect-ratio: 1536/1320`, `padding-top: 0` — the whole 240px band behind the nav
-  and **10% cropped off each side** (box taller than the file → cover fits the height, crops
-  192px a side). At 390 the film's headline lands just under the nav pill.
+- **≤640px**: a different file — the VERTICAL tall cut (`tomorrow-promo-mobile-hero.mp4`, see
+  "Vertical cut" above) at its own shape, `aspect-ratio: 1080/1530`, `padding-top: 0`. (Before the
+  vertical cut existed, phones got the landscape tall cut with 10% cropped off each side.)
 **Still not a `.hero`**: the nav must keep its raised shadow from the first frame. Playback is
 handed to the page's play-while-on-screen observer. Verified over CDP at 1440 (1218×809 from y=13)
 and 390 touch (390×335 from y=1): playing, looping, no overflow, no console errors.
@@ -1410,8 +1437,9 @@ the app icon there too: `.project-tile.morrow-video-tile`, **flat** (Lucas: no r
 `object-fit: cover`. The film is 16:9 and the tiles are 680/560, which would cut ~16% a side and
 clip the outer wells and the Live caption, so this tile is **3:2** (~8% a side — nothing the loop
 shows sits in that margin: wells at 14–86% of the width, captions from 15%) and a little shorter
-than its neighbours (334 vs 413px at 1440). Below 640px it is 16/10 like the default tiles (~5% a
-side), restated in that file's last 640px block because the base rule is (0,2,0). With that,
+than its neighbours (334 vs 413px at 1440). Below 640px it plays the VERTICAL cut
+(`tomorrow-promo-mobile.mp4`) at exactly **4/5**, restated in that file's last 640px block because
+the base rule is (0,2,0). With that,
 `.app-icon` / `.morrow-icon-tile` / `icon-swap` are gone site-wide (their two dark-mode selectors
 in `dark-mobile.css` too), and `/images/to.morrow/app-icon-light|dark.webp` are **orphaned on
 disk**. `/images/morrow/screen1–3.webp` were already orphaned.

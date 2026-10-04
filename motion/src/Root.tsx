@@ -2,6 +2,7 @@ import React from 'react';
 import {Composition, continueRender, delayRender, staticFile} from 'remotion';
 import {Lab, LAB_BTN, LAB_H, LAB_W, LabBox, LabButtons} from './Lab';
 import {DURATION_E, DURATION_F, EXT, FPS, LabPhone, Promo, PromoTall} from './Promo';
+import {DURATION_F as DURATION_FV, EXT_V, PromoV, PromoVTall} from './PromoV';
 import './sk.css';
 
 /* W95FA (Alina Sava, SIL OFL 1.1) — the app's chrome face. Block rendering
@@ -45,6 +46,26 @@ export const RemotionRoot: React.FC = () => (
       fps={FPS}
       width={1920}
       height={1080}
+      defaultProps={{variant: 'A' as const, transition: 'golive3' as const}}
+    />
+    {/* The VERTICAL cut (4:5) for phones — F's story re-laid, see PromoV.tsx */}
+    <Composition
+      id="TomorrowPromoV"
+      component={PromoV}
+      durationInFrames={DURATION_FV}
+      fps={FPS}
+      width={1080}
+      height={1350}
+      defaultProps={{variant: 'A' as const, transition: 'golive3' as const}}
+    />
+    {/* ...and its tall cut, the project page's phone hero: EXT_V px of canvas above */}
+    <Composition
+      id="TomorrowPromoVTall"
+      component={PromoVTall}
+      durationInFrames={DURATION_FV}
+      fps={FPS}
+      width={1080}
+      height={1350 + EXT_V}
       defaultProps={{variant: 'A' as const, transition: 'golive3' as const}}
     />
     {/* F's TALL cut — the website hero on desktop: EXT px of empty canvas above the frame */}
