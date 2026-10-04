@@ -25,7 +25,10 @@
       --text-primary: #1A1A1A;
       --text-secondary: #8E8E93;
       --text-tertiary: #c7c7cc;
-      --accent-orange: #FF5C00;
+      /* NOT orange on this page (Lucas, 2026-10-04): a mid-light greyish blue, in
+         the family of the app's own Slate accents (#3F5670 / #526D8C) but lighter.
+         The token keeps its site-wide name so every rule that reads it follows. */
+      --accent-orange: #7A92B0;
       --border-color: #6f6f6f;
 
       --shadow-raised-sm: 5px 5px 12px rgba(174,174,192,0.65), -5px -5px 12px rgba(255,255,255,1);
@@ -235,20 +238,32 @@
       height: auto;
       aspect-ratio: 16 / 9;
       background: #C7CCD4;
-      /* The file is the TALL cut (1920x1276: the 16:9 film plus 196px of empty
-         canvas on top). Below 861px the box stays 16:9 and cover + bottom
-         crops exactly that band off again, so phones see the plain film. */
+      /* The file is the TALL cut: 1920x1320, the 16:9 film plus 240px of empty
+         canvas on top. Every width shows its bottom edge (cover + bottom) and
+         chooses how much of that band and of the sides by the box's shape.
+         641–860px: 16:9, i.e. exactly the plain film again. */
       object-fit: cover;
       object-position: 50% 100%;
     }
     /* Desktop (Lucas, 2026-10-04): no empty strip between the nav and the
-       video. The video starts at the card's top border and the tall cut's
-       extra canvas fills what was padding — the film itself only rises
-       ~25px at 1440 (196 video px = 124 css px against the old 150px gap).
-       That band is background only; the nav sits over it. */
+       video. It starts at the card's top border and 196px of the band fill
+       what was padding (the box is wider than the file, so cover crops the
+       top 44 rows) — the film itself only rises ~25px at 1440 (196 video px =
+       124 css px against the old 150px gap). Background only; the nav sits
+       over it. */
     @media (min-width: 861px) {
       .morrow-devices { padding-top: 0; }
       .hero-promo { aspect-ratio: 1920 / 1276; }
+    }
+    /* Phones (Lucas): the video pushed up to the top of the page and the whole
+       240px band behind the nav, and 10% cropped off each side so the film
+       reads larger. The box is 1536 x 1320 in video px — taller than the file
+       — so cover fits the full height and crops exactly 192px a side. At 390
+       wide the film's own top sits ~61px down, its headline just under the
+       nav pill. */
+    @media (max-width: 640px) {
+      .morrow-devices { padding-top: 0; }
+      .hero-promo { aspect-ratio: 1536 / 1320; }
     }
 
     /* .guide-section is a flex column with one gap for everything, so the
@@ -1710,7 +1725,8 @@
          reads as dirt. So the two hues are re-derived from the orange itself:
          top-left gets a darker orange, bottom-right a lighter one, keeping the
          site's light-from-top-left convention. */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(168, 56, 0, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 173, 122, 1);
+      /* re-derived from this page's blue accent (#7A92B0), as the orange pair was from #FF5C00 */
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(78, 98, 124, 0.6), inset -3.25px -3.25px 6.5px rgba(176, 194, 216, 1);
     }
     .mobile-mode-btn:active:not(.is-active) {
       /* Scale is the tap feedback both toggles share. */
@@ -2766,7 +2782,7 @@
          play/pause-on-visibility script at the bottom of the file covers it
          like every other clip here. -->
     <div class="morrow-devices">
-      <video class="hero-promo" autoplay loop muted playsinline preload="auto" width="1920" height="1276"
+      <video class="hero-promo" autoplay loop muted playsinline preload="auto" width="1920" height="1320"
              poster="/images/to.morrow/promo-poster-hero.webp"
              aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Demnächst verschoben, dann wird eine Aufgabe live geschaltet und erscheint auf dem Sperrbildschirm">
         <source src="/videos/to.morrow/tomorrow-promo-hero.mp4" type="video/mp4" />

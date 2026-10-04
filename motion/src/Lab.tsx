@@ -50,3 +50,27 @@ export const LabBox: React.FC = () => (
     </div>
   </AbsoluteFill>
 );
+
+/* Centring check for the text inside the phone's buttons (dev only): each
+   control at 4x on its own band, at a known top, so the pill's centre line is
+   known exactly and the ink can be measured against it. */
+export const LAB_BTN = {z: 4, w: 1700, h: 1200, rows: [60, 340, 620, 900]};
+export const LabButtons: React.FC = () => {
+  const {z, rows} = LAB_BTN;
+  return (
+    <AbsoluteFill style={{background: DARK.canvas}}>
+      <div style={{position: 'absolute', left: 40, top: rows[0]}}>
+        <TopBar w={359} z={z} p={DARK} />
+      </div>
+      <div style={{position: 'absolute', left: 40, top: rows[1]}}>
+        <LiveControls screenW={402} z={z} p={DARK} mode="go" breath={null} hasText knob />
+      </div>
+      <div style={{position: 'absolute', left: 40, top: rows[2]}}>
+        <LiveControls screenW={402} z={z} p={DARK} mode="live" breath={1} hasText />
+      </div>
+      <div style={{position: 'absolute', left: 40, top: rows[3]}}>
+        <TabBar w={359} z={z} p={DARK} liveSelected pill={null} />
+      </div>
+    </AbsoluteFill>
+  );
+};

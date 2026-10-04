@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Easing, interpolate, spring, useCurrentFrame} from 'remotion';
-import {BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, mix, Pal, Phone, phoneScreen, PIXEL, Pixel, ROW, StatusBar, Trough, sf} from './ui';
+import {BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, mix, Pal, Phone, phoneScreen, Pixel, ROW, StatusBar, Trough, sf} from './ui';
 import {AddRow, KNOB, LiveBox, LiveControls, LockCard, TabBar, TaskRow, TopBar} from './app';
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -33,7 +33,9 @@ const H = 1080;
    background (Canvas, the dark overlays, the root fill) reaches up by `ext`,
    and the camera views see that much more above. 0 = the normal 16:9 film. */
 export const ExtTop = React.createContext(0);
-export const EXT = 196; // video px; 1920 x 1276 — see the to.morrow page's .hero-promo
+/* 240 covers the phone layout (Lucas, 2026-10-04: no gap under the nav there
+   either); desktop shows only the bottom 196 of it — see .hero-promo. */
+export const EXT = 240; // video px; 1920 x 1320
 
 /* The app's own springs (SwiftUI response/damping → stiffness/damping, m=1). */
 const SPR = {
@@ -136,6 +138,7 @@ const goLiveText = (tr: Transition) => (tr === 'golive2' ? 'Go Live' : 'go live'
    exactly as they were. */
 const PZ = 1.6 * 0.8;
 const CLOSE = (2.6 * 1.6) / PZ; // camera zoom of the close-ups (the typed name, "Go Live")
+const OPEN = CLOSE * 1.4; // the opening: "to.morrow" typed 40% larger (Lucas, 2026-10-04)
 const WELL_W = 340; // pt
 const ROW_X = 8; // pt
 const WELL_GAP = 38; // px
@@ -215,7 +218,12 @@ const INS = (() => {
   const delEnd = delStart + sum(del);
   return {at, type, typeEnd, delStart, del, delEnd, len: delEnd + 8 - at};
 })();
-const insWarp = (f0: number) => (f0 < INS.at ? f0 : f0 < INS.at + INS.len ? INS.at : f0 - INS.len);
+/* After the line is taken back, E's own hold is NOT replayed in full (Lucas:
+   "Go Live" back to the button sooner): E resumes INS_SKIP frames further on,
+   inside its still dark hold, so the button builds 12 frames after the last
+   backspace instead of 58. */
+const INS_SKIP = 46;
+const insWarp = (f0: number) => (f0 < INS.at ? f0 : f0 < INS.at + INS.len ? INS.at : f0 - INS.len + INS_SKIP);
 const insChars = (f0: number) =>
   f0 < INS.at || f0 >= INS.at + INS.len ? 0 : typedCount(f0, INS.at, INS.type) - typedCount(f0, INS.delStart, INS.del);
 /* The line grows to the right, so the camera glides left with it until ring +
@@ -309,14 +317,12 @@ const wellDepth = (well: number, g: number) =>
 /* The landing: the app's own SkeuLanding — the tab a task arrives in swells. */
 const landSwell = (well: number, g: number) => MOVES.filter((m) => m.well === well).reduce((acc, m) => acc * swell(g, m.push, m.push + 7), 1);
 
-/* The tab label, in the app's chrome face (W95FA) at the app's tab size. */
+/* The tab label, in the app's Modern face at the app's tab size. */
 const TabLabel: React.FC<{text: string; z: number; p: Pal; scale?: number}> = ({text, z, p, scale = 1}) => (
   <span
     style={{
       position: 'relative',
-      fontFamily: PIXEL,
-      fontSize: 16.4 * 1.22 * z,
-      letterSpacing: `${-0.02 * 16.4 * z}px`,
+      ...sf(16.4, z, 400, -0.02),
       color: p.ink,
       lineHeight: 1,
       display: 'inline-block',
@@ -389,7 +395,7 @@ const BarOwn: React.FC<{f: number; G: Geo; p: Pal; z: number}> = ({f, G, p, z}) 
    out inside the scaled phone, where the browser rounds to whole phone pixels
    (≈4 screen px at the cut); these were measured off rendered frames across
    the cut and are applied by transform, which is never rounded. */
-const CUT_FIX = {textY: -0.31, ringX: 0.52, ringY: 0.18};
+const CUT_FIX = {textY: 0.72, ringX: 0.52, ringY: 0.18}; // textY refit after the pill label's 0.6pt drop: matches on 0.66–0.77
 
 /* Ring + dot at breath b: full → faint and small. Its large end is the mark's
    own size (breathing past it read as big-small-big). Shared with the pill. */
@@ -465,7 +471,7 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
   const push = tr === 'golive' ? 1 + 0.07 * ease(f, GOLIVE.fade[0] - 4, GOLIVE.fade[1] + 2, Easing.in(Easing.quad)) : 1;
   const addX = wellCX(GL_WELL) - (ROW_W * z) / 2 + (ROW.touch + ROW.gap) * z; // where a new task's text starts
   const addY = slotCY(G, 1); // Today: Plan trip to Asia, then add
-  const s = lerp(Math.exp(lerp(Math.log(CLOSE), 0, out)), CLOSE, inT) * push;
+  const s = lerp(Math.exp(lerp(Math.log(OPEN), 0, out)), CLOSE, inT) * push;
   const fx = lerp(lerp(textCX, W / 2, out), addX + 26 * z, inT);
   const fy = lerp(lerp(slotCY(G, 0), G.camY, out), addY, inT);
   const camT = `translate(${W / 2 - fx * s}px, ${H / 2 - fy * s}px) scale(${s})`;
@@ -665,9 +671,9 @@ const toGlobal = (cx: number, x: number, y: number): P => [cx - PS.W / 2 + PS.x 
 const TASK = 'Bring passport';
 const LTYPE = {start: LIVE_CUT + 34, gaps: [3, 2, 3, 3, 2, 4, 3, 2, 3, 2, 3, 3, 2, 3]};
 const LTYPE_END = LTYPE.start + LTYPE.gaps.reduce((a, b) => a + b, 0);
-const GO = LIVE_CUT + 86; // tap "Go" — the task goes live
+const GO = LIVE_CUT + 107; // tap "Go" — the task goes live (0.7 s after the last letter — Lucas)
 const ARRIVE = GO + 40;
-const TICK = ARRIVE + 66;
+const TICK = ARRIVE + 81; // ticked off on the Lock Screen (0.5 s later than at first — Lucas)
 const OFF_AIR = TICK + 26;
 
 /* the app screen, 390pt wide */
@@ -974,7 +980,7 @@ const checkScreen = toScreen(toGlobal(PR_CX, CHECK_C[0], CHECK_C[1]), camAt(FLOO
 // clock0: the Live box is still EMPTY when the phone is revealed — "Bring passport" is typed after (Lucas)
 const E = {cut: E_CUT, hold: 60 + E_SETTLE, clock0: LIVE_CUT + 30, zoom: [8 + E_SETTLE, 56 + E_SETTLE] as [number, number]};
 export const DURATION_E = FLOOD.end - E.clock0 + E.cut + E.hold + 1;
-export const DURATION_F = DURATION_E + INS.len;
+export const DURATION_F = DURATION_E + INS.len - INS_SKIP;
 const eClock = (f0: number) => E.clock0 + Math.max(0, f0 - E.cut - E.hold);
 const LABEL_W = 52.9; // pt — "Go Live" in the ROW setting (SF Pro Text Regular 16.4pt, −0.05em); refit off the rendered cut
 /* The anchor: the left edge of the pill's label, in world px. */
@@ -1086,3 +1092,14 @@ export const PromoTall: React.FC<{variant: Variant; transition?: Transition}> = 
     </AbsoluteFill>
   </ExtTop.Provider>
 );
+
+/* Dev only (not in the film): the Live section's phone exactly as the film
+   renders it, with the camera parked on one control at 4 screen px per pt —
+   for measuring how the labels sit in their buttons. */
+export const LabPhone: React.FC<{at: 'top' | 'pill' | 'tab'; live?: boolean}> = ({at, live = false}) => {
+  const y = at === 'top' ? 54 + 44.4 / 2 : at === 'pill' ? CTRL_Y + 44.4 / 2 : 844 - 34 - 51 / 2;
+  const x = at === 'top' ? 90 : SCREEN_W / 2;
+  const g = toGlobal(PL_CX, x, y);
+  // clear of the finger (go) and of the go-live ripples (live)
+  return <LiveScene f={live ? GO + 125 : GO - 30} camOv={{s: 4 / PS.z, fx: g[0], fy: g[1]}} forceGo={!live} />;
+};

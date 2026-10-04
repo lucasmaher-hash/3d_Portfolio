@@ -1,5 +1,5 @@
 import React from 'react';
-import {BOX_LEFT, BOX_NUDGE, CheckRing, CIRCLE_LINE, Glass, GLYPH, Grip, LiveGlyph, Pal, PIXEL, Pixel, ROW, Trough, rgba, mix, mixHex, sf} from './ui';
+import {BOX_LEFT, BOX_NUDGE, CheckRing, CIRCLE_LINE, Glass, GLYPH, Grip, LiveGlyph, Pal, Pixel, ROW, Trough, rgba, mix, mixHex, sf} from './ui';
 
 /* ─────────────────────────────────────────────────────────────────────────
    The app's screens' building blocks, at the app's own metrics. Every size
@@ -165,9 +165,8 @@ export const TabBar: React.FC<{
               <span
                 style={{
                   position: 'relative',
-                  fontFamily: PIXEL,
-                  fontSize: 16.4 * 1.22 * z,
-                  letterSpacing: `${-0.02 * 16.4 * z}px`,
+                  // Modern face: skeuSegmentLabel = SkeuFont.at(16.4), tracking −0.02
+                  ...sf(16.4, z, 400, -0.02),
                   color: p.ink,
                   lineHeight: 1,
                 }}
@@ -188,7 +187,11 @@ export const TopBar: React.FC<{w: number; z: number; p: Pal}> = ({w, z, p}) => {
   return (
     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: w * z}}>
       <Glass h={rowH} z={z} p={p} radius={rowH / 2} style={{height: rowH * z, padding: `0 ${14.8 * z}px`, display: 'flex', alignItems: 'center', gap: 12.2 * z}}>
-        <span style={{position: 'relative', fontFamily: PIXEL, fontSize: 19.7 * 1.22 * z, letterSpacing: `${-0.02 * 19.7 * z}px`, color: p.ink, lineHeight: 1}}>
+        {/* the app's Modern face (Lucas, 2026-10-04: no pixel type in the video) —
+            SkeuFont.at(label) with the workspace pill's −0.02 tracking */}
+        {/* +0.45pt: measured in the film, the word sat that much above the pill's
+            centre (Lucas: "a bit too high") — a transform, so nothing re-rounds */}
+        <span style={{position: 'relative', ...sf(19.7, z, 400, -0.02), color: p.ink, lineHeight: 1, transform: `translateY(${0.45 * z}px)`}}>
           Personal
         </span>
         <svg width={10.8 * z} height={6.3 * z} viewBox="0 0 10.8 6.3" style={{position: 'relative'}}>
@@ -294,7 +297,9 @@ export const LiveControls: React.FC<{
               ...label,
               // −0.72pt: inside the scaled phone the label's line box rounds 3px lower on screen
               // than the same words in the list — measured across the cut and taken back here
-              ...(knob ? {...sf(ROW.label, z, 400, -0.02), top: -0.54 * z} : {}),
+              // +0.6pt (transform): it sat ~0.4–0.9pt above the pill's centre in the
+              // film (Lucas: "a bit too high"); the words on the swipe side moved with it (CUT_FIX)
+              ...(knob ? {...sf(ROW.label, z, 400, -0.02), top: -0.54 * z, transform: `translateY(${0.6 * z}px)`} : {}),
               color: p.ink,
             }}
           >

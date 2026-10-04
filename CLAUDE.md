@@ -984,29 +984,59 @@ not read. Same dimensions as the source, so the `data-vid="homepage"` placement 
 
 ## to.morrow promo loop (`motion/`, Remotion)
 
-A silent, seamlessly looping motion graphic — **the hero of the to.morrow page since
-2026-10-04** (see "to.morrow page" below) — **25.6 s, 1920×1080, 30 fps**, built in
-**Remotion 4** in its own folder `motion/` (own `package.json`, outside `public/`, so nothing in
-it deploys). `cd motion && npm run studio` to preview, `npm run render` renders the master
-(`TomorrowPromoE`, CRF 16) to `motion/out/promoE.mp4`. The web encode is
-`ffmpeg -i out/promoE.mp4 -c:v libx264 -crf 22 -preset slow -pix_fmt yuv420p -movflags +faststart -an`
-→ `public/videos/to.morrow/tomorrow-promo.mp4` (~1.3 MB), and its first frame is the poster,
-`public/images/to.morrow/promo-poster.webp` — **re-make both after every re-render**. Review
-renders also go to `~/Downloads/tomorrow-promo-E-go-live-button.mp4`.
+A silent, seamlessly looping motion graphic — **the hero of the to.morrow page and its tile on
+the landing page since 2026-10-04** — **29.5 s, 30 fps**, built in **Remotion 4** in its own
+folder `motion/` (own `package.json`, outside `public/`, so nothing in it deploys).
+`cd motion && npm run studio` to preview.
 
-**`TomorrowPromoF` — an alternate, review only (2026-10-04), NOT on the page.** E plus one beat in
-the dark hold: "Go Live" alone for a moment, then " on important tasks" typed onto it letter by
-letter, read (1 s), backspaced away, and E carries on — 126 frames longer (29.8 s). Built as a
-**time warp of E** (`INS`, `insWarp` in Promo.tsx): the scene is frozen at `INS.at` for
-`INS.len` frames (under the dark nothing moves) and every later frame is E's frame minus
-`INS.len`, so nothing existing is retimed; the ring breathes on REAL time (`ext.bf`) so it never
-stalls, and the cut still measures ring 0.1px / text 0.25px. While the line is long the dark
-layer glides left (`INS_PAN` −189px, measured so ring + full line sit centred) and back as it is
-deleted. Review copy: `~/Downloads/tomorrow-promo-F-important-tasks.mp4`.
+**The site's version is `TomorrowPromoF`** (Lucas, 2026-10-04), in two cuts:
+- `TomorrowPromoF` — 1920×1080 → `public/videos/to.morrow/tomorrow-promo.mp4` (landing tile),
+  poster `promo-poster.webp`; also the review copy `~/Downloads/tomorrow-promo-F-important-tasks.mp4`.
+- `TomorrowPromoFTall` — the same film with **`EXT` = 240px of empty canvas on top**, 1920×1320 →
+  `tomorrow-promo-hero.mp4` (the page hero), poster `promo-poster-hero.webp`. See "Tall cut" below.
+Render each (`npx remotion render <id> out/<name>.mp4 --crf=16`), web-encode with
+`ffmpeg -i <master> -c:v libx264 -crf 22 -preset slow -pix_fmt yuv420p -movflags +faststart -an`,
+and **re-make both posters (first frame) after every re-render**. (zsh does not word-split a
+`$VAR` holding those flags — write them out.)
 
-**Only E is registered as the site's version** (Lucas picked it, 2026-10-04). The A–D compositions were
-removed from `Root.tsx` and their renders deleted; their branches (`variant` B/C, the `line` and
-`golive` transitions, `TextScene`) are still inside `Promo.tsx`, unused. The variant notes
+**F = E plus one beat in the dark hold**: "Go Live" alone for a moment, then " on important
+tasks" typed onto it letter by letter, read (1 s), backspaced away. Built as a **time warp of E**
+(`INS`, `insWarp` in Promo.tsx): the scene is frozen at `INS.at` for `INS.len` frames (under the
+dark nothing moves); afterwards E resumes **`INS_SKIP` = 46 frames further on** inside its own
+still dark hold, so the button builds 12 frames after the last backspace instead of 58 (Lucas:
+smoother). The ring breathes on REAL time (`ext.bf`) so it never stalls. While the line is long
+the dark layer glides left (`INS_PAN` −189px, measured so ring + full line sit centred) and back.
+
+**Retimed and re-set 2026-10-04 (all in E's shared code, so E and F both carry it):**
+- `GO` = `LIVE_CUT + 107` (was +86): 0.7 s more between "Bring passport" and the tap.
+- `TICK` = `ARRIVE + 81` (was +66): the Lock Screen tick comes 0.5 s later.
+- `OPEN` = `CLOSE × 1.4`: the opening's typed "to.morrow" is 40% larger; the Go Live close-up
+  keeps `CLOSE`.
+- **No pixel type in the film**: the workspace pill and the tab labels are SF now, as in the
+  app's Modern face (`SkeuFont.at(label)`: 19.7 / 16.4pt regular, −0.02 tracking).
+- **Button labels re-centred** (Lucas: "sits a bit too high"). Measured in the film (`LabPhone`,
+  the phone exactly as rendered with the camera parked at 4 px/pt, plus a 4× still of a film
+  frame): "Personal" sat ~0.45pt and "Go Live" ~0.4–0.9pt above their pills' centres; "Live" and
+  the tab labels were centred. Both are lowered by a transform (not `top`, which re-rounds in phone
+  px): Personal +0.45pt, Go Live +0.6pt — and because "Go Live" must land on the typed words at
+  the cut, the words on the swipe side moved with it: **`CUT_FIX.textY` 0.72** (matches on
+  0.66–0.77; text snaps to whole px, so it is a plateau, not a point). Re-measured across the cut:
+  text identical in y, 0.25px in x; ring ≤0.3px.
+- `LabButtons` / `LabPhone` are dev-only compositions for exactly this kind of measuring.
+
+**Tall cut (`PromoTall`, `ExtTop`, `EXT`).** The hero runs up under the nav, so the film needs
+canvas above its frame. Nothing is placed there: the scene keeps its 1920×1080 box, placed `EXT`
+down, and every full-frame background reaches up by `EXT` itself — `Canvas` (its gradient
+rewritten in px against the ORIGINAL frame so the frame is pixel-identical, mean diff <0.1/255 vs
+the 16:9 cut), the dark overlay of the dark hold and `rv.frame`'s overlay. **Remotion's
+`AbsoluteFill` is `height: 100%`, not `bottom: 0`** — `top: -ext` alone just slid each box up and
+left a light strip at the bottom; the height has to be restated (`H + ext`). The cameras simply
+see more above, so during the pull-back from the pill the phone's top (status bar, "Personal")
+passes through the band for ~0.8 s; at rest it is background only.
+
+**Only F is the site's version.** The A–D compositions were removed from `Root.tsx` and their
+renders deleted; E stays registered (F is built on it). Their branches (`variant` B/C, the `line`
+and `golive` transitions, `TextScene`) are still inside `Promo.tsx`, unused. The variant notes
 below are history.
 
 **Ground truth is the app's own source, not the `shove95-*.md` CSS ports.** The SwiftUI project
@@ -1044,9 +1074,9 @@ side-by-sides). Things that comparison caught, all of which the md ports had wro
   pixels and the core did not, so the dot sat visibly off-centre at button size.
 - The Live box is a **trough** (recessed, `refH 64, fillStop .26, shadeScale .65, fillLift .55`),
   not a raised card; the pill reads **"Go"** while typing, then **"Live"** with the accent glyph
-  and the whole content pulsing (SkeuPulse); the tab labels are W95FA, the rest of the phone UI
-  is system type.
-- **W95FA is rendered WITH antialiasing**, like every other text (2026-10-04, Lucas: "the pixel
+  and the whole content pulsing (SkeuPulse); since 2026-10-04 ALL phone UI type is system (SF) —
+  the tab labels and workspace pill used to be W95FA.
+- *(History — W95FA has since left the film.)* **W95FA was rendered WITH antialiasing** (Lucas: "the pixel
   font isn't quite right"). It used to carry `WebkitFontSmoothing: 'none'`, which looks crisp at
   3× but at the video's ~1.15 px/pt rounds every font-pixel to 1 or 2 px, so "Personal" and the
   tab labels came out visibly bold and lumpy. iOS draws this face grayscale-antialiased like any
@@ -1346,33 +1376,45 @@ existing theme (`.color-slot--extra`, `aria-hidden`, empty `alt`) — `display: 
 640px, so the desktop fan is still the four themes the `aria-label` names.
 
 **Hero: the promo loop (2026-10-04).** `.morrow-devices` holds one `<video class="hero-promo">`
-(autoplay, muted, loop, playsinline, poster = the loop's first frame) of
-`/videos/to.morrow/tomorrow-promo.mp4` — see "to.morrow promo loop" above for how it is made.
-It replaced the app icon that shoved across the column, and **the title's shove went with it**:
-`.morrow-shove`, `@keyframes morrow-shove`, the `--shove-x`/icon-width script, `.app-icon` /
-`.app-icon-dark` / `@keyframes icon-fade` and their reduced-motion lines are all deleted; the
-title is a plain `.title-row` like every other project page. It sits **flush and full frame**
-(Lucas — a rounded, raised card was tried first and rejected): `.morrow-devices` has no horizontal
-padding, so the video runs edge to edge between the page-wrapper's border lines (111 → 1329 at
-1440) and edge to edge of the screen below 860px, where those borders go; `aspect-ratio: 16/9`,
-no radius, no shadow. **Still not a `.hero`**: the video's headline sits near its top edge, so it must not run under the nav the way
-the other project pages' full-bleed heroes do; `.morrow-devices`' top padding clears the bar, and
-with no `.hero` the nav keeps its raised shadow from the first frame. Playback is handed to the
-page's existing play-while-on-screen observer like every other clip. Verified over CDP at 1440
-(1058×595, title right under it) and 390 touch (350×197): playing, looping, no overflow, no
-console errors (re-checked after the flush change: video box = wrapper inner box at both).
+(autoplay, muted, loop, playsinline, poster = the loop's first frame) of the TALL cut,
+`/videos/to.morrow/tomorrow-promo-hero.mp4` (1920×1320: the film plus 240px of empty canvas on
+top — see "to.morrow promo loop" above). It replaced the app icon that shoved across the column,
+and **the title's shove went with it**: `.morrow-shove`, `@keyframes morrow-shove`, the
+`--shove-x`/icon-width script, `.app-icon` / `.app-icon-dark` / `@keyframes icon-fade` and their
+reduced-motion lines are all deleted; the title is a plain `.title-row` like every other project
+page. **Flush and full frame** (Lucas — a rounded, raised card was tried first and rejected): no
+horizontal padding, edge to edge between the page-wrapper's border lines (111 → 1329 at 1440) and
+of the screen below 860px. Always `object-fit: cover; object-position: 50% 100%` — every width
+shows the file's bottom edge and picks how much band and side by the BOX's shape:
+- **≥861px**: `aspect-ratio: 1920/1276`, `padding-top: 0` — the video starts at the card's top
+  border and 196px of band sit under the nav (box wider than the file → cover crops the top 44
+  rows). The film itself only rose ~25px at 1440.
+- **641–860px**: `16/9` with the old nav-clearing top padding — exactly the plain film.
+- **≤640px**: `aspect-ratio: 1536/1320`, `padding-top: 0` — the whole 240px band behind the nav
+  and **10% cropped off each side** (box taller than the file → cover fits the height, crops
+  192px a side). At 390 the film's headline lands just under the nav pill.
+**Still not a `.hero`**: the nav must keep its raised shadow from the first frame. Playback is
+handed to the page's play-while-on-screen observer. Verified over CDP at 1440 (1218×809 from y=13)
+and 390 touch (390×335 from y=1): playing, looping, no overflow, no console errors.
 
-**The landing tile on `2D.html` is the same loop** (2026-10-04, replacing the app icon there
-too): `.project-tile.morrow-video-tile`, on the raised plate every other tile uses, the `<video>`
-absolutely filling it with `object-fit: cover`. The film is 16:9 and the tiles are 680/560, which
-would cut ~16% a side and clip the outer wells and the Live caption, so this tile is **3:2**
-(~8% a side — nothing the loop shows sits in that margin: wells at 14–86% of the width, captions
-from 15%) and a little shorter than its neighbours (334 vs 413px at 1440). Below 640px it is
-16/10 like the default tiles (~5% a side), restated in that file's last 640px block because the
-base rule is (0,2,0). Verified over CDP at 1440 and 390: playing, ratios 1.5 / 1.6, no overflow,
-no errors. With that, `.app-icon` / `.morrow-icon-tile` / `icon-swap` are gone site-wide (their
-two dark-mode selectors in `dark-mobile.css` too), and `/images/to.morrow/app-icon-light|dark.webp`
-are **orphaned on disk**. `/images/morrow/screen1–3.webp` were already orphaned.
+**The page's accent is NOT orange** (Lucas, 2026-10-04): `--accent-orange` is redefined on this
+page to **`#7A92B0`**, a mid-light greyish blue in the family of the app's Slate accents
+(`#3F5670` / `#526D8C`) — step badges, meta labels, the glance dots, the scroll dots, the mobile
+menu's selected 2D/3D segment (whose inset shadow pair was re-derived from the blue, as it had been
+from the orange). The token keeps its site-wide name so every rule follows; the nav iframe is a
+separate document and is untouched.
+
+**The landing tile on `2D.html` is the same loop** (the 16:9 cut, `tomorrow-promo.mp4`), replacing
+the app icon there too: `.project-tile.morrow-video-tile`, **flat** (Lucas: no raised plate —
+`box-shadow: none`; the other tiles' 16px corners stay), the `<video>` absolutely filling it with
+`object-fit: cover`. The film is 16:9 and the tiles are 680/560, which would cut ~16% a side and
+clip the outer wells and the Live caption, so this tile is **3:2** (~8% a side — nothing the loop
+shows sits in that margin: wells at 14–86% of the width, captions from 15%) and a little shorter
+than its neighbours (334 vs 413px at 1440). Below 640px it is 16/10 like the default tiles (~5% a
+side), restated in that file's last 640px block because the base rule is (0,2,0). With that,
+`.app-icon` / `.morrow-icon-tile` / `icon-swap` are gone site-wide (their two dark-mode selectors
+in `dark-mobile.css` too), and `/images/to.morrow/app-icon-light|dark.webp` are **orphaned on
+disk**. `/images/morrow/screen1–3.webp` were already orphaned.
 
 **App Store badges.** The **icon beside the App Store badge at the foot of the page is gone** —
 so `.appstore-row` is the badge alone. A **second copy of the badge sits above At a
