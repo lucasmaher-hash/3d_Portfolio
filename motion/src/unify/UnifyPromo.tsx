@@ -287,7 +287,8 @@ export const TimetableScene: React.FC<{f: number}> = ({f}) => {
     const at = course === 'CAD Modeling' ? T.PEOPLE_C : course === 'break' ? T.PEOPLE_B : course === 'Book Club' ? T.PEOPLE_M : -1;
     return at < 0 ? 0 : sp(f, at + i * 5, 'bouncy');
   };
-  const blockT = (i: number) => (i === 0 ? 1 : sp(f, T.CARD_IN0 + 4 + i * 6, 'soft'));
+  // all three sections (courses, break, activity) appear together, fading in with the card itself (Lucas)
+  const blockT = () => 1;
   const expandT = (course: string) => (course === 'CAD Modeling' ? growC(f) : course === 'break' ? growB(f) : course === 'Book Club' ? growM(f) : 0);
   const emilOpen = ease(f, T.TAP_EMIL + 1, T.TAP_EMIL + 12, Easing.inOut(Easing.quad));
 

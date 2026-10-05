@@ -32,7 +32,11 @@ export const UNIFY_EXT_V = 180;
 
 /* Where each stage sits in the frame: the subject's stage point → its frame point. */
 const CHAT = {dx: VW / 2 - W / 2, dy: 675 - H / 2}; // the phone centred
-const TT_DY = 800 - H / 2; // the timetable's focus point, under its caption
+const TT_DY = 800 - H / 2; // the timetable's focus point, under its caption (the overview)
+/* At the detail stops the focus sits a tenth of the frame higher (Lucas: less gap
+   between a caption and what it describes); it moves up with the first zoom, so the
+   overview card, the blob's landing and the captions stay where they were. */
+const TT_NUDGE = VH / 10;
 const CN = {dx: VW / 2 - LEFT3, dy: 780 - H / 2}; // the connect card, then the customize character
 const MAP = {dx: VW / 2 - W / 2, dy: 675 - H / 2}; // the map, and the phone that closes round it (= the chat's phone)
 
@@ -74,9 +78,8 @@ const CAP_TT_Y = 230;
 const CAP_Y = 300;
 /* The wash under the timetable's captions (Lucas, 2026-10-05), in frame px:
    an even 0.93 over the top 270px (the caption sits on it), fading out by 525.
-   That reaches the overview card's days row (top ~416), so the wash only comes
-   in with the first zoom (ttWash): over the overview nothing sits above the
-   card to cover, and Lucas wanted that row clear.
+   It would reach the card's days row at the overview and the days stop, so it
+   only comes in with the move to the course stop (ttWash).
    Dialled in with wash-tuner/ at the repo root. `ext` (the tall cut's band
    above) stays at `top`. */
 export const TT_WASH: Wash = {start: 270, end: 525, top: 0.93, curve: 0.85}; // Lucas, from wash-tuner/
@@ -105,8 +108,10 @@ export const UnifyPromoV: React.FC<{tune?: boolean}> = ({tune}) => {
   const ttDx = VW / 2 - ttCx(f) + ROOM_DX * room;
   const boost = boostAt(f);
   // a dark wash under the timetable's captions: the page runs on above the camera's point.
-  // It comes in with the first zoom, so the overview card is never under it.
-  const ttWash = ease(f, T.ZOOM_TOP[0], T.ZOOM_TOP[1]) * (1 - ease(f, T.TT_OUT, T.TT_OUT + 14));
+  // It comes in with the move to the course stop — the first stop where the page runs up
+  // under the caption; at the overview and the days stop the card's top is below the text,
+  // and the wash would only darken the days row (Lucas wanted that row clear).
+  const ttWash = ease(f, T.ZOOM_COURSES[0], T.ZOOM_COURSES[1]) * (1 - ease(f, T.TT_OUT, T.TT_OUT + 14));
 
   // the ending, as the landscape film's
   const k = Math.exp(Math.log(6) * (1 - ease(f, T.FRAME0, T.FRAME1, Easing.inOut(Easing.cubic))));
@@ -133,7 +138,7 @@ export const UnifyPromoV: React.FC<{tune?: boolean}> = ({tune}) => {
 
         {/* 2 — the shared timetable, caption above */}
         {f >= T.CARD_IN0 && f < T.TT_OUT + 16 ? (
-          <Stage dx={ttDx} dy={TT_DY}>
+          <Stage dx={ttDx} dy={TT_DY - TT_NUDGE * ease(f, T.ZOOM_TOP[0], T.ZOOM_TOP[1], Easing.inOut(Easing.cubic))}>
             <div style={{position: 'absolute', inset: 0, transform: boost !== 1 ? `scale(${boost})` : undefined, transformOrigin: `${ttCx(f)}px ${H / 2}px`}}>
               <TimetableScene f={f} />
             </div>
