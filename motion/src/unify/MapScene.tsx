@@ -88,8 +88,12 @@ const XB = layoutWords(WB);
    burst starting where the vertical customize puts the character, and the
    caption on two lines ("locate your friends" / "on campus"). */
 type Pt = [number, number];
-export type MapLayout = {panC: Pt; pan0: Pt; pan1: Pt; full: {s: number; c: Pt; at: Pt}; start: Pt; capY: number; xa: number[]; ya: number[]; xb: number[]};
-const LAYOUT_H: MapLayout = {panC: PAN_C, pan0: PAN0, pan1: PAN1, full: FULL, start: [LEFT3, H / 2], capY: CAP_Y, xa: XA, ya: XA.map(() => CAP_Y), xb: XB};
+/* `wash`: the cream wash under the caption, in stage y — solid down to `solid`,
+   clear by `end`. The film's: 150 → 330 (its one-line caption already sits in
+   the fade). The vertical cut's (Lucas, 2026-10-05): solid only at the frame's
+   top and three times the fade, so the two-line caption sits IN it. */
+export type MapLayout = {panC: Pt; pan0: Pt; pan1: Pt; full: {s: number; c: Pt; at: Pt}; start: Pt; capY: number; xa: number[]; ya: number[]; xb: number[]; wash: {solid: number; end: number; eased?: boolean}};
+const LAYOUT_H: MapLayout = {panC: PAN_C, pan0: PAN0, pan1: PAN1, full: FULL, start: [LEFT3, H / 2], capY: CAP_Y, xa: XA, ya: XA.map(() => CAP_Y), xb: XB, wash: {solid: 150, end: 330}};
 const XA_V = [...layoutWords(WA.slice(0, 3)), ...layoutWords(WA.slice(3))];
 const CAP_Y_V = -30;
 export const MAP_V: MapLayout = {
@@ -102,6 +106,17 @@ export const MAP_V: MapLayout = {
   xa: XA_V,
   ya: [CAP_Y_V, CAP_Y_V, CAP_Y_V, CAP_Y_V + CAP_FS * 1.05, CAP_Y_V + CAP_FS * 1.05],
   xb: XB,
+  wash: {solid: -135, end: -135 + 540, eased: true}, // frame top → 540px down
+};
+
+/* the cream wash's gradient; `o` is the stage y 0 measured from the wash's own top */
+const washBg = (w: MapLayout['wash'], o: number) => {
+  const c = '249,242,235';
+  const a = o + w.solid;
+  const b = o + w.end;
+  return w.eased
+    ? `linear-gradient(rgba(${c},1) ${a}px, rgba(${c},.62) ${a + (b - a) * 0.3}px, rgba(${c},.27) ${a + (b - a) * 0.62}px, rgba(${c},0) ${b}px)`
+    : `linear-gradient(rgba(${c},1) ${a}px, rgba(${c},0) ${b}px)`;
 };
 
 type TL = {BOOM: number; COURSES: number; LOOP0: number; FRAME0: number; FRAME1: number; END: number};
@@ -209,7 +224,7 @@ export const CampusMap: React.FC<{f: number; T: TL; charW: number; finalChar: Ch
       {nodes}
       {/* a cream wash at the top keeps the caption clear of the map passing under it
           (gone once the caption is: inside the phone it would fade the top room) */}
-      <div style={{position: 'absolute', left: -BLEED, right: -BLEED, top: -ext - BLEED, height: 330 + ext + BLEED, background: `linear-gradient(${CREAM} ${ext + BLEED + 150}px, rgba(249,242,235,0))`, opacity: ease(f, T.BOOM + 20, T.BOOM + 34) * (1 - ease(f, T.FRAME0, T.FRAME0 + 24))}} />
+      <div style={{position: 'absolute', left: -BLEED, right: -BLEED, top: -ext - BLEED, height: layout.wash.end + ext + BLEED, background: washBg(layout.wash, ext + BLEED), opacity: ease(f, T.BOOM + 20, T.BOOM + 34) * (1 - ease(f, T.FRAME0, T.FRAME0 + 24))}} />
       <div style={{position: 'absolute', inset: 0, fontFamily: NUNITO, fontWeight: 800, fontSize: CAP_FS, lineHeight: 1, letterSpacing: 0, color: DARK}}>
         {f < morph + 12 ? word('locate', XA[0], wordAnim(f, capIn, morph), 'a0') : null}
         {word('your', yourX, wordAnim(f, capIn + 3, capOut + 2), 'your')}

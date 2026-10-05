@@ -2,7 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Easing, useCurrentFrame} from 'remotion';
 import {CampusMap} from './MapScene';
 import {Character, CharId, viewBox} from './Character';
-import {ChatScene, SUCK} from './ChatScene';
+import {ChatScene, OPEN, SUCK} from './ChatScene';
 import {ConnectCard, friendFigure, MC, MonsterCard, PANEL_H, PANEL_W} from './Connect';
 import {APP, clamp01, CREAM, DARK, ease, ExtTop, fullBg, H, lerp, NUNITO, PINK, POPB, sp, W, wordAnim} from './lib';
 import {PhoneFrameClose, SCREEN_H, SCREEN_W} from './Chat';
@@ -113,6 +113,13 @@ T.BLACK1 = T.BLACK0 + 16;
 T.LOOP0 = T.FRAME0; // (the map caption leaves as the frame starts closing)
 T.END = T.BLACK1 + 8;
 export const UNIFY_DURATION = T.END;
+/* Every cut STARTS ON THE CHAT (Lucas, 2026-10-05), not on the black phone:
+   the file's frame 0 is the film's frame FILM_START, the opener just in, and
+   the film's own first frames — the black screen waking, the opener easing
+   in — play at the END of the file, from where they loop straight into its
+   start. The film's timeline (T) is unchanged; only where the file begins. */
+export const FILM_START = OPEN + 14;
+export const useFilmFrame = () => (useCurrentFrame() + FILM_START) % UNIFY_DURATION;
 
 /* ── Layout ─────────────────────────────────────────────────────────────── */
 export const LEFT3 = W / 3; // the connect card and the character sit on the left third line
@@ -454,7 +461,7 @@ export const FINAL_CHAR = CYCLE[CYCLE.length - 1][0];
 
 /* ═══ The film ═════════════════════════════════════════════════════════════ */
 export const UnifyPromo: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useFilmFrame();
   const ext = React.useContext(ExtTop);
   const tile = React.useContext(TileCut);
   // the tile cut: the timetable scene eases left with its slide, which evens its margins there,

@@ -197,11 +197,15 @@ export const ChatScene: React.FC<{
   cardBox: {x: number; y: number; w: number; h: number; r: number};
   cardIn: [number, number];
   vertical?: boolean;
-}> = ({f, cardBox, cardIn, vertical}) => {
+  /* the widest the 3x opener may be: the vertical frame is narrower than it */
+  maxW?: number;
+}> = ({f, cardBox, cardIn, vertical, maxW = Infinity}) => {
   const sucking = f >= SUCK.INHALE;
   const phone = sucked(f, CHAT_C, 0, 1, 999);
   const els: React.ReactNode[] = [];
 
+  /* the opener's size: 3x, or as much as fits (the page's rule: min(3, width * .92 / bubble)) */
+  const K0 = Math.min(3, maxW / msgW(MSGS[0]));
   /* the column */
   MSGS.forEach((m, i) => {
     const right = isRight(m);
@@ -209,7 +213,7 @@ export const ChatScene: React.FC<{
       // the opener alone: 3x, set as layout (not scaled), centred on the screen —
       // in the same right-aligned box the move below starts from, so nothing jumps
       if (f < OPEN) return;
-      const k = 3;
+      const k = K0;
       const t = ease(f, OPEN, OPEN + 14, Easing.bezier(0.2, 0.9, 0.3, 1));
       els.push(
         <div key="m0" style={{position: 'absolute', left: CHAT_C[0] - BFS * k * 0.21, top: CHAT_C[1], transform: 'translate(-50%, -50%)'}}>
@@ -229,8 +233,8 @@ export const ChatScene: React.FC<{
     if (i === 0 && f < MOVE + MOVE_LEN) {
       // FLIP: from the big centred bubble to its own place, type set at every size
       const t = ease(f, MOVE, MOVE + MOVE_LEN, Easing.bezier(0.5, 0, 0.2, 1));
-      k = lerp(3, 1, t);
-      const tail = BFS * 3 * 0.21 * -1;
+      k = lerp(K0, 1, t);
+      const tail = BFS * K0 * 0.21 * -1;
       cx = lerp(CHAT_C[0] + tail, cx, t);
       cy = lerp(CHAT_C[1], cy, t);
     }

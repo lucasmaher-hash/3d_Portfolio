@@ -1344,13 +1344,26 @@ for the tall frame (`ChatScene vertical`, 4x7 minus the column), the map its own
 (`MAP_V`: pan path keeping "you" in shot, pull-out at 0.3 px/unit, burst starting where the
 vertical customize puts the character, caption on two lines "locate your friends" / "on campus").
 Hand-offs agree by construction: connect card → dive → customize character → burst all at frame
-(540, 780); chat phone and the closing phone at (540, 675).
+(540, 780); chat phone and the closing phone at (540, 675). The 3x opener is capped at 90% of the
+frame's width (`ChatScene maxW`, the page's own min(3, width/bubble) rule) — at 3x it was 1131px
+in a 1080 frame. The washes under the captions (dark on the timetable, cream on the map) are
+solid only at the frame's very top and fade over 420 / 540px with eased stops, so the captions
+sit IN the fade (Lucas: under the text only a little darkened, more solid toward the top) and
+the timetable's wash is gone before the overview card's days row.
+
+**Every cut starts on the chat** (Lucas, 2026-10-05): `useFilmFrame()` maps the file's frame to
+the film's `(f + FILM_START) % duration`, `FILM_START` = the opener just in (frame 26), so the
+black-screen wake plays at the END of each file and loops straight into its start; T is
+unchanged. The posters are that frame 0 (the opener on the phone); phones get the vertical cut's
+own first frame as poster (`promo-poster-mobile.webp` / `-mobile-hero.webp`, swapped in by a
+two-line script after each `<video>`), since the landscape one cover-cropped would cut the
+bubble.
 
 **Every new version goes onto all of them** (Lucas): render `UnifyPromo` (review copy),
 `UnifyPromoTall`, `UnifyPromoTile`, `UnifyPromoV` and `UnifyPromoVTall`; re-encode the last four
 (`unify-promo-hero.mp4`, `unify-promo-tile.mp4`, `unify-promo-mobile.mp4`,
-`unify-promo-mobile-hero.mp4`); re-make the hero and tile posters (frame 0; the phone files reuse
-the landscape posters, as on to.morrow).
+`unify-promo-mobile-hero.mp4`); re-make all four posters from each file's frame 0 (`promo-poster-hero`, `-tile`, `-mobile`,
+`-mobile-hero`).
 
 **Ground truth is the final pink app's own code, `~/TEMP/Unify/web/`** (static HTML/CSS/JS,
 Nunito, `--pink #FF88C8 / --dark #292925 / --cream #F9F2EB`; design notes in

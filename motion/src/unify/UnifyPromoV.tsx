@@ -1,11 +1,11 @@
 import React from 'react';
-import {AbsoluteFill, Easing, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Easing} from 'remotion';
 import {PhoneFrameClose, SCREEN_H, SCREEN_W} from './Chat';
 import {ChatScene} from './ChatScene';
 import {CampusMap, MAP_V} from './MapScene';
 import {APP_W, MapAppUI} from './MapUI';
 import {CREAM, DARK, ease, ExtTop, H, NUNITO, PINK, W, wordAnim} from './lib';
-import {charWidth, ConnectScene, CustomizeChar, CYCLE, FINAL_CHAR, LEFT3, T, TimetableScene, TT_CAPS, TT_SIL, ttCx} from './UnifyPromo';
+import {charWidth, ConnectScene, CustomizeChar, CYCLE, FINAL_CHAR, LEFT3, T, TimetableScene, TT_CAPS, TT_SIL, ttCx, useFilmFrame} from './UnifyPromo';
 
 /* ─────────────────────────────────────────────────────────────────────────
    Unify — the VERTICAL cut, 1080x1350 (4:5) @ 30 fps, what phones get (the
@@ -72,6 +72,16 @@ const CaptionV: React.FC<{lines: string[]; f: number; inAt: number; outAt?: numb
 
 const CAP_TT_Y = 230;
 const CAP_Y = 300;
+/* The wash under the timetable's captions (Lucas, 2026-10-05): solid only at
+   the very top and fading over WASH_END px — three times the first version's
+   fade, starting at the frame's top instead of under the text, so the text
+   sits IN the fade (the page under it only a little darkened) and the wash is
+   gone before the card's days row at the overview (its top is at ~416).
+   Eased stops, so it thins out softly. `ext` is the tall cut's band above,
+   kept solid. */
+export const WASH_END = 420;
+export const washGradient = (rgb: string, ext: number) =>
+  `linear-gradient(rgba(${rgb},1) ${ext}px, rgba(${rgb},.62) ${ext + WASH_END * 0.3}px, rgba(${rgb},.27) ${ext + WASH_END * 0.62}px, rgba(${rgb},0) ${ext + WASH_END}px)`;
 /* The timetable's overview is small in the tall frame at the landscape's 1.25:
    the vertical cut shows it BOOST times larger, easing back to the landscape
    camera over the first zoom (ZOOM_TOP), so the days stop and everything after
@@ -83,7 +93,7 @@ const boostAt = (f: number) => 1 + (BOOST - 1) * (1 - ease(f, T.ZOOM_TOP[0], T.Z
 const ROOM_DX = 80;
 
 export const UnifyPromoV: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useFilmFrame();
   const ext = React.useContext(ExtTop);
 
   // the chat's blob lands on the timetable card where the TIMETABLE stage puts it (boosted)
@@ -117,7 +127,7 @@ export const UnifyPromoV: React.FC = () => {
         {/* 1 — the chat, the flood, the suck, the puff and the morph */}
         {f < T.CARD_IN1 + 4 ? (
           <Stage dx={CHAT.dx} dy={CHAT.dy}>
-            <ChatScene f={f} cardBox={cardBox} cardIn={[T.CARD_IN0, T.CARD_IN1]} vertical />
+            <ChatScene f={f} cardBox={cardBox} cardIn={[T.CARD_IN0, T.CARD_IN1]} vertical maxW={VW * 0.9} />
           </Stage>
         ) : null}
 
@@ -129,9 +139,7 @@ export const UnifyPromoV: React.FC = () => {
             </div>
           </Stage>
         ) : null}
-        {ttWash > 0 ? (
-          <div style={{position: 'absolute', left: 0, top: -ext, width: VW, height: 470 + ext, opacity: ttWash, background: `linear-gradient(${DARK} ${ext + 330}px, rgba(41,41,37,0))`}} />
-        ) : null}
+        {ttWash > 0 ? <div style={{position: 'absolute', left: 0, top: -ext, width: VW, height: WASH_END + ext, opacity: ttWash, background: washGradient('41,41,37', ext)}} /> : null}
         {TT_CAPS.map((c, i) => (f >= c.inAt && f < c.outAt + 20 ? <CaptionV key={i} lines={c.lines} f={f} inAt={c.inAt} outAt={c.outAt} color={CREAM} y={CAP_TT_Y} size={88} /> : null))}
 
         {/* 3 — connect now, and the dive into Nam */}

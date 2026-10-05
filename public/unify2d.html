@@ -1614,6 +1614,9 @@
         <source src="/videos/unify/unify-promo-hero.mp4" media="(min-width: 641px)" type="video/mp4" />
         <source src="/videos/unify/unify-promo-mobile-hero.mp4" type="video/mp4" />
       </video>
+      <!-- a phone gets the vertical cut's own first frame as its poster: the landscape
+           one, cover-cropped to 1080:1530, would cut the opening bubble off -->
+      <script>(function (v) { if (matchMedia('(max-width: 640px)').matches) v.poster = '/images/unify/promo-poster-mobile-hero.webp'; })(document.currentScript.previousElementSibling);</script>
     </div>
 
     <!-- Hero: extended blob runs off the top-right; header sits bottom-left.

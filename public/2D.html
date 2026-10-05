@@ -1394,6 +1394,9 @@
             <source src="/videos/unify/unify-promo-tile.mp4" media="(min-width: 641px)" type="video/mp4" />
             <source src="/videos/unify/unify-promo-mobile.mp4" type="video/mp4" />
           </video>
+          <!-- a phone gets the vertical cut's own first frame as its poster: the tile
+               cut's, cover-cropped to 4:5, would cut the opening bubble off -->
+          <script>(function (v) { if (matchMedia('(max-width: 640px)').matches) v.poster = '/images/unify/promo-poster-mobile.webp'; })(document.currentScript.previousElementSibling);</script>
         </div>
       </a>
     </div>
