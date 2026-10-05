@@ -204,6 +204,36 @@
       .unify-film video { aspect-ratio: 1920 / 1276; }
     }
 
+    /* ── The hero's blob, reused at the page's end (2026-10-05, Lucas) ──
+       Upside down, HALF the hero's size, bottom-right of "What we learned",
+       its head sunk into the line above the next-project panel (.cs-section has
+       no border, so the section's bottom edge IS that line). --bh is the height
+       the whole 830-unit hero viewBox would get — the hero's own clamp halved —
+       and the svg shows 760 x 864 units of it (the long body: 20% taller than
+       the 720 a plain cut showed, same width). The text makes room on its left. */
+    #learned {
+      position: relative;
+      --bh: clamp(220px, 25vw, 340px);
+      --blob-w: calc(var(--bh) * 760 / 830);
+      --blob-h: calc(var(--bh) * 864 / 830);
+    }
+    #learned .guide-text { max-width: calc(100% - var(--blob-w) - clamp(24px, 4vw, 56px)); }
+    .learned-blob {
+      position: absolute;
+      right: clamp(40px, 8vw, 80px);
+      bottom: 0;
+      width: var(--blob-w);
+      height: var(--blob-h);
+      display: block;
+      pointer-events: none;
+    }
+    /* Phones: the text keeps the full column and the blob gets its own room under it. */
+    @media (max-width: 640px) {
+      #learned .guide-text { max-width: none; }
+      #learned { padding-bottom: calc(var(--blob-h) + 24px); }
+      .learned-blob { right: 20px; }
+    }
+
     /* ── Shared section padding ── */
     .section {
       border-bottom: 1px solid var(--border-color);
@@ -2573,12 +2603,14 @@
     </nav>
 
     <!-- Hero film (desktop): the Unify promo loop's tall cut — silent, seamless,
-         ~48s. The poster is the loop's own first frame (the phone, screen off). -->
+         ~54s. The poster is the loop's own first frame (the phone, screen off). -->
     <div class="unify-film">
       <video autoplay loop muted playsinline preload="auto" width="1920" height="1320"
              poster="/images/unify/promo-poster-hero.webp"
              aria-label="Animation: a group chat drowning in timetable screenshots collapses into Unify's shared timetable, then the connect now card, character customisation, and the campus map with friends and course rooms">
-        <source src="/videos/unify/unify-promo-hero.mp4" type="video/mp4" />
+        <!-- media: phones never show the film (.unify-film is display:none ≤640px),
+             so they get no source and download nothing; picked once, at load -->
+        <source src="/videos/unify/unify-promo-hero.mp4" media="(min-width: 641px)" type="video/mp4" />
       </video>
     </div>
 
@@ -3108,6 +3140,27 @@
       <p class="guide-text">The feature everyone argued about was not the one that got used. Three-quarters of the pilot's time sat in a single block on the home screen, while the indoor map — the part that was hardest to build — barely registered in it. Walking the app in that order, and making one deliberate exception for the part worth a closer look anyway, was the most uncomfortable call in this whole page.</p>
       <p class="guide-text">A visual language is not decoration. My v1 was clear, structured and cold, and the feedback round said so in the politest possible way: it looked like something the university had issued. The same screens in the character design read as the group's own, and none of the information architecture underneath had changed.</p>
       <p class="guide-text">What I would do next: widgets, so the free-now block never needs the app opened at all, and a proper look at what happens when a group grows past six people — the lane that won the timetable test starts to crowd at around eight.</p>
+      <!-- The hero's blob, reused (Lucas, 2026-10-05): upside down, half the
+           hero's size, its head sunk into the line above the next-project panel
+           so it pokes up out of it. It is the LONG body the phone hero uses
+           (.blob-long: the sides drawn 326.6 units further up), cut 144 units
+           lower than the first version, so it stands 20% taller at the same
+           scale (Lucas: taller, not bigger). The <g> turns it 180° about
+           (370, 328), which maps the box x -10–750, y -104–760 onto itself — so
+           the viewBox is that box (the hero's own x range: the right eye bulges
+           past the body to x 742) and its bottom edge (the head, cut at y -104,
+           where both sides still run straight) sits on the section's bottom,
+           i.e. on the line. Pupils
+           track the cursor (the script below drives both blobs). -->
+      <svg id="learned-blob" class="learned-blob" viewBox="-10 -104 760 864" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g id="learned-blob-g" transform="rotate(180 370 328)">
+          <path d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741L25.2783 -60.859C25.2772 -412.6 -6.99887 -386.6 202.306 -386.6L429.004 -386.6C709.5 -381.6 694.991 -428.6 694.991 -155.048L694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
+          <circle cx="266.586" cy="324.744" r="168.5" fill="#fff"/>
+          <circle cx="574.086" cy="324.744" r="168" fill="#fff"/>
+          <circle id="learned-pupil-l" cx="223.086" cy="425.744" r="52.5" fill="#292925"/>
+          <circle id="learned-pupil-r" cx="530.586" cy="425.744" r="52.5" fill="#292925"/>
+        </g>
+      </svg>
     </section>
     <div class="project-nav">
       <div class="project-nav-item"></div>
@@ -3356,27 +3409,40 @@
     // ── Blob pupils track the cursor ─────────────────────────────
     // Each pupil moves toward the pointer but is clamped to stay inside
     // its white eye. Coordinates come straight from the Figma export.
+    // Two blobs share the geometry: the hero's (phones only now — the film
+    // took its place on desktop) and the upside-down one in "What we learned".
+    // `space` is the element whose coordinate system the circles live in: the
+    // hero's own <svg>, and for the upside-down one the rotated <g> inside its
+    // svg (its getScreenCTM includes the rotation). A blob that is display:none
+    // has no CTM and simply rests.
     (function () {
-      const svg = document.getElementById('unify-blob');
-      const pr  = document.getElementById('unify-pupil-r');
-      const pl  = document.getElementById('unify-pupil-l');
-      if (!svg || !pr || !pl) return;
-
       // eye centre (ex,ey) + pupil rest position (rx,ry) per eye
-      const EYES = [
-        { el: pr, ex: 574.086, ey: 324.744, rx: 530.586, ry: 425.744 },
-        { el: pl, ex: 266.586, ey: 324.744, rx: 223.086, ry: 425.744 },
-      ];
+      const EYE_R = { ex: 574.086, ey: 324.744, rx: 530.586, ry: 425.744 };
+      const EYE_L = { ex: 266.586, ey: 324.744, rx: 223.086, ry: 425.744 };
+      const BLOBS = [
+        ['unify-blob', 'unify-pupil-l', 'unify-pupil-r'],
+        ['learned-blob-g', 'learned-pupil-l', 'learned-pupil-r'],
+      ].map(function (ids) {
+        const pl = document.getElementById(ids[1]), pr = document.getElementById(ids[2]);
+        return {
+          space: document.getElementById(ids[0]),
+          eyes: [Object.assign({ el: pr }, EYE_R), Object.assign({ el: pl }, EYE_L)],
+          tx: null, ty: null,                  // target in this blob's space; null ⇒ rest
+        };
+      }).filter(function (b) { return b.space && b.eyes[0].el && b.eyes[1].el; });
+      if (!BLOBS.length) return;
+      BLOBS.forEach(function (b) { b.eyes.forEach(function (e) { e.x = e.rx; e.y = e.ry; }); });
       const MAX = 108;            // max pupil travel from eye centre (eyeR - pupilR ≈ 115)
-      const state = EYES.map(e => ({ x: e.rx, y: e.ry }));
-      let targetX = null, targetY = null;   // null ⇒ rest (look toward Figma default)
 
-      function clientToSvg(cx, cy) {
-        const ctm = svg.getScreenCTM();
-        if (!ctm) return null;
-        const pt = svg.createSVGPoint();
-        pt.x = cx; pt.y = cy;
-        return pt.matrixTransform(ctm.inverse());
+      function aimAt(cx, cy) {
+        BLOBS.forEach(function (b) {
+          const ctm = b.space.getScreenCTM();
+          if (!ctm) { b.tx = b.ty = null; return; }
+          const pt = (b.space.ownerSVGElement || b.space).createSVGPoint();
+          pt.x = cx; pt.y = cy;
+          const p = pt.matrixTransform(ctm.inverse());
+          b.tx = p.x; b.ty = p.y;
+        });
       }
       // Which kind of pointer was last seen. Only used by the two guards below;
       // the tracking maths is identical for mouse and touch.
@@ -3384,8 +3450,7 @@
 
       window.addEventListener('pointermove', function (e) {
         lastPointerType = e.pointerType;
-        const p = clientToSvg(e.clientX, e.clientY);
-        if (p) { targetX = p.x; targetY = p.y; }
+        aimAt(e.clientX, e.clientY);
       }, { passive: true });
 
       // TOUCH: a screen has no hover, so a tap fires pointerdown/pointerup with no
@@ -3402,8 +3467,7 @@
       window.addEventListener('pointerdown', function (e) {
         lastPointerType = e.pointerType;
         if (e.pointerType === 'mouse') return;
-        const p = clientToSvg(e.clientX, e.clientY);
-        if (p) { targetX = p.x; targetY = p.y; }
+        aimAt(e.clientX, e.clientY);
       }, { passive: true });
 
       // Ease back to rest when the cursor leaves the window — MOUSE ONLY.
@@ -3412,26 +3476,27 @@
       // centre the instant the finger lifted, undoing the tap they just followed.
       document.addEventListener('mouseleave', function () {
         if (lastPointerType !== 'mouse') return;
-        targetX = targetY = null;
+        BLOBS.forEach(function (b) { b.tx = b.ty = null; });
       });
 
       function frame() {
-        for (let i = 0; i < EYES.length; i++) {
-          const e = EYES[i];
-          let tx, ty;
-          if (targetX === null) {                 // ease back to rest
-            tx = e.rx; ty = e.ry;
-          } else {
-            let dx = targetX - e.ex, dy = targetY - e.ey;
-            const d = Math.hypot(dx, dy);
-            if (d > MAX) { dx = dx / d * MAX; dy = dy / d * MAX; }
-            tx = e.ex + dx; ty = e.ey + dy;
-          }
-          state[i].x += (tx - state[i].x) * 0.18;  // smooth follow
-          state[i].y += (ty - state[i].y) * 0.18;
-          e.el.setAttribute('cx', state[i].x.toFixed(2));
-          e.el.setAttribute('cy', state[i].y.toFixed(2));
-        }
+        BLOBS.forEach(function (b) {
+          b.eyes.forEach(function (e) {
+            let tx, ty;
+            if (b.tx === null) {                  // ease back to rest
+              tx = e.rx; ty = e.ry;
+            } else {
+              let dx = b.tx - e.ex, dy = b.ty - e.ey;
+              const d = Math.hypot(dx, dy);
+              if (d > MAX) { dx = dx / d * MAX; dy = dy / d * MAX; }
+              tx = e.ex + dx; ty = e.ey + dy;
+            }
+            e.x += (tx - e.x) * 0.18;  // smooth follow
+            e.y += (ty - e.y) * 0.18;
+            e.el.setAttribute('cx', e.x.toFixed(2));
+            e.el.setAttribute('cy', e.y.toFixed(2));
+          });
+        });
         requestAnimationFrame(frame);
       }
       requestAnimationFrame(frame);

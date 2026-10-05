@@ -16,6 +16,7 @@ export const PHONE_W = 876 * FK;
 /* the screen hole, as a share of the frame (page: .phone-shot-screen) */
 const SCR = {top: 0.015487, left: 0.038813, w: 0.922374, h: 0.969027};
 export const SCREEN_H = PHONE_H * SCR.h;
+export const SCREEN_W = PHONE_W * SCR.w;
 
 /* One page "cqw" of the 16:9 stage, kept in proportion to the phone: the
    page's phone is 27cqw wide. */
@@ -164,17 +165,21 @@ export const Phone: React.FC<{cx: number; cy: number; black?: number; style?: CS
 };
 
 /* The phone's screen hole, as a box in the phone's own frame. */
-const ScreenHole: React.FC<{style?: CSS}> = ({style}) => (
-  <div style={{position: 'absolute', top: `${SCR.top * 100}%`, left: `${SCR.left * 100}%`, width: `${SCR.w * 100}%`, height: `${SCR.h * 100}%`, borderRadius: '16.0891% / 7.4201%', ...style}} />
+const ScreenHole: React.FC<{style?: CSS; children?: React.ReactNode}> = ({style, children}) => (
+  <div style={{position: 'absolute', top: `${SCR.top * 100}%`, left: `${SCR.left * 100}%`, width: `${SCR.w * 100}%`, height: `${SCR.h * 100}%`, borderRadius: '16.0891% / 7.4201%', ...style}}>
+    {children}
+  </div>
 );
 
 /* The ending: the same phone FRAME, scaled `k` times about the frame's middle,
    with the dark ground everywhere outside its screen hole — whatever is behind
    (the map) shows only through the hole. At k = 1 it is exactly the opening
-   phone. `black` fades the hole to black. */
-export const PhoneFrameClose: React.FC<{k: number; black: number; ground: string}> = ({k, black, ground}) => (
+   phone. `screen` is drawn ON the glass (SCREEN_W x SCREEN_H px, clipped to
+   the hole), so it scales with the frame. `black` fades the hole to black. */
+export const PhoneFrameClose: React.FC<{k: number; black: number; ground: string; screen?: React.ReactNode}> = ({k, black, ground, screen}) => (
   <div style={{position: 'absolute', left: 1920 / 2 - PHONE_W / 2, top: 1080 / 2 - PHONE_H / 2, width: PHONE_W, height: PHONE_H, transform: `scale(${k})`, transformOrigin: '50% 50%'}}>
     <ScreenHole style={{boxShadow: `0 0 0 3000px ${ground}`}} />
+    {screen ? <ScreenHole style={{overflow: 'hidden'}}>{screen}</ScreenHole> : null}
     {black > 0 ? <ScreenHole style={{background: '#000', opacity: black}} /> : null}
     <Img src={staticFile('unify/iphone-17-frame.png')} style={{position: 'absolute', inset: 0, width: '100%', height: '100%'}} />
   </div>

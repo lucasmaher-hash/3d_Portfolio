@@ -1,0 +1,10 @@
+<!-- The Unify hero blob (Figma export), the whole character: body, eyes, pupils at rest.
+     Saved 2026-10-05 when the promo film replaced it as the desktop hero; the same paths
+     are inline in unify2d.html (phone hero) and unify2d1.html (hero + "What we learned"). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -90 712 860" fill="none">
+  <path d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741C25.2772 -86 -6.99887 -60 202.306 -60L429.004 -60C709.5 -55 694.991 -102 694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
+  <circle cx="266.586" cy="324.744" r="168.5" fill="#fff"/>
+  <circle cx="574.086" cy="324.744" r="168" fill="#fff"/>
+  <circle cx="223.086" cy="425.744" r="52.5" fill="#292925"/>
+  <circle cx="530.586" cy="425.744" r="52.5" fill="#292925"/>
+</svg>

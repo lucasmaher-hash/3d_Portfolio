@@ -166,6 +166,35 @@
       padding-bottom: clamp(4px, 1vw, 10px);
     }
 
+    /* ── Hero film (2026-10-05, desktop only — phones keep the blob hero for now) ──
+       The Unify promo loop, rendered in Remotion from motion/src/unify (see
+       CLAUDE.md "Unify promo loop"), as its TALL cut: 1920x1320, the 16:9 film
+       plus 240px of empty canvas on top (Lucas: extend it up under the nav,
+       nothing on the page moved or hidden for it). Same treatment as the
+       to.morrow hero (.hero-promo on to-shove2d.html): flush, no card, cover +
+       bottom so every width shows the film's bottom edge. Deliberately not a
+       .hero — the nav keeps its raised shadow from the first frame. */
+    .unify-film { display: none; }
+    @media (min-width: 641px) {
+      .unify-film { display: block; padding-top: clamp(116px, 11vw, 150px); }
+      .unify-film video {
+        display: block; width: 100%; height: auto;
+        aspect-ratio: 16 / 9;               /* 641-860px: exactly the plain film, below the nav */
+        background: #292925;                /* the film's own ground, before the poster paints */
+        object-fit: cover; object-position: 50% 100%;
+      }
+      /* the film is the hero now: the blob gives way, the title sits right under it */
+      .hero-blob { display: none; }
+      .hero-top { min-height: 0; padding-top: clamp(18px, 2.4vw, 32px); }
+    }
+    /* Desktop: no strip between the nav and the film — it starts at the card's
+       top border and 196px of the band run up under the nav (the box is wider
+       than the file, so cover crops the band's top 44 rows), as on to.morrow. */
+    @media (min-width: 861px) {
+      .unify-film { padding-top: 0; }
+      .unify-film video { aspect-ratio: 1920 / 1276; }
+    }
+
     /* ── Shared section padding ── */
     .section {
       border-bottom: 1px solid var(--border-color);
@@ -1560,6 +1589,18 @@
   </div>
 
   <div class="page-wrapper">
+
+    <!-- Hero film (desktop): the Unify promo loop's tall cut — silent, seamless,
+         ~54s. The poster is the loop's own first frame (the phone, screen off). -->
+    <div class="unify-film">
+      <video autoplay loop muted playsinline preload="auto" width="1920" height="1320"
+             poster="/images/unify/promo-poster-hero.webp"
+             aria-label="Animation: a group chat drowning in timetable screenshots collapses into Unify's shared timetable, then the connect now card, character customisation, and the campus map with friends and course rooms">
+        <!-- media: phones never show the film (.unify-film is display:none ≤640px),
+             so they get no source and download nothing; picked once, at load -->
+        <source src="/videos/unify/unify-promo-hero.mp4" media="(min-width: 641px)" type="video/mp4" />
+      </video>
+    </div>
 
     <!-- Hero: extended blob runs off the top-right; header sits bottom-left.
          Blob exported from Figma; pupils track the cursor. -->

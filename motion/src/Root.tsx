@@ -3,7 +3,7 @@ import {Composition, continueRender, delayRender, staticFile} from 'remotion';
 import {Lab, LAB_BTN, LAB_H, LAB_W, LabBox, LabButtons} from './Lab';
 import {DURATION_E, DURATION_F, EXT, FPS, LabPhone, Promo, PromoTall} from './Promo';
 import {DURATION_F as DURATION_FV, EXT_V, PromoV, PromoVTall} from './PromoV';
-import {UNIFY_DURATION, UNIFY_EXT, UnifyPromo, UnifyPromoTall} from './unify/UnifyPromo';
+import {TILE as UNIFY_TILE, UNIFY_DURATION, UNIFY_EXT, UnifyPromo, UnifyPromoTall, UnifyPromoTile} from './unify/UnifyPromo';
 import {UnifyLab} from './unify/Lab';
 import {DURATION_F as DURATION_F16, Promo16} from './Promo16';
 import './sk.css';
@@ -44,6 +44,7 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="UnifyPromo" component={UnifyPromo} durationInFrames={UNIFY_DURATION} fps={30} width={1920} height={1080} />
     {/* ...and its TALL cut, the draft page's hero: UNIFY_EXT px of canvas above the frame */}
     <Composition id="UnifyPromoTall" component={UnifyPromoTall} durationInFrames={UNIFY_DURATION} fps={30} width={1920} height={1080 + UNIFY_EXT} />
+    <Composition id="UnifyPromoTile" component={UnifyPromoTile} durationInFrames={UNIFY_DURATION} fps={30} width={UNIFY_TILE.w} height={UNIFY_TILE.h} />
     <Composition id="UnifyLab" component={UnifyLab} durationInFrames={1} fps={30} width={1920} height={1080} defaultProps={{which: 'card' as const}} />
     <Composition id="Lab" component={Lab} durationInFrames={1} fps={30} width={LAB_W} height={LAB_H} />
     <Composition id="LabButtons" component={LabButtons} durationInFrames={1} fps={30} width={LAB_BTN.w} height={LAB_BTN.h} />

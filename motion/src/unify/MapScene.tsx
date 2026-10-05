@@ -2,7 +2,9 @@ import React from 'react';
 import {Easing} from 'remotion';
 import {Plan, PLAN_W, ROOMS} from './CampusMap';
 import {Character, CharId, viewBox} from './Character';
-import {clamp01, CREAM, CSS, DARK, ease, ExtTop, fullBg, H, lerp, mix, NUNITO, PINK, rnd, sp, W, wordAnim} from './lib';
+import {SCREEN_H, SCREEN_W} from './Chat';
+import {APP_W, MAP_WINDOW} from './MapUI';
+import {BLEED, clamp01, CREAM, CSS, DARK, ease, ExtTop, fullBg, H, lerp, mix, NUNITO, PINK, rnd, sp, W, wordAnim} from './lib';
 
 /* ─────────────────────────────────────────────────────────────────────────
    Scenes 5–6 — the burst onto the campus map.
@@ -25,6 +27,11 @@ const PAN0: [number, number] = [1550, 1330];
 const PAN1: [number, number] = [2750, 1000]; // far enough up that the top room clears the caption
 /* the whole floor: the drawn plan (x 314–4237, y 562–1849) 1720px wide, a little below the middle */
 const FULL = {s: 1720 / (4237 - 314), c: [(314 + 4237) / 2, (562 + 1849) / 2] as [number, number], at: [W / 2, 612] as [number, number]};
+/* As the phone closes round it, the floor glides up into the window the app's
+   own chrome leaves on the screen (under the floor selector, above the sheet's
+   eyes) — at k = 1 the screen is SCREEN_W x SCREEN_H about the frame's middle. */
+const US = SCREEN_W / APP_W;
+const IN_PHONE_Y = H / 2 - SCREEN_H / 2 + ((MAP_WINDOW.top + MAP_WINDOW.bottom(SCREEN_H / US)) / 2) * US;
 const LEFT3 = W / 3;
 
 /* the app's map marker, at video scale: figure contained in a 96x88 box, the
@@ -73,7 +80,7 @@ const layoutWords = (ws: readonly (readonly [string, number])[]) => {
 const XA = layoutWords(WA);
 const XB = layoutWords(WB);
 
-type TL = {BOOM: number; COURSES: number; LOOP0: number; END: number};
+type TL = {BOOM: number; COURSES: number; LOOP0: number; FRAME0: number; FRAME1: number; END: number};
 
 export const CampusMap: React.FC<{f: number; T: TL; charW: number; finalChar: CharId; finalEyes: CharId}> = ({f, T, charW, finalChar, finalEyes}) => {
   // camera, part 1 — the burst: from the customize framing (character at the
@@ -90,7 +97,8 @@ export const CampusMap: React.FC<{f: number; T: TL; charW: number; finalChar: Ch
     const pan = ease(f, T.BOOM + 42, T.COURSES + 34, Easing.inOut(Easing.cubic));
     const out = ease(f, T.COURSES + 36, T.COURSES + 70, Easing.inOut(Easing.cubic));
     const C: [number, number] = [lerp(lerp(PAN0[0], PAN1[0], pan), FULL.c[0], out), lerp(lerp(PAN0[1], PAN1[1], pan), FULL.c[1], out)];
-    const at: [number, number] = [lerp(PAN_C[0], FULL.at[0], out), lerp(PAN_C[1], FULL.at[1], out)];
+    const settle = ease(f, T.FRAME0, T.FRAME1, Easing.inOut(Easing.cubic));
+    const at: [number, number] = [lerp(PAN_C[0], FULL.at[0], out), lerp(PAN_C[1], lerp(FULL.at[1], IN_PHONE_Y, settle), out)];
     scale = Math.exp(lerp(Math.log(SPAN), Math.log(FULL.s), out));
     origin = [at[0] - C[0] * scale, at[1] - C[1] * scale];
   }
@@ -173,8 +181,9 @@ export const CampusMap: React.FC<{f: number; T: TL; charW: number; finalChar: Ch
         </div>
       </div>
       {nodes}
-      {/* a cream wash at the top keeps the caption clear of the map passing under it */}
-      <div style={{position: 'absolute', left: 0, right: 0, top: -ext, height: 330 + ext, background: `linear-gradient(${CREAM} ${ext + 150}px, rgba(249,242,235,0))`, opacity: ease(f, T.BOOM + 20, T.BOOM + 34) * (1 - loopOut)}} />
+      {/* a cream wash at the top keeps the caption clear of the map passing under it
+          (gone once the caption is: inside the phone it would fade the top room) */}
+      <div style={{position: 'absolute', left: -BLEED, right: -BLEED, top: -ext - BLEED, height: 330 + ext + BLEED, background: `linear-gradient(${CREAM} ${ext + BLEED + 150}px, rgba(249,242,235,0))`, opacity: ease(f, T.BOOM + 20, T.BOOM + 34) * (1 - ease(f, T.FRAME0, T.FRAME0 + 24))}} />
       <div style={{position: 'absolute', inset: 0, fontFamily: NUNITO, fontWeight: 800, fontSize: CAP_FS, lineHeight: 1, letterSpacing: 0, color: DARK}}>
         {f < morph + 12 ? word('locate', XA[0], wordAnim(f, capIn, morph), 'a0') : null}
         {word('your', yourX, wordAnim(f, capIn + 3, capOut + 2), 'your')}

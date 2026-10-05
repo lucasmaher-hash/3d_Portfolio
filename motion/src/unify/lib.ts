@@ -28,7 +28,12 @@ export type CSS = React.CSSProperties;
    nav. Nothing is placed there; every full-frame ground reaches up by it
    (fullBg) and the cameras simply see more above. 0 = the plain 16:9 film. */
 export const ExtTop = React.createContext(0);
-export const fullBg = (ext: number, extra?: React.CSSProperties): React.CSSProperties => ({position: 'absolute', left: 0, top: -ext, width: 1920, height: 1080 + ext, ...extra});
+/* Full-frame grounds also overshoot the frame by BLEED on every side: the 3:2
+   tile cut shows the film at 0.9 (UnifyPromoTile), so a little of the world
+   past the 1920x1080 frame comes into view there. In the other cuts the
+   overshoot lies outside the composition and is clipped. */
+export const BLEED = 160;
+export const fullBg = (ext: number, extra?: React.CSSProperties): React.CSSProperties => ({position: 'absolute', left: -BLEED, top: -ext - BLEED, width: 1920 + 2 * BLEED, height: 1080 + ext + 2 * BLEED, ...extra});
 
 export const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;

@@ -10,7 +10,7 @@ import {clamp01, CREAM, CSS, DARK, NUNITO, PINK} from './lib';
 
 const u = (f: string) => staticFile(`unify/${f}`);
 
-export type Day = 'montag' | 'dienstag' | 'donnerstag';
+export type Day = 'montag' | 'dienstag' | 'mittwoch';
 /* `figs` overrides the figure per person (the break shows the home screen's own friend art) */
 type Course = {title: string; room: string; time: string; people?: string[]; figs?: Record<string, string>};
 
@@ -32,11 +32,17 @@ export const DAYS: Record<Day, {pink: Course[]; cream: Course[]}> = {
     // scheduler put it at 12:00, which would collide with the break block
     cream: [{title: 'Movie Night', room: '(0.012)', time: '19:00-21:30', people: ['Greg', 'Michi']}],
   },
-  // Thursday as the app has it (one course, Book Club at its Socials time); the film
-  // gives Ergonomics a people row so "who's in your course" has someone to show
-  donnerstag: {
-    pink: [{title: 'Ergonomics', room: '(1.031)', time: '09:00-10:30', people: ['Konst', 'Zoe', 'Nam', 'Sophia', 'Anna']}],
-    cream: [{title: 'Book Club', room: '(0.220)', time: '17:00-18:30', people: ['Greg', 'Anna', 'James', 'Michi']}],
+  // The film's Wednesday (Lucas, 2026-10-05): Ergonomics, then the app's own
+  // Wednesday course CAD Modeling under it — the one whose people row "who's in
+  // your course" shows, so that beat needs its own scroll down from the days.
+  // Book Club (Thursday's social in the app) is the uni activity in the cream
+  // block, with its own stop. Four friends in the course, two at the activity (Lucas).
+  mittwoch: {
+    pink: [
+      {title: 'Ergonomics', room: '(1.031)', time: '09:00-10:30'},
+      {title: 'CAD Modeling', room: '(1.026)', time: '10:30-12:00', people: ['Konst', 'Zoe', 'Sophia', 'Anna']},
+    ],
+    cream: [{title: 'Book Club', room: '(0.220)', time: '17:00-18:30', people: ['Greg', 'Michi']}],
   },
 };
 
@@ -50,11 +56,11 @@ const T19: CSS = {fontFamily: NUNITO, fontWeight: 800, fontSize: 19, color: DARK
 
 /* A person in a course's people row. `t` is a spring (0 → 1, overshooting):
    each one bounces into existence from its feet. */
-const Person: React.FC<{name: string; src: string; t: number}> = ({name, src, t}) => (
+const Person: React.FC<{name: string; src: string; t: number; h?: number}> = ({name, src, t, h = 81}) => (
   <div
     style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end',
-      height: 81, width: 66, padding: '0 1px', boxSizing: 'border-box', flex: 'none',
+      height: h, width: 66, padding: '0 1px', boxSizing: 'border-box', flex: 'none',
       opacity: clamp01(t * 3), transform: `scale(${Math.max(0, t)})`, transformOrigin: '50% 100%',
     }}
   >
@@ -70,23 +76,37 @@ const Person: React.FC<{name: string; src: string; t: number}> = ({name, src, t}
    only makes room for its friends once they arrive. */
 export const COURSE_H = 98;
 export const PEOPLE_ROW_H = 88;
-const CourseRow: React.FC<{c: Course; personT: (name: string, i: number) => number; expand?: number}> = ({c, personT, expand = 1}) => {
+/* The COMPACT row — the break and the uni activity (Lucas, 2026-10-05: 30%
+   shorter, closed and open): no empty headroom in the person boxes, less air
+   under the friends, and the break drops its blank room line. Its height is
+   always explicit, so the camera's model of it (ttLayout) is exact. The break:
+   closed 64 + its 16px top padding = 80 (was 114), open 125 + 16 = 141 (was
+   202); the activity keeps its room line, so 17px more either way. */
+const compactHead = (c: Course) => (c.room ? 63 : 46); // the 3px line + the title row (60, or 43 with no room line)
+const COMPACT_AIR = 18; // under the title while closed
+const COMPACT_PERSON_H = 58; // a person's own figure + name, nothing above
+export const COMPACT_GROW = 61; // what the people row adds: 6 + 58 + 15, less the closed air
+export const BREAK_ROW = 46 + COMPACT_AIR;
+export const SOCIAL_ROW = 63 + COMPACT_AIR;
+const CourseRow: React.FC<{c: Course; personT: (name: string, i: number) => number; expand?: number; compact?: boolean}> = ({c, personT, expand = 1, compact}) => {
   const people = !!c.people?.length;
-  const size: CSS = !people ? {height: COURSE_H} : expand < 1 ? {height: COURSE_H + PEOPLE_ROW_H * expand, overflow: 'hidden'} : {height: 'auto', minHeight: 142};
+  const size: CSS = compact
+    ? {height: compactHead(c) + COMPACT_AIR + COMPACT_GROW * expand, overflow: 'hidden'}
+    : !people ? {height: COURSE_H} : expand < 1 ? {height: COURSE_H + PEOPLE_ROW_H * expand, overflow: 'hidden'} : {height: 'auto', minHeight: 142};
   return (
     <div style={{width: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', ...size}}>
       <div style={{height: 3, background: DARK, width: 336, margin: '0 auto', flexShrink: 0}} />
-      <div style={{display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '8px 0', width: 336, margin: '0 auto', gap: 8, flexShrink: 0}}>
+      <div style={{display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '8px 0', width: 336, margin: '0 auto', gap: 8, flexShrink: 0, ...(compact ? {height: compactHead(c) - 3, boxSizing: 'border-box'} : {})}}>
         <div style={{display: 'flex', flexDirection: 'column', flex: 1}}>
-          <p style={{...T19, lineHeight: 1, marginBottom: 2}}>{c.title}</p>
-          <p style={{...T19, lineHeight: 1}}>{c.room}</p>
+          <p style={{...T19, lineHeight: 1, marginBottom: c.room ? 2 : 0}}>{c.title}</p>
+          {c.room ? <p style={{...T19, lineHeight: 1}}>{c.room}</p> : null}
         </div>
         <p style={{...T19, fontWeight: 500, whiteSpace: 'nowrap', textAlign: 'right', flexShrink: 0}}>{c.time}</p>
       </div>
       {people ? (
-        <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px 3px', width: '100%', padding: '2px 0 40px', alignItems: 'flex-start', flexShrink: 0, justifyContent: 'flex-start', boxSizing: 'border-box'}}>
+        <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px 3px', width: '100%', padding: compact ? '6px 0 15px' : '2px 0 40px', alignItems: 'flex-start', flexShrink: 0, justifyContent: 'flex-start', boxSizing: 'border-box'}}>
           {c.people!.map((p, i) => (
-            <Person key={p} name={p} src={c.figs?.[p] ?? FIG[p]} t={personT(c.title, i)} />
+            <Person key={p} name={p} src={c.figs?.[p] ?? FIG[p]} t={personT(c.title, i)} h={compact ? COMPACT_PERSON_H : undefined} />
           ))}
         </div>
       ) : null}
@@ -178,13 +198,14 @@ export const SpCard: React.FC<{
 
 /* ── The film's timetable (Lucas, 2026-10-05) ─────────────────────────────
    No tab header and no week row: it starts at the days. A BREAK section — a
-   course row like any other, the friends who are on a break right now — sits
+   compact course row, the friends who are on a break right now — sits
    between the courses and the socials as its own rounded block, with a gap
    either side. */
 export const BREAK: Course = {
-  // no room line (Lucas) — a blank one keeps the row the same height as every other course
-  title: 'break', room: '\u00a0', time: '12:00-12:45', people: ['Paul', 'Nam', 'Greg', 'Yas', 'Moritz'],
-  figs: {Paul: 'friend_paul.svg', Nam: 'friend_nam.svg', Greg: 'friend_greg.svg', Yas: 'friend_yas.svg', Moritz: 'friend_moritz.svg'},
+  // no room line (Lucas); the compact row skips it altogether
+  // three of the home screen's friends on a break (Lucas) — Nam and Yas are the two opened on "connect now"
+  title: 'break', room: '', time: '12:00-12:45', people: ['Paul', 'Nam', 'Yas'],
+  figs: {Paul: 'friend_paul.svg', Nam: 'friend_nam.svg', Yas: 'friend_yas.svg'},
 };
 export const TT_GAP = 16;
 /* Heights with every people row collapsed (0) or grown (1) — the film's camera
@@ -195,9 +216,9 @@ export const ttLayout = (eCourse: number, eBreak: number, eSocial: number, pinkC
   // days + the pink courses (pinkCourses may be fractional while a day switch resizes the panel)
   const pink = DAYS_PAD + 51.8 + (4 + COURSE_H) * pinkCourses + PEOPLE_ROW_H * eCourse;
   const breakTop = pink + TT_GAP;
-  const breakH = 16 + COURSE_H + PEOPLE_ROW_H * eBreak;
+  const breakH = 16 + BREAK_ROW + COMPACT_GROW * eBreak;
   const creamTop = breakTop + breakH + TT_GAP;
-  const creamH = 18 + COURSE_H + PEOPLE_ROW_H * eSocial;
+  const creamH = 16 + SOCIAL_ROW + COMPACT_GROW * eSocial; // the activity: a compact row like the break
   return {pink, breakTop, breakH, creamTop, creamH, h: creamTop + creamH};
 };
 
@@ -245,12 +266,12 @@ export const SharedTimetable: React.FC<{
         ))}
       </div>
       <div style={{width: 377, boxSizing: 'border-box', background: PINK, borderRadius: 22, padding: '16px 16px 0', display: 'flex', flexDirection: 'column', overflow: 'hidden', ...block(1)}}>
-        <CourseRow c={BREAK} personT={personT} expand={expandT(BREAK.title)} />
+        <CourseRow c={BREAK} personT={personT} expand={expandT(BREAK.title)} compact />
       </div>
-      <div style={{width: 377, boxSizing: 'border-box', background: CREAM, borderRadius: 22, padding: '18px 16px 0', display: 'flex', flexDirection: 'column', gap: 4, overflow: 'hidden', ...block(2)}}>
+      <div style={{width: 377, boxSizing: 'border-box', background: CREAM, borderRadius: 22, padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 4, overflow: 'hidden', ...block(2)}}>
         {d.cream.map((c) => (
           <div key={c.title} style={slideStyle}>
-            <CourseRow c={c} personT={personT} expand={expandT(c.title)} />
+            <CourseRow c={c} personT={personT} expand={expandT(c.title)} compact />
           </div>
         ))}
       </div>

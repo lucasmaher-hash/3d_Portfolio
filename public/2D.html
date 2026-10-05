@@ -229,6 +229,29 @@
       background: #C7CCD4;
     }
 
+    /* The Unify tile is its promo loop too (2026-10-05), flat like the to.morrow
+       one and at its 3:2 — but NOT a crop of the 16:9 film, whose captions run to
+       ~95% of the frame: its own TILE cut (UnifyPromoTile, 1620x1080), the film
+       re-framed at 0.9 so nothing is cut (see CLAUDE.md "Unify promo loop").
+       3:2 at every width: there is no vertical cut of this film to give phones
+       the to.morrow tile's 4:5. (0,2,0), so no tile rule in the 640px blocks can
+       reshape it. */
+    .project-tile.unify-video-tile {
+      position: relative;
+      aspect-ratio: 3 / 2;
+      overflow: hidden;
+      box-shadow: none;
+    }
+    .unify-video-tile video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #292925;   /* the film's own ground, before the poster paints */
+    }
+
     /* ── Mobile only: hero fills the screen, blob + title centred ──────── */
     @media (max-width: 640px) {
       /* Grow the section so its bottom border lands at the fold instead of
@@ -321,7 +344,9 @@
       box-shadow: var(--shadow-raised);
     }
 
-    /* Unify's landing tile: a transparent iPhone frame image sits OVER the recording,
+    /* UNUSED since 2026-10-05: the Unify tile plays the promo film now (.unify-video-tile).
+       Kept as the record of how the phone-framed recording was built.
+       Unify's landing tile: a transparent iPhone frame image sits OVER the recording,
        instead of the clip-path that used to be measured to the video's own baked-in
        bezel. homepage.mov has no content outside its own device mockup — the phone
        body and its ROUNDED screen corners are baked into the footage — so no
@@ -1350,20 +1375,14 @@
         <a href="/unify2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
       </div>
       <a href="/unify2d.html" style="display:block;">
-        <div class="project-tile tile-xl-media" style="box-shadow: none; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; background: transparent;">
-          <!-- The recording, pre-cropped to just its own screen (ffmpeg
-               crop=614:1356:38:32 off homepage.mov, whose screen was measured at
-               x 36-654, y 30-1390 and then pulled 2px tighter on every side), sits
-               UNDER a transparent iPhone frame. See the .phone-shot block in <style>
-               for why, and for where every number comes from. -->
-          <div class="phone-shot">
-            <div class="phone-shot-screen">
-              <video class="phone-shot-video" autoplay loop muted playsinline>
-                <source src="/videos/unify/homepage_screen.mov" type="video/mp4">
-              </video>
-            </div>
-            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-          </div>
+        <div class="project-tile unify-video-tile" style="cursor: pointer;">
+          <!-- The Unify promo loop (2026-10-05), its own 3:2 tile cut (the film
+               re-framed for this shape, not a crop). One file at every width:
+               there is no phone cut of this film yet. -->
+          <video autoplay muted loop playsinline width="1620" height="1080" poster="/images/unify/promo-poster-tile.webp"
+                 aria-label="Animation: a group chat drowning in timetable screenshots collapses into Unify's shared timetable, then the connect now card, character customisation, and the campus map with friends and course rooms">
+            <source src="/videos/unify/unify-promo-tile.mp4" type="video/mp4" />
+          </video>
         </div>
       </a>
     </div>

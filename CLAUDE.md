@@ -138,7 +138,20 @@ fixed "Draft · not linked" pill used to mark it; removed 2026-10-05 at Lucas's 
 the `noindex` removed.
 
 It is a copy of `unify2d.html` (same head, nav, hero blob, scripts), so every Unify gotcha below
-still applies. The nav iframe recognises it because its checks are substring matches on
+still applies. **Exception, 2026-10-05:** the promo film hero (`.unify-film`) was put on the live page
+ahead of the rest of the draft (Lucas: the video is ready to ship) — see "Unify promo loop".
+
+**The hero's blob is reused at the end of the draft** (Lucas, 2026-10-05): `#learned-blob`, upside
+down, half the hero's size (`--bh: clamp(220px, 25vw, 340px)`, the hero clamp halved) but 20% taller
+— the phone hero's LONG body (`.blob-long` path), cut at y -104, so it stands taller at the same
+scale and width (Lucas: "taller without making him bigger") — bottom-right
+of "What we learned", its head sunk into the line above the next-project panel so it pokes up out
+of it; the paragraphs make room on its left, and below 640px it gets its own space under the text.
+Same Figma paths as the hero; an inner `<g>` rotates it 180° about (370, 328), which maps the box
+x -10–750, y -104–760 onto itself, so that box is the viewBox (x to 750 because the right eye bulges
+past the body). The pupil script drives both blobs from one set of listeners, each through its own
+coordinate space (the hero's `<svg>`, the rotated `<g>` — its `getScreenCTM` includes the turn).
+The whole character is also saved as `public/images/unify/unify-blob.svg` for reuse. The nav iframe recognises it because its checks are substring matches on
 `unify2d`. Differences: the middle follows plan §2 (Problem → Research → Idea → Pivot → Timetable
 → Supporting features → Privacy → Results → Learned, step badges 1–9, anchors for the page map);
 new CSS lives in the `Case-study rebuild` block at the end of `<style>` (`.ph` placeholder wells,
@@ -1283,20 +1296,34 @@ captions are system type — Lucas does not want pixel type outside the app chro
 
 ## Unify promo loop (`motion/src/unify/`, Remotion, 2026-10-04, second pass 2026-10-05)
 
-A silent 47.9 s loop (1438 frames, 30 fps, **1920×1080, desktop only** — no vertical cut yet),
+A silent 53.8 s loop (1613 frames, 30 fps, **1920×1080, desktop only** — no vertical cut yet),
 composition **`UnifyPromo`**, in the same Remotion project as the to.morrow film. Review master:
-`motion/out/unify-promo.mp4` (copies `~/Downloads/` and `~/Desktop/unify-promo.mp4`).
+`motion/out/unify-promo.mp4`, copied over `~/Desktop/unify-promo.mp4` after every render (numbered
+`-vN` copies only when Lucas asks for one).
 
-**It is the hero of the unlinked draft `unify2d1.html`** (never the live `unify2d.html`), as
-the **tall cut** `UnifyPromoTall` (1920×1320: `UNIFY_EXT` = 240px of canvas above the frame;
+**SHIPPED 2026-10-05 (Lucas: "ready to ship")** — it is the desktop hero of BOTH the live
+`unify2d.html` and the draft `unify2d1.html` (the same `.unify-film` block, CSS and markup, in
+each), and the Unify tile on `2D.html`. The heroes use the **tall cut** `UnifyPromoTall` (1920×1320: `UNIFY_EXT` = 240px of canvas above the frame;
 every full-frame ground reaches up through `ExtTop`/`fullBg` in `lib.ts`, the cameras just see
 more above). Web file `public/videos/unify/unify-promo-hero.mp4` (x264 crf 22, faststart, no
 audio), poster `public/images/unify/promo-poster-hero.webp` (frame 0). On the page `.unify-film`
 copies the to.morrow hero exactly: flush between the frame's borders, `object-fit: cover` +
 bottom, `aspect-ratio: 1920/1276` from 861px (196px of band up under the nav), 16:9 with
 nav-clearing padding at 641–860px; the blob hero is hidden there and the title follows the film.
-**Below 640px the film is off and the blob hero stays** (no phone cut yet). **Every new version
-goes onto the page** (Lucas): render `UnifyPromoTall`, re-encode, re-make the poster.
+**Below 640px the film is off and the blob hero stays** (no phone cut yet); its `<source>` carries
+`media="(min-width: 641px)"`, so phones download nothing (picked once, at load). The landing tile
+(`.unify-video-tile` on `2D.html`) is **3:2 like the to.morrow tile** (Lucas), at every width (no
+vertical cut exists to give phones the to.morrow tile's 4:5), flat, no raised plate. It plays its
+OWN cut, **`UnifyPromoTile`** (1620x1080) → `public/videos/unify/unify-promo-tile.mp4`, poster
+`promo-poster-tile.webp` — not a crop: the 16:9 film's timetable captions run to x 1827, so a
+centre crop (150px a side) cut them. The tile cut re-frames instead: the whole film at 0.9 about
+the frame's middle (`TileCut` context; the cameras see a little more on every side, and every
+full-frame ground overshoots the frame by `BLEED` = 160 in `lib.ts` to cover it — so must any new
+one), the timetable scene eases 30px left with its slide (card and captions ~65px from either
+edge), and during the room-number zoom the page alone moves 60px right so Emil's name stays in.
+**Every new version goes onto all three** (Lucas): render `UnifyPromo` (review copy),
+`UnifyPromoTall` and `UnifyPromoTile`, re-encode the last two (`unify-promo-hero.mp4`,
+`unify-promo-tile.mp4`), re-make both posters.
 
 **Ground truth is the final pink app's own code, `~/TEMP/Unify/web/`** (static HTML/CSS/JS,
 Nunito, `--pink #FF88C8 / --dark #292925 / --cream #F9F2EB`; design notes in
@@ -1306,16 +1333,27 @@ scenes scale them:
 - `Timetable.tsx` — `SpCard` is the app's `.sp-card` 1:1 (diffed against a CDP screenshot of the
   real card: identical bar sub-pixel offsets; `UnifyLab` composition is that check).
   **`SharedTimetable` is what the film shows** (Lucas, 2026-10-05): no tab header, no week row —
-  it starts at the day discs, with `DAYS_PAD` (8px) of air above them — and a **break** block (a course row like any other: "break
-  12:00-12:45", no room line, the home screen's five friends on a break) between the courses and the
-  socials, rounded, with a 16px gap either side. Movie Night shows the Socials tab's own
+  it starts at the day discs, with `DAYS_PAD` (8px) of air above them — and a **break** block ("break
+  12:00-12:45", no room line, three of the home screen's friends on a break) between the courses and the
+  socials, rounded, with a 16px gap either side. **The break is a COMPACT row, 30% shorter than a
+  course** (Lucas: too much air above and below its friends, and too tall even closed): no room
+  line, person boxes cut to their own figure + name (58px, not 81), 6/15px around the people row,
+  and an always-explicit height (`BREAK_ROW` 64 + `COMPACT_GROW` 61 × expand) so `ttLayout` is exact
+  — block 80px closed (was 114), 141 open (was 202). **The uni activity (the cream block) uses the
+  same compact row** (Lucas), keeping its room line: `SOCIAL_ROW` 81, block 97 closed / 158 open. Movie Night shows the Socials tab's own
   19:00-21:30 (the timetable's back-to-back scheduler put it at 12:00, colliding with the break).
   **Every people row starts collapsed** (a plain 98px course) and only grows — 88px, then its
   friends bounce in — once the camera reaches that section, so no section shows empty space;
   `ttLayout(eCourse, eBreak, eSocial)` gives the heights, and the camera's keyframes are
   functions of the frame read off that live layout, so it stays on its section while sections
-  above it grow. Each stop has its own caption ("your week, day by day" / "see who's in your
-  course" / "see who's on a break" / "see your friends' timetables", `TT_CAPS`). The friends
+  above it grow. Each stop has its own caption ("all in one place" — Lucas, was "your week, day by
+  day"; the camera leaves the days 40 frames after the Wednesday tap, no idle second / "see who's in your
+  course" / "see who's on a break" / "add uni activities to your timetable" / "green means
+  they're at uni" / "see your friends' timetables", `TT_CAPS`). Friends per row (Lucas): four in
+  the course, three on the break, two at the uni activity (Book Club, the cream block). Camera keys carry an optional page-x too (default the card's centre
+  line), and **a zoom segment interpolates about its more-zoomed end** — that end's screen offset
+  travels in a straight line — so a push-in heads straight for its target; with equal scales it is
+  a plain lerp, as before. The friends
   list fades in only as the camera heads for it. Friends rows expand via
   `grid-template-rows: <p>fr`, which gives p × the content height.
 - `Connect.tsx` — the home card: closed bubble → open panel (the app's .9 s unfurl), the five
@@ -1326,7 +1364,17 @@ scenes scale them:
   own 1.364em) so `friendFigure()` knows each figure's exact centre — the dive starts from it.
 - `Character.tsx` + `chars.json` — the monsters as body path + eye group, extracted from
   `figur_1–7.svg` and `friend_monster_9.svg` (getBBox over CDP). `eyes=` fits ANOTHER character's
-  eye group into this body's eye box; that is what "customize" cycles.
+  eye group into this body's eye box; that is what "customize" cycles — a swap every `STEP` = 7.2
+  frames (25% faster than the first cut's 9, Lucas), each swap rounded to a whole frame
+  (`swapFrame`) so its pop spring starts at 0.
+- `MapUI.tsx` — the map screen's own chrome from `map.html`/`map.css`, 1:1 in app px: the
+  GF / 1.F / 2.F floor selector (1.F active), the collapsed bottom sheet (peeking eyes from
+  `toggle_eyes_*.svg`, the Friends | Courses toggle with Courses active and the ribbed edge, the
+  nav bar with the map pin filled). It rides on the ending phone's GLASS (`PhoneFrameClose`'s
+  `screen` slot, clipped to the screen hole), so it scales in with the frame while the map
+  behind keeps its size; meanwhile the floor glides up into the window the chrome leaves
+  (`IN_PHONE_Y` in `MapScene.tsx`), and the caption's cream wash fades so the top room is not
+  washed out inside the phone.
 - `CampusMap.tsx` / `MapScene.tsx` — the 1.F plan from `map.html` (`#mapBg1FCourses`): walls as
   `public/unify/map_1f_walls.svg` (pink rects and `vector-effect` stripped, `#938E87`), the ten
   course rooms as separate pink divs UNDER the walls. **Eight characters, each placed where its
@@ -1349,20 +1397,26 @@ scenes scale them:
 
 Story: chat → flood around it → everything spirals into the centre, a pink blob puffs and morphs
 into the timetable, landing centred, which then slides to the left third as its caption rises
-→ the camera goes in: days (tap Tuesday, then Thursday — the pink panel eases to Thursday's
-single course) → courses (their friends
-bounce in, only now) → the break (its friends bounce in) → the friends list (Emil's timetable
-opens) → "connect now" unfurls and slowly pushes in; tap Nam, tap outside; tap Yas, tap outside →
+→ the camera goes in: days (tap Tuesday, then Wednesday — the film's Wednesday is Ergonomics plus
+the app's own Wednesday course CAD Modeling under it) → the camera scrolls DOWN to CAD Modeling
+and only its friends bounce in (Lucas: the course-overlap beat must read apart from the day
+switching, so it gets its own scroll) → the break (its friends bounce in) → a short stop on the
+uni activity, the cream socials block ("add uni activities to your timetable", two friends
+bounce in) → the friends list →
+the camera pushes in on Emil's green room number ("green means they're at uni"), holds ~2 s,
+pulls back out → Emil's timetable opens as before → "connect now" unfurls and slowly pushes in; tap Nam, tap outside; tap Yas, tap outside →
 from the plain card the camera dives into Nam (the friends and text on the card ease out and
 the card's own pink grows past the frame — no separate wipe shape) → "customize your
-character", body or eyes swap every 9 frames → the others burst out from behind, land in their
+character", body or eyes swap every 7.2 frames → the others burst out from behind, land in their
 rooms as the camera pulls out to the panning map → "locate your friends on campus" → they leave,
 the rooms grow → "your" slides into "and your courses" → the camera
 pulls out to the whole floor → a phone FRAME, six times too big, closes in round the map until it
-is the opening phone exactly (the map keeps its size; outside the frame is the opening's dark)
-→ its screen fades to black, and frame 0 wakes the black screen into the chat (seam: 0.04/255
+is the opening phone exactly (the map keeps its size; outside the frame is the opening's dark),
+the app's own map chrome on its glass (Lucas) → it holds 1.2 s as the app's map screen, the
+sheet's eyes glancing about → its screen fades to black, and frame 0 wakes the black screen into the chat (seam: 0.04/255
 mean diff to frame 0). Each day tapped in the timetable stays up twice as long as the first cut. Captions for the timetable ("your timetable, and
-everyone's") and connect ("who's free right now") beats were added beyond the brief — cut freely.
+everyone's") and connect ("or view at a glance" — Lucas's wording, 2026-10-05; it was "who's free right
+now") beats were added beyond the brief — cut freely.
 
 Two things that will bite again:
 - **Characters handed between scenes are placed by `transform`, never `left/top`** (`ScreenChar`,

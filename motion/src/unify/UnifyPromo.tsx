@@ -5,7 +5,8 @@ import {Character, CharId, viewBox} from './Character';
 import {ChatScene, SUCK} from './ChatScene';
 import {ConnectCard, friendFigure, MC, MonsterCard, PANEL_H, PANEL_W} from './Connect';
 import {APP, clamp01, CREAM, DARK, ease, ExtTop, fullBg, H, lerp, NUNITO, PINK, POPB, sp, W, wordAnim} from './lib';
-import {PhoneFrameClose} from './Chat';
+import {PhoneFrameClose, SCREEN_H, SCREEN_W} from './Chat';
+import {APP_W, MapAppUI} from './MapUI';
 import {COURSE_H, DAYS_PAD, FRIENDS, FriendRow, PEOPLE_ROW_H, SearchBar, SharedTimetable, ttLayout} from './Timetable';
 import CH from './chars.json';
 
@@ -18,17 +19,22 @@ import CH from './chars.json';
    250   new messages and timetable screenshots pile up around it
    324   everything is sucked into the middle, puffs, and the pink blob morphs
          into the app's shared timetable
-   386   the camera goes in: the days (tap Tuesday), the courses (who's in
-         them bounces in), the break (who's on a break), the friends'
-         timetables (Emil's opens)
-   654   "connect now" unfurls; tap Nam, back; tap Yas, back
-   830   the camera dives into Nam, everything else eases out to pink
-   850   "customize your character" — every 0.3 s a different body or eyes
-   977   the character bursts, the others burst out behind it and land in their
+   428   the camera goes in: the days (tap Tuesday, then Wednesday), down to
+         the second course (who's in it bounces in), the break (who's on a
+         break), the uni activity ("add uni activities to your timetable",
+         two friends going), the friends list — in on Emil's green room
+         number ("green means they're at uni") and back out — and Emil's
+         timetable opens
+   1028  "connect now" unfurls; tap Nam, back; tap Yas, back
+   1204  the camera dives into Nam, everything else eases out to pink
+   1236  "customize your character" — every 0.24 s a different body or eyes
+   1331  the character bursts, the others burst out behind it and land in their
          rooms as the camera pulls out to a zoomed-in, slowly panning map —
          "locate your friends on campus"
-   1077  the friends make way for the pink course rooms — "and your courses"
-   1143  the map clears to dark, the phone comes back: frame 0
+   1431  the friends make way for the pink course rooms — "and your courses"
+   1511  the phone frame closes round the map, with the app's own map chrome
+         (floor selector, sheet, nav bar) on its glass; it holds, goes dark:
+         frame 0
    ───────────────────────────────────────────────────────────────────────── */
 
 const P = SUCK.PUFF;
@@ -44,33 +50,41 @@ export const T = {
   ZOOM_TOP: [P + 74, P + 96] as const,
   CUR_IN: P + 94,
   TAP_TUE: P + 116,
-  TAP_THU: P + 164, // each picked day stays up twice as long as the first cut (Lucas)
-  ZOOM_COURSES: [P + 234, P + 256] as const,
-  GROW_C: P + 256,
-  PEOPLE_C: P + 264,
-  ZOOM_BREAK: [P + 313, P + 335] as const,
-  GROW_B: P + 335,
-  PEOPLE_B: P + 343,
-  ZOOM_FRIENDS: [P + 392, P + 422] as const,
-  GROW_M: P + 394,
-  PEOPLE_M: P + 400,
-  CUR2_IN: P + 420,
-  TAP_EMIL: P + 444,
-  TT_OUT: P + 499,
+  TAP_WED: P + 164, // each picked day stays up twice as long as the first cut (Lucas)
+  // down from the days to Wednesday's SECOND course, whose friends bounce in —
+  // its own beat, apart from the day switching (Lucas, 2026-10-05); it leaves
+  // 40 frames after the Wednesday tap — no idle second on the days any more
+  ZOOM_COURSES: [P + 204, P + 226] as const,
+  GROW_C: P + 226,
+  PEOPLE_C: P + 234,
+  ZOOM_BREAK: [P + 283, P + 305] as const,
+  GROW_B: P + 305,
+  PEOPLE_B: P + 313,
+  // the uni activity (the cream socials block): its own short stop (Lucas, 2026-10-05)
+  ZOOM_SOCIAL: [P + 362, P + 384] as const,
+  GROW_M: P + 384,
+  PEOPLE_M: P + 392,
+  ZOOM_FRIENDS: [P + 441, P + 471] as const,
+  // in on Emil's room number (green = at uni), held, and back out to the list (Lucas, 2026-10-05)
+  ROOM_IN: [P + 481, P + 503] as const,
+  ROOM_OUT: [P + 561, P + 585] as const,
+  CUR2_IN: P + 581,
+  TAP_EMIL: P + 605,
+  TT_OUT: P + 660,
   // connect: the card simply opens (no unfold from the bubble any more)
-  C_IN: P + 513,
-  C_FRIENDS0: P + 529,
-  CUR3_IN: P + 559,
-  TAP_NAM: P + 579,
-  CLOSE1: P + 609,
-  TAP_YAS: P + 639,
-  CLOSE2: P + 669,
-  ZOOM0: P + 689,
-  ZOOM1: P + 721,
+  C_IN: P + 674,
+  C_FRIENDS0: P + 690,
+  CUR3_IN: P + 720,
+  TAP_NAM: P + 740,
+  CLOSE1: P + 770,
+  TAP_YAS: P + 800,
+  CLOSE2: P + 830,
+  ZOOM0: P + 850,
+  ZOOM1: P + 882,
   // customize
   CAP_CU: 0,
   CYCLE0: 0,
-  STEP: 9,
+  STEP: 7.2, // 25% faster than the first cut's 9 (Lucas, 2026-10-05)
   // map
   BOOM: 0,
   COURSES: 0,
@@ -81,18 +95,20 @@ export const T = {
   BLACK1: 0,
   END: 0,
 };
-/* The customize cycle: [body, eyes]. Each holds STEP frames (0.3 s). */
+/* The customize cycle: [body, eyes]. Each holds STEP frames (0.24 s). */
 const CYCLE: [CharId, CharId][] = [
   ['f6', 'f6'], ['f6', 'f1'], ['f1', 'f1'], ['f1', 'f4'], ['f4', 'f4'], ['f4', 'f3'],
   ['f3', 'f3'], ['f7', 'f7'], ['f7', 'f2'], ['f2', 'f2'], ['m9', 'm9'], ['f5', 'f5'],
 ];
 T.CAP_CU = T.ZOOM1 - 12;
 T.CYCLE0 = T.ZOOM1 + 6;
-T.BOOM = T.CYCLE0 + (CYCLE.length - 1) * T.STEP + 10;
+/* the frame of the k-th swap (k >= 1), rounded so every pop starts on a whole frame */
+const swapFrame = (k: number) => Math.round(T.CYCLE0 + (k - 1) * T.STEP);
+T.BOOM = swapFrame(CYCLE.length) + 10;
 T.COURSES = T.BOOM + 100;
 T.FRAME0 = T.COURSES + 80; // after the pull-out to the whole floor, the phone frame closes in
 T.FRAME1 = T.FRAME0 + 42;
-T.BLACK0 = T.FRAME1 + 2;
+T.BLACK0 = T.FRAME1 + 36; // the closed phone holds, showing the app's map screen, before going dark
 T.BLACK1 = T.BLACK0 + 16;
 T.LOOP0 = T.FRAME0; // (the map caption leaves as the frame starts closing)
 T.END = T.BLACK1 + 8;
@@ -166,45 +182,70 @@ const GROW = 14;
 const growC = (f: number) => ease(f, T.GROW_C, T.GROW_C + GROW, Easing.inOut(Easing.cubic));
 const growB = (f: number) => ease(f, T.GROW_B, T.GROW_B + GROW, Easing.inOut(Easing.cubic));
 const growM = (f: number) => ease(f, T.GROW_M, T.GROW_M + GROW, Easing.inOut(Easing.cubic));
-/* Monday and Tuesday have two pink courses, Thursday one: the panel eases to its new height */
-const pinkN = (f: number) => 2 - ease(f, T.TAP_THU + 1, T.TAP_THU + 15, APP);
-const layoutAt = (f: number) => ttLayout(growC(f), growB(f), growM(f), pinkN(f));
+/* Monday, Tuesday and Wednesday all have two pink courses, so the panel keeps its height */
+const layoutAt = (f: number) => ttLayout(growC(f), growB(f), growM(f));
+/* Wednesday's second course: below the days row and the first course */
+const course2Mid = (f: number) => DAYS_PAD + 51.8 + 4 + COURSE_H + 4 + (COURSE_H + PEOPLE_ROW_H * growC(f)) / 2;
 const emilTop = (f: number) => layoutAt(f).h + 34 + 52 + 22; // past the search bar
-/* Camera keyframes [frame, scale, page y at the frame's middle]. The y is a
-   FUNCTION of the frame, read off the live layout, so the camera stays on its
-   section while sections above it grow. */
-type Key = [number, number, (f: number) => number];
+/* Emil's room number ("0.012", green: he is at uni) — its centre in the row */
+const ROOM: Pt = [283, 36];
+const ROOM_S = 3.2;
+/* Camera keyframes [frame, scale, page y at the frame's middle, page x there
+   (default: the timetable's centre line)]. Both are FUNCTIONS of the frame,
+   read off the live layout, so the camera stays on its section while sections
+   above it grow. */
+type Key = [number, number, (f: number) => number, ((f: number) => number)?];
+const MID_X = () => 377 / 2;
 const TT_KEYS: Key[] = [
   [T.CARD_IN0, 1.25, (f) => layoutAt(f).h / 2], // the whole thing, as the blob lands
   [T.ZOOM_TOP[0], 1.25, (f) => layoutAt(f).h / 2],
   [T.ZOOM_TOP[1], 2.3, () => 148], // the days
   [T.ZOOM_COURSES[0], 2.3, () => 148],
-  [T.ZOOM_COURSES[1], 2.3, (f) => DAYS_PAD + 55.8 + (COURSE_H + PEOPLE_ROW_H * growC(f)) / 2 + 20], // the course (Thursday's one)
-  [T.ZOOM_BREAK[0], 2.3, (f) => DAYS_PAD + 55.8 + (COURSE_H + PEOPLE_ROW_H * growC(f)) / 2 + 20],
+  [T.ZOOM_COURSES[1], 2.3, (f) => course2Mid(f) + 20], // Wednesday's second course
+  [T.ZOOM_BREAK[0], 2.3, (f) => course2Mid(f) + 20],
   [T.ZOOM_BREAK[1], 2.3, (f) => layoutAt(f).breakTop + layoutAt(f).breakH / 2], // the break
-  [T.ZOOM_FRIENDS[0], 2.3, (f) => layoutAt(f).breakTop + layoutAt(f).breakH / 2],
+  [T.ZOOM_SOCIAL[0], 2.3, (f) => layoutAt(f).breakTop + layoutAt(f).breakH / 2],
+  [T.ZOOM_SOCIAL[1], 2.3, (f) => layoutAt(f).creamTop + layoutAt(f).creamH / 2], // the uni activity
+  [T.ZOOM_FRIENDS[0], 2.3, (f) => layoutAt(f).creamTop + layoutAt(f).creamH / 2],
   [T.ZOOM_FRIENDS[1], 1.8, (f) => emilTop(f) + 117], // the friends list
+  [T.ROOM_IN[0], 1.8, (f) => emilTop(f) + 117],
+  // Emil's room number, a little right of the timetable's line so his name stays in shot
+  [T.ROOM_IN[1], ROOM_S, (f) => emilTop(f) + ROOM[1], () => ROOM[0] - 100 / ROOM_S],
+  [T.ROOM_OUT[0], ROOM_S, (f) => emilTop(f) + ROOM[1], () => ROOM[0] - 100 / ROOM_S],
+  [T.ROOM_OUT[1], 1.8, (f) => emilTop(f) + 117],
   [T.TAP_EMIL, 1.8, (f) => emilTop(f) + 117],
   [T.TAP_EMIL + 26, 1.8, (f) => emilTop(f) + 210], // ...following Emil's timetable down
 ];
 const ttCam = (f: number) => {
+  const X = (k: Key) => (k[3] ?? MID_X)(f);
   let k = TT_KEYS[0];
   for (let i = 0; i < TT_KEYS.length - 1; i++) {
-    const [a, sa, ya] = TT_KEYS[i];
-    const [b, sb, yb] = TT_KEYS[i + 1];
-    if (f <= a) return {s: sa, y: ya(f)};
+    const A = TT_KEYS[i];
+    const B = TT_KEYS[i + 1];
+    const [a, sa, ya] = A;
+    const [b, sb, yb] = B;
+    if (f <= a) return {s: sa, y: ya(f), x: X(A)};
     if (f <= b) {
       const t = ease(f, a, b, Easing.inOut(Easing.cubic));
-      return {s: Math.exp(lerp(Math.log(sa), Math.log(sb), t)), y: lerp(ya(f), yb(f), t)};
+      const s = Math.exp(lerp(Math.log(sa), Math.log(sb), t));
+      // zoom about the closer end's centre: its screen offset travels in a straight
+      // line, so a push-in heads straight for its target instead of swinging past it
+      // (with equal scales this is a plain lerp)
+      const near = sb >= sa ? B : A;
+      const ax = X(near);
+      const ay = near[2](f);
+      const ox = lerp((ax - X(A)) * sa, (ax - X(B)) * sb, t);
+      const oy = lerp((ay - ya(f)) * sa, (ay - yb(f)) * sb, t);
+      return {s, x: ax - ox / s, y: ay - oy / s};
     }
-    k = TT_KEYS[i + 1];
+    k = B;
   }
-  return {s: k[1], y: k[2](f)};
+  return {s: k[1], y: k[2](f), x: X(k)};
 };
 /* page point → screen */
 const ttScreen = (f: number, px: number, py: number): Pt => {
   const c = ttCam(f);
-  return [ttCx(f) + (px - 377 / 2) * c.s, H / 2 + (py - c.y) * c.s];
+  return [ttCx(f) + (px - c.x) * c.s, H / 2 + (py - c.y) * c.s];
 };
 /* the blob morphs into the pink panel at the overview (every section still closed) */
 const TT_SIL = (() => {
@@ -216,43 +257,45 @@ const TT_SIL = (() => {
 /* What the caption says at each stop */
 const TT_CAPS: {lines: string[]; inAt: number; outAt: number}[] = [
   {lines: ['your timetable,', "and everyone's"], inAt: T.CAP_TT, outAt: T.ZOOM_TOP[0]},
-  {lines: ['your week,', 'day by day'], inAt: T.ZOOM_TOP[0] + 16, outAt: T.ZOOM_COURSES[0]},
+  {lines: ['all in', 'one place'], inAt: T.ZOOM_TOP[0] + 16, outAt: T.ZOOM_COURSES[0]},
   {lines: ["see who's in", 'your course'], inAt: T.ZOOM_COURSES[0] + 16, outAt: T.ZOOM_BREAK[0]},
-  {lines: ["see who's on", 'a break'], inAt: T.ZOOM_BREAK[0] + 16, outAt: T.ZOOM_FRIENDS[0]},
-  {lines: ["see your friends'", 'timetables'], inAt: T.ZOOM_FRIENDS[0] + 16, outAt: T.TT_OUT},
+  {lines: ["see who's on", 'a break'], inAt: T.ZOOM_BREAK[0] + 16, outAt: T.ZOOM_SOCIAL[0]},
+  {lines: ['add uni activities', 'to your timetable'], inAt: T.ZOOM_SOCIAL[0] + 16, outAt: T.ZOOM_FRIENDS[0]},
+  {lines: ['green means', "they're at uni"], inAt: T.ZOOM_FRIENDS[0] + 16, outAt: T.ROOM_OUT[0]},
+  {lines: ["see your friends'", 'timetables'], inAt: T.ROOM_OUT[0] + 16, outAt: T.TT_OUT},
 ];
 
 const TimetableScene: React.FC<{f: number}> = ({f}) => {
   const cam = ttCam(f);
   const cardIn = ease(f, T.CARD_IN0, T.CARD_IN1, Easing.out(Easing.cubic));
   const out = ease(f, T.TT_OUT, T.TT_OUT + 14, Easing.in(Easing.cubic));
-  // Monday → tap Tuesday → tap Thursday
-  const day = f < T.TAP_TUE + 1 ? 'montag' : f < T.TAP_THU + 1 ? 'dienstag' : 'donnerstag';
-  const lastTap = f < T.TAP_THU + 1 ? T.TAP_TUE : T.TAP_THU;
+  // Monday → tap Tuesday → tap Wednesday
+  const day = f < T.TAP_TUE + 1 ? 'montag' : f < T.TAP_WED + 1 ? 'dienstag' : 'mittwoch';
+  const lastTap = f < T.TAP_WED + 1 ? T.TAP_TUE : T.TAP_WED;
   const slide = day === 'montag' ? 1 : ease(f, lastTap + 1, lastTap + 15, APP);
   const activeT = ease(f, lastTap, lastTap + 4);
-  const [activeFrom, activeTo] = day === 'montag' ? [0, 0] : day === 'dienstag' ? [0, 1] : [1, 3];
+  const [activeFrom, activeTo] = day === 'montag' ? [0, 0] : day === 'dienstag' ? [0, 1] : [1, 2];
   // friends bounce in only once the camera is on their section
   const personT = (course: string, i: number) => {
-    const at = course === 'Ergonomics' ? T.PEOPLE_C : course === 'break' ? T.PEOPLE_B : course === 'Book Club' ? T.PEOPLE_M : -1;
+    const at = course === 'CAD Modeling' ? T.PEOPLE_C : course === 'break' ? T.PEOPLE_B : course === 'Book Club' ? T.PEOPLE_M : -1;
     return at < 0 ? 0 : sp(f, at + i * 5, 'bouncy');
   };
   const blockT = (i: number) => (i === 0 ? 1 : sp(f, T.CARD_IN0 + 4 + i * 6, 'soft'));
-  const expandT = (course: string) => (course === 'Ergonomics' ? growC(f) : course === 'break' ? growB(f) : course === 'Book Club' ? growM(f) : 0);
+  const expandT = (course: string) => (course === 'CAD Modeling' ? growC(f) : course === 'break' ? growB(f) : course === 'Book Club' ? growM(f) : 0);
   const emilOpen = ease(f, T.TAP_EMIL + 1, T.TAP_EMIL + 12, Easing.inOut(Easing.quad));
 
-  // cursor: the Tuesday disc, then Emil's chevron
+  // cursor: the Tuesday disc, the Wednesday disc, then Emil's chevron
   const dDisc = ttScreen(f, 114.5, DAYS_PAD + 25.9); // Tuesday
-  const thDisc = ttScreen(f, 114.5 + 2 * 74, DAYS_PAD + 25.9); // Thursday
+  const wDisc = ttScreen(f, 114.5 + 74, DAYS_PAD + 25.9); // Wednesday
   const emilChev = ttScreen(f, 340, emilTop(f) + 35.5);
   const cur =
-    f < T.TAP_THU + 12
-      ? path(f, [[T.CUR_IN, [dDisc[0] + 320, dDisc[1] + 380]], [T.TAP_TUE - 4, dDisc], [T.TAP_TUE + 6, dDisc], [T.TAP_THU - 4, thDisc]])
+    f < T.TAP_WED + 12
+      ? path(f, [[T.CUR_IN, [dDisc[0] + 320, dDisc[1] + 380]], [T.TAP_TUE - 4, dDisc], [T.TAP_TUE + 6, dDisc], [T.TAP_WED - 4, wDisc]])
       : path(f, [[T.CUR2_IN, [emilChev[0] + 260, emilChev[1] + 330]], [T.TAP_EMIL - 4, emilChev]]);
   const curO =
-    ease(f, T.CUR_IN, T.CUR_IN + 8) * (1 - ease(f, T.TAP_THU + 10, T.TAP_THU + 18)) +
+    ease(f, T.CUR_IN, T.CUR_IN + 8) * (1 - ease(f, T.TAP_WED + 10, T.TAP_WED + 18)) +
     ease(f, T.CUR2_IN, T.CUR2_IN + 8) * (1 - ease(f, T.TAP_EMIL + 12, T.TAP_EMIL + 20));
-  const curDown = Math.max(press(f, T.TAP_TUE), press(f, T.TAP_THU), press(f, T.TAP_EMIL));
+  const curDown = Math.max(press(f, T.TAP_TUE), press(f, T.TAP_WED), press(f, T.TAP_EMIL));
 
   const origin = ttScreen(f, 0, 0);
   return (
@@ -264,7 +307,7 @@ const TimetableScene: React.FC<{f: number}> = ({f}) => {
           opacity: cardIn * (1 - out),
         }}
       >
-        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 34, width: 377, transform: `scale(${1 - 0.05 * out})`, transformOrigin: `188.5px ${cam.y}px`}}>
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 34, width: 377, transform: `scale(${1 - 0.05 * out})`, transformOrigin: `${cam.x}px ${cam.y}px`}}>
           <SharedTimetable day={day} slide={slide} activeFrom={activeFrom} activeTo={activeTo} activeT={day === 'montag' ? 1 : activeT} personT={personT} blockT={blockT} expandT={expandT} pinkH={layoutAt(f).pink} />
           {/* the friends list only comes up as the camera heads for it */}
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, width: '100%', opacity: ease(f, T.ZOOM_FRIENDS[0] - 4, T.ZOOM_FRIENDS[0] + 12)}}>
@@ -394,12 +437,15 @@ const charNorm = (id: CharId) => {
   return Math.sqrt(a('f6') / a(id));
 };
 const charWidth = (id: CharId) => viewBox(id)[2] * PX_PER_UNIT_NAM * charNorm(id);
-const cycleAt = (f: number) => (f < T.CYCLE0 ? 0 : Math.max(0, Math.min(CYCLE.length - 1, Math.floor((f - T.CYCLE0) / T.STEP) + 1)));
+const cycleAt = (f: number) => {
+  let k = 0;
+  while (k < CYCLE.length - 1 && f >= swapFrame(k + 1)) k++;
+  return k;
+};
 const CustomizeChar: React.FC<{f: number}> = ({f}) => {
   const k = cycleAt(f);
   const [body, eyes] = CYCLE[k];
-  const swapAt = T.CYCLE0 + (k - 1) * T.STEP;
-  const pop = k > 0 ? 1 + 0.09 * (1 - sp(f, swapAt, 'snappy')) : 1;
+  const pop = k > 0 ? 1 + 0.09 * (1 - sp(f, swapFrame(k), 'snappy')) : 1;
   // the pupils glance over at the text once the dive has landed
   const glance = ease(f, T.ZOOM1 + 2, T.ZOOM1 + 12) * (1 - ease(f, T.BOOM - 14, T.BOOM - 4));
   return <ScreenChar id={body} eyes={eyes} w={charWidth(body)} c={[LEFT3, H / 2]} scale={pop} pupil={[2.2 * glance, -0.6 * glance]} />;
@@ -410,14 +456,28 @@ const FINAL_CHAR = CYCLE[CYCLE.length - 1][0];
 export const UnifyPromo: React.FC = () => {
   const f = useCurrentFrame();
   const ext = React.useContext(ExtTop);
+  const tile = React.useContext(TileCut);
+  // the tile cut: the timetable scene eases left with its slide, which evens its margins there,
+  // and the page (not its caption) moves right while the camera is in on Emil's room number,
+  // in step with that zoom, so his name stays inside the narrower frame
+  const ttDx = tile ? TILE.ttDx * ease(f, T.SLIDE[0], T.SLIDE[1], Easing.inOut(Easing.cubic)) : 0;
+  const roomDx = tile ? TILE.roomDx * ease(f, T.ROOM_IN[0], T.ROOM_IN[1], Easing.inOut(Easing.cubic)) * (1 - ease(f, T.ROOM_OUT[0], T.ROOM_OUT[1], Easing.inOut(Easing.cubic))) : 0;
 
   // the ending: the phone FRAME closes in round the map (the map keeps its size; outside the
   // frame is the opening's dark), then its screen fades to black — and frame 0 wakes it again
   const k = Math.exp(Math.log(6) * (1 - ease(f, T.FRAME0, T.FRAME1, Easing.inOut(Easing.cubic))));
   const black = ease(f, T.BLACK0, T.BLACK1, Easing.inOut(Easing.quad));
+  // the app's map chrome rides on the glass; while the phone holds, the sheet's eyes glance about
+  const look = -3.5 * ease(f, T.FRAME1 - 6, T.FRAME1 + 4) + 7 * ease(f, T.FRAME1 + 14, T.FRAME1 + 24);
+  const us = SCREEN_W / APP_W;
+  const screenUI = (
+    <div style={{position: 'absolute', left: 0, top: 0, transformOrigin: '0 0', transform: `scale(${us})`}}>
+      <MapAppUI h={SCREEN_H / us} look={look} />
+    </div>
+  );
 
   return (
-    <AbsoluteFill style={{background: DARK, overflow: 'hidden'}}>
+    <AbsoluteFill style={{background: DARK, overflow: tile ? 'visible' : 'hidden'}}>
       {/* the film's 1920x1080 frame; the tall cut adds `ext` of canvas above it */}
       <div style={{position: 'absolute', left: 0, top: ext, width: W, height: H}}>
         {/* after the dive the card's own pink has filled the frame; this takes over from it */}
@@ -427,12 +487,16 @@ export const UnifyPromo: React.FC = () => {
         {f < T.CARD_IN1 + 4 ? <ChatScene f={f} cardBox={TT_SIL} cardIn={[T.CARD_IN0, T.CARD_IN1]} /> : null}
 
         {/* 2 — the shared timetable */}
-        {f >= T.CARD_IN0 && f < T.TT_OUT + 16 ? <TimetableScene f={f} /> : null}
-        {TT_CAPS.map((c, i) => (f >= c.inAt && f < c.outAt + 20 ? <Caption key={i} lines={c.lines} f={f} inAt={c.inAt} outAt={c.outAt} color={CREAM} x={1100} size={88} /> : null))}
+        <div style={{position: 'absolute', inset: 0, transform: ttDx + roomDx ? `translateX(${ttDx + roomDx}px)` : undefined}}>
+          {f >= T.CARD_IN0 && f < T.TT_OUT + 16 ? <TimetableScene f={f} /> : null}
+        </div>
+        <div style={{position: 'absolute', inset: 0, transform: ttDx ? `translateX(${ttDx}px)` : undefined}}>
+          {TT_CAPS.map((c, i) => (f >= c.inAt && f < c.outAt + 20 ? <Caption key={i} lines={c.lines} f={f} inAt={c.inAt} outAt={c.outAt} color={CREAM} x={1100} size={88} /> : null))}
+        </div>
 
         {/* 3 — connect now, and the dive into Nam */}
         {f >= T.C_IN && f < T.ZOOM1 ? <ConnectScene f={f} /> : null}
-        {f >= T.C_IN && f < T.ZOOM0 + 14 ? <Caption lines={["who's free", 'right now']} f={f} inAt={T.C_IN + 6} outAt={T.ZOOM0} color={CREAM} x={1060} /> : null}
+        {f >= T.C_IN && f < T.ZOOM0 + 14 ? <Caption lines={['or view', 'at a glance']} f={f} inAt={T.C_IN + 6} outAt={T.ZOOM0} color={CREAM} x={1060} /> : null}
 
         {/* 4 — customize your character, on the app's pink */}
         {f >= T.ZOOM1 && f < T.BOOM ? <CustomizeChar f={f} /> : null}
@@ -442,11 +506,31 @@ export const UnifyPromo: React.FC = () => {
         {f >= T.BOOM ? <CampusMap f={f} T={T} charW={charWidth(FINAL_CHAR)} finalChar={FINAL_CHAR} finalEyes={CYCLE[CYCLE.length - 1][1]} /> : null}
 
         {/* 7 — the phone frame closes round the map, its screen goes black: frame 0 */}
-        {f >= T.FRAME0 ? <PhoneFrameClose k={k} black={black} ground={DARK} /> : null}
+        {f >= T.FRAME0 ? <PhoneFrameClose k={k} black={black} ground={DARK} screen={screenUI} /> : null}
       </div>
     </AbsoluteFill>
   );
 };
+
+/* The landing tile's cut (2D.html, Lucas 2026-10-05): 3:2 like the to.morrow
+   tile, 1620x1080. A plain centre crop of the 16:9 film would cut the long
+   timetable captions short (they run to x 1827), so this cut re-frames
+   instead: the whole film at 0.9 about the frame's middle — the cameras see a
+   little more on every side, full-frame grounds bleed to cover it (BLEED) —
+   and the timetable scene eases 30px left with its slide, so its card and its
+   captions sit ~65px from either edge; during the room-number zoom the page
+   alone moves 60px right, keeping Emil's name in. */
+export const TILE = {w: 1620, h: 1080, scale: 0.9, ttDx: -30, roomDx: 60};
+const TileCut = React.createContext(false);
+export const UnifyPromoTile: React.FC = () => (
+  <AbsoluteFill style={{background: DARK, overflow: 'hidden'}}>
+    <div style={{position: 'absolute', left: (TILE.w - W) / 2, top: (TILE.h - H) / 2, width: W, height: H, transform: `scale(${TILE.scale})`, transformOrigin: '50% 50%'}}>
+      <TileCut.Provider value={true}>
+        <UnifyPromo />
+      </TileCut.Provider>
+    </div>
+  </AbsoluteFill>
+);
 
 /* The page hero's tall cut: EXT px of canvas above the film (see ExtTop). */
 export const UNIFY_EXT = 240;
