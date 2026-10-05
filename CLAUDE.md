@@ -1347,9 +1347,17 @@ Hand-offs agree by construction: connect card → dive → customize character �
 (540, 780); chat phone and the closing phone at (540, 675). The 3x opener is capped at 90% of the
 frame's width (`ChatScene maxW`, the page's own min(3, width/bubble) rule) — at 3x it was 1131px
 in a 1080 frame. The washes under the captions (dark on the timetable, cream on the map) are
-solid only at the frame's very top and fade over 420 / 540px with eased stops, so the captions
-sit IN the fade (Lucas: under the text only a little darkened, more solid toward the top) and
-the timetable's wash is gone before the overview card's days row.
+solid only at the frame's very top and fade out by 420 / 540px, so the captions sit IN the fade
+(Lucas: under the text darkened, more solid toward the top) and the timetable's wash is gone
+before the overview card's days row. Each is a `Wash` {start, end, top, curve} in frame px
+(`TT_WASH` in UnifyPromoV.tsx, `MAP_WASH_V` in MapScene.tsx), drawn by `washStops()` in lib.ts:
+alpha `top` above `start`, then `top·(1−t)^curve` to 0 at `end` (curve 0.7: ~0.57 under the
+timetable caption). **Tune them with `wash-tuner/`** (repo root — the Vite dev server serves it at
+`/wash-tuner/`, the build never ships it): real frames of the vertical cut rendered with no wash
+and no captions (`npx remotion still UnifyPromoV wash-tuner/f<N>.png --frame=<N>
+--props='{"tune":true}'`, then JPEG), the same gradient and captions drawn live over them,
+sliders per scene, and a "copy settings" line whose numbers drop straight into TT_WASH /
+MAP_WASH_V.
 
 **Every cut starts on the chat** (Lucas, 2026-10-05): `useFilmFrame()` maps the file's frame to
 the film's `(f + FILM_START) % duration`, `FILM_START` = the opener just in (frame 26), so the
@@ -1364,6 +1372,10 @@ bubble.
 (`unify-promo-hero.mp4`, `unify-promo-tile.mp4`, `unify-promo-mobile.mp4`,
 `unify-promo-mobile-hero.mp4`); re-make all four posters from each file's frame 0 (`promo-poster-hero`, `-tile`, `-mobile`,
 `-mobile-hero`).
+**Then bump the `?v=` version on every one of those URLs** (the `<source>`s, `poster`s and the
+phone-poster scripts in `2D.html`, `unify2d.html`, `unify2d1.html` — one regex). The files keep
+their names, GitHub Pages serves them with `max-age=600`, and iOS Safari holds video longer than
+that: without a new query the live phone page kept playing the previous cut after a deploy.
 
 **Ground truth is the final pink app's own code, `~/TEMP/Unify/web/`** (static HTML/CSS/JS,
 Nunito, `--pink #FF88C8 / --dark #292925 / --cream #F9F2EB`; design notes in

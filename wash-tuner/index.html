@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wash Tuner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&display=swap" rel="stylesheet" />
+<!--
+  Dev tool for the Unify promo's VERTICAL cut (motion/src/unify/UnifyPromoV.tsx):
+  dial in the wash under the captions — the dark one on the timetable, the cream
+  one on the map — over real frames of the film rendered with no wash and no
+  captions (UnifyPromoV, props {"tune": true}). The gradient here is built the
+  same way as washStops() in motion/src/unify/lib.ts, in the frame's own px
+  (1080 x 1350), so the numbers carry over 1:1. Served by the Vite dev server
+  (repo root, not public/), so it never deploys.
+-->
+<style>
+  :root {
+    --bg: #18181b; --panel: #232327; --line: #34343a; --text: #ececee; --muted: #9a9aa2; --accent: #FF88C8;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  main { display: grid; grid-template-columns: minmax(0, 460px) minmax(280px, 380px); gap: 24px; justify-content: center; padding: 20px 16px 40px; }
+  @media (max-width: 760px) {
+    main { grid-template-columns: minmax(0, 1fr); padding: 12px 16px 40px; gap: 16px; }
+    /* keep the preview and the sliders on screen together: the frame pins to the top, at most ~half the screen tall */
+    .frame-wrap { width: min(100%, calc(50svh * 0.8)); margin: 0 auto; position: sticky; top: 8px; z-index: 2; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+  }
+
+  /* the frame, 1080 x 1350, scaled to its column */
+  .frame-wrap { position: relative; width: 100%; aspect-ratio: 1080 / 1350; border-radius: 10px; overflow: hidden; background: #292925; }
+  .frame { position: absolute; left: 0; top: 0; width: 1080px; height: 1350px; transform-origin: 0 0; }
+  .frame img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .wash { position: absolute; left: 0; top: 0; width: 1080px; }
+  .cap { position: absolute; left: 0; width: 1080px; font-family: "Nunito", sans-serif; font-weight: 800; text-align: center; white-space: pre; }
+  .guide { position: absolute; left: 0; width: 1080px; height: 0; border-top: 3px dashed rgba(255, 136, 200, .9); pointer-events: none; }
+  .guide span { position: absolute; right: 8px; top: 2px; font: 600 26px/1 -apple-system, sans-serif; color: var(--accent); }
+
+  aside { display: flex; flex-direction: column; gap: 16px; }
+  h1 { margin: 0; font-size: 17px; font-weight: 650; }
+  .hint { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 3px; }
+  .seg button { appearance: none; border: 0; border-radius: 8px; padding: 9px 8px; background: transparent; color: var(--muted); font: inherit; font-weight: 600; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--line); color: var(--text); }
+  .frames { display: flex; flex-wrap: wrap; gap: 6px; }
+  .frames button { appearance: none; border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 6px 11px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  .frames button[aria-pressed="true"] { border-color: var(--accent); color: var(--text); }
+  .ctl { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+  .row { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; }
+  .row label { font-weight: 600; }
+  .row output { font-variant-numeric: tabular-nums; color: var(--accent); min-width: 4.5ch; text-align: right; }
+  .row input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+  .row small { grid-column: 1 / -1; color: var(--muted); font-size: 12px; margin-top: -2px; }
+  .readout { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; }
+  .readout b { color: var(--text); font-variant-numeric: tabular-nums; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .actions button { appearance: none; border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 9px; padding: 9px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  .actions button.primary { background: var(--accent); border-color: var(--accent); color: #1b1b1d; }
+  .actions label { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; margin-left: auto; }
+  pre { margin: 0; white-space: pre-wrap; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: 12.5px/1.5 ui-monospace, Menlo, monospace; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame-wrap" id="wrap">
+    <div class="frame" id="frame">
+      <img id="img" alt="" />
+      <div class="wash" id="wash"></div>
+      <div id="caps"></div>
+      <div id="guides"></div>
+    </div>
+  </div>
+
+  <aside>
+    <div>
+      <h1>Caption wash · vertical Unify film</h1>
+      <p class="hint">Each scene has its own settings. Copy them and send them back, and they go into the film as they are.</p>
+    </div>
+
+    <div class="seg" role="group" aria-label="Scene">
+      <button data-scene="tt" aria-pressed="true">Timetable (dark)</button>
+      <button data-scene="map" aria-pressed="false">Map (cream)</button>
+    </div>
+    <div class="frames" id="frames" role="group" aria-label="Frame"></div>
+
+    <div class="ctl">
+      <div class="row"><label for="top">Opacity at the top</label><output id="o-top"></output>
+        <input type="range" id="top" min="0" max="1" step="0.01" /></div>
+      <div class="row"><label for="start">Fade starts at</label><output id="o-start"></output>
+        <input type="range" id="start" min="-300" max="700" step="5" /><small>px from the frame's top; solid above it</small></div>
+      <div class="row"><label for="end">Fade ends at</label><output id="o-end"></output>
+        <input type="range" id="end" min="0" max="1100" step="5" /><small>px from the frame's top; clear below it</small></div>
+      <div class="row"><label for="curve">Curve</label><output id="o-curve"></output>
+        <input type="range" id="curve" min="0.2" max="3" step="0.05" /><small>under 1 holds the dark longer · 1 is linear · over 1 lets it go early</small></div>
+      <div class="readout"><span>Opacity under the caption's middle</span><b id="under"></b></div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="copy">Copy settings</button>
+      <button id="reset">Reset to the film's</button>
+      <label><input type="checkbox" id="showGuides" /> guides</label>
+    </div>
+    <pre id="out"></pre>
+  </aside>
+</main>
+
+<script>
+  // The film's current values (motion/src/unify: TT_WASH in UnifyPromoV.tsx, MAP_WASH_V in MapScene.tsx).
+  const FILM = {
+    tt:  {start: 0, end: 420, top: 1, curve: 0.7},
+    map: {start: 0, end: 540, top: 1, curve: 0.7},
+  };
+  const RGB = {tt: '41,41,37', map: '249,242,235'};
+  // Captions exactly as the film sets them: the timetable's centred on y 230 (88px, line-height .92),
+  // the map's two lines from y 105 (84px, 88.2px apart). Frame numbers are the vertical file's.
+  const FRAMES = {
+    tt: [
+      {n: 494, label: 'days', lines: ['all in', 'one place']},
+      {n: 600, label: 'course', lines: ["see who's in", 'your course']},
+      {n: 674, label: 'break', lines: ["see who's on", 'a break']},
+      {n: 740, label: 'activity', lines: ['add uni activities', 'to your timetable']},
+      {n: 854, label: 'room no.', lines: ['green means', "they're at uni"]},
+      {n: 969, label: 'friends', lines: ["see your friends'", 'timetables']},
+    ],
+    map: [
+      {n: 1374, label: 'friends', lines: ['locate your friends', 'on campus']},
+      {n: 1470, label: 'courses', lines: ['and your courses']},
+    ],
+  };
+
+  const KEY = 'unify-wash-tuner';
+  let state = {tt: {...FILM.tt}, map: {...FILM.map}, scene: 'tt', frame: {tt: 600, map: 1374}, guides: false};
+  try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.tt && s.map) state = {...state, ...s}; } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+  const $ = (id) => document.getElementById(id);
+  const frame = $('frame'), wrap = $('wrap');
+
+  // same construction as washStops() in motion/src/unify/lib.ts
+  const alphaAt = (w, y) => (y <= w.start ? w.top : y >= w.end ? 0 : w.top * Math.pow(1 - (y - w.start) / (w.end - w.start), w.curve));
+  const gradient = (rgb, w, n = 10) => {
+    const stops = [`rgba(${rgb},${w.top}) ${w.start}px`];
+    for (let i = 1; i <= n; i++) {
+      const t = i / n;
+      stops.push(`rgba(${rgb},${(w.top * Math.pow(1 - t, w.curve)).toFixed(3)}) ${(w.start + (w.end - w.start) * t).toFixed(1)}px`);
+    }
+    return `linear-gradient(${stops.join(', ')})`;
+  };
+
+  function fit() { frame.style.transform = `scale(${wrap.clientWidth / 1080})`; }
+  new ResizeObserver(fit).observe(wrap);
+
+  function renderFrames() {
+    const box = $('frames');
+    box.innerHTML = '';
+    FRAMES[state.scene].forEach((fr) => {
+      const b = document.createElement('button');
+      b.textContent = fr.label;
+      b.setAttribute('aria-pressed', String(state.frame[state.scene] === fr.n));
+      b.onclick = () => { state.frame[state.scene] = fr.n; save(); renderFrames(); render(); };
+      box.appendChild(b);
+    });
+    document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.scene === state.scene)));
+  }
+
+  function render() {
+    const sc = state.scene, w = state[sc];
+    const fr = FRAMES[sc].find((x) => x.n === state.frame[sc]) || FRAMES[sc][0];
+    $('img').src = `f${fr.n}.jpg`;
+
+    const wash = $('wash');
+    wash.style.height = Math.max(w.end, w.start, 1) + 'px';
+    wash.style.background = gradient(RGB[sc], w);
+
+    const caps = $('caps');
+    caps.innerHTML = '';
+    let mid;
+    if (sc === 'tt') {
+      const c = document.createElement('div');
+      c.className = 'cap';
+      Object.assign(c.style, {top: '230px', transform: 'translateY(-50%)', fontSize: '88px', lineHeight: '.92', letterSpacing: '-0.01em', color: '#F9F2EB'});
+      c.textContent = fr.lines.join('\n');
+      caps.appendChild(c);
+      mid = 230;
+    } else {
+      fr.lines.forEach((line, i) => {
+        const c = document.createElement('div');
+        c.className = 'cap';
+        Object.assign(c.style, {top: 105 + i * 88.2 + 'px', fontSize: '84px', lineHeight: '1', color: '#292925'});
+        c.textContent = line;
+        caps.appendChild(c);
+      });
+      mid = 105 + (fr.lines.length * 88.2) / 2;
+    }
+
+    const g = $('guides');
+    g.innerHTML = state.guides
+      ? [['start', w.start], ['end', w.end], ['caption middle', mid]].map(([l, y]) => `<div class="guide" style="top:${y}px"><span>${l}</span></div>`).join('')
+      : '';
+
+    ['top', 'start', 'end', 'curve'].forEach((k) => { $(k).value = w[k]; });
+    $('o-top').textContent = w.top.toFixed(2);
+    $('o-start').textContent = w.start + 'px';
+    $('o-end').textContent = w.end + 'px';
+    $('o-curve').textContent = w.curve.toFixed(2);
+    $('under').textContent = alphaAt(w, mid).toFixed(2);
+    $('showGuides').checked = state.guides;
+
+    const fmt = (x) => `start ${x.start}, end ${x.end}, top ${x.top.toFixed(2)}, curve ${x.curve.toFixed(2)}`;
+    $('out').textContent = `timetable: ${fmt(state.tt)}\nmap:       ${fmt(state.map)}`;
+  }
+
+  ['top', 'start', 'end', 'curve'].forEach((k) => {
+    $(k).addEventListener('input', (e) => {
+      const w = state[state.scene];
+      w[k] = parseFloat(e.target.value);
+      if (k === 'start' && w.start >= w.end) w.end = w.start + 5;
+      if (k === 'end' && w.end <= w.start) w.start = w.end - 5;
+      save(); render();
+    });
+  });
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => { state.scene = b.dataset.scene; save(); renderFrames(); render(); }));
+  $('showGuides').addEventListener('change', (e) => { state.guides = e.target.checked; save(); render(); });
+  $('reset').addEventListener('click', () => { state.tt = {...FILM.tt}; state.map = {...FILM.map}; save(); render(); });
+  $('copy').addEventListener('click', async () => {
+    const txt = $('out').textContent;
+    try { await navigator.clipboard.writeText(txt); $('copy').textContent = 'Copied'; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents($('out')); getSelection().removeAllRanges(); getSelection().addRange(r); $('copy').textContent = 'Selected — copy it'; }
+    setTimeout(() => { $('copy').textContent = 'Copy settings'; }, 1600);
+  });
+
+  renderFrames();
+  render();
+  fit();
+</script>
+</body>
+</html>

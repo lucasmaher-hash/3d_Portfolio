@@ -66,6 +66,19 @@ export const mix = (a: string, b: string, t: number) => {
   return `rgb(${c[0]},${c[1]},${c[2]})`;
 };
 
+/* A caption wash's gradient (gradient-local px): alpha `top` down to y0, then
+   top * (1 - t)^curve to 0 at y1. curve < 1 holds the dark longer and lets it
+   go late; 1 is linear. Dialled in with wash-tuner/ at the repo root. */
+export type Wash = {start: number; end: number; top: number; curve: number};
+export const washStops = (rgb: string, y0: number, y1: number, top = 1, curve = 1, n = 10) => {
+  const stops = [`rgba(${rgb},${top}) ${y0.toFixed(1)}px`];
+  for (let i = 1; i <= n; i++) {
+    const t = i / n;
+    stops.push(`rgba(${rgb},${(top * Math.pow(1 - t, curve)).toFixed(3)}) ${(y0 + (y1 - y0) * t).toFixed(1)}px`);
+  }
+  return `linear-gradient(${stops.join(', ')})`;
+};
+
 /* Deterministic pseudo-random in [0,1) from an integer seed. */
 export const rnd = (seed: number) => {
   const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
