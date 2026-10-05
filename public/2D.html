@@ -11,7 +11,7 @@
   <script src="/analytics.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A-BT';
@@ -40,7 +40,7 @@
       overflow-x: clip;
       background: var(--bg-surface);
       color: var(--text-primary);
-      font-family: 'Roboto', system-ui, sans-serif;
+      font-family: 'Roboto', system-ui, sans-serif; font-size-adjust: none;
       line-height: 1.6;
       /* Fluid outer padding: full clamp() ceiling (55px) at/above 1440px,
          shrinks linearly to exactly 0 by 860px — matches the vertical
@@ -119,7 +119,7 @@
     }
 
     .hero-subtitle {
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(19px, 2.2vw, 31px);
       color: var(--text-secondary);
       text-transform: uppercase;
@@ -145,7 +145,7 @@
     }
 
     .hero-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(32px, 8vw, 83px);
       line-height: 1;
       color: var(--text-primary);
@@ -178,7 +178,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      font-family: 'Roboto Flex', sans-serif;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       font-size: clamp(13px, 1.2vw, 15px);
       pointer-events: none;
     }
@@ -310,7 +310,7 @@
     }
 
     .craft-title {
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(28px, 3.5vw, 48px);
       color: var(--text-primary);
       text-transform: uppercase;
@@ -466,7 +466,7 @@
     }
 
     .project-label {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: 40px;
       line-height: 1;
       color: var(--text-secondary);
@@ -474,7 +474,7 @@
     }
 
     .project-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(22px, 3.8vw, 64px);
       line-height: 1;
       color: var(--text-primary);
@@ -496,7 +496,7 @@
          elements (meta-inset, text-inset, etc.) keep the standard depth. */
       box-shadow: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
       padding: clamp(3px, 0.5vw, 5px) clamp(8px, 1.2vw, 12px);
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(12px, 1.4vw, 16px);
       color: var(--text-primary);
       text-transform: uppercase;
@@ -509,7 +509,7 @@
       padding: clamp(10px, 1.3vw, 17px) clamp(24px, 3.5vw, 48px);
       border: none;
       cursor: pointer;
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(15px, 1.6vw, 19px);
       color: #f0f0f2;
       text-transform: uppercase;
@@ -775,7 +775,7 @@
       background: transparent;
       border-radius: 9999px;
       padding: 11px 0;
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
          line-height, so a segment's text box is identical to a nav button's. The
          segment keeps 11px vertical padding, which is exactly what makes the TRACK
@@ -853,7 +853,7 @@
       border-radius: 9999px;
       box-shadow: var(--shadow-raised-sm);
       padding: 16px 24px;
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 22px;
       color: #555;
       text-transform: uppercase;
@@ -906,7 +906,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 18px;
       color: var(--text-primary);
       flex-shrink: 0;
@@ -931,7 +931,7 @@
     }
 
     .footer-label {
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 14px;
       color: var(--text-tertiary);
       text-transform: uppercase;
@@ -942,7 +942,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      font-family: 'Roboto Flex', sans-serif;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       font-size: 15px;
       color: var(--text-primary);
     }
@@ -957,7 +957,7 @@
       display: flex;
       gap: 16px;
       align-items: center;
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 22px;
       color: var(--text-primary);
     }
@@ -967,7 +967,7 @@
     }
 
     .copyright {
-      font-family: 'Roboto Flex', sans-serif;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       font-size: 14px;
       color: var(--text-primary);
       transform: translateY(-18px);   /* nudge up to sit level with the top button */
@@ -1101,7 +1101,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(34px, 6vw, 56px);
       color: var(--text-primary);
       z-index: 2;
@@ -1370,7 +1370,7 @@
     <div class="project-section" style="align-items: stretch;">
       <div class="project-content">
         <div class="project-title-block">
-          <p class="project-label" style="font-family: 'VT323', monospace; font-size: 20px;" data-i18n="label-project-01">Project 01</p>
+          <p class="project-label" style="font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-01">Project 01</p>
           <h2 class="project-title">Unify</h2>
         </div>
         <div class="project-tags">
@@ -1415,7 +1415,7 @@
       </a>
       <div class="project-content">
         <div class="project-title-block">
-          <p class="project-label" style="font-family: 'VT323', monospace; font-size: 20px;" data-i18n="label-project-02">Project 02</p>
+          <p class="project-label" style="font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-02">Project 02</p>
           <h2 class="project-title">Virtual Cooking</h2>
         </div>
         <div class="project-tags">
@@ -1432,7 +1432,7 @@
     <div class="project-section" style="align-items: stretch;">
       <div class="project-content">
         <div class="project-title-block">
-          <p class="project-label" style="font-family: 'VT323', monospace; font-size: 20px;" data-i18n="label-project-03">Project 03</p>
+          <p class="project-label" style="font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-03">Project 03</p>
           <h2 class="project-title">to.morrow</h2>
         </div>
         <div class="project-tags">
@@ -1494,7 +1494,7 @@
       </a>
       <div class="project-content">
         <div class="project-title-block">
-          <p class="project-label" style="font-family: 'VT323', monospace; font-size: 20px;" data-i18n="label-project-04">Project 04</p>
+          <p class="project-label" style="font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-04">Project 04</p>
           <h2 class="project-title">Cybercoffee</h2>
         </div>
         <div class="project-tags">
@@ -1511,7 +1511,7 @@
     <div class="project-section" style="align-items: stretch;">
       <div class="project-content">
         <div class="project-title-block">
-          <p class="project-label" style="font-family: 'VT323', monospace; font-size: 20px;" data-i18n="label-project-05">Project 05</p>
+          <p class="project-label" style="font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-05">Project 05</p>
           <h2 class="project-title">Mac-Lamp</h2>
         </div>
         <div class="project-tags">
@@ -1541,7 +1541,7 @@
       </div>
       <div class="project-content">
         <div class="project-title-block">
-          <p class="project-label" style="font-family: 'VT323', monospace; font-size: 20px;" data-i18n="label-project-06">Project 06</p>
+          <p class="project-label" style="font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-06">Project 06</p>
           <h2 class="project-title">Double Packaging</h2>
         </div>
         <div class="project-tags">

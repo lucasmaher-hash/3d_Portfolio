@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Roboto Flex is the site's body face; added for .card-description, which no
        longer uses the VT323 pixel font (headings still do). -->
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A-BT';
@@ -30,7 +30,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; }
-    body { background: var(--bg-base); font-family: 'VT323', monospace; padding: 32px; display: flex; justify-content: center; }
+    body { background: var(--bg-base); font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; padding: 32px; display: flex; justify-content: center; }
 
     /* Body copy is Roboto Flex at EVERY width, not just on phones. The mobile
        block below already made this switch and explains why (real body copy
@@ -40,7 +40,7 @@
        the mobile block only overrides the SIZE.
        Headings (.card-title) deliberately stay VT323 — the pixel face still
        carries the page's character. */
-    .card-description { font-family: 'Roboto Flex', sans-serif; }
+    .card-description { font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; }
 
     .container {
       width: min(100%, 804px);
@@ -66,7 +66,7 @@
     }
 
     .header-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(36px, 5.6vw, 56px);
       color: var(--text-primary);
       letter-spacing: 6px;
@@ -377,7 +377,7 @@
          where 18px of VT323 did, and it's the site-wide mobile body floor.
          .card-title goes to 24px to keep a clear step above it. */
       .card-description {
-        font-family: 'Roboto Flex', sans-serif;
+        font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
         font-size: 16px;
         line-height: 1.45;
       }

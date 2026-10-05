@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Roboto Flex is the site's body face; added for .card-description so this
        screen's copy matches controls_open3d.html instead of being set in VT323. -->
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A-BT';
@@ -33,7 +33,7 @@
        the panel itself is fully opaque */
     body {
       background: rgba(220, 220, 227, 0.85);
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -62,7 +62,7 @@
     }
 
     .header-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(36px, 4vw, 56px);
       color: var(--text-primary);
       letter-spacing: 6px;
@@ -120,7 +120,7 @@
        Headings (.card-title) stay VT323 in both, so the pixel face still carries
        the character. Sizes are matched per breakpoint in the mobile block below. */
     .card-description {
-      font-family: 'Roboto Flex', sans-serif;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       font-size: 12px;
       color: var(--text-secondary);
       line-height: 1.4;

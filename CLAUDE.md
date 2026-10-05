@@ -121,6 +121,26 @@ still in the files, now inert. Do not re-add them. Older notes below that descri
 breadcrumb are history. The typewriter cursor in the landing hero ("INTERFACE DESIGNER...|") is
 not a dot and stays.
 
+## No pixel font (2026-10-06, Lucas) — ONE commit, revertible
+
+Every **VT323** use on the site was swapped for the body face, **Roboto Flex**, in a single commit
+of its own (so `git revert <that commit>` brings the pixel font back): all 2D pages, the nav iframe,
+the 3D page's menu/help button, the 3D overlays (about3d, contact3d, craft3d, controls_open3d,
+controls_fullscreen3d) and the Exit pill strings. Sizes, weights, colours, letter-spacing and
+uppercase are untouched; **`font-size-adjust: 0.4`** sits next to each swapped `font-family` so
+Roboto Flex renders at VT323's x-height (0.400 em vs Roboto's 0.528) — i.e. the labels look the size
+they did, instead of a third bigger. Because `font-size-adjust` inherits, every OTHER `font-family`
+declaration in a `<style>` block on those pages carries `font-size-adjust: none` (the 3D overlays had
+VT323 on `body`, so their Roboto/OCR children would otherwise have shrunk). Google Fonts links no
+longer request VT323; pages that only loaded VT323 now load Roboto Flex. The **3D room titles**
+(`src/main.js`, `ROOM_TITLES`) use `/Roboto-Regular.ttf` (static Roboto, SIL OFL, `Roboto-OFL.txt`
+beside it) with `FONT_MATCH = 0.400 / 0.528` on the scale (depth divided back out) for the same
+reason; `curveSegments` 2 → 6 for Roboto's curves. `VT323-Regular.ttf` stays on disk, unused.
+**Deliberately NOT changed:** W95FA inside the to.morrow page's SkeuKit exhibits (it is the app's
+own retro theme, and the copy beside it talks about "pixel type"), and Digital-7 in the Cybercoffee
+machine's LCD (a simulated segment display, inside the machine app). Comments elsewhere in this file
+and in the pages that say "VT323" describe the old state.
+
 ## Landing tagline removed (2026-10-06, Lucas)
 
 "From material to pixel." / "Von Material zu Pixel." under the landing hero is **gone** on desktop

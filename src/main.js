@@ -1,8 +1,9 @@
 import './style.css'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-// Room-title lettering: TTFLoader triangulates the site's pixel font (VT323,
-// /public/VT323-Regular.ttf) at runtime — no typeface.json to generate/commit.
+// Room-title lettering: TTFLoader triangulates the site's text face (Roboto,
+// /public/Roboto-Regular.ttf, SIL OFL — was the VT323 pixel font until
+// 2026-10-06) at runtime — no typeface.json to generate/commit.
 import { TTFLoader } from 'three/addons/loaders/TTFLoader.js'
 import { Font } from 'three/addons/loaders/FontLoader.js'
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
@@ -1892,8 +1893,9 @@ function probeMove(origin, direction) {
   return _probeResult
 }
 
-// ── Room titles: pixel-font lettering above each room entrance ──────────
-// Extruded 3D text in VT323 (the 2D site's pixel font), mounted just proud of
+// ── Room titles: lettering above each room entrance ─────────────────────
+// Extruded 3D text in Roboto (the site's text face; it was the VT323 pixel font
+// until 2026-10-06, when Lucas removed pixel type site-wide), mounted just proud of
 // the wall above a room's doorway — real geometry, so it catches the room
 // lighting like raised signage. The TTF is parsed and triangulated at runtime
 // by TTFLoader (no typeface.json asset needed).
@@ -1914,6 +1916,10 @@ function probeMove(origin, direction) {
 // measures 2.68 units, so 0.273 renders it ≈0.73 wide, the look Lucas settled
 // on after three shrink passes.
 const TITLE_SCALE = 0.273
+// Both scales were tuned for VT323. Roboto's x-height is 0.528 em against
+// VT323's 0.400 (measured with opentype.js), so at the same scale every letter
+// would come out a third taller; this keeps the lettering the size it was.
+const FONT_MATCH = 0.400 / 0.528
 // Door cuts in Wall_Cylinder sit at 0° / ±90° / 180°, each z(or x) ±0.9, lintel
 // y=3, inner wall face radius 9.6. The lettering is BENT to that curvature
 // (see the vertex loop below): a flat run's far letters would dip inside the
@@ -1956,14 +1962,14 @@ const ROOM_TITLES = [
 ]
 
 function addRoomTitles(model) {
-  new TTFLoader().load('/VT323-Regular.ttf', ttf => {
+  new TTFLoader().load('/Roboto-Regular.ttf', ttf => {
     const font = new Font(ttf)
     // Very dark grey (site --text-primary is #1A1A1A), dielectric, fairly matte.
     const mat = new THREE.MeshStandardMaterial({ color: 0x1e1e1e, roughness: 0.65, metalness: 0 })
     for (const spec of ROOM_TITLES) {
-      // curveSegments 2: VT323 outlines are near-rectangular; more adds nothing.
+      // curveSegments 6: Roboto's bowls need a few steps to read round at sign size.
       const geo = new TextGeometry(spec.text, {
-        font, size: 1, depth: TITLE_DEPTH, curveSegments: 2, bevelEnabled: false,
+        font, size: 1, depth: TITLE_DEPTH / FONT_MATCH, curveSegments: 6, bevelEnabled: false,   // depth undone by FONT_MATCH: same raised read as before
       })
       geo.computeBoundingBox()
       const bb = geo.boundingBox
@@ -1977,7 +1983,7 @@ function addRoomTitles(model) {
       // space sits at (0, ·, +R): x becomes an arc length, extrusion depth (z)
       // becomes radius. Runs are ≤ ~14° of arc, so the original normals stay
       // visually fine unrecomputed.
-      const s = spec.scale || TITLE_SCALE
+      const s = (spec.scale || TITLE_SCALE) * FONT_MATCH
       const R = TITLE_R / s
       const pa = geo.attributes.position
       for (let i = 0; i < pa.count; i++) {

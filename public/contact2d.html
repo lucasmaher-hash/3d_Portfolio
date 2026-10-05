@@ -11,7 +11,7 @@
   <script src="/analytics.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A-BT';
@@ -42,7 +42,7 @@
       overflow-x: clip;
       background: var(--bg-surface);
       color: var(--text-primary);
-      font-family: 'Roboto Flex', sans-serif;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       line-height: 1.6;
       /* Fluid outer padding: full clamp() ceiling (55px) at/above 1440px,
          shrinks linearly to exactly 0 by 860px — matches the vertical
@@ -121,7 +121,7 @@
     }
 
     .contact-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(32px, 5vw, 56px);
       line-height: 1;
       color: var(--text-primary);
@@ -194,7 +194,7 @@
 
     .contact-label {
       flex: 1;
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 20px;
       line-height: 1.1;
       color: var(--text-primary);
@@ -210,7 +210,7 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 22px;
       color: #f0f0f2;
       pointer-events: none;
@@ -271,7 +271,7 @@
 
     .mobile-mode-btn {
       border: none; background: transparent; border-radius: 9999px;
-      padding: 11px 0; font-family: 'VT323', monospace; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
+      padding: 11px 0; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
          line-height, so a segment's text box is identical to a nav button's. The
          segment keeps 11px vertical padding, which is exactly what makes the TRACK
          come out level with a nav button: the track adds its own 5px padding top and
@@ -340,7 +340,7 @@
     .mobile-nav-btn {
       display: block; background: var(--bg-surface); border-radius: 9999px;
       box-shadow: var(--shadow-raised-sm);
-      padding: 16px 24px; font-family: 'VT323', monospace; font-size: 22px;
+      padding: 16px 24px; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
       color: #555; text-transform: uppercase; text-decoration: none;
       text-align: center; cursor: pointer;
       -webkit-tap-highlight-color: transparent;

@@ -11,7 +11,7 @@
   <script src="/analytics.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A-BT';
@@ -42,7 +42,7 @@
       overflow-x: clip;
       background: var(--bg-surface);
       color: var(--text-primary);
-      font-family: 'Roboto Flex', sans-serif;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       line-height: 1.6;
       /* Fluid outer padding: full clamp() ceiling (55px) at/above 1440px,
          shrinks linearly to exactly 0 by 860px — matches the vertical
@@ -127,7 +127,7 @@
     .project-header { display: flex; flex-direction: column; gap: 16px; }
 
     .breadcrumb {
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 14px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -137,7 +137,7 @@
     .title-row { display: flex; align-items: baseline; gap: 12px; }
 
     .project-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(40px, 7vw, 96px);
       line-height: 1.05;
       color: var(--text-primary);
@@ -192,7 +192,7 @@
     }
 
     .meta-label {
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 24px;
       color: var(--accent-orange);
       text-transform: uppercase;
@@ -233,7 +233,7 @@
     }
 
     .section-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(28px, 4vw, 44px);
       line-height: 1.05;
       color: var(--text-primary);
@@ -247,7 +247,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 22px;
       color: var(--text-primary);
       flex-shrink: 0;
@@ -283,7 +283,7 @@
     }
 
     .glance-label {
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 17px;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -340,14 +340,14 @@
 
     /* ── Reflection sections (no step badge, softer tone) ── */
     .reflection-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(22px, 3vw, 30px);
       letter-spacing: -0.03em;
       color: var(--text-primary);
     }
 
     .reflection-tag {
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 13px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -429,14 +429,14 @@
     }
 
     .project-nav-number {
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(14px, 1.5vw, 18px);
       color: var(--text-secondary);
       letter-spacing: 1px;
     }
 
     .project-nav-label {
-      font-family: 'VT323', monospace;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(14px, 1.5vw, 18px);
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -444,7 +444,7 @@
     }
 
     .project-nav-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(20px, 3vw, 36px);
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -486,7 +486,7 @@
 
     .mobile-mode-btn {
       border: none; background: transparent; border-radius: 9999px;
-      padding: 11px 0; font-family: 'VT323', monospace; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
+      padding: 11px 0; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
          line-height, so a segment's text box is identical to a nav button's. The
          segment keeps 11px vertical padding, which is exactly what makes the TRACK
          come out level with a nav button: the track adds its own 5px padding top and
@@ -555,7 +555,7 @@
     .mobile-nav-btn {
       display: block; background: var(--bg-surface); border-radius: 9999px;
       box-shadow: var(--shadow-raised-sm);
-      padding: 16px 24px; font-family: 'VT323', monospace; font-size: 22px;
+      padding: 16px 24px; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
       color: #555; text-transform: uppercase; text-decoration: none;
       text-align: center; cursor: pointer;
       -webkit-tap-highlight-color: transparent;
@@ -614,7 +614,7 @@
 
     /* ── At a glance lead paragraph (big, light) ── */
     .glance-lead {
-      font-family: 'Roboto Flex', sans-serif;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       font-weight: 300;
       font-size: clamp(18px, 2.2vw, 24px);
       line-height: 1.4;
@@ -675,7 +675,7 @@
        (clamp(22px, 3vw, 34px)). These are sub-items inside a section that already has a
        .section-title at clamp(28px, 4vw, 44px), so they must stay clearly below it. */
     .feature-title {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(20px, 2.6vw, 26px);
       line-height: 1.1;
       letter-spacing: -0.02em;
@@ -694,7 +694,7 @@
 
 
     .result-subhead {
-      font-family: 'OCR-A-BT', monospace;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
       font-size: clamp(20px, 2.6vw, 26px);
       letter-spacing: -0.02em;
       color: var(--text-primary);
@@ -1590,7 +1590,7 @@
       var style = document.createElement('style');
       // Both shadows are gated on .is-raised — see updateExitShadow() below.
       // The transform lift is NOT gated: it works on any background.
-      style.textContent = '.exit-3d-btn{position:fixed;top:24px;left:24px;z-index:10000;background:var(--bg-surface);border:none;border-radius:9999px;padding:10px 24px;font-family:"VT323",monospace;font-size:16px;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-primary);box-shadow:none;cursor:pointer;text-decoration:none;transition:left 200ms ease, transform 150ms ease, box-shadow 260ms cubic-bezier(.2,.7,.2,1);}.exit-3d-btn.is-raised{box-shadow:var(--shadow-raised-sm);}.exit-3d-btn:hover{transform:translateY(-2px) scale(1.03);transition:left 200ms ease, transform 150ms ease, box-shadow 150ms ease;}.exit-3d-btn.is-raised:hover{box-shadow:11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);}';
+      style.textContent = '.exit-3d-btn{position:fixed;top:24px;left:24px;z-index:10000;background:var(--bg-surface);border:none;border-radius:9999px;padding:10px 24px;font-family:"Roboto Flex",sans-serif;font-size-adjust:0.4;font-size:16px;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-primary);box-shadow:none;cursor:pointer;text-decoration:none;transition:left 200ms ease, transform 150ms ease, box-shadow 260ms cubic-bezier(.2,.7,.2,1);}.exit-3d-btn.is-raised{box-shadow:var(--shadow-raised-sm);}.exit-3d-btn:hover{transform:translateY(-2px) scale(1.03);transition:left 200ms ease, transform 150ms ease, box-shadow 150ms ease;}.exit-3d-btn.is-raised:hover{box-shadow:11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);}';
       style.textContent += /* keyframes start AND end in the :hover pose: an animation replaces the
          whole transform, so plain scale(1) frames made the button first DROP
          out of its hover lift on click. The mouse is on the button when this
