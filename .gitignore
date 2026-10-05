@@ -27,3 +27,4 @@ dist-ssr
 # Local design source files (heavy raw video, not for the web build)
 design-sources/
 *.mkv
+wash-tuner/settings.json

@@ -73,12 +73,11 @@ const CaptionV: React.FC<{lines: string[]; f: number; inAt: number; outAt?: numb
 const CAP_TT_Y = 230;
 const CAP_Y = 300;
 /* The wash under the timetable's captions (Lucas, 2026-10-05), in frame px:
-   solid only at the very top, fading out by `end`, so the text sits IN the
-   fade and the overview card's days row (top ~416) is clear of it; curve < 1
-   keeps it darker under the text (Lucas: the first pass was barely there).
+   an even 0.79 over the top 190px (the caption sits on it), fading out by 440,
+   just clear of the overview card's days row.
    Dialled in with wash-tuner/ at the repo root. `ext` (the tall cut's band
    above) stays at `top`. */
-export const TT_WASH: Wash = {start: 0, end: 420, top: 1, curve: 0.7};
+export const TT_WASH: Wash = {start: 190, end: 440, top: 0.79, curve: 1.1}; // Lucas, from wash-tuner/
 /* The timetable's overview is small in the tall frame at the landscape's 1.25:
    the vertical cut shows it BOOST times larger, easing back to the landscape
    camera over the first zoom (ZOOM_TOP), so the days stop and everything after

@@ -104,13 +104,14 @@
       <label><input type="checkbox" id="showGuides" /> guides</label>
     </div>
     <pre id="out"></pre>
+    <p class="hint" id="sync">Saving…</p>
   </aside>
 </main>
 
 <script>
   // The film's current values (motion/src/unify: TT_WASH in UnifyPromoV.tsx, MAP_WASH_V in MapScene.tsx).
   const FILM = {
-    tt:  {start: 0, end: 420, top: 1, curve: 0.7},
+    tt:  {start: 190, end: 440, top: 0.79, curve: 1.1},
     map: {start: 0, end: 540, top: 1, curve: 0.7},
   };
   const RGB = {tt: '41,41,37', map: '249,242,235'};
@@ -134,7 +135,19 @@
   const KEY = 'unify-wash-tuner';
   let state = {tt: {...FILM.tt}, map: {...FILM.map}, scene: 'tt', frame: {tt: 600, map: 1374}, guides: false};
   try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.tt && s.map) state = {...state, ...s}; } catch (e) {}
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+  // Every change is also posted to the save server (wash-tuner/save-server.mjs, port 5174),
+  // which writes wash-tuner/settings.json — so the settings can be picked up from the Mac
+  // without copying anything. Debounced; a missing server is simply ignored.
+  let sendT = 0;
+  const send = () => {
+    clearTimeout(sendT);
+    sendT = setTimeout(() => {
+      fetch(`${location.protocol}//${location.hostname}:5174/save`, {method: 'POST', body: JSON.stringify({tt: state.tt, map: state.map})})
+        .then((r) => { $('sync').textContent = r.ok ? 'Saved to the Mac ✓' : 'Not saved'; })
+        .catch(() => { $('sync').textContent = 'Save server not running — use Copy'; });
+    }, 350);
+  };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} send(); };
 
   const $ = (id) => document.getElementById(id);
   const frame = $('frame'), wrap = $('wrap');
@@ -235,6 +248,7 @@
   renderFrames();
   render();
   fit();
+  send(); // whatever this device has saved goes to the Mac on load
 </script>
 </body>
 </html>
