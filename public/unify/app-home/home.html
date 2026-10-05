@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=402">
+<meta name="robots" content="noindex, nofollow">
+<title>Unify home</title>
+<!--
+  The Unify app's home screen, rebuilt 1:1 from the app's own source
+  (~/TEMP/Unify/web/index.html + styles.css) for the case-study page
+  unify2d1.html, which shows it three times in iframes — one per card:
+  ?open=connect | socials | map. Static: the card is open, the page is parked
+  at the scroll position where the app itself would have that card open, and
+  nothing reacts to input. What still moves is what moves in the app at rest:
+  the friends' and posters' drift and the floor-plan dots' pulse.
+  The 402x874 screen fills this document; the iPhone frame lives on the
+  host page. Assets are the app's own (posters/floor plan re-encoded webp).
+  Nunito: SIL OFL 1.1, see Nunito-OFL.txt.
+-->
+<style>
+@font-face { font-family: 'Nunito'; src: url('Nunito.ttf') format('truetype'); font-weight: 200 1000; font-display: block; }
+:root {
+  --pink: #FF88C8; --dark: #292925; --cream: #F9F2EB;
+  --font: 'Nunito', system-ui, -apple-system, sans-serif;
+  --screen-w: 402px; --screen-h: 874px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; width: 402px; height: 874px; overflow: hidden; background: var(--pink); }
+body { font-family: var(--font); -webkit-font-smoothing: antialiased; }
+.phone { position: relative; width: var(--screen-w); height: var(--screen-h); background: var(--pink); overflow: hidden; }
+.screen { width: var(--screen-w); height: var(--screen-h); overflow: hidden; }
+html.only, html.only body { width: 377px; height: auto; background: transparent; overflow: visible; }
+html.only .card { position: relative; height: auto; }
+html.only .card__open { position: relative; }
+/* connect now 18px taller (friends area 188 -> 206, friends moved down 9 to
+   keep them centred) so all three panels are 365px, the map's height. */
+.card--connect .friends { height: 206px; }
+.card--connect .friends .friend { margin-top: 9px; }
+/* Five-poster socials panel (see the markup comment). */
+.posters.posters--five { height: 208px; }
+.posters.posters--five .poster:nth-of-type(5) { animation: drift-poster-c 12.5s ease-in-out infinite; animation-delay: -4s; }
+/* Static: no unfurl transition on load. */
+.card, .card__closed, .card__open { transition: none !important; }
+.nav__btn { cursor: default; }
+.friends .friend { cursor: default; }
+@media (prefers-reduced-motion: reduce) {
+  .friend, .poster, .floorplan__dot, .panel__sub span { animation: none !important; }
+}
+/* ---- below: the app's own styles.css, HERO → nav, verbatim ---- */
+/* =========================== HERO (pink) =========================== */
+.hero{
+  height:395px;
+  padding:103px 20px 35px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:10px;
+}
+.hero__title{
+  margin:0;
+  width:214px;
+  font-weight:800;            /* Nunito ExtraBold */
+  font-size:48px;
+  line-height:40px;
+  color:var(--dark);
+}
+.hero__sub{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  width:265px;
+}
+.hero__sub p{
+  margin:0;
+  padding-left:10px;
+  width:199px;
+  font-weight:700;            /* Nunito Bold */
+  font-size:18px;
+  line-height:normal;
+  color:var(--cream);
+}
+
+/* ======================= DARK SECTION + MONSTER ==================== */
+.dark{
+  position:relative;
+  /* 470, i.e. 4px LESS than the monster's 474px height, so the dark panel
+     starts 4px early and slides under the monster's (solid-dark) bottom edge.
+     Both are #292925, so the overlap is invisible — but it closes the
+     sub-pixel seam that otherwise let the pink background peek through
+     between the figure and the panel (worse once the phone is scaled). */
+  padding-top:470px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.dark__panel{
+  width:100%;
+  background:var(--dark);
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.monster{
+  position:absolute;
+  top:0;
+  left:0;
+  width:503.52px;
+  height:474px;
+  pointer-events:none;
+}
+.monster svg{ display:block; width:100%; height:100%; }
+/* Pupils track scroll position via JS (see index.html), translated straight
+   down as the page scrolls. A short transition smooths out the per-event
+   jumps without introducing noticeable lag behind the actual scroll. */
+.monster-pupil{ transition:transform .12s linear; }
+
+/* ============================== CARDS ============================= */
+.cards{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
+  padding-bottom:130px;       /* clears the fixed nav */
+  isolation:isolate;
+}
+.card{
+  position:relative;
+  z-index:0;
+  width:377px;
+  flex:none;
+  overflow:visible;
+  transition:height .9s cubic-bezier(.4,0,.2,1);
+}
+/* Adds scroll headroom uniformly (regardless of which card is open) so the
+   connect_now/socials dwell thresholds in index.html's scroll script are
+   actually reachable — see the comment there for the exact numbers. */
+.scroll-spacer{ width:100%; height:178px; flex:none; }
+/* Two stacked states that cross-fade (opacity) AND scale/slide from the top
+   edge, kept in sync with .card's own height transition above. Opacity
+   alone rendered the open panel at its full, already-formed size the instant
+   it started appearing, which read as "fading into existence" in place
+   rather than actually growing/unfurling out of the closed bubble — adding
+   a scaleY+translateY anchored to the top edge gives that growing motion.
+   (A clip-path wipe was tried first for a literal reveal effect, but
+   animating percentage-based clip-path on these auto-height absolutely-
+   positioned elements made the closed bubble fail to render entirely in
+   Safari — reverted to this more reliable transform-based approach.) */
+.card__closed,
+.card__open{
+  position:absolute;
+  top:0;
+  left:0;
+  width:377px;
+  transform-origin:top center;
+  transition:opacity .9s cubic-bezier(.4,0,.2,1), transform .9s cubic-bezier(.4,0,.2,1);
+}
+.card__open{ opacity:0; transform:scaleY(.75) translateY(-6px); pointer-events:none; }
+.card.is-open .card__closed{ opacity:0; transform:scaleY(.75) translateY(-6px); pointer-events:none; }
+.card.is-open .card__open{ opacity:1; transform:scaleY(1) translateY(0); pointer-events:auto; }
+
+/* ---------------------- Open panel (reconstructed) ------------------ */
+.panel{
+  box-sizing:border-box;
+  width:377px;
+  padding:20px 19px 40px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+  border-radius:43px;
+}
+.panel--pink{ background:var(--pink); }
+.panel--cream{ background:var(--cream); border-radius:30px; padding-top:18px; }
+
+.panel__header{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; width:100%; }
+.panel__title{
+  margin:0;
+  font-weight:800;
+  font-size:48px;
+  line-height:40px;
+  color:var(--dark);
+}
+.panel__divider{ width:100%; height:3px; border-radius:1.5px; background:var(--dark); }
+
+.panel__time-row{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  width:100%;
+}
+.panel__time-row p{ margin:0; font-weight:800; font-size:19px; color:var(--dark); white-space:nowrap; }
+.panel__sub{ margin:0; font-weight:800; font-size:19px; color:var(--dark); }
+
+/* connect_now: scattered friend blobs */
+.friends{ position:relative; width:100%; height:188px; }
+.friend{
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+}
+.friend__figure{ display:block; }
+.friend__name{ margin:0; font-family:var(--font); font-weight:400; font-size:17.8px; color:var(--dark); white-space:nowrap; }
+.friend__name--lg{ font-size:25.1px; }
+.friend__name--md{ font-size:23.7px; }
+
+/* Same slow drift + breathing scale as the socials posters, tuned per figure
+   by how much clearance it actually has (worst-case reach = diagonal drift
+   distance + scale-pulse growth, NOT a simple sum of the two axes — a 9px/7px
+   diagonal move is a 11.4px reach, not 9px). Paul, Greg and Moritz each have
+   30px+ of room on every side and move freely (worst reach ~11-14px each,
+   comfortably under that). Nam and Yas sit only ~8px apart (their tightest
+   pairing) so both stay noticeably more restrained — worst case each
+   contributes ~3.8px, summing to ~7.4px, still under that 8px gap. */
+.friend{ transform-origin:center; }
+.friend:nth-of-type(1){ animation: drift-paul   8s   ease-in-out infinite; animation-delay:-1.5s; }  /* Paul */
+.friend:nth-of-type(2){ animation: drift-nam    9s   ease-in-out infinite; animation-delay:-6s;   }  /* Nam */
+.friend:nth-of-type(3){ animation: drift-greg   7.5s ease-in-out infinite; animation-delay:-3s;   }  /* Greg */
+.friend:nth-of-type(4){ animation: drift-yas    8.5s ease-in-out infinite; animation-delay:-9s;   }  /* Yas */
+.friend:nth-of-type(5){ animation: drift-moritz 8s   ease-in-out infinite; animation-delay:-4.5s; }  /* Moritz */
+
+/* socials: 3 circular activity posters */
+.posters{ position:relative; width:346px; height:331.6px; }
+.poster{ position:absolute; display:block; border-radius:50%; object-fit:cover; transform-origin:center; }
+/* Tuned per poster by actual clearance, same idea as the friends above
+   (worst-case reach = diagonal drift distance + scale-pulse growth). Poster
+   1 sits 33-36px from its neighbors and moves the most dramatically (worst
+   reach ~21px, leaving ~5.5px margin against its 36.4px pairing with poster
+   2). Posters 2 and 3 are the tight pair (~19px apart) and stay more modest
+   — worst reach ~9.6px and ~8px, summing to ~17.6px, ~1.6px under that
+   19px gap. */
+.poster:nth-of-type(1){ animation: drift-poster-a 11s   ease-in-out infinite; animation-delay:-2s;  }
+.poster:nth-of-type(2){ animation: drift-poster-b 13s   ease-in-out infinite; animation-delay:-8s;  }
+.poster:nth-of-type(3){ animation: drift-poster-c 12s   ease-in-out infinite; animation-delay:-11s; }
+.poster:nth-of-type(4){ animation: drift-poster-d 12.5s ease-in-out infinite; animation-delay:-5s;  }
+
+/* Translate distances bumped up again (faster + further for all five —
+   Nam/Yas specifically were nearly motionless before, now clearly moving
+   too, just kept in opposite phase to each other so they drift apart
+   instead of into one another given their tight ~8px clearance). */
+@keyframes drift-paul{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  33%{ transform:translate(17px,-13px) scale(1.09); }
+  66%{ transform:translate(-11px,11px) scale(0.92); }
+}
+@keyframes drift-nam{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  33%{ transform:translate(-6px,4px) scale(1.05); }
+  66%{ transform:translate(4px,-6px) scale(0.95); }
+}
+@keyframes drift-greg{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  33%{ transform:translate(13px,10px) scale(1.08); }
+  66%{ transform:translate(-9px,-7px) scale(0.93); }
+}
+@keyframes drift-yas{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  33%{ transform:translate(6px,-4px) scale(0.95); }
+  66%{ transform:translate(-4px,6px) scale(1.05); }
+}
+@keyframes drift-moritz{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  33%{ transform:translate(-13px,-10px) scale(1.08); }
+  66%{ transform:translate(9px,7px) scale(0.93); }
+}
+/* Nine-stop closed loops tracing an actual orbit around the circle's resting
+   spot (instead of a handful of straight-line waypoints, which read as
+   "ping left, ping right" rather than a hover). Each stop's radius wobbles a
+   little instead of sitting on a perfect circle, so the loop feels organic
+   rather than mechanical; a/b/c/d each orbit at a different radius, rotation
+   direction and phase so the four circles never move in sync. Scale stays a
+   light, secondary "breathing" touch (~±3-4%) under the orbit motion. */
+@keyframes drift-poster-a{
+  0%,100%{ transform:translate(0,0)         scale(1);     }
+  12%     { transform:translate(10px,-6px) scale(1.015); }
+  25%     { transform:translate(14px,2px)  scale(0.985); }
+  37%     { transform:translate(10px,11px) scale(1.02);  }
+  50%     { transform:translate(-1px,15px) scale(0.98);  }
+  62%     { transform:translate(-12px,9px) scale(1.01);  }
+  75%     { transform:translate(-14px,-3px)scale(0.99);  }
+  87%     { transform:translate(-6px,-11px)scale(1.015); }
+}
+@keyframes drift-poster-b{
+  0%,100%{ transform:translate(0,0)         scale(1);    }
+  12%     { transform:translate(-7px,-6px)  scale(0.97); }
+  25%     { transform:translate(-11px,2px) scale(1.04); }
+  37%     { transform:translate(-8px,9px)   scale(0.96); }
+  50%     { transform:translate(1px,12px)   scale(1.03); }
+  62%     { transform:translate(9px,7px)    scale(0.98); }
+  75%     { transform:translate(11px,-3px)  scale(1.02); }
+  87%     { transform:translate(5px,-9px)   scale(0.97); }
+}
+@keyframes drift-poster-c{
+  0%,100%{ transform:translate(0,0)        scale(1);    }
+  12%     { transform:translate(6px,-7px)  scale(1.04); }
+  25%     { transform:translate(10px,1px)  scale(0.96); }
+  37%     { transform:translate(6px,9px)   scale(1.03); }
+  50%     { transform:translate(-3px,11px) scale(0.97); }
+  62%     { transform:translate(-9px,5px)  scale(1.02); }
+  75%     { transform:translate(-9px,-4px) scale(0.98); }
+  87%     { transform:translate(-2px,-9px) scale(1.03); }
+}
+@keyframes drift-poster-d{
+  0%,100%{ transform:translate(0,0)         scale(1);    }
+  12%     { transform:translate(-6px,7px)   scale(0.96); }
+  25%     { transform:translate(-2px,11px)  scale(1.04); }
+  37%     { transform:translate(7px,9px)    scale(0.97); }
+  50%     { transform:translate(11px,0px)   scale(1.02); }
+  62%     { transform:translate(7px,-8px)   scale(0.98); }
+  75%     { transform:translate(-2px,-11px) scale(1.03); }
+  87%     { transform:translate(-8px,-5px)  scale(0.96); }
+}
+
+/* map: floor-plan illustration */
+.floorplan{ display:flex; justify-content:center; width:100%; overflow:hidden; }
+.floorplan__inner{ position:relative; display:inline-block; }
+.floorplan img{ display:block; width:389.85px; height:auto; }
+/* The 4 plain cream dots are painted out of the PNG itself (replaced with
+   flat pink) — these overlay circles are the only thing drawing them now,
+   so fading their opacity actually fades the dot instead of just fading a
+   duplicate sitting on top of a still-solid one underneath. No per-dot
+   animation-delay, so all 4 fade in/out together. The ringed "you are
+   here" pin is untouched (still baked into the PNG, no overlay on it). */
+.floorplan__dot{
+  position:absolute;
+  width:15px; height:15px;
+  border-radius:50%;
+  background:#F9F2EB;
+  transform:translate(-50%,-50%);
+  animation:floorplan-dot-pulse 2.4s ease-in-out infinite;
+}
+@keyframes floorplan-dot-pulse{
+  0%,100%{ opacity:1; }
+  50%{ opacity:0.15; }
+}
+
+/* shared face (lip + round arrow button), pokes bottom-right.
+   Same lip + button sizing as the socials activity card: an 80×80 lip whose
+   semicircular bottom (r=40) is concentric with the 64px button (r=32), so the
+   button sits perfectly centred inside an even 8px ring. Home keeps the arrow
+   icon rather than the plus. */
+.panel__face{ position:absolute; width:80px; height:80px; }
+.panel__face-pill{
+  position:absolute; inset:0;
+  border-radius:0 0 999px 999px;
+}
+.panel__face-pill--pink{ background:var(--pink); }
+.panel__face-pill--cream{ background:var(--cream); }
+.panel__face-eyes{
+  position:absolute;
+  left:19px; top:27px;
+  width:90.397px; height:71.653px;
+  display:flex; align-items:center; justify-content:center;
+}
+.panel__face-eyes img{ display:block; width:79.324px; height:52.543px; transform:rotate(15.34deg); }
+.panel__face-btn{
+  position:absolute;
+  left:8px; top:8px;          /* centred in the 80×80 lip */
+  width:64px; height:64px;
+  border-radius:999px;
+  background:var(--dark);
+  display:flex; align-items:center; justify-content:center;
+}
+.panel__face-btn img{ display:block; width:28px; height:16px; }
+.card__bubble{ position:absolute; top:0; left:0; display:block; }
+.card__bubble img{ display:block; width:100%; height:100%; }
+.card__label{
+  position:absolute;
+  margin:0;
+  font-weight:800;
+  font-size:48px;
+  line-height:40px;
+  color:var(--dark);
+  white-space:nowrap;
+}
+.card__eyes{
+  position:absolute;
+  display:block;
+  width:67.561px;
+  height:49.939px;
+}
+.card__eyes img{ display:block; width:100%; height:100%; }
+
+/* first-on-top z-order (matches Figma itemReverseZIndex) */
+.card--connect{ height:72px; z-index:3; }
+.card--connect .card__bubble{ width:377px; height:118px; }
+.card--connect .card__label{ left:15px; top:11px; }
+.card--connect .card__eyes{ left:317px; top:33px; }
+
+.card--small{ height:64px; z-index:2; }
+.card--small .card__bubble{ width:294px; height:63.805px; }
+.card--small .card__label{ left:13.293px; top:9.748px; }
+
+.card--socials{ height:72px; z-index:2; }
+.card--socials .card__bubble{ width:377px; height:118px; }
+.card--socials .card__label{ left:15px; top:11px; }
+.card--socials .card__eyes{ left:318px; top:33px; }
+
+.card--map{ height:99px; z-index:1; }
+.card--map .card__bubble{ width:377px; height:118px; }
+.card--map .card__label{ left:15px; top:11px; }
+.card--map .card__eyes{ left:317px; top:27px; }
+
+/* expanded (open) heights — match the Figma Open variant heights */
+.card--connect.is-open{ height:347px; }
+.card--socials.is-open{ height:485px; }
+.card--map.is-open{ height:401px; }
+
+/* =========================== BOTTOM NAV ========================== */
+.nav{
+  position:absolute;
+  bottom:15px;
+  left:50%;
+  transform:translateX(-50%);
+  width:363px;
+  height:92px;
+  background:var(--dark);
+  border-radius:29.5px;
+  display:flex;
+  align-items:center;
+  gap:40px;
+  padding:4px 9px 5px 40px;
+  /* Without an explicit z-index this defaults to auto, which loses to any
+     descendant elsewhere on the page with a positive z-index (e.g. the
+     friend-row face's z-index:1) regardless of DOM order — that let the
+     stundenplan friend list's monster faces paint over the nav bar. Also
+     above .home-monster-dim (z-index:39, index.html's connect-now card
+     overlay) — the nav's own opaque background then simply occludes the dim
+     layer beneath it, so opening a monster card darkens everything BEHIND
+     the nav but leaves the nav itself unaffected, exactly as if the dim
+     layer had a cutout there. */
+  z-index:41;
+}
+.nav__btn{
+  flex:none;
+  display:block;
+  padding:0;
+  border:0;
+  background:none;
+  cursor:pointer;
+}
+.nav__btn img{ display:block; }
+
+.nav__home img{ width:38px;  height:44px; }
+.nav__cal  img{ width:43px;  height:46px; }
+.nav__pin  img{ width:37px;  height:44px; }
+.nav__star img{ width:44px;  height:49px; }
+
+</style>
+</head>
+<body>
+<div class="phone" data-screen="home">
+  <div class="screen">
+      <!-- HERO -->
+      <section class="hero">
+        <h1 class="hero__title" id="hero-title">hello<br>moritz!</h1>
+        <div class="hero__sub">
+          <p>2 friends are available,</p>
+          <p>4 activities later</p>
+        </div>
+      </section>
+
+      <!-- DARK SECTION: cards + monster -->
+      <section class="dark">
+        <div class="dark__panel">
+          <div class="cards">
+
+            <!-- connect_now (expandable) -->
+            <div class="card card--connect" data-expand>
+              <div class="card__closed">
+                <span class="card__bubble"><img src="card_bubble_pink.svg" alt=""></span>
+                <p class="card__label">connect now</p>
+              </div>
+              <div class="card__open panel panel--pink" aria-hidden="true">
+                <div class="panel__header">
+                  <p class="panel__title">connect now</p>
+                  <div class="panel__divider"></div>
+                </div>
+                <div class="panel__time-row">
+                  <p>11:30 until 12:00</p>
+                </div>
+                <div class="friends">
+                  <div class="friend" data-break="11:00 - 12:30" style="left:14px; top:19px; width:66.6px; height:62.2px;">
+                    <img class="friend__figure" src="friend_paul.svg" alt="" style="width:46.8px;height:29.3px;">
+                    <p class="friend__name">Paul</p>
+                  </div>
+                  <div class="friend" data-break="11:15 - 12:45" style="left:128.75px; top:19px; width:94px; height:87.7px;">
+                    <img class="friend__figure" src="friend_nam.svg" alt="" style="width:66.6px;height:49.6px;">
+                    <p class="friend__name friend__name--lg">Nam</p>
+                  </div>
+                  <div class="friend" data-break="11:30 - 13:00" style="left:51px; top:112px; width:66.6px; height:62.2px;">
+                    <img class="friend__figure" src="friend_greg.svg" alt="" style="width:47.2px;height:30.7px;">
+                    <p class="friend__name">Greg</p>
+                  </div>
+                  <div class="friend" data-break="11:00 - 12:15" style="left:193px; top:115px; width:89px; height:83px;">
+                    <img class="friend__figure" src="friend_yas.svg" alt="" style="width:55.2px;height:50.8px;">
+                    <p class="friend__name friend__name--md">Yas</p>
+                  </div>
+                  <div class="friend" data-break="11:45 - 13:00" style="left:259px; top:57px; width:66.6px; height:62.2px;">
+                    <img class="friend__figure" src="friend_moritz.svg" alt="" style="width:43.5px;height:32.6px;">
+                    <p class="friend__name">Moritz</p>
+                  </div>
+                </div>
+                <div class="panel__face" style="right:0; bottom:-37px;">
+                  <span class="panel__face-pill panel__face-pill--pink"></span>
+                  <span class="panel__face-btn"><img src="icon_arrow.svg" alt=""></span>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- socials (expandable) -->
+            <div class="card card--socials" data-expand>
+              <div class="card__closed">
+                <span class="card__bubble"><img src="card_bubble_cream.svg" alt=""></span>
+                <p class="card__label">socials</p>
+              </div>
+              <div class="card__open panel panel--cream" aria-hidden="true">
+                <div class="panel__header">
+                  <p class="panel__title">socials</p>
+                  <div class="panel__divider"></div>
+                </div>
+                <p class="panel__sub">activities past 16:00</p>
+                <!-- Five posters, not the app's four, and smaller (121.6 -> 92px),
+                     so this panel comes out the same height as connect now and
+                     map (Lucas, for the case study). Laid out by centre
+                     distance: every pair >= 108px apart, i.e. >= 16px of air
+                     at rest, with the tightest pair (2 and 5) on the two
+                     gentlest orbits. -->
+                <div class="posters posters--five">
+                  <img class="poster" src="poster-1.webp" alt="" style="left:8px; top:6px; width:92px; height:92px;">
+                  <img class="poster" src="poster-uniparty.webp" alt="" style="left:128px; top:28px; width:92px; height:92px;">
+                  <img class="poster" src="poster-bookclub.webp" alt="" style="left:246px; top:0px; width:92px; height:92px;">
+                  <img class="poster" src="poster-ted.webp" alt="" style="left:52px; top:112px; width:92px; height:92px;">
+                  <img class="poster" src="poster-movienight.webp" alt="" style="left:190px; top:116px; width:92px; height:92px;">
+                </div>
+                <div class="panel__face" style="right:0; bottom:-46px;">
+                  <span class="panel__face-pill panel__face-pill--cream"></span>
+                  <span class="panel__face-btn"><img src="icon_arrow.svg" alt=""></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- map (expandable) -->
+            <div class="card card--map" data-expand>
+              <div class="card__closed">
+                <span class="card__bubble"><img src="card_bubble_pink.svg" alt=""></span>
+                <p class="card__label">map</p>
+              </div>
+              <div class="card__open panel panel--pink" aria-hidden="true">
+                <div class="panel__header">
+                  <p class="panel__title">map</p>
+                  <div class="panel__divider"></div>
+                </div>
+                <p class="panel__sub">currently <span style="color:var(--cream); display:inline-block; animation:floorplan-dot-pulse 2.4s ease-in-out infinite;">3</span> friends nearby</p>
+                <div class="floorplan">
+                  <div class="floorplan__inner">
+                    <img src="floorplan.webp" alt="floor plan">
+                    <span class="floorplan__dot" style="left:51.59%; top:30.88%;"></span>
+                    <span class="floorplan__dot" style="left:48.02%; top:37.88%;"></span>
+                    <span class="floorplan__dot" style="left:51.52%; top:44.28%;"></span>
+                    <span class="floorplan__dot" style="left:49.92%; top:65.53%;"></span>
+                  </div>
+                </div>
+                <div class="panel__face" style="right:0; bottom:-37px;">
+                  <span class="panel__face-pill panel__face-pill--pink"></span>
+                  <span class="panel__face-btn"><img src="icon_arrow.svg" alt=""></span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- extra scroll headroom so connect_now/socials have enough room
+               to stay open before the sequence advances (see script below) -->
+          <div class="scroll-spacer" aria-hidden="true"></div>
+        </div>
+
+        <!-- big monster illustration (spills off the left, clipped).
+             Inlined (not <img>) so the two pupil paths can be targeted
+             directly and animated with scroll — see the script below. -->
+        <div class="monster" role="img" aria-label="Unify monster">
+          <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 503.52 474" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="Screenshot 2026-06-24 at 18.11.37 1 [Vectorized]" clip-path="url(#clip0_0_416)">
+              <path id="Vector" d="M186.543 133.907C194.816 97.4674 228.901 7.55931 271.755 73.532C281.043 87.83 290.869 114.847 294.488 131.714L294.894 131.385C298.94 128.064 305.722 120.569 309.387 117.082C358.848 70.0235 411.719 57.7138 399.79 148.489C397.955 162.443 394.511 176.875 391.071 190.983C396.555 189.039 402.361 187.937 407.791 186.499C444.591 176.749 518.297 170.38 487.658 234.307C477.286 255.952 459.733 275.848 443.328 292.962C466.949 297.456 516.236 315.688 529.148 336.076C555.402 377.539 467.707 403.922 443.128 409.734C462.915 430.786 489.928 460.013 494.773 490H-15.1655C-13.372 465.794 5.80219 440.572 21.0385 422.984C24.519 418.965 30.6049 412.056 34.3784 408.706L34.7286 408.401C13.4471 405.137 -33.8327 385.158 -46.2266 367.388C-74.3652 327.043 8.11912 299.767 34.2605 293.814C30.0256 290.122 26.9458 285.903 23.1058 281.725C-0.935405 255.569 -47.5685 189.261 19.7291 183.98C42.5207 182.192 66.9786 188.252 89.2903 194.452C81.3678 169.569 71.3204 116.104 83.5651 94.0887C106.458 52.9267 170.641 116.886 186.543 133.907Z" fill="#292925"/>
+              <ellipse id="Vector_2" cx="314" cy="316" rx="42" ry="59" fill="#FEFEFE"/>
+              <ellipse id="Vector_3" class="monster-pupil" cx="314" cy="291" rx="20" ry="26" fill="#FF88C8"/>
+              <ellipse id="Vector_4" cx="205" cy="316" rx="45" ry="59" fill="#FEFEFE"/>
+              <ellipse id="Vector_5" class="monster-pupil" cx="205" cy="291" rx="20" ry="26" fill="#FF88C8"/>
+            </g>
+            <defs>
+              <clipPath id="clip0_0_416"><rect width="503.52" height="474" fill="white"/></clipPath>
+            </defs>
+          </svg>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- BOTTOM NAV (fixed) -->
+    <nav class="nav" aria-label="Primary">
+      <span class="nav__btn nav__home"><img src="icon_home.svg" alt=""></span>
+      <span class="nav__btn nav__cal" aria-label="Calendar"><img src="icon_calendar.svg" alt=""></span>
+      <span class="nav__btn nav__pin" aria-label="Map"><img src="icon_pin.svg" alt=""></span>
+      <span class="nav__btn nav__star" aria-label="Settings"><img src="icon_star.svg" alt=""></span>
+    </nav>
+
+
+</div>
+<script>
+  // Which card is open, and where the app's own scroll would be for it.
+  // (index.html in the app opens cards purely by scrollTop: connect below
+  // 680, socials above, map at the very bottom.) Values tuned so the open
+  // card sits in the visible part of the screen above the nav.
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var open = q.get('open') || 'connect';
+    var card = document.querySelector('.card--' + open) || document.querySelector('.card--connect');
+    card.classList.add('is-open');
+    // ?only=1: just the open card's panel, on a transparent page sized to
+    // it (lip included) — no hero, no monster, no other cards, no nav.
+    if (q.get('only')) {
+      var wrap = document.createElement('div');
+      wrap.className = card.className;
+      wrap.appendChild(card.querySelector('.card__open'));
+      document.body.innerHTML = '';
+      document.body.appendChild(wrap);
+      document.documentElement.classList.add('only');
+      return;
+    }
+    var screen = document.querySelector('.screen');
+    var ST = { connect: 560, socials: 760, map: 800 };
+    var st = ST[open] || ST.connect;
+    screen.scrollTop = st;
+    // Monster pupils follow scroll in the app (56px over the first 400px).
+    var y = Math.min(1, st / 400) * 56;
+    document.querySelectorAll('.monster-pupil').forEach(function (p) { p.style.transform = 'translateY(' + y + 'px)'; });
+  })();
+</script>
+</body>
+</html>

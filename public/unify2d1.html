@@ -14,6 +14,8 @@
        n=120 survey, n=12 diary, n=28 preference test, n=20 pilot, n=12 usability ·
        2.1 → 5.8 warmth, 24 of 28 preferred · 14.2/11.5/4.1 s and 30/45/5 % variants ·
        71/18/6/4/1 % feature use · 1.4 → 3.1 meetups ·
+       before/after the home screen: opens 4.2 → 9.1, socials 0.7 → 2.6, map 0.5 → 1.9 per person per week,
+       and the week-1-without / weeks-2-3-with timeline itself ·
        task table 92/83/75/92/42 → 100/92/92/92/92 · SUS 71 → 83 · "7 of 12 diary participants". -->
   <meta name="robots" content="noindex, nofollow" />
   <title>lucasmaher.com</title>
@@ -496,6 +498,66 @@
       width: 100%; height: 100%;
       pointer-events: none;
       display: block;
+    }
+
+    /* ── Home previews (end of "The final design", 2026-10-05) ────────────
+       The three cards of the app's home screen, opened (connect now / socials
+       / map), side by side on the page — just the panels, no phone (Lucas).
+       Not screenshots: each is the app's own panel from its source
+       (/unify/app-home/home.html?open=<card>&only=1, a transparent page
+       exactly one panel big, lip included) in an iframe, so the friends and
+       posters drift and the map dots pulse exactly as in the app. Each iframe
+       is the panel at its native 377px width, scaled to its column by the
+       small script at the bottom of the page (a transform can't be sized in
+       percent); the box's aspect-ratio is the panel's own 377 x H. */
+    /* The three sit in one dark frame, the app's own #292925 (the
+       ground they sit on in the app), so the row reads as a widescreen
+       screenshot rather than three loose cards on the page grey. The socials
+       panel carries five smaller posters instead of the app's four so all
+       three come out the same height (see app-home/home.html). */
+    .home-previews {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 280px));
+      justify-content: center;
+      align-content: center;
+      align-items: start;          /* tops in one line */
+      gap: clamp(16px, 2.6vw, 40px);
+      padding: clamp(28px, 4vw, 52px) clamp(20px, 3vw, 44px);
+      margin-inline: clamp(0px, 8vw, 80px);   /* same inset as .home-copy / .stat-block */
+      background: #292925;
+      border-radius: clamp(14px, 1.8vw, 24px);
+      margin-top: clamp(60px, 9vw, 96px);
+    }
+    .home-panel { position: relative; width: 100%; }
+    .home-frame {
+      position: absolute; top: 0; left: 0;
+      width: 377px; height: 100%;
+      border: 0; display: block;
+      transform-origin: 0 0;
+      pointer-events: none;
+      background: transparent;
+      overflow: hidden;
+    }
+    /* The two reasons one under the other, inset like the Problem section's
+       finding (.stat-block's padding-inline), not side by side (Lucas). */
+    .home-copy {
+      display: flex; flex-direction: column;
+      gap: clamp(28px, 4vw, 44px);
+      padding-inline: clamp(0px, 8vw, 80px);
+      margin-top: clamp(40px, 5vw, 64px);
+    }
+    .home-copy .feature-title { margin: 0 0 12px; }
+    .home-copy .guide-text { margin: 0; }
+    @media (max-width: 640px) {
+      /* One under the other on a phone: three across a 350px column would
+         set the panels' own type at ~4px. */
+      .home-previews {
+        grid-template-columns: minmax(0, 300px);
+        gap: 36px;
+        padding: 32px 20px 40px;
+        margin-top: 72px;
+      }
+      .home-copy { gap: 28px; margin-top: 36px; }
     }
     .phone-shot-video[data-vid="homepage"] { top: -0.3831%; left: -1.3252%; width: 102.6885%; height: 101.4183%; }
     .phone-shot-video[data-vid="timetable"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.8972%; }
@@ -1684,11 +1746,11 @@
        is the one place on the page where all three numbers have already been
        earned by the sections above. Each number chains to a figure stated
        elsewhere: 23 min from the Problem section's diary study, 2.2x is the
-       pie note's 1.4 -> 3.1 meetups, 83 is the task note's SUS. Change one and
-       change its twin. */
+       pie note's 1.4 -> 3.1 meetups. Change one and change its twin. (The third,
+       SUS 71 -> 83, went 2026-10-05 with the usability iteration it came from.) */
     .fact-bar {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: clamp(14px, 2.4vw, 28px);
     }
     .fact { display: flex; flex-direction: column; gap: 8px; }   /* no card: the numbers sit on the page */
@@ -1886,6 +1948,8 @@
     }
 
     /* Results: task success before / after one iteration. */
+    /* UNUSED as of 2026-10-05, see CLAUDE.md (the task table went with the
+       invented usability iteration). */
     .cs-table { width: 100%; border-collapse: collapse; font-size: 14px; color: var(--text-secondary); }
     .cs-table th {
       font-family: 'VT323', monospace; font-size: 17px; font-weight: 400;
@@ -1954,6 +2018,21 @@
     /* .cs-sub carries its own margin-top for use in normal flow; inside this
        flex column the `gap` already does that job, so it's zeroed. */
     .res-block > .cs-sub { margin-top: 0; }
+
+    /* Before/after paired bars (2026-10-05). Reuses the .chart-track /
+       .chart-fill / .chart-key / .chart-val pieces (pressed trough, grey fill)
+       and adds the pairing: two bars per metric, the second (.is-after) in
+       the accent. Left-aligned inside the centred .res-block. */
+    .ba-chart { width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 22px; text-align: left; }
+    .ba-legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: 'Roboto Flex', sans-serif; font-weight: 500; font-size: 12.9px; color: var(--text-secondary); }
+    .ba-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; background: var(--text-tertiary); }
+    .ba-legend i.is-after { background: var(--accent-orange); }
+    .ba-group { display: flex; flex-direction: column; gap: 6px; }
+    .ba-group .chart-key { margin-bottom: 2px; }
+    .ba-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
+    .ba-row .chart-track { display: block; }
+    .ba-row.is-after .chart-fill { background: var(--accent-orange); }
+    .ba-row.is-after .chart-val { color: var(--accent-ink); }
 
     /* The stage is exactly the circle's box; the labels and their leader
        lines hang outside it (overflow visible), so the PIE ITSELF is what's
@@ -2215,8 +2294,8 @@
        the rest. The numbers are placeholders — a value lives in one place, the
        `--v` on its row (0–100) with the label beside it — so filling a study in
        is a number swap, never a rebuild.
-       .chart/.chart-row/.chart-key/.chart-track/.chart-fill/.chart-val are
-       UNUSED as of 2026-09-28, see CLAUDE.md — this was the bar chart in the
+       .chart/.chart-row are UNUSED as of 2026-09-28 (.chart-key/-track/-fill/
+       -val are back in use since 2026-10-05, by .ba-chart in Results), see CLAUDE.md — this was the bar chart in the
        old "Supporting features" section; its data now renders as a pie chart
        (.pie-chart) inside "Testing and results" instead. Kept, not deleted. */
     .chart { display: flex; flex-direction: column; gap: 10px; width: 100%; }
@@ -2568,7 +2647,70 @@
     @media (max-width: 640px) {
       .hero-top { min-height: 0; padding-top: 18px; }
     }
-  </style>
+  
+    /* ── Inset text column, MacBook widths and up (2026-10-05, Lucas) ──────
+       Every case-study section's content sits on the inset the Problem
+       section's finding (.stat-block) and the home-screen text (.home-copy)
+       already used: 80px further in than the section padding, so lines stop
+       running the full card width — headings and dotted dividers included
+       (Lucas). From 1280px up (every MacBook
+       default resolution and wider); below that the page keeps its old
+       padding. The components that carried this inset themselves (and the
+       scrollys' own side padding) give it back here, or it would apply twice. */
+    @media (min-width: 1280px) {
+      .cs-section:not(#top) { padding-inline: 160px; }
+      /* and the header block above the sections too (Lucas): breadcrumb,
+         title + divider, the lead line and the meta tiles */
+      .hero-top, #top, .page-wrapper > .section { padding-inline: 160px; }
+      .stat-block { padding-inline: 0; }
+      /* the scrollys carried their own 80px of side padding on top of the
+         section's; that now IS the section's, so it goes */
+      .cs-section .scrolly-sticky { padding-inline: 0; }
+      .home-copy { padding-inline: 0; }
+      .home-previews { margin-inline: 0; }
+    }
+
+    /* ── Breathing room, after Jessica Im's TurboTax case study (2026-10-05) ──
+       Lucas: the page felt cramped. Measured off imjiwoo.com/tt-onboarding at
+       1440 wide: body 18px on a 1.4 line, sub-heads 28px, stat numbers 48px
+       over an 18px label; ~240-280px between major sections, ~40-80px
+       between sub-sections inside one, 40px from a label to its heading and
+       from text to the media under it, ~19px from a heading to its text, and
+       a 1036px column at 1440. Translated here, desktop only (861px+), with
+       clamps so the 861-1440 band scales down to it instead of jumping:
+       - body text 14.4 -> 18px at 1440 (line 1.55: this face is lighter and
+         greyer than Figtree and wants a little more air than 1.4)
+       - section-to-section ~244px at 1440 (122px top + bottom each; the old
+         .cs-section + .cs-section shortcut that cut the top to 32px is
+         overridden, and #research's own inline top padding is gone)
+       - every gap inside a section 28 -> 40px
+       - sub-headings get ~64px more above them, the results blocks ~120px
+       - fact labels 13 -> 16px under their numbers
+       Mobile (<=860) is untouched. */
+    @media (min-width: 861px) {
+      .guide-section.cs-section:not(#top) { padding-block: clamp(64px, 8.5vw, 136px); }
+      .guide-section.cs-section { gap: clamp(28px, 2.8vw, 40px); }
+      .cs-section .guide-text,
+      .cs-section .stat-sub { font-size: clamp(16px, 1.25vw, 18px); line-height: 1.55; }
+      .cs-section .cs-sub { margin-top: clamp(32px, 4.4vw, 64px); }
+      #pivot .cs-sub { margin-top: 0; }   /* collage -> heading -> text -> heading all at the section gap (Lucas) */
+      .cs-section .stat-head.is-section { margin-top: clamp(32px, 4.4vw, 64px) !important; }
+      .res-block { margin-top: clamp(80px, 8.5vw, 120px); gap: clamp(24px, 2.8vw, 40px); }
+      .home-previews { margin-top: clamp(80px, 8.5vw, 120px); }
+      /* Lucas: frame -> text, and block -> block, at the same 40px as the
+         wireframes -> their paragraph in The idea (i.e. just the section gap) */
+      .home-copy { margin-top: 0; gap: clamp(28px, 2.8vw, 40px); }
+      .home-copy .feature-title { margin-bottom: 19px; }
+      .stat-block { gap: clamp(28px, 2.8vw, 40px); }
+      .imsg-stage + .stat-block { margin-top: clamp(48px, 6.9vw, 99px); }   /* chat -> finding: 124 -> 223px at 1440, +80% (Lucas) */
+      .fact-label { font-size: 16px; line-height: 1.45; }
+      .fact-bar { margin-top: clamp(80px, 8.5vw, 120px) !important; }
+      .feature-row + .feature-row,
+      .scrolly + .feature-row,
+      .feature-row + .scrolly,
+      .scrolly + .scrolly { margin-top: clamp(40px, 5.5vw, 80px); }
+    }
+</style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
   <script src="/theme/theme.js" defer></script>
@@ -2654,10 +2796,8 @@
       </svg>
       <div class="hero-header">
         <div class="project-header">
-          <p class="breadcrumb" data-i18n-html="breadcrumb">Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;Unify</p>
           <div class="title-row">
             <h1 class="project-title">Unify</h1>
-            <span class="accent-dot"></span>
           </div>
           <div class="dot-divider"></div>
         </div>
@@ -2769,7 +2909,7 @@
     <!-- 2 · Research → one model -->
     <!-- +80% of the usual section gap above this one, specifically (Lucas) —
          .cs-section + .cs-section stays the shared default for every other pair. -->
-    <section class="guide-section cs-section" id="research" style="padding-top: clamp(28.8px, 5.4vw, 57.6px);">
+    <section class="guide-section cs-section" id="research">
       <div class="section-heading-row">
         <h2 class="section-title">The constraints</h2>
         <span class="step-badge">2</span>
@@ -2906,25 +3046,7 @@
       <!-- The cohort ("five friend groups, 20 people, three weeks") used to be
            restated here as well; it now lives once, in Testing and results,
            which is also where the numbers it produced live. -->
-      <p class="guide-text">What follows is the shipped design, mostly in the order people actually reached for it — the numbers behind that order are in Testing and results, further down.</p>
-
-      <div class="feature-row">
-        <div class="feature-media">
-          <div class="phone-shot">
-            <div class="phone-shot-screen">
-              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="homepage">
-                <source src="/videos/unify/homepage_freenow.mov" type="video/quicktime" />
-                <source src="/videos/unify/homepage_freenow.mov" type="video/mp4" />
-              </video>
-            </div>
-            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-          </div>
-        </div>
-        <div class="feature-copy">
-          <h3 class="feature-title">Who's free now</h3>
-          <p class="guide-text">This is the screen most pilot sessions opened on first: the same idea from earlier, shipped — who's free, right now, and until when, before you've typed anything.</p>
-        </div>
-      </div>
+      <p class="guide-text">What follows is the shipped design: the three features on their own screens first, then the home screen that sums them up.</p>
 
       <!-- Timetable + Socialplan, mirrored (text left, videos right) — the
            live page's actual scroll-driven sticky-pin mechanism, not a
@@ -2971,12 +3093,6 @@
           </div>
         </div>
       </section>
-
-      <!-- Map spotlight — angle deliberately not written yet (Lucas: "we'll
-           talk about that later"). Placeholder in the established .ph idiom
-           rather than throwaway copy, so it's obviously pending and not
-           mistaken for a finished decision. -->
-      <div class="ph ph--chart"><span class="ph-tag">Map spotlight · TBD</span><span class="ph-desc">A deeper look at the indoor-navigation problem — angle not decided yet</span></div>
 
       <!-- Friends + Courses, NOT mirrored (videos left, text right) —
            matches the live page's own alternation (Timetable/Socials
@@ -3039,6 +3155,31 @@
           <p class="guide-text">The profile is where you pick your character and manage who can see you. Everything else here stays in the app and out of this page.</p>
         </div>
       </div>
+
+      <!-- Home previews (2026-10-05, Lucas): the three features above were
+           built as full screens first; the home screen that summarises them
+           came after, so it closes the walkthrough instead of opening it (Settings
+           sits just above it, so these two are the section's last word).
+           Just the three home cards, opened, side by side — no phone (Lucas):
+           each is the app's real panel (see .home-previews CSS). Two reasons, kept
+           apart on purpose: a glance is usually enough, and a preview pulls
+           you into the full screen. -->
+      <div class="home-previews" role="img" aria-label="The three cards on the Unify home screen, opened: connect now (who's free and until when), socials (what's on today), map (friends nearby).">
+        <div class="home-panel" style="aspect-ratio: 377 / 402;"><iframe class="home-frame" src="/unify/app-home/home.html?open=connect&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
+        <div class="home-panel" style="aspect-ratio: 377 / 411;"><iframe class="home-frame" src="/unify/app-home/home.html?open=socials&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
+        <div class="home-panel" style="aspect-ratio: 377 / 402;"><iframe class="home-frame" src="/unify/app-home/home.html?open=map&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
+      </div>
+      <div class="home-copy">
+        <div>
+          <h3 class="feature-title">A glance is usually enough</h3>
+          <p class="guide-text">We started with the three features as full screens: the timetable, the socials, the map. Using them, we noticed that most of the time nobody needs a friend's whole week, only who is free right now. Socials worked the same way: you rarely scroll the full list, you want to know what's on today. So the home screen became three summaries, one card per feature, each holding only its most important piece.</p>
+        </div>
+        <div>
+          <h3 class="feature-title">A preview pulls you in</h3>
+          <p class="guide-text">The second reason is what the summaries do for the screens behind them. A video that plays a few seconds of itself in the feed gets clicked more than a still thumbnail, and the cards are meant to work the same way. Who's free, what's on and who's nearby all sit on the first screen you see, so each card is an invitation to open the full feature behind it, instead of a feature waiting for you to go looking.</p>
+        </div>
+      </div>
+
     </section>
 
     <!-- 6 · Testing + results -->
@@ -3082,38 +3223,40 @@
           <span class="pie-label" style="top: 65.9%;">Room finder <b>1 %</b></span>
           <span class="pie-label" style="top: 87.9%;">Who's free now <b>76 %</b></span>
         </div>
-        <p class="guide-text res-note">Almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
+        <p class="guide-text res-note">Once the home screen was in, almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
       </div>
 
-      <!-- Second movement, same shape as the pie above it (2026-09-29):
-           heading -> the evidence -> a plain note under it, all in a centred
-           .res-block. It used to be a full-width .cs-grid-2 putting the table
-           beside a raised neumorphic .sus card, with its explanatory paragraph
-           ABOVE — three different idioms in one section. The SUS pair is now a
-           picked-out number inside the note (it was a second before/after
-           sitting next to a table that already had before/after columns), and
-           the paragraph moved under the table so both halves read the same way.
-
-           The table itself is kept as-is: its `.is-highlight` last row already
-           does the page's "one accent row carries the finding, grey for the
-           rest" job, so unlike the A/B/C variant grid that was cut earlier,
-           this one is already consistent with the page's chart convention. -->
+      <!-- Before / after the home screen (2026-10-05, Lucas): the evidence for
+           the two reasons at the end of "The final design". Same res-block
+           shape as the pie: heading -> evidence -> plain note. Paired bars on
+           ONE scale (0-10 opens per person per week, --v = value x 10), grey
+           for week 1 without the home screen, pink for weeks 2-3 with it.
+           ⚠ Invented like every number here, AND so is the timeline (that the
+           home screen arrived after the first pilot week) — see the list at
+           the top of the file. -->
       <div class="res-block">
-        <h3 class="cs-sub">The one nobody could find</h3>
-        <table class="cs-table">
-          <thead><tr><th>Task</th><th class="num">Week 1</th><th class="num">Week 3</th></tr></thead>
-          <tbody>
-            <tr><td>Find a friend free at 12:15</td><td class="num">92 %</td><td class="num">100 %</td></tr>
-            <tr><td>See who is in the building</td><td class="num">83 %</td><td class="num">92 %</td></tr>
-            <tr><td>Add a social to your timetable</td><td class="num">75 %</td><td class="num">92 %</td></tr>
-            <tr><td>Find room X</td><td class="num">92 %</td><td class="num">92 %</td></tr>
-            <tr class="is-highlight"><td>Hide yourself from one friend</td><td class="num">42 %</td><td class="num">92 %</td></tr>
-          </tbody>
-        </table>
-        <p class="guide-text res-note">Five tasks, run in the first week and again in the last. Four were fine from the start. The fifth — hiding yourself from a single friend — was buried in settings, where nobody thought to look: <b>"I assumed that lived on the person, not in a menu."</b> Moving it onto that friend's own profile took it from <b>42 % to 92 %</b>, and carried the System Usability Scale for the whole prototype from <b>71 to 83</b>.</p>
+        <h3 class="cs-sub">Before and after the home screen</h3>
+        <div class="ba-chart" role="img" aria-label="Opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify 4.2 to 9.1, socials 0.7 to 2.6, map 0.5 to 1.9.">
+          <div class="ba-legend"><span><i></i>Week 1, no home screen</span><span><i class="is-after"></i>Weeks 2–3, with it</span></div>
+          <div class="ba-group">
+            <span class="chart-key">Opened Unify</span>
+            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 42;"></span></span><span class="chart-val">4.2 / week</span></div>
+            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 91;"></span></span><span class="chart-val">9.1 / week</span></div>
+          </div>
+          <div class="ba-group">
+            <span class="chart-key">Opened socials</span>
+            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 7;"></span></span><span class="chart-val">0.7 / week</span></div>
+            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 26;"></span></span><span class="chart-val">2.6 / week</span></div>
+          </div>
+          <div class="ba-group">
+            <span class="chart-key">Opened the map</span>
+            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 5;"></span></span><span class="chart-val">0.5 / week</span></div>
+            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 19;"></span></span><span class="chart-val">1.9 / week</span></div>
+          </div>
+        </div>
+        <p class="guide-text res-note">For the first week of the pilot the prototype opened straight onto the timetable; the home screen arrived for weeks two and three. Once it did, people opened Unify more than twice as often, and the two features that had barely been touched in week one — socials and the map — were opened three to four times as often, most of the time straight from their card.</p>
       </div>
 
-      <div class="ph ph--chart" style="margin-top: clamp(60px, 9vw, 84px);"><span class="ph-tag">Before / after</span><span class="ph-desc">The settings screen and the friend's profile, side by side</span></div>
 
       <!-- The three hero stats, back (Lucas) — they were in the hero until
            2026-09-26 and briefly in "The idea" until 2026-09-27, and were cut
@@ -3134,11 +3277,6 @@
           <span class="fact-label">more meetups per person per week, 1.4 to 3.1</span>
           <span class="fact-src">During the pilot</span>
         </div>
-        <div class="fact">
-          <span class="fact-num">83</span>
-          <span class="fact-label">System Usability Scale, up from 71</span>
-          <span class="fact-src">After one iteration</span>
-        </div>
       </div>
     </section>
 
@@ -3149,12 +3287,11 @@
         <span class="step-badge">7</span>
       </div>
       <div class="dot-divider"></div>
-      <!-- "Ordering this page by measured use" (the old claim) is no longer
-           quite true once the map spotlight breaks that order on purpose —
-           reworded 2026-09-28 to stay honest about that without pre-empting
-           what the spotlight itself will argue (still TBD, see "The final
-           design" above). -->
-      <p class="guide-text">The feature everyone argued about was not the one that got used. Three-quarters of the pilot's time sat in a single block on the home screen, while the indoor map — the part that was hardest to build — barely registered in it. Walking the app in that order, and making one deliberate exception for the part worth a closer look anyway, was the most uncomfortable call in this whole page.</p>
+      <!-- 2026-10-05: "The final design" now shows the three full features
+           first and the home screen last (the order they were built in), so
+           this paragraph no longer claims the page walks the app in usage
+           order; it ties the usage finding to the home screen instead. -->
+      <p class="guide-text">The feature everyone argued about was not the one that got used. Three-quarters of the pilot's time sat in a single block on the home screen, while the indoor map — the part that was hardest to build — barely registered in it. It backed up the home screen: the full screens came first, and the summary of all three turned out to be where people actually spent their time.</p>
       <p class="guide-text">A visual language is not decoration. My v1 was clear, structured and cold, and the feedback round said so in the politest possible way: it looked like something the university had issued. The same screens in the character design read as the group's own, and none of the information architecture underneath had changed.</p>
       <p class="guide-text">What I would do next: widgets, so the free-now block never needs the app opened at all, and a proper look at what happens when a group grows past six people — the lane that won the timetable test starts to crowd at around eight.</p>
       <!-- The hero's blob, reused (Lucas, 2026-10-05): upside down, half the
@@ -4477,6 +4614,25 @@
       fit();
       addEventListener('resize', fit);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);   // VT323 changes the widths
+    })();
+  </script>
+  <script>
+    // Home previews: scale each panel iframe (377px wide, the app's own
+    // size) to its column. A transform can't take a percentage of the parent,
+    // so it is measured; the ResizeObserver keeps it right at any width. The
+    // iframe's height is 100% of the box divided back by the scale.
+    (function () {
+      var frames = document.querySelectorAll('.home-frame');
+      if (!frames.length || !('ResizeObserver' in window)) return;
+      var ro = new ResizeObserver(function (entries) {
+        entries.forEach(function (e) {
+          var box = e.target, f = box.querySelector('.home-frame');
+          var k = box.clientWidth / 377;
+          f.style.height = (box.clientHeight / k) + 'px';
+          f.style.transform = 'scale(' + k + ')';
+        });
+      });
+      frames.forEach(function (f) { ro.observe(f.parentNode); });
     })();
   </script>
 </body>

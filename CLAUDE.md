@@ -110,6 +110,17 @@ spring-surface version (fluid.js, MIT) sat between the two and was rejected on t
 - **Dropdown expand height:** Increased from 280px to 400px to ensure full dropdown visibility without clipping
 - **Collapse height must match the default (140px), not shrink to 90px.** See "Nav bar iframe" below — this was a live bug (nav bottom shadow got clipped after the Craft dropdown closed) fixed this session.
 
+## No blinking dots, no breadcrumbs (2026-10-06, Lucas)
+
+The blinking accent dot beside every project title (`<span class="accent-dot">`) and beside
+"LUCAS MAHER" on `2D.html` (`<div class="hero-accent">`) are **removed site-wide**, and so is the
+`PORTFOLIO / PROJECTS / <NAME>` breadcrumb above each project title (`<p class="breadcrumb">`) —
+on all six project pages incl. the Unify draft (to.morrow never had either). Markup only: the
+`.accent-dot` / `.hero-accent` / `.breadcrumb` CSS and the `breadcrumb` `TRANSLATIONS` keys are
+still in the files, now inert. Do not re-add them. Older notes below that describe the dot or the
+breadcrumb are history. The typewriter cursor in the landing hero ("INTERFACE DESIGNER...|") is
+not a dot and stays.
+
 ## Page map
 
 | File | What it is |
@@ -679,8 +690,7 @@ question, not a walkthrough one.
 **"The final design" (`id="features"`, reused from the old "Supporting features" section — see
 below for why the id didn't change) now runs: intro paragraph → Home/"Who's free now" (a
 `.feature-row` using `homepage_freenow.mov`, the same "who's free now" cut used on the live
-homepage hero) → Timetable+Socialplan (scroll-driven, mirrored: text left, videos right) → a map
-spotlight placeholder (angle explicitly not decided — see below) → Friends+Courses (scroll-driven,
+homepage hero) → Timetable+Socialplan (scroll-driven, mirrored: text left, videos right) → Friends+Courses (scroll-driven,
 NOT mirrored: videos left, text right, matching the live page's own alternation) → Settings
 (`.feature-row.reverse`).**
 - **Timetable+Socialplan and Friends+Courses both reuse `.scrolly`/`initScrolly` as-is — zero JS
@@ -704,11 +714,62 @@ NOT mirrored: videos left, text right, matching the live page's own alternation)
   scrolly — neither referenced the removed content, so there was nothing to fix.
 - **Settings' copy was trimmed** — it used to also cover the room finder ("took 1% of pilot time")
   in one line; that line is gone now that Room finder/Courses has its own paired video above.
-- **The map spotlight is a deliberate placeholder**, in the established `.ph` idiom
-  (`<div class="ph ph--chart"><span class="ph-tag">Map spotlight · TBD</span>...`), not throwaway
-  copy — Lucas's angle for it ("why is indoor navigation actually hard") is still undecided as of
-  this note; he said "we'll talk about that later." Don't write speculative content into this slot;
-  wait for the actual brief.
+- **The map spotlight is GONE (2026-10-05)** — Lucas: it made no sense in the project's context.
+  The depth goes into "Who's free now" in "The idea" instead (the connect-now/timetable design
+  choices, which Lucas is fleshing out himself). "What we learned" no longer mentions "one
+  deliberate exception"; the section now walks the app in strict usage order.
+- **The opening Home/"Who's free now" row is GONE, and the home screen now CLOSES the section
+  (2026-10-05, Lucas).** Order is now: intro → Timetable+Socials → Friends+Courses → Settings → **home
+  previews** (Lucas moved Settings above it, so the previews close the section). Reason: the three full screens were built first and the
+  home summary came after, so it reads as the conclusion; `homepage_freenow.mov` is no longer used
+  on the draft. `.home-previews` = the three home-screen CARDS, opened (connect now / socials /
+  map), side by side on the page — **just the panels, no phone frames** (Lucas; a first pass put
+  three whole home screens in iPhone frames and was rejected). Each is an **iframe of
+  `/unify/app-home/home.html?open=<card>&only=1`**: the app's own `index.html` + `styles.css`
+  (HERO → nav) rebuilt from `~/TEMP/Unify/web/`; `only=1` strips the page down to the open card's
+  `.card__open` on a transparent 377px-wide document (lip included: 377 x 402 / 411 / 402, which is
+  each box's `aspect-ratio`). Without `only` it is still the full static home screen with that card
+  open and the scroll parked where the app opens it (connect 560, socials 760, map 800). The drift /
+  poster orbit / map-dot pulse keyframes are the app's verbatim, so things float exactly as in the
+  app. Assets in `public/unify/app-home/` (posters + floor plan re-encoded webp, Nunito variable +
+  OFL). A ResizeObserver script scales each 377px iframe to its column. **They sit in one dark frame** (`#292925`, the app's own dark,
+  rounded, flat, height from padding, inset like the text below it — "like a widescreen screenshot", Lucas), tops aligned. **The socials panel has FIVE
+  posters at 92px instead of the app's four at 121.6** (the fifth is the app's own Movie Night
+  poster), so it is 365px tall like map instead of 489; connect now's friends area is 18px taller (188 → 206) so it is 365 too — all three panels equal — a deliberate deviation from
+  the app, Lucas's call; pairs keep >= 16px of air at rest, the tightest (2 and 5) on the gentlest
+  orbits. Under them `.home-copy`: two blocks ONE UNDER THE OTHER, inset by `.stat-block`'s `padding-inline` (same left edge as "Why the 68 % stopped trying"), "A glance is usually enough" and "A preview
+  pulls you in" (the YouTube-preview comparison) — written as intent, NO percentage (Lucas floated
+  "80%"; it isn't measured). Below 640px the three panels stack, 300px max, inside the same dark frame (no 16:9 there). Verified over CDP at 1440 and 390 touch: no overflow, no console errors.
+- **Spacing system after Jessica Im's TurboTax page (2026-10-05, Lucas: "cramped, no room to
+  breathe").** Measured off imjiwoo.com/tt-onboarding at 1440 over CDP: body 18px / 1.4, sub-heads
+  28px, stat numbers 48px over 18px labels, ~240–280px between major sections, 40–80px between
+  sub-sections, 40px label→heading and text→media, ~19px heading→text. Applied in the LAST block of
+  `<style>` (`@media (min-width: 861px)`, clamps so 861–1440 scales): `.guide-text`/`.stat-sub`
+  18px / 1.55 at 1440 (16px at 1100), section-to-section ~245px at 1440 (`padding-block` on
+  `.guide-section.cs-section`, which beats the old `.cs-section + .cs-section` 32px top — and
+  `#research`'s inline top padding is gone), section `gap` 40px, `.cs-sub` / Why-the-68 heading
+  +64px above (except in `#pivot`, where Lucas wanted just the 40px gap), the Problem finding starts 80% further below the chat phone (124 → 223px at 1440, `.imsg-stage + .stat-block` margin; its own inner gaps stay 40 — Lucas meant the gap ABOVE it), `.home-copy`
+  at just the section gap (40px under the frame and between its two blocks, Lucas), `.res-block`/`.home-previews`/`.fact-bar` 120px above, fact labels 16px. Mobile
+  (≤860) unchanged — measured 14.4px / 69px at 860 and 16px at 390, as before.
+- **Inset text column from 1280px up (2026-10-05, Lucas: lines ran too long).** At
+  `min-width: 1280px` every `.cs-section` — and the header block above them (`.hero-top` with breadcrumb/title/divider, `#top`'s lead, the meta `.section`) — has `padding-inline: 160px` (the old 80 +
+  the `.stat-block` inset) — headings and dotted dividers included (Lucas; for one round they were
+  pulled back out to the old edge). Components that carried the inset themselves zero it there
+  (`.stat-block`, `.home-copy` padding, `.home-previews` margin), and `.scrolly-sticky` drops its
+  own side padding. Below 1280 nothing changed. Measured: text at 401/271/241 at 1920/1440/1280,
+  headings and dividers on the same line; 1279 and 1100 identical to before. The block is the last rule
+  in `<style>`.
+- **"Before and after the home screen" (2026-10-05, Lucas)** — a second `.res-block` in Results,
+  right after the pie: paired bars (`.ba-chart`, reusing `.chart-key/-track/-fill/-val`), opens per
+  person per week on ONE 0–10 scale (`--v` = value × 10), grey = week 1 without the home screen,
+  pink = weeks 2–3 with it: Unify 4.2 → 9.1, socials 0.7 → 2.6, map 0.5 → 1.9. ⚠ Invented, and so is
+  the TIMELINE it implies (home screen added after pilot week 1) — the pie note now opens "Once the
+  home screen was in…" to agree with it. Both are in the invented-numbers comment at the top.
+- **"Testing and results" lost its second half (2026-10-05):** "The one nobody could find", the
+  task table, its note, the before/after `.ph` and the SUS fact are gone — the usability iteration
+  was invented and nothing real replaced it. `.cs-table` marked UNUSED; `.fact-bar` is 2 columns
+  now. "What we learned" no longer claims the page walks in usage order; it ties the 76% home
+  finding to the home screen instead.
 - **The id stayed `#features` on purpose**, even though the section's job and title both changed —
   reusing it kept the sidebar (`.cs-map`, dynamically built off `<a href>`s, no hardcoded id list —
   see its script) to a one-line edit (swap the `<a href="#timetable">Timetable</a>` link for
@@ -929,9 +990,9 @@ the most uncomfortable decision in it" — a claim that stopped being quite true
 spotlight was added, since that spotlight is an explicit, deliberate EXCEPTION to strict usage-order
 (a 1%-of-pilot-time feature getting a dedicated deep dive because it's the hardest thing built, not
 because people used it). Reworded to "walking the app in that order, and making one deliberate
-exception for the part worth a closer look anyway, was the most uncomfortable call" — true either
-way the spotlight's eventual content lands, and it doesn't pre-empt what that content will argue
-(still TBD).
+exception for the part worth a closer look anyway, was the most uncomfortable call". **Superseded
+2026-10-05:** with the spotlight removed, it now reads "walking the app in that order, rather than
+in the order it was built, was the most uncomfortable call in this whole page."
 
 **Marked UNUSED, not deleted, same convention as every other dormant block in this file**: the
 whole A/B/C comparison system — `.variant`/`.variant-name`/`.variant-metrics`/`.variant.is-winner`
