@@ -73,11 +73,13 @@ const CaptionV: React.FC<{lines: string[]; f: number; inAt: number; outAt?: numb
 const CAP_TT_Y = 230;
 const CAP_Y = 300;
 /* The wash under the timetable's captions (Lucas, 2026-10-05), in frame px:
-   an even 0.79 over the top 190px (the caption sits on it), fading out by 440,
-   just clear of the overview card's days row.
+   an even 0.93 over the top 270px (the caption sits on it), fading out by 525.
+   That reaches the overview card's days row (top ~416), so the wash only comes
+   in with the first zoom (ttWash): over the overview nothing sits above the
+   card to cover, and Lucas wanted that row clear.
    Dialled in with wash-tuner/ at the repo root. `ext` (the tall cut's band
    above) stays at `top`. */
-export const TT_WASH: Wash = {start: 190, end: 440, top: 0.79, curve: 1.1}; // Lucas, from wash-tuner/
+export const TT_WASH: Wash = {start: 270, end: 525, top: 0.93, curve: 0.85}; // Lucas, from wash-tuner/
 /* The timetable's overview is small in the tall frame at the landscape's 1.25:
    the vertical cut shows it BOOST times larger, easing back to the landscape
    camera over the first zoom (ZOOM_TOP), so the days stop and everything after
@@ -102,8 +104,9 @@ export const UnifyPromoV: React.FC<{tune?: boolean}> = ({tune}) => {
   const room = ease(f, T.ROOM_IN[0], T.ROOM_IN[1], Easing.inOut(Easing.cubic)) * (1 - ease(f, T.ROOM_OUT[0], T.ROOM_OUT[1], Easing.inOut(Easing.cubic)));
   const ttDx = VW / 2 - ttCx(f) + ROOM_DX * room;
   const boost = boostAt(f);
-  // a dark wash under the timetable's captions: the page runs on above the camera's point
-  const ttWash = ease(f, T.CARD_IN0, T.CARD_IN1) * (1 - ease(f, T.TT_OUT, T.TT_OUT + 14));
+  // a dark wash under the timetable's captions: the page runs on above the camera's point.
+  // It comes in with the first zoom, so the overview card is never under it.
+  const ttWash = ease(f, T.ZOOM_TOP[0], T.ZOOM_TOP[1]) * (1 - ease(f, T.TT_OUT, T.TT_OUT + 14));
 
   // the ending, as the landscape film's
   const k = Math.exp(Math.log(6) * (1 - ease(f, T.FRAME0, T.FRAME1, Easing.inOut(Easing.cubic))));

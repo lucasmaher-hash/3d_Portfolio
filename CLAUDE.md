@@ -1352,8 +1352,9 @@ solid only at the frame's very top and fade out by 420 / 540px, so the captions 
 before the overview card's days row. Each is a `Wash` {start, end, top, curve} in frame px
 (`TT_WASH` in UnifyPromoV.tsx, `MAP_WASH_V` in MapScene.tsx), drawn by `washStops()` in lib.ts:
 alpha `top` above `start`, then `top·(1−t)^curve` to 0 at `end`. Lucas's values from the tuner:
-timetable {start 190, end 440, top 0.79, curve 1.1} (an even 0.79 under the caption), map {0, 540,
-1, 0.7}. **Tune them with `wash-tuner/`** (repo root — the Vite dev server serves it at
+timetable {start 270, end 525, top 0.93, curve 0.85} (an even 0.93 under the caption), map {0, 540,
+1, 0.7}. The timetable wash reaches the overview card's days row, so it only fades in with the
+first zoom (`ttWash`, over ZOOM_TOP) — the overview has nothing above the card to cover. **Tune them with `wash-tuner/`** (repo root — the Vite dev server serves it at
 `/wash-tuner/`, the build never ships it): real frames of the vertical cut rendered with no wash
 and no captions (`npx remotion still UnifyPromoV wash-tuner/f<N>.png --frame=<N>
 --props='{"tune":true}'`, then JPEG), the same gradient and captions drawn live over them,
