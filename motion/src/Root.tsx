@@ -5,6 +5,7 @@ import {DURATION_E, DURATION_F, EXT, FPS, LabPhone, Promo, PromoTall} from './Pr
 import {DURATION_F as DURATION_FV, EXT_V, PromoV, PromoVTall} from './PromoV';
 import {TILE as UNIFY_TILE, UNIFY_DURATION, UNIFY_EXT, UnifyPromo, UnifyPromoTall, UnifyPromoTile} from './unify/UnifyPromo';
 import {UnifyLab} from './unify/Lab';
+import {UNIFY_EXT_V, UnifyPromoV, UnifyPromoVTall, VH as UNIFY_VH, VW as UNIFY_VW} from './unify/UnifyPromoV';
 import {DURATION_F as DURATION_F16, Promo16} from './Promo16';
 import './sk.css';
 
@@ -45,6 +46,8 @@ export const RemotionRoot: React.FC = () => (
     {/* ...and its TALL cut, the draft page's hero: UNIFY_EXT px of canvas above the frame */}
     <Composition id="UnifyPromoTall" component={UnifyPromoTall} durationInFrames={UNIFY_DURATION} fps={30} width={1920} height={1080 + UNIFY_EXT} />
     <Composition id="UnifyPromoTile" component={UnifyPromoTile} durationInFrames={UNIFY_DURATION} fps={30} width={UNIFY_TILE.w} height={UNIFY_TILE.h} />
+    <Composition id="UnifyPromoV" component={UnifyPromoV} durationInFrames={UNIFY_DURATION} fps={30} width={UNIFY_VW} height={UNIFY_VH} />
+    <Composition id="UnifyPromoVTall" component={UnifyPromoVTall} durationInFrames={UNIFY_DURATION} fps={30} width={UNIFY_VW} height={UNIFY_VH + UNIFY_EXT_V} />
     <Composition id="UnifyLab" component={UnifyLab} durationInFrames={1} fps={30} width={1920} height={1080} defaultProps={{which: 'card' as const}} />
     <Composition id="Lab" component={Lab} durationInFrames={1} fps={30} width={LAB_W} height={LAB_H} />
     <Composition id="LabButtons" component={LabButtons} durationInFrames={1} fps={30} width={LAB_BTN.w} height={LAB_BTN.h} />

@@ -1310,8 +1310,11 @@ audio), poster `public/images/unify/promo-poster-hero.webp` (frame 0). On the pa
 copies the to.morrow hero exactly: flush between the frame's borders, `object-fit: cover` +
 bottom, `aspect-ratio: 1920/1276` from 861px (196px of band up under the nav), 16:9 with
 nav-clearing padding at 641–860px; the blob hero is hidden there and the title follows the film.
-**Below 640px the film is off and the blob hero stays** (no phone cut yet); its `<source>` carries
-`media="(min-width: 641px)"`, so phones download nothing (picked once, at load). The landing tile
+**Phones get the VERTICAL cut** (2026-10-05, see below): the hero's second `<source>` (no
+`media`, after the landscape one) is `unify-promo-mobile-hero.mp4`, shown at `aspect-ratio:
+1080/1530` from the very top (390x553 at 390 wide, under the nav pill, like to.morrow's phone
+hero); the blob hero is hidden at every width now, and a last-in-sheet 640px rule drops
+`.hero-top`'s blob-sized min-height so the title sits right under the film. The landing tile
 (`.unify-video-tile` on `2D.html`) is **3:2 like the to.morrow tile** (Lucas), at every width (no
 vertical cut exists to give phones the to.morrow tile's 4:5), flat, no raised plate. It plays its
 OWN cut, **`UnifyPromoTile`** (1620x1080) → `public/videos/unify/unify-promo-tile.mp4`, poster
@@ -1321,9 +1324,33 @@ the frame's middle (`TileCut` context; the cameras see a little more on every si
 full-frame ground overshoots the frame by `BLEED` = 160 in `lib.ts` to cover it — so must any new
 one), the timetable scene eases 30px left with its slide (card and captions ~65px from either
 edge), and during the room-number zoom the page alone moves 60px right so Emil's name stays in.
-**Every new version goes onto all three** (Lucas): render `UnifyPromo` (review copy),
-`UnifyPromoTall` and `UnifyPromoTile`, re-encode the last two (`unify-promo-hero.mp4`,
-`unify-promo-tile.mp4`), re-make both posters.
+Its `<video>` is overscanned 1px past every edge (clipped by the tile): Safari painted the frame a
+hair short of the fractional box and the element's dark background showed as a hairline along the
+top and right over the pink/cream scenes. Below 640px the tile plays the vertical cut
+(`unify-promo-mobile.mp4`) at 4:5, exactly like the to.morrow tile.
+
+**Vertical cut — `UnifyPromoV` (`motion/src/unify/UnifyPromoV.tsx`), 1080x1350 (4:5), and
+`UnifyPromoVTall` (+`UNIFY_EXT_V` = 180px on top, 1080x1530) for the phone hero.** Same story,
+timings and scene components — every scene RE-FRAMED, not cropped (the standard advice for taking
+landscape motion vertical, and what to.morrow's PromoV does): each scene still draws in the
+landscape 1920x1080 stage coordinates, and a `Stage` offsets that stage so its subject sits
+centred, a little below the middle, with `ExtTop` raised by the offset so full-frame grounds still
+reach the top. Captions (`CaptionV`) are centred ABOVE the subject (they sat to its right); the
+timetable gets a dark wash under its captions (the page runs on above the camera's point), its
+landscape slide is undone so the card stays centred, its overview is shown 1.3x larger (`BOOST`,
+easing back to the landscape camera over the first zoom — the chat blob's landing box scales with
+it), and the page moves 80px right during the room-number zoom. The chat's flood has its own grid
+for the tall frame (`ChatScene vertical`, 4x7 minus the column), the map its own framing
+(`MAP_V`: pan path keeping "you" in shot, pull-out at 0.3 px/unit, burst starting where the
+vertical customize puts the character, caption on two lines "locate your friends" / "on campus").
+Hand-offs agree by construction: connect card → dive → customize character → burst all at frame
+(540, 780); chat phone and the closing phone at (540, 675).
+
+**Every new version goes onto all of them** (Lucas): render `UnifyPromo` (review copy),
+`UnifyPromoTall`, `UnifyPromoTile`, `UnifyPromoV` and `UnifyPromoVTall`; re-encode the last four
+(`unify-promo-hero.mp4`, `unify-promo-tile.mp4`, `unify-promo-mobile.mp4`,
+`unify-promo-mobile-hero.mp4`); re-make the hero and tile posters (frame 0; the phone files reuse
+the landscape posters, as on to.morrow).
 
 **Ground truth is the final pink app's own code, `~/TEMP/Unify/web/`** (static HTML/CSS/JS,
 Nunito, `--pink #FF88C8 / --dark #292925 / --cream #F9F2EB`; design notes in

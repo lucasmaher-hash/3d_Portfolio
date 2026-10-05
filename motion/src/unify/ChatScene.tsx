@@ -112,14 +112,21 @@ const WHO = ['Ben', 'Anna', 'Sophia', 'Jonas', 'Mila', 'Theo'];
 // a different screenshot every time — no repeats
 const IMGS: ImgId[] = ['tt-flood-jonas', 'tt-flood-mila', 'tt-flood-theo', 'tt-flood-anna', 'tt-flood-paul', 'tt-flood-emil', 'tt-flood-nina'];
 type FloodItem = {x: number; y: number; rot: number; k: number; t: number; m: M};
-const FLOOD: FloodItem[] = (() => {
-  // a 7 x 5 grid over the frame, minus the 3 x 3 cells the chat column sits in
-  const cols = 7;
-  const rows = 5;
+/* Where the flood lands: a grid over a region of the stage, minus the cells the
+   chat column sits in. The film's own frame: 7 x 5 over 1920 x 1080, the
+   middle 3 x 3 out. The VERTICAL cut sees only stage x 420–1500, y -135–1215
+   (its 1080 x 1350 frame), where the column spans nearly the whole width: 4 x 7
+   there, the middle 2 x 3 out, so the pile-up fills above and below the chat. */
+type FloodGrid = {x0: number; y0: number; w: number; h: number; cols: number; rows: number; hole: [number, number, number, number]};
+const GRID_H: FloodGrid = {x0: 0, y0: 0, w: W, h: H, cols: 7, rows: 5, hole: [2, 4, 1, 3]};
+const GRID_V: FloodGrid = {x0: 420, y0: -135, w: 1080, h: 1350, cols: 4, rows: 7, hole: [1, 2, 2, 4]};
+const makeFlood = (g: FloodGrid): FloodItem[] => {
+  const {cols, rows} = g;
+  const [c0, c1, r0, r1] = g.hole;
   const cells = Array.from({length: cols * rows}, (_, i) => i).filter((c) => {
     const col = c % cols;
     const row = Math.floor(c / cols);
-    return !(col >= 2 && col <= 4 && row >= 1 && row <= 3);
+    return !(col >= c0 && col <= c1 && row >= r0 && row <= r1);
   });
   cells.sort((a, b) => rnd(a * 7 + 3) - rnd(b * 7 + 3)); // a fixed shuffle
   const N = 21; // a fifth fewer than the 26 cells
@@ -133,8 +140,8 @@ const FLOOD: FloodItem[] = (() => {
       ? {img: IMGS[Math.floor(i / 3) % IMGS.length], text: ['look', 'mine', 'this one'][i % 3], tw: [62, 66, 108][i % 3], who: WHO[i % WHO.length], right: rnd(i) < 0.5}
       : {text: txt, tw: txt.length * 15.2, out, who: out ? undefined : rnd(i * 5) < 0.6 ? WHO[(i * 3) % WHO.length] : undefined, right: !out && rnd(i * 9) < 0.35};
     return {
-      x: (col + 0.5) * (W / cols) + (rnd(i * 31 + 2) - 0.5) * 90,
-      y: (row + 0.5) * (H / rows) + (rnd(i * 17 + 5) - 0.5) * 60,
+      x: g.x0 + (col + 0.5) * (g.w / cols) + (rnd(i * 31 + 2) - 0.5) * 90,
+      y: g.y0 + (row + 0.5) * (g.h / rows) + (rnd(i * 17 + 5) - 0.5) * 60,
       rot: (rnd(i * 23 + 9) - 0.5) * (img ? 12 : 8),
       k: img ? 0.56 + 0.18 * rnd(i * 3 + 1) : 0.85 + 0.3 * rnd(i * 3 + 2),
       // one after the other, quickening only a little
@@ -142,7 +149,9 @@ const FLOOD: FloodItem[] = (() => {
       m,
     };
   });
-})();
+};
+const FLOOD = makeFlood(GRID_H);
+const FLOOD_V = makeFlood(GRID_V);
 
 /* ── The suck: everything spirals into the middle ──────────────────────── */
 const suckP = (f: number, seed: number) => {
@@ -187,7 +196,8 @@ export const ChatScene: React.FC<{
   f: number;
   cardBox: {x: number; y: number; w: number; h: number; r: number};
   cardIn: [number, number];
-}> = ({f, cardBox, cardIn}) => {
+  vertical?: boolean;
+}> = ({f, cardBox, cardIn, vertical}) => {
   const sucking = f >= SUCK.INHALE;
   const phone = sucked(f, CHAT_C, 0, 1, 999);
   const els: React.ReactNode[] = [];
@@ -243,7 +253,7 @@ export const ChatScene: React.FC<{
   });
 
   /* the flood */
-  FLOOD.forEach((it, i) => {
+  (vertical ? FLOOD_V : FLOOD).forEach((it, i) => {
     if (f < it.t) return;
     const right = isRight(it.m);
     const t = ease(f, it.t, it.t + 12, MSGPOP);

@@ -80,16 +80,41 @@ const layoutWords = (ws: readonly (readonly [string, number])[]) => {
 const XA = layoutWords(WA);
 const XB = layoutWords(WB);
 
+/* The map's framing. The film's own (above); the VERTICAL cut's, in the same
+   stage coordinates, for a stage the 1080 x 1350 frame sees at x 420–1500,
+   y -135–1215: the camera's centre point lower (under the caption), a pan
+   from the plan's lower left up to the right that keeps "you" in shot, a
+   pull-out that fits the floor's width rather than the whole floor, the
+   burst starting where the vertical customize puts the character, and the
+   caption on two lines ("locate your friends" / "on campus"). */
+type Pt = [number, number];
+export type MapLayout = {panC: Pt; pan0: Pt; pan1: Pt; full: {s: number; c: Pt; at: Pt}; start: Pt; capY: number; xa: number[]; ya: number[]; xb: number[]};
+const LAYOUT_H: MapLayout = {panC: PAN_C, pan0: PAN0, pan1: PAN1, full: FULL, start: [LEFT3, H / 2], capY: CAP_Y, xa: XA, ya: XA.map(() => CAP_Y), xb: XB};
+const XA_V = [...layoutWords(WA.slice(0, 3)), ...layoutWords(WA.slice(3))];
+const CAP_Y_V = -30;
+export const MAP_V: MapLayout = {
+  panC: [W / 2, 730],
+  pan0: [2050, 1330],
+  pan1: [2600, 1000],
+  full: {s: 0.3, c: FULL.c, at: [W / 2, 735]},
+  start: [W / 2, 645],
+  capY: CAP_Y_V,
+  xa: XA_V,
+  ya: [CAP_Y_V, CAP_Y_V, CAP_Y_V, CAP_Y_V + CAP_FS * 1.05, CAP_Y_V + CAP_FS * 1.05],
+  xb: XB,
+};
+
 type TL = {BOOM: number; COURSES: number; LOOP0: number; FRAME0: number; FRAME1: number; END: number};
 
-export const CampusMap: React.FC<{f: number; T: TL; charW: number; finalChar: CharId; finalEyes: CharId}> = ({f, T, charW, finalChar, finalEyes}) => {
+export const CampusMap: React.FC<{f: number; T: TL; charW: number; finalChar: CharId; finalEyes: CharId; layout?: MapLayout}> = ({f, T, charW, finalChar, finalEyes, layout = LAYOUT_H}) => {
+  const {panC: PAN_C, pan0: PAN0, pan1: PAN1, full: FULL} = layout;
   // camera, part 1 — the burst: from the customize framing (character at the
   // left third, charW wide) out to the close map at PAN0
   const Z0 = charW / fitW(finalChar);
   const c = ease(f, T.BOOM + 2, T.BOOM + 42, Easing.inOut(Easing.cubic));
   const Z = Math.exp(Math.log(Z0) * (1 - c));
   const mainLand: [number, number] = [PAN_C[0] + (MAIN_U[0] - PAN0[0]) * SPAN, PAN_C[1] + (MAIN_U[1] - PAN0[1]) * SPAN];
-  const sMain: [number, number] = [lerp(LEFT3, mainLand[0], c), lerp(H / 2, mainLand[1], c)];
+  const sMain: [number, number] = [lerp(layout.start[0], mainLand[0], c), lerp(layout.start[1], mainLand[1], c)];
   let scale = SPAN * Z;
   let origin: [number, number] = [sMain[0] - MAIN_U[0] * scale, sMain[1] - MAIN_U[1] * scale];
   // part 2 — the pan, eased in and out; part 3 — out to the whole floor
@@ -163,10 +188,11 @@ export const CampusMap: React.FC<{f: number; T: TL; charW: number; finalChar: Ch
   // caption
   const capIn = T.BOOM + 24;
   const morph = T.COURSES + 2;
+  const {xa: XA, ya: YA, xb: XB, capY} = layout;
   const yourX = lerp(XA[1], XB[1], ease(f, morph + 6, morph + 24, Easing.inOut(Easing.cubic)));
   const capOut = T.LOOP0;
-  const word = (w: string, x: number, style: CSS, key: string) => (
-    <span key={key} style={{position: 'absolute', left: x, top: CAP_Y, display: 'inline-block', whiteSpace: 'pre', ...style}}>
+  const word = (w: string, x: number, style: CSS, key: string, y = capY) => (
+    <span key={key} style={{position: 'absolute', left: x, top: y, display: 'inline-block', whiteSpace: 'pre', ...style}}>
       {w}
     </span>
   );
@@ -188,8 +214,8 @@ export const CampusMap: React.FC<{f: number; T: TL; charW: number; finalChar: Ch
         {f < morph + 12 ? word('locate', XA[0], wordAnim(f, capIn, morph), 'a0') : null}
         {word('your', yourX, wordAnim(f, capIn + 3, capOut + 2), 'your')}
         {f < morph + 16 ? word('friends', XA[2], wordAnim(f, capIn + 6, morph + 2), 'a2') : null}
-        {f < morph + 16 ? word('on', XA[3], wordAnim(f, capIn + 9, morph + 4), 'a3') : null}
-        {f < morph + 18 ? word('campus', XA[4], wordAnim(f, capIn + 12, morph + 6), 'a4') : null}
+        {f < morph + 16 ? word('on', XA[3], wordAnim(f, capIn + 9, morph + 4), 'a3', YA[3]) : null}
+        {f < morph + 18 ? word('campus', XA[4], wordAnim(f, capIn + 12, morph + 6), 'a4', YA[4]) : null}
         {f >= morph + 10 ? word('and', XB[0], wordAnim(f, morph + 12, capOut), 'b0') : null}
         {f >= morph + 10 ? word('courses', XB[2], wordAnim(f, morph + 16, capOut + 4), 'b2') : null}
       </div>

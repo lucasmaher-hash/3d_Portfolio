@@ -233,9 +233,8 @@
        one and at its 3:2 — but NOT a crop of the 16:9 film, whose captions run to
        ~95% of the frame: its own TILE cut (UnifyPromoTile, 1620x1080), the film
        re-framed at 0.9 so nothing is cut (see CLAUDE.md "Unify promo loop").
-       3:2 at every width: there is no vertical cut of this film to give phones
-       the to.morrow tile's 4:5. (0,2,0), so no tile rule in the 640px blocks can
-       reshape it. */
+       Below 640px it plays the VERTICAL cut (UnifyPromoV, 4:5) at exactly its
+       own shape, restated in the last 640px block as the to.morrow tile's is. */
     .project-tile.unify-video-tile {
       position: relative;
       aspect-ratio: 3 / 2;
@@ -244,9 +243,17 @@
     }
     .unify-video-tile video {
       position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+      /* 1px past every edge, clipped by the tile's overflow: the tile's box is
+         fractional (3:2 of a fractional width) and Safari paints the video's
+         frame a hair short of it, so the element's dark background showed as a
+         hairline along the top and right over the film's pink and cream scenes
+         (the file itself is clean to every edge). Same overscan as the project
+         hero images; width/height must be explicit, `inset` alone does not size
+         a replaced element. */
+      top: -1px;
+      left: -1px;
+      width: calc(100% + 2px);
+      height: calc(100% + 2px);
       object-fit: cover;
       display: block;
       background: #292925;   /* the film's own ground, before the poster paints */
@@ -1116,6 +1123,8 @@
          shape, so nothing is cropped. Restated at the tile's own specificity —
          the base .morrow-video-tile rule is (0,2,0) and would otherwise keep 3:2. */
       .project-tile.morrow-video-tile { aspect-ratio: 4 / 5; }
+      /* ...and the Unify tile likewise: the vertical cut (UnifyPromoV), 4:5. */
+      .project-tile.unify-video-tile { aspect-ratio: 4 / 5; }
 
       /* Virtual Cooking's tile carries an inline `box-shadow: none` (the desktop
          render is a cut-out on a transparent ground, where a raised edge would
@@ -1376,12 +1385,14 @@
       </div>
       <a href="/unify2d.html" style="display:block;">
         <div class="project-tile unify-video-tile" style="cursor: pointer;">
-          <!-- The Unify promo loop (2026-10-05), its own 3:2 tile cut (the film
-               re-framed for this shape, not a crop). One file at every width:
-               there is no phone cut of this film yet. -->
+          <!-- The Unify promo loop (2026-10-05): its own 3:2 tile cut above 640px
+               (the film re-framed for this shape, not a crop), the vertical (4:5)
+               cut on a phone. Tile cut FIRST, so a browser that ignores `media`
+               falls back to it everywhere. -->
           <video autoplay muted loop playsinline width="1620" height="1080" poster="/images/unify/promo-poster-tile.webp"
                  aria-label="Animation: a group chat drowning in timetable screenshots collapses into Unify's shared timetable, then the connect now card, character customisation, and the campus map with friends and course rooms">
-            <source src="/videos/unify/unify-promo-tile.mp4" type="video/mp4" />
+            <source src="/videos/unify/unify-promo-tile.mp4" media="(min-width: 641px)" type="video/mp4" />
+            <source src="/videos/unify/unify-promo-mobile.mp4" type="video/mp4" />
           </video>
         </div>
       </a>

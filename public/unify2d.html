@@ -174,17 +174,22 @@
        to.morrow hero (.hero-promo on to-shove2d.html): flush, no card, cover +
        bottom so every width shows the film's bottom edge. Deliberately not a
        .hero — the nav keeps its raised shadow from the first frame. */
-    .unify-film { display: none; }
+    /* Phones (2026-10-05): the VERTICAL tall cut (UnifyPromoVTall, 1080x1530: the
+       4:5 vertical film plus 180px of canvas on top), at its own shape, from the
+       very top so it runs up under the nav pill, as on to.morrow's phone hero. */
+    .unify-film { display: block; }
+    .unify-film video {
+      display: block; width: 100%; height: auto;
+      aspect-ratio: 1080 / 1530;
+      background: #292925;                  /* the film's own ground, before the poster paints */
+      object-fit: cover; object-position: 50% 100%;
+    }
+    /* the film is the hero at every width now: the blob gives way (it lives on in
+       images/unify/unify-blob.svg and, on the draft, under "What we learned") */
+    .hero-blob { display: none; }
     @media (min-width: 641px) {
-      .unify-film { display: block; padding-top: clamp(116px, 11vw, 150px); }
-      .unify-film video {
-        display: block; width: 100%; height: auto;
-        aspect-ratio: 16 / 9;               /* 641-860px: exactly the plain film, below the nav */
-        background: #292925;                /* the film's own ground, before the poster paints */
-        object-fit: cover; object-position: 50% 100%;
-      }
-      /* the film is the hero now: the blob gives way, the title sits right under it */
-      .hero-blob { display: none; }
+      .unify-film { padding-top: clamp(116px, 11vw, 150px); }
+      .unify-film video { aspect-ratio: 16 / 9; }   /* 641-860px: exactly the plain film, below the nav */
       .hero-top { min-height: 0; padding-top: clamp(18px, 2.4vw, 32px); }
     }
     /* Desktop: no strip between the nav and the film — it starts at the card's
@@ -1556,6 +1561,13 @@
       .vid-press,
       .vid-press.is-pressed { transition: none; transform: none; }
     }
+  
+    /* Phones: the vertical film is the hero (see .unify-film), so the blob-sized
+       hero box goes and the title sits right under the film. Last in the sheet:
+       the earlier 640px block sizes .hero-top for the blob. */
+    @media (max-width: 640px) {
+      .hero-top { min-height: 0; padding-top: 18px; }
+    }
   </style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
@@ -1596,9 +1608,11 @@
       <video autoplay loop muted playsinline preload="auto" width="1920" height="1320"
              poster="/images/unify/promo-poster-hero.webp"
              aria-label="Animation: a group chat drowning in timetable screenshots collapses into Unify's shared timetable, then the connect now card, character customisation, and the campus map with friends and course rooms">
-        <!-- media: phones never show the film (.unify-film is display:none ≤640px),
-             so they get no source and download nothing; picked once, at load -->
+        <!-- the landscape tall cut above 640px, the VERTICAL tall cut (1080x1530) on a
+             phone — picked once, at load. Landscape FIRST, so a browser that ignores
+             `media` falls back to it everywhere. -->
         <source src="/videos/unify/unify-promo-hero.mp4" media="(min-width: 641px)" type="video/mp4" />
+        <source src="/videos/unify/unify-promo-mobile-hero.mp4" type="video/mp4" />
       </video>
     </div>
 

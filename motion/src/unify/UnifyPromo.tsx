@@ -96,7 +96,7 @@ export const T = {
   END: 0,
 };
 /* The customize cycle: [body, eyes]. Each holds STEP frames (0.24 s). */
-const CYCLE: [CharId, CharId][] = [
+export const CYCLE: [CharId, CharId][] = [
   ['f6', 'f6'], ['f6', 'f1'], ['f1', 'f1'], ['f1', 'f4'], ['f4', 'f4'], ['f4', 'f3'],
   ['f3', 'f3'], ['f7', 'f7'], ['f7', 'f2'], ['f2', 'f2'], ['m9', 'm9'], ['f5', 'f5'],
 ];
@@ -115,8 +115,8 @@ T.END = T.BLACK1 + 8;
 export const UNIFY_DURATION = T.END;
 
 /* ── Layout ─────────────────────────────────────────────────────────────── */
-const LEFT3 = W / 3; // the connect card and the character sit on the left third line
-const CHAR_W = 520; // the customize character's width
+export const LEFT3 = W / 3; // the connect card and the character sit on the left third line
+export const CHAR_W = 520; // the customize character's width
 const CAP_X = 1010; // captions start here (the timetable's sit further right: it is zoomed)
 
 /* ── Captions: Nunito ExtraBold, the app's header voice, lowercase ───────── */
@@ -176,7 +176,7 @@ const path = (f: number, pts: [number, Pt][]): Pt => {
    timetable's centre line lands in the middle of the frame and then slides to
    x = TT_CX, making room for the caption. */
 const TT_CX = 600;
-const ttCx = (f: number) => lerp(W / 2, TT_CX, ease(f, T.SLIDE[0], T.SLIDE[1], Easing.inOut(Easing.cubic)));
+export const ttCx = (f: number) => lerp(W / 2, TT_CX, ease(f, T.SLIDE[0], T.SLIDE[1], Easing.inOut(Easing.cubic)));
 /* how far each section has grown (0 = no room for people yet) */
 const GROW = 14;
 const growC = (f: number) => ease(f, T.GROW_C, T.GROW_C + GROW, Easing.inOut(Easing.cubic));
@@ -248,14 +248,14 @@ const ttScreen = (f: number, px: number, py: number): Pt => {
   return [ttCx(f) + (px - c.x) * c.s, H / 2 + (py - c.y) * c.s];
 };
 /* the blob morphs into the pink panel at the overview (every section still closed) */
-const TT_SIL = (() => {
+export const TT_SIL = (() => {
   const s = 1.25;
   const L = ttLayout(0, 0, 0);
   return {x: W / 2 - (377 / 2) * s, y: H / 2 - (L.h / 2) * s, w: 377 * s, h: L.pink * s, r: 22 * s};
 })();
 
 /* What the caption says at each stop */
-const TT_CAPS: {lines: string[]; inAt: number; outAt: number}[] = [
+export const TT_CAPS: {lines: string[]; inAt: number; outAt: number}[] = [
   {lines: ['your timetable,', "and everyone's"], inAt: T.CAP_TT, outAt: T.ZOOM_TOP[0]},
   {lines: ['all in', 'one place'], inAt: T.ZOOM_TOP[0] + 16, outAt: T.ZOOM_COURSES[0]},
   {lines: ["see who's in", 'your course'], inAt: T.ZOOM_COURSES[0] + 16, outAt: T.ZOOM_BREAK[0]},
@@ -265,7 +265,7 @@ const TT_CAPS: {lines: string[]; inAt: number; outAt: number}[] = [
   {lines: ["see your friends'", 'timetables'], inAt: T.ROOM_OUT[0] + 16, outAt: T.TT_OUT},
 ];
 
-const TimetableScene: React.FC<{f: number}> = ({f}) => {
+export const TimetableScene: React.FC<{f: number}> = ({f}) => {
   const cam = ttCam(f);
   const cardIn = ease(f, T.CARD_IN0, T.CARD_IN1, Easing.out(Easing.cubic));
   const out = ease(f, T.TT_OUT, T.TT_OUT + 14, Easing.in(Easing.cubic));
@@ -359,7 +359,7 @@ const cardState = (f: number, at: number, close: number) => {
   return {t: open * (1 - shut), dim: ease(f, at + 2, at + 10) * (1 - ease(f, close + 1, close + 9)), on: f >= at && f < close + 10};
 };
 
-const ConnectScene: React.FC<{f: number}> = ({f}) => {
+export const ConnectScene: React.FC<{f: number}> = ({f}) => {
   const ext = React.useContext(ExtTop);
   const sec = f / 30;
   // a smooth open: the card fades up from a little smaller, eased out
@@ -436,13 +436,13 @@ const charNorm = (id: CharId) => {
   const a = (k: CharId) => (CH as any)[k].body.bb[2] * (CH as any)[k].body.bb[3];
   return Math.sqrt(a('f6') / a(id));
 };
-const charWidth = (id: CharId) => viewBox(id)[2] * PX_PER_UNIT_NAM * charNorm(id);
+export const charWidth = (id: CharId) => viewBox(id)[2] * PX_PER_UNIT_NAM * charNorm(id);
 const cycleAt = (f: number) => {
   let k = 0;
   while (k < CYCLE.length - 1 && f >= swapFrame(k + 1)) k++;
   return k;
 };
-const CustomizeChar: React.FC<{f: number}> = ({f}) => {
+export const CustomizeChar: React.FC<{f: number}> = ({f}) => {
   const k = cycleAt(f);
   const [body, eyes] = CYCLE[k];
   const pop = k > 0 ? 1 + 0.09 * (1 - sp(f, swapFrame(k), 'snappy')) : 1;
@@ -450,7 +450,7 @@ const CustomizeChar: React.FC<{f: number}> = ({f}) => {
   const glance = ease(f, T.ZOOM1 + 2, T.ZOOM1 + 12) * (1 - ease(f, T.BOOM - 14, T.BOOM - 4));
   return <ScreenChar id={body} eyes={eyes} w={charWidth(body)} c={[LEFT3, H / 2]} scale={pop} pupil={[2.2 * glance, -0.6 * glance]} />;
 };
-const FINAL_CHAR = CYCLE[CYCLE.length - 1][0];
+export const FINAL_CHAR = CYCLE[CYCLE.length - 1][0];
 
 /* ═══ The film ═════════════════════════════════════════════════════════════ */
 export const UnifyPromo: React.FC = () => {
