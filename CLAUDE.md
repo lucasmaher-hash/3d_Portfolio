@@ -121,6 +121,12 @@ still in the files, now inert. Do not re-add them. Older notes below that descri
 breadcrumb are history. The typewriter cursor in the landing hero ("INTERFACE DESIGNER...|") is
 not a dot and stays.
 
+## Landing tagline removed (2026-10-06, Lucas)
+
+"From material to pixel." / "Von Material zu Pixel." under the landing hero is **gone** on desktop
+and mobile (markup + both `tagline1` keys). Only the "More about me →" link is left in
+`.tagline-block`. (For a few minutes "pixel" was set in VT323 as a word play — that went with it.)
+
 ## Page map
 
 | File | What it is |
@@ -503,6 +509,22 @@ typography/character deep-dive also inside Pivot. The fix was a real cut, not a 
   render correctly against the page's grey background, zero console errors from the now-dormant
   carousel script, div/section tag counts balanced.
 
+**`.v1-scene` replaced BOTH `.wf-frame` and `.v1-collage` (2026-10-06, Lucas: "these two sections
+look awful").** The hand-built blue wireframes (Idea, "Who's free now") and the tilted, letterboxed
+card collage (Pivot) are gone; both are now the **real v1 Figma exports** (`public/images/unify/v1/`)
+**upright, no tilt**, in a `.v1-canvas` (flat `#90A4BD`, no dot grid, no pressed shadow — to.morrow's step-badge blue `#7A92B0`, 7% lighter, Lucas; fixed, so dark mode doesn't change it) that is **16:9 at every width and scales like an image**:
+`.v1-scene` is a size container and every length inside is `cqw` or `%` (phone width, top offsets,
+black v1 frame, radius, arrow), so nothing re-flows when the window changes shape — on a
+phone it is simply a smaller picture. Phones may run off the top or bottom edge (the canvas clips).
+Long exports (home 720×2774, timetable 720×2922) are windows onto the page: `--y` on the img is
+where the window starts, in % of the screen width (a percentage `margin-top` resolves against
+width); home starts at -65% (Idea, so "Hello Lucas!" + Connect now show) / -56% (Pivot); their tab
+bars (`v1-*-bar.webp`) sit on top at the bottom. Building screens are full 720×1565 screens,
+`object-fit: cover` from the top. Idea: home (left 19%, top 12cqw) → arrow at the open Calendar
+button's height (top 41cqw) → timetable (left 55%, top 5cqw), phones 26% wide. Pivot: all five at
+17% wide, staggered tops -7 / 15 / 3 / 25 / -3 cqw. `.wf-*` and `.v1-collage*` CSS marked UNUSED.
+Everything below about `.wf-frame` and `.v1-collage` is history.
+
 **`.wf-frame`: two CONSTRUCTED wireframes under "Who's free now", built the same day as the cut
 above, after Lucas pointed at a Jessica Im case-study screenshot as the exact reference** (two
 screens sharing one dotted-grid canvas, one arrow between them, no side text — his instruction was
@@ -732,14 +754,14 @@ NOT mirrored: videos left, text right, matching the live page's own alternation)
   open and the scroll parked where the app opens it (connect 560, socials 760, map 800). The drift /
   poster orbit / map-dot pulse keyframes are the app's verbatim, so things float exactly as in the
   app. Assets in `public/unify/app-home/` (posters + floor plan re-encoded webp, Nunito variable +
-  OFL). A ResizeObserver script scales each 377px iframe to its column. **They sit in one dark frame** (`#292925`, the app's own dark,
+  OFL). A ResizeObserver script scales each 377px iframe to its column. **They sit in one dark frame** (`#292925`, the app's own dark — a blue tried for one round was reverted;
   rounded, flat, height from padding, inset like the text below it — "like a widescreen screenshot", Lucas), tops aligned. **The socials panel has FIVE
   posters at 92px instead of the app's four at 121.6** (the fifth is the app's own Movie Night
   poster), so it is 365px tall like map instead of 489; connect now's friends area is 18px taller (188 → 206) so it is 365 too — all three panels equal — a deliberate deviation from
   the app, Lucas's call; pairs keep >= 16px of air at rest, the tightest (2 and 5) on the gentlest
   orbits. Under them `.home-copy`: two blocks ONE UNDER THE OTHER, inset by `.stat-block`'s `padding-inline` (same left edge as "Why the 68 % stopped trying"), "A glance is usually enough" and "A preview
   pulls you in" (the YouTube-preview comparison) — written as intent, NO percentage (Lucas floated
-  "80%"; it isn't measured). Below 640px the three panels stack, 300px max, inside the same dark frame (no 16:9 there). Verified over CDP at 1440 and 390 touch: no overflow, no console errors.
+  "80%"; it isn't measured). **Fixed proportions at every width** (Lucas, 2026-10-06: act like a video, never re-flow): padding and column gap are % of the frame width (5.8 / 4.9 / 6.2 %, gap 4 %), panels are thirds, radius `2.67% / 6.5%` — so on a phone it is the same picture, smaller (full column width there, `margin-inline: 0`); there is no stacked layout any more. Verified over CDP at 1440 and 390 touch: no overflow, no console errors.
 - **Spacing system after Jessica Im's TurboTax page (2026-10-05, Lucas: "cramped, no room to
   breathe").** Measured off imjiwoo.com/tt-onboarding at 1440 over CDP: body 18px / 1.4, sub-heads
   28px, stat numbers 48px over 18px labels, ~240–280px between major sections, 40–80px between

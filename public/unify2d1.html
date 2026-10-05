@@ -517,15 +517,19 @@
        three come out the same height (see app-home/home.html). */
     .home-previews {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 280px));
-      justify-content: center;
-      align-content: center;
+      /* Fixed proportions at every width, like a still from a video (Lucas,
+         2026-10-06): padding and gap are percentages of the frame's width,
+         the panels are thirds of what's left, so the whole thing scales and
+         never re-flows. Numbers are the 1440 layout divided by its 898px
+         frame width; the radius is the 24px corner as an x / y percentage
+         pair so it stays round. */
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       align-items: start;          /* tops in one line */
-      gap: clamp(16px, 2.6vw, 40px);
-      padding: clamp(28px, 4vw, 52px) clamp(20px, 3vw, 44px);
+      column-gap: 4%;
+      padding: 5.8% 4.9% 6.2%;
       margin-inline: clamp(0px, 8vw, 80px);   /* same inset as .home-copy / .stat-block */
       background: #292925;
-      border-radius: clamp(14px, 1.8vw, 24px);
+      border-radius: 2.67% / 6.5%;
       margin-top: clamp(60px, 9vw, 96px);
     }
     .home-panel { position: relative; width: 100%; }
@@ -549,14 +553,9 @@
     .home-copy .feature-title { margin: 0 0 12px; }
     .home-copy .guide-text { margin: 0; }
     @media (max-width: 640px) {
-      /* One under the other on a phone: three across a 350px column would
-         set the panels' own type at ~4px. */
-      .home-previews {
-        grid-template-columns: minmax(0, 300px);
-        gap: 36px;
-        padding: 32px 20px 40px;
-        margin-top: 72px;
-      }
+      /* No phone layout of its own: the three panels stay side by side and
+         the frame just gets smaller, like a picture (Lucas). */
+      .home-previews { margin-top: 72px; margin-inline: 0; }
       .home-copy { gap: 28px; margin-top: 36px; }
     }
     .phone-shot-video[data-vid="homepage"] { top: -0.3831%; left: -1.3252%; width: 102.6885%; height: 101.4183%; }
@@ -1880,6 +1879,39 @@
        shared aspect-ratio box (3/4) is used for all five regardless of the
        source image's own ratio, so the scatter reads as one consistent set
        of "photos" rather than five different-shaped crops. */
+    /* ── v1 scenes (2026-10-06, Lucas) ─────────────────────────────────────
+       The real v1 Figma exports, upright (no tilt), in a canvas that keeps
+       its aspect ratio at every width and scales like an image: the canvas is
+       a size container and every length inside it is in cqw or %, so nothing
+       re-flows when the window changes shape. Phones may run off the top or
+       bottom edge (the canvas clips). Long exports (home, timetable) are
+       windows onto the scrolling page: --y is where the window starts, in %
+       of the screen width (margin-top percentages resolve against width),
+       and their own tab bar sits on top at the bottom. The black rounded
+       frame is v1's own (its Figma screens sit in black cards). */
+    .v1-scene { container-type: inline-size; width: 100%; }
+    .v1-canvas {
+      position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+      border-radius: 2cqw;
+      /* flat: no dot grid, no pressed shadow (Lucas). To.morrow's step-badge
+         blue #7A92B0, 7% lighter; fixed, so dark mode doesn't change it. */
+      background: #90A4BD;
+    }
+    .v1-phone {
+      position: absolute; box-sizing: border-box;
+      width: 26%; aspect-ratio: 402 / 874;
+      border: .55cqw solid #000; border-radius: 3.2cqw;
+      overflow: hidden; background: #fff;
+      box-shadow: 0 1.4cqw 2.8cqw rgba(0, 0, 0, .16), 0 .3cqw .8cqw rgba(0, 0, 0, .10);
+    }
+    .v1-scene--pivot .v1-phone { width: 17%; border-width: .4cqw; border-radius: 2.2cqw; }
+    .v1-phone img { display: block; width: 100%; }
+    .v1s-fill { height: 100%; object-fit: cover; object-position: top; }
+    .v1s-scroll { height: auto; margin-top: var(--y, 0%); }
+    .v1s-bar { position: absolute; left: 0; bottom: 0; }
+    .v1-arrow { position: absolute; width: 7%; height: auto; }
+
+    /* UNUSED as of 2026-10-06 (replaced by .v1-scene), see CLAUDE.md */
     .v1-collage {
       display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center;
       gap: clamp(22px, 3.4vw, 40px);
@@ -2372,6 +2404,7 @@
        to always render as the literal light v1 UI, the same reasoning as
        "SkeuKit exhibits keep their own light material" in the dark-mode
        section above, and none of it touches the tokens dark-mobile.css swaps. */
+    /* UNUSED as of 2026-10-06 (replaced by .v1-scene), see CLAUDE.md */
     .wf-frame {
       --v1-blue: #2010FF;
       display: flex;
@@ -2945,41 +2978,16 @@
       <h3 class="cs-sub">Who's free now</h3>
       <p class="guide-text">I wanted two ways into the same overlap, not one screen doing both jobs. Connect now is the glance — who is free right now, and until when, answered before you have typed anything. Tap open Calendar and it opens into the full week: everyone's actual timetable, side by side, for the times a two-second glance can't answer.</p>
 
-      <div class="wf-frame" role="img" aria-label="Two wireframes: a short 'Connect now' glance showing who is free right now, with an arrow from its open Calendar button to the full weekly timetable it opens into.">
-        <div class="wf-screen wf-connect">
-          <div class="wf-connect-title">Connect now</div>
-          <div class="wf-connect-range"><span>11:30</span><span>till</span><span>12:00</span></div>
-          <div class="wf-bubbles">
-            <span class="wf-bubble wf-bubble--paul1">Paul</span>
-            <span class="wf-bubble wf-bubble--luis">Luis</span>
-            <span class="wf-bubble wf-bubble--zoe">Zoe</span>
-            <span class="wf-bubble wf-bubble--paul2">Paul</span>
-            <span class="wf-bubble wf-bubble--tom">Tom</span>
-          </div>
-          <button type="button" class="wf-cal-btn" tabindex="-1">open Calendar</button>
-        </div>
-
-        <svg class="wf-arrow" viewBox="0 0 100 24" fill="none" aria-hidden="true">
-          <line x1="2" y1="12" x2="86" y2="12" stroke="currentColor" stroke-width="2"/>
-          <path d="M76 3 L92 12 L76 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-
-        <div class="wf-screen wf-stundenplan">
-          <div class="wf-sp-tabs">
-            <span class="wf-sp-tab is-active">Timetable</span>
-            <span class="wf-sp-tab">Socialplan</span>
-          </div>
-          <div class="wf-sp-divider"></div>
-          <div class="wf-sp-nav"><span>←</span><span>7.3&nbsp;&nbsp;till&nbsp;&nbsp;13.3</span><span>→</span></div>
-          <div class="wf-sp-days">
-            <span class="wf-sp-day is-active">m</span><span class="wf-sp-day">d</span><span class="wf-sp-day">m</span><span class="wf-sp-day">d</span><span class="wf-sp-day">f</span>
-          </div>
-          <div class="wf-sp-rows">
-            <div class="wf-sp-row"><div class="wf-sp-row-lines"><span class="wf-sp-line-a">Interface Design</span><span class="wf-sp-line-b">09:00–10:30 · 1.019</span></div><span class="wf-sp-chev">⌄</span></div>
-            <div class="wf-sp-row"><div class="wf-sp-row-lines"><span class="wf-sp-line-a">Interface Design</span><span class="wf-sp-line-b">09:00–10:30 · 1.019</span></div><span class="wf-sp-chev">⌄</span></div>
-            <div class="wf-sp-row"><div class="wf-sp-row-lines"><span class="wf-sp-line-a">Interface Design</span><span class="wf-sp-line-b">09:00–10:30 · 1.019</span></div><span class="wf-sp-chev">⌄</span></div>
-            <div class="wf-sp-row is-active"><div class="wf-sp-row-lines"><span class="wf-sp-line-a">Interface Design</span><span class="wf-sp-line-b">09:00–10:30 · 1.019</span></div><span class="wf-sp-avatars">●●●+</span></div>
-          </div>
+      <!-- 2026-10-06 (Lucas): the hand-built wireframes are gone. This is the
+           real v1 Figma export, two screens upright in one fixed-aspect canvas
+           that scales like an image (everything inside is in cqw / %), the
+           phones running off the bottom edge. --y is where the long export's
+           window starts, in % of the screen's width. -->
+      <div class="v1-scene v1-scene--idea" role="img" aria-label="The v1 design: the home screen's Connect now card, showing who is free from 11:30 till 12:00, and an arrow from its open Calendar button to the full timetable it opens into.">
+        <div class="v1-canvas">
+          <div class="v1-phone " style="left: 19%; top: 12cqw;"><img class="v1s-scroll" src="/images/unify/v1/v1-home.webp" alt="" style="--y: -65%;" /></div>
+          <div class="v1-phone " style="left: 55%; top: 5cqw;"><img class="v1s-scroll" src="/images/unify/v1/v1-timetable.webp" alt="" style="--y: 0%;" /></div>
+          <svg class="v1-arrow" style="left: 46.5%; top: 41cqw;" viewBox="0 0 60 12" aria-hidden="true"><path d="M0 6 H57 M51 1 L57 6 L51 11" fill="none" stroke="#2010FF" stroke-width="1.6"/></svg>
         </div>
       </div>
 
@@ -3007,12 +3015,18 @@
            bezel — closer to the Jessica Im "audit" reference Lucas pointed to
            than to this page's usual phone-mockup treatment. No per-screen
            labels (Lucas: keep it to plain screens, no annotations). -->
-      <div class="v1-collage" role="img" aria-label="Five screens from the v1 design, scattered: the home screen, the timetable, and the building map in its floor-switcher, friends-list and full-screen states.">
-        <div class="v1-collage-card"><img src="/images/unify/v1/v1-home.webp" alt="" /></div>
-        <div class="v1-collage-card"><img src="/images/unify/v1/v1-timetable.webp" alt="" /></div>
-        <div class="v1-collage-card"><img src="/images/unify/v1/v1-building.webp" alt="" /></div>
-        <div class="v1-collage-card"><img src="/images/unify/v1/v1-building-friends.webp" alt="" /></div>
-        <div class="v1-collage-card"><img src="/images/unify/v1/v1-building-open.webp" alt="" /></div>
+      <!-- 2026-10-06 (Lucas): replaces the tilted, letterboxed card collage.
+           All five v1 Figma exports upright, side by side, staggered so they
+           run off the top and bottom edges, in a fixed-aspect canvas that
+           scales like an image. -->
+      <div class="v1-scene v1-scene--pivot" role="img" aria-label="Five screens from the v1 design side by side: the home screen, the timetable, and the building map with its floor switcher, its friends list and full screen.">
+        <div class="v1-canvas">
+          <div class="v1-phone " style="left: 4.5%; top: -7cqw;"><img class="v1s-scroll" src="/images/unify/v1/v1-home.webp" alt="" style="--y: -56%;" /><img class="v1s-bar" src="/images/unify/v1/v1-home-bar.webp" alt="" /></div>
+          <div class="v1-phone " style="left: 23%; top: 15cqw;"><img class="v1s-scroll" src="/images/unify/v1/v1-timetable.webp" alt="" style="--y: 0%;" /><img class="v1s-bar" src="/images/unify/v1/v1-timetable-bar.webp" alt="" /></div>
+          <div class="v1-phone " style="left: 41.5%; top: 3cqw;"><img class="v1s-fill" src="/images/unify/v1/v1-building.webp" alt="" /></div>
+          <div class="v1-phone " style="left: 60%; top: 25cqw;"><img class="v1s-fill" src="/images/unify/v1/v1-building-friends.webp" alt="" /></div>
+          <div class="v1-phone " style="left: 78.5%; top: -3cqw;"><img class="v1s-fill" src="/images/unify/v1/v1-building-open.webp" alt="" /></div>
+        </div>
       </div>
 
       <h3 class="cs-sub">It felt like a tool</h3>
