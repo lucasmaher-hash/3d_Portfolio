@@ -1,0 +1,157 @@
+<!doctype html>
+<meta charset="utf-8">
+<!-- Extra timetable screenshots for the Unify promo's flood (motion/src/unify/ChatScene.tsx).
+     Same idea as the repo root's timetable-source.html: each card is a different student's
+     different uni app, captured over CDP at 2x → motion/public/unify/tt-flood-<id>.webp. -->
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #888; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; padding: 40px; display: flex; flex-direction: column; gap: 40px; align-items: flex-start; }
+  .card { overflow: hidden; width: 900px; border-radius: 30px; }
+  .tn { font-variant-numeric: tabular-nums; }
+
+  /* Jonas — dark list, teal rows (like Ben's app, a different school) */
+  #jonas { background: #0F1416; }
+  #jonas .day { color: #fff; font-size: 40px; font-weight: 700; padding: 26px 34px 18px; }
+  #jonas .row { display: flex; align-items: center; gap: 26px; padding: 20px 34px; color: #fff; }
+  #jonas .row:nth-of-type(odd) { background: #2C6E6A; }
+  #jonas .row:nth-of-type(even) { background: #3F8C86; }
+  #jonas .time { font-size: 30px; line-height: 1.3; }
+  #jonas b { display: block; font-size: 32px; }
+  #jonas span { display: block; font-size: 26px; opacity: .85; margin-top: 3px; }
+  #jonas .foot { color: #fff; font-size: 28px; font-weight: 600; padding: 18px 34px 24px; }
+
+  /* Mila — light cards with a coloured left bar */
+  #mila { background: #fff; padding: 30px 32px 14px; }
+  #mila .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 22px; }
+  #mila .top b { font-size: 44px; font-weight: 800; letter-spacing: -.02em; }
+  #mila .top span { font-size: 30px; color: #E0457B; }
+  #mila .blk { display: flex; gap: 22px; align-items: center; background: #F5F5F7; border-radius: 18px; padding: 18px 24px; margin-bottom: 16px; }
+  #mila .bar { width: 10px; align-self: stretch; border-radius: 5px; }
+  #mila .time { font-size: 28px; line-height: 1.3; color: #555; }
+  #mila b { display: block; font-size: 31px; color: #111; }
+  #mila span { display: block; font-size: 25px; color: #777; margin-top: 3px; }
+
+  /* Theo — time rail, orange + blue blocks */
+  #theo { background: #FBF8F3; padding: 24px 26px; }
+  #theo .top { display: flex; gap: 14px; align-items: baseline; margin-bottom: 16px; }
+  #theo .top b { font-size: 34px; font-weight: 700; color: #222; }
+  #theo .top span { font-size: 26px; color: #A08F7A; }
+  #theo .grid { position: relative; height: 380px; }
+  #theo .hour { position: absolute; left: 0; right: 0; border-top: 2px solid #ECE4D8; }
+  #theo .hour i { position: absolute; top: -17px; font-style: normal; font-size: 23px; color: #B5A894; }
+  #theo .ev { position: absolute; left: 94px; right: 8px; border-radius: 14px; padding: 10px 18px; }
+  #theo .ev b { display: block; font-size: 27px; }
+  #theo .ev span { display: block; font-size: 22px; opacity: .8; margin-top: 2px; }
+  #theo .o { background: #F6C391; color: #4A2A0C; }
+  #theo .bl { background: #A9C8F2; color: #102A4C; }
+
+  /* Anna — a whole week as columns */
+  #anna { background: #fff; padding: 26px 28px 30px; }
+  #anna .top { font-size: 36px; font-weight: 700; margin-bottom: 18px; color: #1B1B1F; }
+  #anna .week { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  #anna .col h4 { font-size: 24px; color: #8A8A8E; font-weight: 600; text-align: center; margin-bottom: 10px; }
+  #anna .col { display: flex; flex-direction: column; gap: 10px; }
+  #anna .e { border-radius: 12px; padding: 10px 10px; font-size: 20px; font-weight: 600; line-height: 1.2; color: #fff; }
+  #anna .e i { display: block; font-style: normal; font-weight: 400; font-size: 18px; opacity: .9; margin-top: 3px; }
+  #anna .g { background: #6BBF8A; } #anna .r { background: #E0727B; } #anna .v { background: #8F7BD8; } #anna .y { background: #E5B33E; }
+  #anna .gap { height: 60px; }
+
+  /* Paul — calendar list with day header bar */
+  #paul { background: #fff; }
+  #paul .hd { background: #1F6FEB; color: #fff; padding: 22px 32px; display: flex; justify-content: space-between; align-items: baseline; }
+  #paul .hd b { font-size: 38px; }
+  #paul .hd span { font-size: 26px; color: #fff; opacity: .85; }
+  #paul .it { display: flex; gap: 24px; padding: 20px 32px; border-bottom: 2px solid #EEF0F3; align-items: center; }
+  #paul .t { font-size: 28px; color: #1F6FEB; font-weight: 600; width: 120px; line-height: 1.3; }
+  #paul b { display: block; font-size: 31px; color: #15181D; }
+  #paul span { display: block; font-size: 25px; color: #7A808A; margin-top: 3px; }
+
+  /* Emil — dark grid, neon blocks */
+  #emil { background: #16161D; padding: 24px 26px; }
+  #emil .top { display: flex; gap: 14px; align-items: baseline; margin-bottom: 16px; }
+  #emil .top b { font-size: 34px; color: #fff; }
+  #emil .top span { font-size: 26px; color: #77778A; }
+  #emil .grid { position: relative; height: 340px; }
+  #emil .hour { position: absolute; left: 0; right: 0; border-top: 2px solid #26263A; }
+  #emil .hour i { position: absolute; top: -17px; font-style: normal; font-size: 23px; color: #5E5E78; }
+  #emil .ev { position: absolute; left: 94px; right: 8px; border-radius: 14px; padding: 10px 18px; color: #16161D; }
+  #emil .ev b { display: block; font-size: 27px; }
+  #emil .ev span { display: block; font-size: 22px; opacity: .8; margin-top: 2px; }
+  #emil .pu { background: #B69CFF; } #emil .ye { background: #F1E05A; }
+
+  /* Nina — pastel chips, two per row */
+  #nina { background: #F6EFE6; padding: 28px 30px 30px; }
+  #nina .top { font-size: 38px; font-weight: 800; color: #3B2F25; margin-bottom: 20px; }
+  #nina .top span { font-weight: 500; color: #A48E77; font-size: 28px; margin-left: 12px; }
+  #nina .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  #nina .c { border-radius: 20px; padding: 18px 22px; }
+  #nina .c b { display: block; font-size: 29px; color: #2E241B; }
+  #nina .c span { display: block; font-size: 24px; color: #6E5B48; margin-top: 4px; }
+  #nina .p1 { background: #F4C7C3; } #nina .p2 { background: #CFE3C9; } #nina .p3 { background: #CBD9F2; } #nina .p4 { background: #F2E2B6; }
+</style>
+
+<div class="card" id="jonas">
+  <div class="day">Tuesday</div>
+  <div class="row"><div class="time tn">08:30<br>10:00</div><div><b>Model Making</b><span>2.007 · Brandt</span></div></div>
+  <div class="row"><div class="time tn">10:15<br>11:45</div><div><b>Statistics</b><span>2.101 · Okafor</span></div></div>
+  <div class="row"><div class="time tn">13:00<br>14:30</div><div><b>Design History</b><span>0.220 · Weiß</span></div></div>
+  <div class="foot">Tue 29 Sept</div>
+</div>
+
+<div class="card" id="mila">
+  <div class="top"><b>Wednesday</b><span>30 Sep</span></div>
+  <div class="blk"><div class="bar" style="background:#E0457B"></div><div class="time tn">09:00<br>12:00</div><div><b>Typography</b><span>2.004 · Kessler</span></div></div>
+  <div class="blk"><div class="bar" style="background:#2BB673"></div><div class="time tn">13:30<br>15:00</div><div><b>Writing Workshop</b><span>1.067 · Haas</span></div></div>
+</div>
+
+<div class="card" id="theo">
+  <div class="top"><b>Monday</b><span>28 Sept</span></div>
+  <div class="grid">
+    <div class="hour tn" style="top:0"><i>08</i></div>
+    <div class="hour tn" style="top:62px"><i>10</i></div>
+    <div class="hour tn" style="top:124px"><i>12</i></div>
+    <div class="hour tn" style="top:186px"><i>14</i></div>
+    <div class="hour tn" style="top:248px"><i>16</i></div>
+    <div class="hour tn" style="top:310px"><i>18</i></div>
+    <div class="ev o tn" style="top:62px;height:92px"><b>Motion Design</b><span>10:00 – 11:30 · 1.019</span></div>
+    <div class="ev bl tn" style="top:170px;height:70px"><b>ID Fundamentals</b><span>12:30 – 13:45 · 1.019</span></div>
+    <div class="ev o tn" style="top:264px;height:92px"><b>Ceramics</b><span>16:30 – 18:00 · 0.004</span></div>
+  </div>
+</div>
+
+<div class="card" id="anna">
+  <div class="top">Week 40</div>
+  <div class="week">
+    <div class="col"><h4>Mon</h4><div class="e g">Illustration<i>09:30</i></div><div class="e r">Ergonomics<i>14:00</i></div></div>
+    <div class="col"><h4>Tue</h4><div class="gap"></div><div class="e v">Prototyping<i>11:00</i></div></div>
+    <div class="col"><h4>Wed</h4><div class="e y">CAD<i>08:30</i></div><div class="e g">Illustration<i>12:15</i></div><div class="e r">Seminar<i>16:00</i></div></div>
+    <div class="col"><h4>Thu</h4><div class="e v">UX Research<i>10:00</i></div></div>
+    <div class="col"><h4>Fri</h4><div class="gap"></div><div class="e y">Portfolio<i>13:00</i></div></div>
+  </div>
+</div>
+
+<div class="card" id="paul">
+  <div class="hd"><b>Thursday</b><span>1 October</span></div>
+  <div class="it"><div class="t tn">09:00<br>10:30</div><div><b>Branding</b><span>1.031 · Studio B</span></div></div>
+  <div class="it"><div class="t tn">11:00<br>12:30</div><div><b>Photography</b><span>0.112 · Darkroom</span></div></div>
+  <div class="it"><div class="t tn">14:15<br>15:45</div><div><b>Service Design</b><span>1.052 · Lind</span></div></div>
+</div>
+
+<div class="card" id="emil">
+  <div class="top"><b>Friday</b><span>2 Oct</span></div>
+  <div class="grid">
+    <div class="hour tn" style="top:0"><i>09</i></div>
+    <div class="hour tn" style="top:68px"><i>11</i></div>
+    <div class="hour tn" style="top:136px"><i>13</i></div>
+    <div class="hour tn" style="top:204px"><i>15</i></div>
+    <div class="hour tn" style="top:272px"><i>17</i></div>
+    <div class="ev pu tn" style="top:20px;height:96px"><b>Interface Design</b><span>09:30 – 12:00 · 1.019</span></div>
+    <div class="ev ye tn" style="top:170px;height:84px"><b>User Testing</b><span>14:00 – 15:30 · Lab</span></div>
+  </div>
+</div>
+
+<div class="card" id="nina">
+  <div class="top">Today<span>Tue 29.09.</span></div>
+  <div class="row"><div class="c p1"><b>Sound Design</b><span class="tn">08:30 – 10:00</span></div><div class="c p2"><b>Math</b><span class="tn">10:30 – 12:00</span></div></div>
+  <div class="row"><div class="c p3"><b>Model Making</b><span class="tn">13:00 – 16:00</span></div><div class="c p4"><b>Book Club</b><span class="tn">17:00 – 18:30</span></div></div>
+</div>

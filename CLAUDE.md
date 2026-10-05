@@ -1225,6 +1225,98 @@ captions are system type — Lucas does not want pixel type outside the app chro
   so every moving value is computed from the frame number in `Promo.tsx`.
 - English copy only.
 
+## Unify promo loop (`motion/src/unify/`, Remotion, 2026-10-04, second pass 2026-10-05)
+
+A silent 47.9 s loop (1438 frames, 30 fps, **1920×1080, desktop only** — no vertical cut yet),
+composition **`UnifyPromo`**, in the same Remotion project as the to.morrow film. Review master:
+`motion/out/unify-promo.mp4` (copies `~/Downloads/` and `~/Desktop/unify-promo.mp4`).
+
+**It is the hero of the unlinked draft `unify2d1.html`** (never the live `unify2d.html`), as
+the **tall cut** `UnifyPromoTall` (1920×1320: `UNIFY_EXT` = 240px of canvas above the frame;
+every full-frame ground reaches up through `ExtTop`/`fullBg` in `lib.ts`, the cameras just see
+more above). Web file `public/videos/unify/unify-promo-hero.mp4` (x264 crf 22, faststart, no
+audio), poster `public/images/unify/promo-poster-hero.webp` (frame 0). On the page `.unify-film`
+copies the to.morrow hero exactly: flush between the frame's borders, `object-fit: cover` +
+bottom, `aspect-ratio: 1920/1276` from 861px (196px of band up under the nav), 16:9 with
+nav-clearing padding at 641–860px; the blob hero is hidden there and the title follows the film.
+**Below 640px the film is off and the blob hero stays** (no phone cut yet). **Every new version
+goes onto the page** (Lucas): render `UnifyPromoTall`, re-encode, re-make the poster.
+
+**Ground truth is the final pink app's own code, `~/TEMP/Unify/web/`** (static HTML/CSS/JS,
+Nunito, `--pink #FF88C8 / --dark #292925 / --cream #F9F2EB`; design notes in
+`~/TEMP/Unify/.claude/skills/unify.md`). Not `~/Documents/.../socialplan/` — that React app is the
+rejected blue v1. Components are hand-ported with the app's own CSS numbers, in app px, and the
+scenes scale them:
+- `Timetable.tsx` — `SpCard` is the app's `.sp-card` 1:1 (diffed against a CDP screenshot of the
+  real card: identical bar sub-pixel offsets; `UnifyLab` composition is that check).
+  **`SharedTimetable` is what the film shows** (Lucas, 2026-10-05): no tab header, no week row —
+  it starts at the day discs, with `DAYS_PAD` (8px) of air above them — and a **break** block (a course row like any other: "break
+  12:00-12:45", no room line, the home screen's five friends on a break) between the courses and the
+  socials, rounded, with a 16px gap either side. Movie Night shows the Socials tab's own
+  19:00-21:30 (the timetable's back-to-back scheduler put it at 12:00, colliding with the break).
+  **Every people row starts collapsed** (a plain 98px course) and only grows — 88px, then its
+  friends bounce in — once the camera reaches that section, so no section shows empty space;
+  `ttLayout(eCourse, eBreak, eSocial)` gives the heights, and the camera's keyframes are
+  functions of the frame read off that live layout, so it stays on its section while sections
+  above it grow. Each stop has its own caption ("your week, day by day" / "see who's in your
+  course" / "see who's on a break" / "see your friends' timetables", `TT_CAPS`). The friends
+  list fades in only as the camera heads for it. Friends rows expand via
+  `grid-template-rows: <p>fr`, which gives p × the content height.
+- `Connect.tsx` — the home card: closed bubble → open panel (the app's .9 s unfurl), the five
+  friends on their `drift-*` keyframes as functions of time, the monster card for any friend.
+  **No face/arrow lip** on the open panel, and the closed bubble is a plain 377×72 pill — the
+  app's `card_bubble_pink.svg` carries the same lip, which showed during the unfurl (Lucas). The film no longer unfolds the card from the bubble at
+  all: it fades up from 90% size, eased out. Friend boxes are laid out explicitly (name line box at Nunito's
+  own 1.364em) so `friendFigure()` knows each figure's exact centre — the dive starts from it.
+- `Character.tsx` + `chars.json` — the monsters as body path + eye group, extracted from
+  `figur_1–7.svg` and `friend_monster_9.svg` (getBBox over CDP). `eyes=` fits ANOTHER character's
+  eye group into this body's eye box; that is what "customize" cycles.
+- `CampusMap.tsx` / `MapScene.tsx` — the 1.F plan from `map.html` (`#mapBg1FCourses`): walls as
+  `public/unify/map_1f_walls.svg` (pink rects and `vector-effect` stripped, `#938E87`), the ten
+  course rooms as separate pink divs UNDER the walls. **Eight characters, each placed where its
+  whole marker (figure box + name) clears the walls** — found by rasterising the walls SVG,
+  distance-transforming the free space and min-filtering the marker footprint over it (scipy);
+  a room's feasible box can be tiny (the U's inner room: 10 plan units of vertical play). The map
+  is shown **close (0.9 px/unit, markers 96×88) and panning** from the bottom-left up and across
+  (eased in and out), then **pulls out to the whole floor** as the courses finish. Nothing sits
+  in the far-right wing (the camera never gets there while the friends are up); a cream wash at
+  the top keeps the caption readable over the map passing under it.
+- `Chat.tsx` / `ChatScene.tsx` — the case-study page's Problem chat (same messages, same
+  proportions), on the app's dark. **Even beats** (Lucas): a message every 48 frames, each staying
+  three beats, so they arrive AND leave in the same increments (the page's height cap made the
+  second message leave the moment the third arrived). Only six of the page's ten messages — the
+  beats were doubled and the thread cut to keep the length. From the flood on nothing leaves; 21
+  messages/screenshots are added around the column (never in its 3×3 grid cells), one after
+  another over 72 frames. **Its seven screenshots are all different** — each a different
+  student's different app, built in `motion/unify-tt-source.html` and captured over CDP at 2x
+  into `public/unify/tt-flood-*.webp` (sizes in `Chat.tsx`'s `IMGS`).
+
+Story: chat → flood around it → everything spirals into the centre, a pink blob puffs and morphs
+into the timetable, landing centred, which then slides to the left third as its caption rises
+→ the camera goes in: days (tap Tuesday, then Thursday — the pink panel eases to Thursday's
+single course) → courses (their friends
+bounce in, only now) → the break (its friends bounce in) → the friends list (Emil's timetable
+opens) → "connect now" unfurls and slowly pushes in; tap Nam, tap outside; tap Yas, tap outside →
+from the plain card the camera dives into Nam (the friends and text on the card ease out and
+the card's own pink grows past the frame — no separate wipe shape) → "customize your
+character", body or eyes swap every 9 frames → the others burst out from behind, land in their
+rooms as the camera pulls out to the panning map → "locate your friends on campus" → they leave,
+the rooms grow → "your" slides into "and your courses" → the camera
+pulls out to the whole floor → a phone FRAME, six times too big, closes in round the map until it
+is the opening phone exactly (the map keeps its size; outside the frame is the opening's dark)
+→ its screen fades to black, and frame 0 wakes the black screen into the chat (seam: 0.04/255
+mean diff to frame 0). Each day tapped in the timetable stays up twice as long as the first cut. Captions for the timetable ("your timetable, and
+everyone's") and connect ("who's free right now") beats were added beyond the brief — cut freely.
+
+Two things that will bite again:
+- **Characters handed between scenes are placed by `transform`, never `left/top`** (`ScreenChar`,
+  the map markers). Inside a card scaled ×1.45 and then zoomed ×6, half a px of layout rounding
+  became a visible 4 px jump at the dive's hand-off. Measured after: centroid identical across
+  both hand-offs (dive → customize, customize → burst).
+- Nunito is a local OFL file (`public/unify/Nunito.ttf`, loaded in `Root.tsx` behind
+  `delayRender`), so renders never depend on Google Fonts. Word widths for the map caption's
+  "your" slide are Nunito 800 measured at 100 px in Chrome (in `MapScene.tsx`).
+
 ## to.morrow page (`public/to-shove2d.html`)
 
 **The project is called `to.morrow`, not `morrow` (2026-09-08).** Every user-visible name

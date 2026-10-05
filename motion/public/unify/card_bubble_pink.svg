@@ -1,0 +1,6 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 377 118" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Body 377x72 (r=36 corners) + lip: 80 wide, flush right (297..377), bottom a
+     semicircle of r=40 centred at (337,78) -> bottom edge y=118, i.e. poking 46
+     below the body. Matches the open panel's 80x80 .panel__face lip. -->
+<path id="Union" d="M341 0C360.882 0 377 16.1177 377 36V78A40 40 0 0 1 297 78V72H36C16.1177 72 0 55.8823 0 36C0 16.1177 16.1177 4.42929e-08 36 0H341Z" fill="var(--fill-0, #FF88C8)"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="xMidYMid meet" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 129 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="figur">
+<path id="Vector" d="M77.3788 0C92.6982 0.0447125 96.2659 11.1015 98.2369 24.1895C98.7155 23.5379 99.2176 22.8992 99.7424 22.2796C102.372 19.1753 108.579 14.0525 112.629 14.4996C132.573 17.2334 127.788 43.4606 128.777 57.2768C130.916 87.1128 117.522 83.4144 94.124 83.523L57.7516 83.6379C43.3598 83.6635 15.7013 87.6876 13.239 68.2696C11.6878 56.0312 17.7558 49.3626 29.4251 47.5421C27.42 33.924 21.0259 14.8382 36.389 5.35273C40.0776 3.04045 44.5406 2.3378 48.7529 3.4109C55.4578 5.18024 58.5088 9.51101 61.8252 15.1065C65.6019 7.03266 68.4225 2.05039 77.3788 0Z" fill="var(--fill-0, #FF88C8)"/>
+<g id="Augen">
+<circle id="Auge rechts" cx="82" cy="53" r="29" fill="var(--fill-0, white)"/>
+<circle id="Auge links" cx="29" cy="53" r="29" fill="var(--fill-0, white)"/>
+<circle id="Pupille rechts" cx="82" cy="73" r="9" fill="var(--fill-0, #292925)"/>
+<circle id="Pupille links" cx="29" cy="73" r="9" fill="var(--fill-0, #292925)"/>
+</g>
+</g>
+</svg>

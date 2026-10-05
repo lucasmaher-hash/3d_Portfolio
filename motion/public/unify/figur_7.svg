@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 66.1326 42.0378" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="figur">
+<path id="Vector" d="M32.6729 0.113735C35.524 -0.22914 38.7094 0.261606 41.5814 0.809555C59.2122 4.23407 66.9911 21.9235 66.0577 38.0967C65.7884 42.7611 45.2461 41.6012 44.0855 40.9707C39.378 38.4133 43.5677 29.3042 34.3614 26.5254L33.95 26.4032C25.3013 27.2245 26.4737 34.8116 24.0702 40.334C23.1894 42.3581 3.92135 42.4615 1.47636 41.2603C0.750602 40.9034 -0.0688539 38.8936 0.00460345 38.0756C-0.0296766 19.1642 13.2015 2.19633 32.6729 0.113735Z" fill="var(--fill-0, #292925)"/>
+<g id="Augen">
+<rect id="Auge links" x="35.5475" y="20.4599" width="29.2214" height="16.405" rx="2.56328" transform="rotate(165 35.5475 20.4599)" fill="var(--fill-0, white)"/>
+<rect id="Auge rechts" width="29.2214" height="16.405" rx="2.56328" transform="matrix(0.965926 0.258819 0.258819 -0.965926 28.6216 20.4599)" fill="var(--fill-0, white)"/>
+<circle id="Pupille rechts" cx="44.3447" cy="12.56" r="5.89554" fill="var(--fill-0, #292925)"/>
+<circle id="Pupille links" cx="20.2499" cy="13.0727" r="5.89554" fill="var(--fill-0, #292925)"/>
+</g>
+</g>
+</svg>
