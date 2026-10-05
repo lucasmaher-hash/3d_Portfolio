@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Easing, interpolate, spring, useCurrentFrame} from 'remotion';
-import {BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, mix, Pal, Phone, phoneScreen, Pixel, ROW, StatusBar, Trough, sf} from './ui';
+import {blueHex, BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, mix, Pal, Phone, phoneScreen, Pixel, ROW, StatusBar, Trough, sf} from './ui';
 import {AddRow, KNOB, LiveBox, LiveControls, LockCard, TabBar, TaskRow, TopBar} from './app';
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ const HEAD: React.CSSProperties = {...sf(60, 1, 650), letterSpacing: '-0.025em'}
 
 const Canvas: React.FC<{p: Pal; children: React.ReactNode; flat?: boolean}> = ({p, children, flat}) => {
   const ext = React.useContext(ExtTop);
-  const stops = p.dark ? '#36383C 0%, #2C2D30 52%, #242528 100%' : '#D7DBE1 0%, #CACFD6 52%, #C3C8D0 100%';
+  const stops = (p.dark ? ['#36383C', '#2C2D30', '#242528'] : ['#D7DBE1', '#CACFD6', '#C3C8D0']).map((c, i) => `${blueHex(c)} ${[0, 52, 100][i]}%`).join(', ');
   if (!ext) {
     return (
       <AbsoluteFill style={{background: flat ? p.canvas : `radial-gradient(120% 100% at 82% -12%, ${stops})`, overflow: 'hidden'}}>
@@ -423,8 +423,9 @@ const CheckToLive: React.FC<{f: number; bf?: number; p: Pal; z: number; addX: nu
   const {opacity: op, scale: sc} = markBreath(eBreath(bf ?? f));
   const line = KNOB.line * z;
   const a0 = CHECK_RING.alpha;
-  const [r0, g0, b0] = [0x46, 0x4b, 0x52];
-  const [r1, g1, b1] = [0xdc, 0xe5, 0xf5];
+  const rgbOf = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const [r0, g0, b0] = rgbOf(CHECK_RING.color); // #464B52 — the open box's line
+  const [r1, g1, b1] = rgbOf(DARK.ink); // #DCE5F5 — the Live ring's ink
   const ringCol = `rgba(${Math.round(lerp(r0, r1, m))},${Math.round(lerp(g0, g1, m))},${Math.round(lerp(b0, b1, m))},${lerp(a0, 1, m)})`;
   return (
     // placed by TRANSFORM, not left/top: layout offsets are snapped to whole px in

@@ -5,6 +5,7 @@ import {DURATION_E, DURATION_F, EXT, FPS, LabPhone, Promo, PromoTall} from './Pr
 import {DURATION_F as DURATION_FV, EXT_V, PromoV, PromoVTall} from './PromoV';
 import {UNIFY_DURATION, UNIFY_EXT, UnifyPromo, UnifyPromoTall} from './unify/UnifyPromo';
 import {UnifyLab} from './unify/Lab';
+import {DURATION_F as DURATION_F16, Promo16} from './Promo16';
 import './sk.css';
 
 /* W95FA (Alina Sava, SIL OFL 1.1) — the app's chrome face. Block rendering
@@ -65,6 +66,16 @@ export const RemotionRoot: React.FC = () => (
       id="TomorrowPromoF"
       component={Promo}
       durationInFrames={DURATION_F}
+      fps={FPS}
+      width={1920}
+      height={1080}
+      defaultProps={{variant: 'A' as const, transition: 'golive3' as const}}
+    />
+    {/* ALTERNATE: iPhone 16-class frames, white Lock/Home Screens, the Dynamic Island ending */}
+    <Composition
+      id="TomorrowPromo16"
+      component={Promo16}
+      durationInFrames={DURATION_F16}
       fps={FPS}
       width={1920}
       height={1080}

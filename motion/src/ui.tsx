@@ -1,5 +1,5 @@
 import React from 'react';
-import {Img, staticFile} from 'remotion';
+import {getInputProps, Img, staticFile} from 'remotion';
 
 /* ─────────────────────────────────────────────────────────────────────────
    SkeuKit, ported from the app's own SwiftUI source
@@ -42,8 +42,30 @@ export type Pal = {
   si: number; // shadowIntensity
 };
 
+/* Blue-intensity review switch (2026-10-04, Lucas: "intensify the blue").
+   Render with --props='{"blue": k}': every palette colour keeps its luma and
+   hue and has its chroma — its distance from grey — multiplied by k, so the
+   slate's blue cast deepens in proportion and true greys stay grey. k = 1 (no
+   prop) is now 4 — Lucas picked the ×4 review render (2026-10-04) as the
+   site's colour; pass blue 1 for the original slate. Only the app's
+   own colours follow; the phone frame and the Lock Screen wallpaper are
+   pictures of the iPhone, not the app, and stay as they are. */
+export const BLUE = Number((getInputProps() as {blue?: number}).blue ?? 4);
+export function blueHex(h: string, k = BLUE): string {
+  if (k === 1) return h;
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  const c = (v: number) => Math.max(0, Math.min(255, Math.round(y + k * (v - y))));
+  return '#' + [c(r), c(g), c(b)].map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+function bluePal(p: Pal): Pal {
+  const out = {...p} as Record<string, unknown>;
+  for (const [key, v] of Object.entries(p)) if (typeof v === 'string' && v.startsWith('#')) out[key] = blueHex(v);
+  return out as Pal;
+}
+
 /* Slate — the default theme ("light blue" / "dark blue"). */
-export const LIGHT: Pal = {
+export const LIGHT: Pal = bluePal({
   dark: false,
   canvas: '#CACFD6',
   material: '#D5D9E0',
@@ -63,8 +85,8 @@ export const LIGHT: Pal = {
   critical: '#6B180D',
   shadow: '#242629',
   si: 1.0,
-};
-export const DARK: Pal = {
+});
+export const DARK: Pal = bluePal({
   dark: true,
   canvas: '#2C2D30',
   material: '#2C2D30',
@@ -84,7 +106,7 @@ export const DARK: Pal = {
   critical: '#FF7866',
   shadow: '#09090A',
   si: 0.9,
-};
+});
 
 export const SYS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif';
 
@@ -398,7 +420,7 @@ export const CIRCLE_LINE = 1.8; // pt
    of one weight and one colour, nothing inside (Lucas). The app's resting
    glass — a rim that fades out toward the top, plus a faint lens — never
    read as a clean circle at video size. Colour = the old rim's foot. */
-export const CHECK_RING = {color: '#464B52', alpha: 0.4};
+export const CHECK_RING = {color: blueHex('#464B52'), alpha: 0.4};
 /* `draw` (0..1): only that much of the line, running clockwise from 12 o'clock
    — the ring being drawn on. Round caps so the moving end reads as a pen tip;
    it is one path, so the caps never double the alpha where they meet. */

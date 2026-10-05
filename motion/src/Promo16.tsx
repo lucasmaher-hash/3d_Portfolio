@@ -1,21 +1,20 @@
-/* ═══ to.morrow promo — the VERTICAL cut (4:5, 1080 x 1350) ═══════════════
-   A copy of Promo.tsx (the landscape film, version F) re-laid for a phone:
-   the same story, timing and components, with the layout rebuilt rather than
-   cropped — see CLAUDE.md "Vertical cut". What changed and why:
-   · 4:5, not 9:16: the tallest frame that still leaves room above and below
-     it on a phone page (it does not need the whole screen); 1080 wide keeps
-     every pixel of the 1080-wide UI it shows.
-   · Stack, don't flank: every caption sits ABOVE its subject, centred, never
-     beside it — there is no room beside anything in a 1080 frame.
-   · Bigger type, less at once: the lists are 13% larger (PZ 1.45), so only
-     two lists fit side by side; the camera frames the PAIR a task moves
-     between (Tomorrow+Soon, then Today+Tomorrow) in one eased move each,
-     tied to the flick, instead of showing all three small.
-   · The close-ups keep the landscape film's on-screen type size; the long
-     "Go Live on important tasks" line is centred in the frame. */
+/* ═══ to.morrow promo — ALTERNATE: iPhone 16-class phones + a longer ending ═══
+   A copy of Promo.tsx (landscape F, blue ×4) with:
+   · the iPhone 12 mockups swapped for the modern frame in the project
+     (public/images/unify/iphone-17-frame.png — the only Dynamic Island frame
+     there; its screen is the 16 Pro's 402 x 874pt), and the app screen re-laid
+     to the 16 Pro screenshot Lucas sent (status bar, top bar, Live box,
+     controls, tab bar all measured off it at 3x);
+   · a white Lock Screen and a white, minimal Home Screen;
+   · a new ending: instead of ticking the task off on the Lock Screen, the
+     phone is unlocked (swipe up from the bottom), the task sits in the
+     Dynamic Island as a compact Live Activity, a tap expands the island (a
+     damped spring with a small overshoot; the compact content blurs out as
+     the expanded content blurs in), and the task is ticked off there. Then
+     light floods out of the tick back to frame 0, as before. */
 import React from 'react';
-import {AbsoluteFill, Easing, interpolate, spring, useCurrentFrame} from 'remotion';
-import {blueHex, BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, mix, Pal, Phone, phoneScreen, Pixel, ROW, StatusBar, Trough, sf} from './ui';
+import {AbsoluteFill, Easing, Img, interpolate, spring, staticFile, useCurrentFrame} from 'remotion';
+import {blueHex, BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, LiveGlyph, mix, Pal, Pixel, ROW, Trough, sf} from './ui';
 import {AddRow, KNOB, LiveBox, LiveControls, LockCard, TabBar, TaskRow, TopBar} from './app';
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -39,8 +38,8 @@ import {AddRow, KNOB, LiveBox, LiveControls, LockCard, TabBar, TaskRow, TopBar} 
    ───────────────────────────────────────────────────────────────────────── */
 
 export const FPS = 30;
-const W = 1080;
-const H = 1350;
+const W = 1920;
+const H = 1080;
 /* The website hero's TALL cut (2026-10-04, Lucas): the same film with EXT px of
    extra canvas above the frame, so on desktop the video can run up under the
    nav instead of leaving an empty band there. Nothing is placed in that band —
@@ -73,7 +72,7 @@ const qbez = (p0: P, p1: P, p2: P, t: number): P => {
 };
 
 /* Marketing type: the system face, Display cut. */
-const HEAD: React.CSSProperties = {...sf(76, 1, 650), letterSpacing: '-0.025em'};
+const HEAD: React.CSSProperties = {...sf(60, 1, 650), letterSpacing: '-0.025em'};
 
 const Canvas: React.FC<{p: Pal; children: React.ReactNode; flat?: boolean}> = ({p, children, flat}) => {
   const ext = React.useContext(ExtTop);
@@ -151,22 +150,15 @@ const goLiveText = (tr: Transition) => (tr === 'golive2' ? 'Go Live' : 'go live'
 /* The wells were shrunk by a fifth (Lucas, 2026-10-04) to give the headline
    room; the close-ups zoom in by the same fifth more, so on screen they are
    exactly as they were. */
-const PZ = 1.45; // lists 13% larger than the landscape cut's 1.28
-const CLOSE = 3.9 / PZ; // Go Live close-up: 3.9 px/pt (landscape: 4.16) so the long line fits 1080
-const OPEN = 5.8 / PZ; // the opening "to.morrow": the same 5.8 px/pt as the landscape cut
-/* The close-up's camera sits this far into the words (pt): 5 centres ring +
-   "Go Live" in the frame (the landscape cut uses 26, the words left of centre). */
-const CL_OFF = 5;
-/* The wide shot follows each flick to the PAIR of lists it moves between. */
-const PAIR = (340 * PZ + 38) / 2; // px: half a well + half a gap
-const panX = (f: number) =>
-  PAIR * ease(f, 158, 190, Easing.inOut(Easing.cubic)) - 2 * PAIR * ease(f, 224, 258, Easing.inOut(Easing.cubic));
+const PZ = 1.6 * 0.8;
+const CLOSE = (2.6 * 1.6) / PZ; // camera zoom of the close-ups (the typed name, "Go Live")
+const OPEN = CLOSE * 1.4; // the opening: "to.morrow" typed 40% larger (Lucas, 2026-10-04)
 const WELL_W = 340; // pt
 const ROW_X = 8; // pt
 const WELL_GAP = 38; // px
 type Geo = {top: number; h: number; listTop: number; titles: boolean; camY: number; barTop: number};
 const GEO: Record<Variant, Geo> = {
-  A: {top: 512, h: 372, listTop: 62, titles: true, camY: H / 2, barTop: 0},
+  A: {top: 340, h: 372, listTop: 62, titles: true, camY: H / 2, barTop: 0},
   B: {top: 330, h: 322, listTop: 14, titles: false, camY: H / 2, barTop: 330 + 322 * PZ + 22},
   C: {top: 330, h: 322, listTop: 14, titles: false, camY: H / 2, barTop: 330 + 322 * PZ + 22},
 };
@@ -252,7 +244,7 @@ const insChars = (f0: number) =>
    full line sit centred in the frame (measured off a render of the full line:
    ring left 676 → text right 1622 unpanned, centre 1149), and glides back as
    the words are taken back. Screen px. */
-const INS_PAN = -259; // vertical: ring + full line centred (66.5pt × 3.9 px/pt; refit off a render)
+const INS_PAN = -189;
 const insPan = (f0: number) =>
   INS_PAN *
   (ease(f0, INS.at, INS.typeEnd + 8, Easing.inOut(Easing.cubic)) - ease(f0, INS.delStart - 2, INS.delEnd + 6, Easing.inOut(Easing.cubic)));
@@ -270,7 +262,7 @@ const rowIn = (i: number, g: number) => sp(g, ZOOM_OUT[0] + 4 + i * 5, 'present'
 /* The flick: pulled 140px, accelerating, let go — and from there an
    UNDERDAMPED spring carries it, starting at the speed the finger let go
    with, so it overshoots its slot and bounces back into place. */
-const DRAG = 127; // px — scaled with the wells (112 × 1.45/1.28)
+const DRAG = 112; // px — scaled with the wells
 const DRAG_FRAMES = 10;
 const DRAG_EASE = Easing.in(Easing.cubic);
 const BOUNCE = {response: 0.55, damping: 0.62};
@@ -417,7 +409,7 @@ const BarOwn: React.FC<{f: number; G: Geo; p: Pal; z: number}> = ({f, G, p, z}) 
    out inside the scaled phone, where the browser rounds to whole phone pixels
    (≈4 screen px at the cut); these were measured off rendered frames across
    the cut and are applied by transform, which is never rounded. */
-const CUT_FIX = {textY: 0.42, ringX: 0.59, ringY: 0.18}; // refit for the vertical cut: text matches on 0.30–0.55
+const CUT_FIX = {textY: 0.36, ringX: 0.44, ringY: 0.09}; // refit for the 16 Pro layout: text matches on 0.30–0.42, ring ≤0.1px
 
 /* Ring + dot at breath b: full → faint and small. Its large end is the mark's
    own size (breathing past it read as big-small-big). Shared with the pill. */
@@ -495,7 +487,7 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
   const addX = wellCX(GL_WELL) - (ROW_W * z) / 2 + (ROW.touch + ROW.gap) * z; // where a new task's text starts
   const addY = slotCY(G, 1); // Today: Plan trip to Asia, then add
   const s = lerp(Math.exp(lerp(Math.log(OPEN), 0, out)), CLOSE, inT) * push;
-  const fx = lerp(lerp(textCX, W / 2 + panX(f), out), addX + CL_OFF * z, inT);
+  const fx = lerp(lerp(textCX, W / 2, out), addX + 26 * z, inT);
   const fy = lerp(lerp(slotCY(G, 0), G.camY, out), addY, inT);
   const camT = `translate(${W / 2 - fx * s}px, ${H / 2 - fy * s}px) scale(${s})`;
   const gl = goLiveText(tr).slice(0, typedCount(f, GOLIVE.start, GOLIVE.gaps));
@@ -621,10 +613,8 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
         })}
       </AbsoluteFill>
 
-      {/* stacked, two lines, above the lists */}
-      <div style={{position: 'absolute', left: 0, right: 0, top: 262, display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: goLive ? 1 - ease(f, GOLIVE.zoom[0], GOLIVE.zoom[0] + 12) : 1}}>
-        <Rise text="Swipe to" f={f} start={ZOOM_OUT[0] + 26} step={4} style={{...HEAD, lineHeight: 1.08, color: p.ink}} />
-        <Rise text="reschedule tasks." f={f} start={ZOOM_OUT[0] + 30} step={4} style={{...HEAD, lineHeight: 1.08, color: p.ink}} />
+      <div style={{position: 'absolute', left: 0, right: 0, top: 168, display: 'flex', justifyContent: 'center', opacity: goLive ? 1 - ease(f, GOLIVE.zoom[0], GOLIVE.zoom[0] + 12) : 1}}>
+        <Rise text="Swipe to reschedule tasks." f={f} start={ZOOM_OUT[0] + 26} step={4} style={{...HEAD, color: p.ink}} />
       </div>
 
       {goLive && f >= GOLIVE.tap - 12 && f <= GOLIVE.tap + 14 ? (
@@ -687,10 +677,18 @@ const TextScene: React.FC<{f: number}> = ({f}) => (
 const LIVE_CUT = TEXT_END;
 const PH = 830;
 const PTOP = (H - PH) / 2;
-const PS = phoneScreen(PH);
+/* iphone17-frame.png: 876 x 1808 px, screen hole x 36–839, y 30–1777 (804 x
+   1748 = the 16 Pro's 402 x 874pt at 2px/pt), hole radius 128px; its own
+   Dynamic Island: centre (201, 32.5)pt, 105.5 x 35.5pt. */
+const FR = {w: 876, h: 1808, x: 36, y: 30, sw: 804, sh: 1748, r: 128};
+const SCREEN_H = 874;
+const PS = (() => {
+  const k = PH / FR.h;
+  return {W: FR.w * k, x: FR.x * k, y: FR.y * k, w: FR.sw * k, h: FR.sh * k, r: FR.r * k, z: (FR.sw * k) / 402};
+})();
 const PL_CX = 600;
 const PR_CX = 1320;
-const SCREEN_W = 390;
+const SCREEN_W = 402;
 const toGlobal = (cx: number, x: number, y: number): P => [cx - PS.W / 2 + PS.x + x * PS.z, PTOP + PS.y + y * PS.z];
 
 const TASK = 'Bring passport';
@@ -698,13 +696,19 @@ const LTYPE = {start: LIVE_CUT + 34, gaps: [3, 2, 3, 3, 2, 4, 3, 2, 3, 2, 3, 3, 
 const LTYPE_END = LTYPE.start + LTYPE.gaps.reduce((a, b) => a + b, 0);
 const GO = LIVE_CUT + 107; // tap "Go" — the task goes live (0.7 s after the last letter — Lucas)
 const ARRIVE = GO + 40;
-const TICK = ARRIVE + 81; // ticked off on the Lock Screen (0.5 s later than at first — Lucas)
+/* The new ending (Lucas): unlock, Dynamic Island, tick it off there. */
+const UNLOCK = ARRIVE + 70; // finger lands on the bottom edge of the Lock Screen
+const ISL_IN = UNLOCK + 24; // home screen settled — the island grows into the compact Live Activity
+const ISL_TAP = ISL_IN + 82; // finger presses the island… (+1 s on the closed island — Lucas)
+const ISL_EXP = ISL_TAP + 4; // …and on release it expands
+const TICK = ISL_EXP + 44; // the task is ticked off inside the expanded island
 const OFF_AIR = TICK + 26;
 
 /* the app screen, 390pt wide */
-const BOX = {x: 20, y: 262, w: 350, h: 252};
-const CTRL_Y = BOX.y + BOX.h + 16; // top of the controls row
-const CARD = {x: 12, y: 560, w: 366};
+// measured off the 16 Pro screenshot (1206 x 2622 → pt = px / 3)
+const BOX = {x: 20.5, y: 290.3, w: 361, h: 257.7};
+const CTRL_Y = 566; // top of the controls row (pill 566.8–610)
+const CARD = {x: 12, y: 590, w: 378};
 const CHECK_C: P = [CARD.x + CARD.w - 8 - 18 - 22, CARD.y + 8 + 18 + 22];
 
 /* How much of the phone exists yet — only E's transition uses less than all of it. */
@@ -726,10 +730,11 @@ const AppScreen: React.FC<{f: number; rv?: Reveal; forceGo?: boolean; breathOv?:
   return (
     <div style={{position: 'absolute', inset: 0, background: p.canvas}}>
       <div style={{position: 'absolute', inset: 0, opacity: rv.ui}}>
-        <StatusBar color={p.ink} />
+        <StatusBar16 color={p.ink} />
       </div>
-      <div style={{position: 'absolute', left: 21.5, top: 54, opacity: rv.ui}}>
-        <TopBar w={SCREEN_W - 43} z={1} p={p} />
+      {/* pill 67.7–108.3pt, gear 68.6–110.4pt, both 22.7pt in from the edges */}
+      <div style={{position: 'absolute', left: 22.7, top: 65.8, opacity: rv.ui}}>
+        <TopBar w={SCREEN_W - 45.4} z={1} p={p} />
       </div>
       <div style={{position: 'absolute', left: BOX.x, top: BOX.y, opacity: rv.ui}}>
         <LiveBox w={BOX.w} h={BOX.h} z={1} p={p}>
@@ -760,87 +765,395 @@ const AppScreen: React.FC<{f: number; rv?: Reveal; forceGo?: boolean; breathOv?:
           knob={forceGo}
         />
       </div>
-      <div style={{position: 'absolute', left: 21.5, top: 844 - 34 - 51, opacity: rv.ui}}>
-        <TabBar w={SCREEN_W - 43} z={1} p={p} liveSelected pill={null} liveBreath={live ? breathOv ?? pulse(f - GO) : null} />
+      <div style={{position: 'absolute', left: 21.8, top: SCREEN_H - 34 - 51, opacity: rv.ui}}>
+        <TabBar w={SCREEN_W - 43.6} z={1} p={p} liveSelected pill={null} liveBreath={live ? breathOv ?? pulse(f - GO) : null} />
       </div>
     </div>
   );
 };
 
-const LockScreen: React.FC<{f: number}> = ({f}) => {
-  const p = DARK;
-  const wake = ease(f, ARRIVE - 6, ARRIVE + 6);
-  const nIn = sp(f, ARRIVE, 'present');
+/* ─── The 16 Pro's status bar, in its 402pt screen ──────────────────────
+   Measured off Lucas's screenshot: time centred at x 63.7pt, the right-hand
+   cluster centred at 326pt, both on the island's centre line (32.5pt). Same
+   glyphs as the iPhone 12 bar in ui.tsx, minus the cellular bars. */
+const arc16 = (cx: number, cy: number, r: number, a0: number, a1: number) => {
+  const p0 = [cx + r * Math.cos(a0), cy + r * Math.sin(a0)];
+  const p1 = [cx + r * Math.cos(a1), cy + r * Math.sin(a1)];
+  return `M${p0[0]} ${p0[1]} A${r} ${r} 0 0 1 ${p1[0]} ${p1[1]}`;
+};
+const StatusBar16: React.FC<{color: string}> = ({color}) => {
+  const cy = 32.5;
+  const up0 = (-135 * Math.PI) / 180;
+  const up1 = (-45 * Math.PI) / 180;
+  return (
+    <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: 56, color}}>
+      <div style={{position: 'absolute', left: 63.7, top: cy, transform: 'translate(-50%, -50%)', fontFamily: '"SF Pro Text", -apple-system, sans-serif', fontSize: 17, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1}}>
+        09:41
+      </div>
+      <svg style={{position: 'absolute', left: 326, top: cy, transform: 'translate(-50%, -50%)', overflow: 'visible'}} width="68" height="12" viewBox="0 0 68 12">
+        {/* no cellular bars (Lucas): beside the compact Live Activity they ran
+            under the island's end — Wi-Fi and battery stay where they were */}
+        <g fill="none" stroke={color} strokeWidth="1.9">
+          <path d={arc16(29.5, 11.2, 9.6, up0, up1)} />
+          <path d={arc16(29.5, 11.2, 6.1, up0, up1)} />
+        </g>
+        <path d={`M29.5 11.6 L${29.5 - 2.6} 8.9 A3.7 3.7 0 0 1 ${29.5 + 2.6} 8.9 Z`} fill={color} />
+        <rect x="42.6" y="0.6" width="22.6" height="10.8" rx="3.2" fill="none" stroke={color} strokeOpacity=".4" strokeWidth="1" />
+        <rect x="44.6" y="2.6" width="18.6" height="6.8" rx="1.6" fill={color} />
+        <path d="M66.4 4.1v3.8c.8-.3 1.3-1 1.3-1.9s-.5-1.6-1.3-1.9z" fill={color} fillOpacity=".45" />
+      </svg>
+    </div>
+  );
+};
+
+/* ─── The phone: the modern frame over a 402 x 874pt screen ──────────── */
+const Phone16: React.FC<{left: number; top: number; H: number; frameOpacity?: number; style?: React.CSSProperties; children: React.ReactNode; over?: React.ReactNode}> = ({
+  left,
+  top,
+  H: h,
+  frameOpacity = 1,
+  style,
+  children,
+  over,
+}) => (
+  <div style={{position: 'absolute', left, top, width: PS.W, height: h, ...style}}>
+    {/* the screen box grown 2px all round so its edge sits under the frame's black border */}
+    <div
+      style={{
+        position: 'absolute',
+        left: PS.x - 2,
+        top: PS.y - 2,
+        width: PS.w + 4,
+        height: PS.h + 4,
+        borderRadius: PS.r + 2,
+        overflow: 'hidden',
+        boxShadow: `-26px 46px 70px rgba(9,9,10,${0.55 * frameOpacity}), -8px 14px 22px rgba(9,9,10,${0.35 * frameOpacity})`,
+      }}
+    >
+      <div style={{position: 'absolute', left: 2, top: 2, width: SCREEN_W, height: SCREEN_H, transform: `scale(${PS.z})`, transformOrigin: '0 0'}}>{children}</div>
+    </div>
+    <Img src={staticFile('iphone17-frame.png')} style={{position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: frameOpacity}} />
+    {/* ABOVE the frame, in screen pt: the Dynamic Island. Under the frame the
+        mockup's own island (lens, highlights) showed through ours as a second
+        shape — "not flush" (Lucas); drawn over it, the island is one black. */}
+    {over ? (
+      <div style={{position: 'absolute', left: PS.x, top: PS.y, width: SCREEN_W, height: SCREEN_H, transform: `scale(${PS.z})`, transformOrigin: '0 0'}}>{over}</div>
+    ) : null}
+  </div>
+);
+
+/* A touch on a WHITE screen: the film's finger is a half-white disc, which
+   vanishes on white, so this one is the same disc in a translucent grey. */
+const FingerOnLight: React.FC<{x: number; y: number; d: number; opacity: number; scale: number; ripple?: number}> = ({x, y, d, opacity, scale, ripple = -1}) => (
+  <>
+    {ripple >= 0 && ripple <= 1 ? (
+      <div style={{position: 'absolute', left: 0, top: 0, width: d, height: d, borderRadius: 999, border: '2px solid rgba(60,60,67,.45)', boxSizing: 'border-box', transform: `translate(${x - d / 2}px, ${y - d / 2}px) scale(${0.7 + ripple * 1.1})`, opacity: (1 - ripple) * 0.9}} />
+    ) : null}
+    <div style={{position: 'absolute', left: 0, top: 0, width: d, height: d, borderRadius: 999, background: 'rgba(60,60,67,.30)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.35)', opacity, transform: `translate(${x - d / 2}px, ${y - d / 2}px) scale(${scale})`}} />
+  </>
+);
+
+/* ─── Timing of the ending, shared by the screens and the fingers ─────── */
+const unlockU = (f: number) => ease(f, UNLOCK + 6, UNLOCK + 20, Easing.out(Easing.cubic)); // the Lock Screen slides away
+const homeIn = (f: number) => ease(f, UNLOCK + 9, UNLOCK + 26, Easing.out(Easing.cubic)); // icons settle in
+
+/* ─── Dynamic Island ──────────────────────────────────────────────────
+   Three footprints, all centred on the frame's own island (x 201pt, top
+   14.75pt) and growing DOWN and out from it: bare (the hardware, 105.5 x
+   35.5), compact Live Activity (190 x 36: the task's Live ring leading, the
+   title's first three letters trailing — Lucas: "only type out first 3
+   letters", clear of the hardware cutout and not flush to the edge) and expanded (374 x 84, radius
+   40: title left, tick button right — his expanded shot). Every change of
+   footprint is a damped spring, the way iOS moves the island: growth on
+   response .45 / damping .75 (a small overshoot that settles), the collapse
+   firmer (.40 / .90, barely past its target). A press squishes it 4% first.
+   Content never scales with the shape: the old content blurs (≤6px) and fades
+   out as the new content blurs and fades in a beat later, and the island
+   clips both — see the research notes in CLAUDE.md. */
+const ISL = {cx: 201, top: 14.75, bare: {w: 105.5, h: 35.5}, compact: {w: 190, h: 36}, expanded: {w: 374, h: 84, r: 40}};
+const springOf = (response: number, damping: number) => ({mass: 1, stiffness: Math.pow((2 * Math.PI) / response, 2), damping: (4 * Math.PI * damping) / response});
+const SPR_GROW = springOf(0.45, 0.75);
+const SPR_SHUT = springOf(0.4, 0.9);
+const springAt = (f: number, start: number, config: {mass: number; stiffness: number; damping: number}) => (f < start ? 0 : spring({frame: f - start, fps: FPS, config}));
+const ISL_CHECK: P = [349.7, 65.8]; // the expanded island's tick button, screen pt
+const ISL_DONE = TICK + 22; // ticked off — the activity ends, the island shuts
+
+const Island16: React.FC<{f: number}> = ({f}) => {
+  const cIn = springAt(f, ISL_IN, SPR_GROW);
+  const eIn = springAt(f, ISL_EXP, SPR_GROW);
+  const shut = springAt(f, ISL_DONE, SPR_SHUT);
+  if (f < ISL_IN) return null;
+  const B = ISL.bare;
+  const C = ISL.compact;
+  const X = ISL.expanded;
+  const w = lerp(lerp(lerp(B.w, C.w, cIn), X.w, eIn), B.w, shut);
+  const h = lerp(lerp(lerp(B.h, C.h, cIn), X.h, eIn), B.h, shut);
+  const r = Math.min(h / 2, lerp(h / 2, X.r, clamp01(eIn) * (1 - clamp01(shut))));
+  const press = 1 - 0.04 * (sp(f, ISL_TAP, 'press') - sp(f, ISL_EXP, 'press'));
+  const left = ISL.cx - w / 2;
+  // content: compact fades/blurs out on the press, expanded in a beat after the release
+  const cOp = clamp01(cIn * 1.4) * (1 - ease(f, ISL_EXP - 1, ISL_EXP + 5));
+  const xOp = ease(f, ISL_EXP + 4, ISL_EXP + 14) * (1 - ease(f, ISL_DONE, ISL_DONE + 6));
+  const blurC = (1 - cOp) * 6;
+  const blurX = (1 - xOp) * 6;
   const done = ease(f, TICK + 1, TICK + 6);
   const strike = ease(f, TICK + 4, TICK + 16);
-  const gone = sp(f, TICK + 22, 'layout');
+  /* The tick button SPRINGS (Lucas): squashed to 78% under the finger, then
+     released on an underdamped spring (response .38, damping .42 — about
+     23% overshoot) that throws it past full size and lets it settle. */
+  const tickSquash = ease(f, TICK - 1, TICK + 2, Easing.out(Easing.quad));
+  const tickPop = springAt(f, TICK + 3, springOf(0.38, 0.42));
+  const tickSwell = f < TICK + 3 ? lerp(1, 0.78, tickSquash) : lerp(0.78, 1, tickPop);
+  const ink = DARK.ink;
   return (
-    <div style={{position: 'absolute', inset: 0, background: 'linear-gradient(172deg, #425A76 0%, #31465E 28%, #23262B 66%, #1A1B1E 100%)'}}>
-      <div style={{position: 'absolute', inset: 0, background: 'radial-gradient(90% 55% at 78% 8%, rgba(102,130,162,.5) 0%, rgba(102,130,162,0) 70%)'}} />
-      <StatusBar color={p.ink} />
-      <div style={{position: 'absolute', top: 86, width: '100%', textAlign: 'center', ...sf(19, 1, 600), color: 'rgba(220,229,245,.88)'}}>Friday 4 September</div>
-      <div
-        style={{
-          position: 'absolute',
-          top: 104,
-          width: '100%',
-          textAlign: 'center',
-          fontFamily: '"SF Pro Rounded", -apple-system, sans-serif',
-          fontSize: 104,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-          color: 'rgba(220,229,245,.92)',
-        }}
-      >
-        16:39
+    <div
+      style={{
+        position: 'absolute',
+        left,
+        top: ISL.top,
+        width: w,
+        height: h,
+        borderRadius: r,
+        background: '#000',
+        overflow: 'hidden',
+        transform: `scale(${press})`,
+        transformOrigin: '50% 0%',
+      }}
+    >
+      {/* children in SCREEN coordinates — the island only clips them */}
+      <div style={{position: 'absolute', left: -left, top: -ISL.top, width: SCREEN_W, height: SCREEN_H}}>
+        {cOp > 0.001 ? (
+          <div style={{position: 'absolute', inset: 0, opacity: cOp, filter: blurC > 0.05 ? `blur(${blurC}px)` : undefined}}>
+            <div style={{position: 'absolute', left: ISL.cx - C.w / 2 + 18.5, top: 32.5, transform: 'translate(-50%, -50%)'}}>
+              <LiveGlyph d={20} color={ink} line={1.9} />
+            </div>
+            {/* right-aligned 14pt in from the island's end: "Bri" sits at ~265–282pt,
+                12pt clear of the hardware cutout (148.5–253.5pt) */}
+            <div
+              style={{
+                position: 'absolute',
+                right: SCREEN_W - (ISL.cx + C.w / 2 - 14),
+                top: 32.5,
+                transform: 'translateY(-50%)',
+                ...sf(13, 1, 600),
+                color: DARK.inkMuted,
+                whiteSpace: 'nowrap',
+                lineHeight: 1.2,
+              }}
+            >
+              {TASK.slice(0, 3)}
+            </div>
+          </div>
+        ) : null}
+        {xOp > 0.001 ? (
+          <div style={{position: 'absolute', inset: 0, opacity: xOp, filter: blurX > 0.05 ? `blur(${blurX}px)` : undefined, transform: `scale(${0.96 + 0.04 * xOp})`, transformOrigin: `${ISL.cx}px ${ISL.top}px`}}>
+            <div style={{position: 'absolute', left: 36, top: ISL_CHECK[1], transform: 'translateY(-50%)', ...sf(17, 1, 500), color: mix(ink, DARK.inkMuted, done), lineHeight: 1.2, whiteSpace: 'nowrap'}}>
+              <span style={{position: 'relative'}}>
+                {TASK}
+                <span style={{position: 'absolute', left: -2, top: '55%', height: 1.4, width: `calc(${strike * 100}% + 4px)`, background: DARK.inkMuted, opacity: strike > 0 ? 1 : 0}} />
+              </span>
+            </div>
+            <div
+              style={{
+                position: 'absolute',
+                left: ISL_CHECK[0] - 13,
+                top: ISL_CHECK[1] - 13,
+                width: 26,
+                height: 26,
+                borderRadius: 999,
+                background: mix('#3A3A3C', DARK.accent, done),
+                boxShadow: 'inset 0 0 0 0.75px rgba(255,255,255,.18)',
+                display: 'grid',
+                placeItems: 'center',
+                transform: `scale(${tickSwell})`,
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24">
+                <path d="M2.6 13.2l6.4 7L21.6 3.6" fill="none" stroke={ink} strokeOpacity={0.55 + 0.45 * done} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
+        ) : null}
       </div>
-      <div
-        style={{
-          position: 'absolute',
-          left: CARD.x,
-          top: CARD.y,
-          opacity: clamp01(nIn * 1.5) * (1 - gone),
-          transform: `translateY(${(1 - nIn) * 44 - gone * 14}px) scale(${(0.9 + 0.1 * nIn) * (1 - 0.06 * gone)})`,
-        }}
-      >
-        <LockCard w={CARD.w} z={1} p={p} title={TASK} done={done} strike={strike} checkSwell={swell(f, TICK, TICK + 7)} />
+    </div>
+  );
+};
+
+/* ─── Home Screen: white and nearly empty (Lucas) ───────────────────────
+   One row of four apps and the dock, on the 16 Pro grid measured off his
+   screenshot (columns at 63 / 155 / 248 / 340pt, 63pt icons; dock 17.5–
+   384.5 x 754–855pt). The icons are generic drawings, not Apple artwork,
+   apart from to.morrow's own. */
+const ICON = 63;
+const squircle = (bg: string): React.CSSProperties => ({width: ICON, height: ICON, borderRadius: ICON * 0.225, background: bg, position: 'relative', overflow: 'hidden', boxShadow: '0 0.5px 1.5px rgba(0,0,0,.12)'});
+const AppIcon: React.FC<{kind: string}> = ({kind}) => {
+  if (kind === 'tomorrow') return <Img src={staticFile('tomorrow-icon.webp')} style={{width: ICON, height: ICON, borderRadius: ICON * 0.225, display: 'block'}} />;
+  if (kind === 'calendar')
+    return (
+      <div style={squircle('#FFFFFF')}>
+        <div style={{position: 'absolute', top: 7, width: '100%', textAlign: 'center', ...sf(10, 1, 600), color: '#FF3B30', letterSpacing: '0.02em'}}>FRIDAY</div>
+        <div style={{position: 'absolute', top: 17, width: '100%', textAlign: 'center', fontFamily: '"SF Pro Display", -apple-system, sans-serif', fontSize: 36, fontWeight: 300, color: '#1C1C1E', lineHeight: 1}}>4</div>
       </div>
-      {/* torch and camera — iOS's two Lock Screen quick actions */}
-      {[46, SCREEN_W - 46 - 50].map((x, i) => (
+    );
+  if (kind === 'notes')
+    return (
+      <div style={squircle('#FFFFFF')}>
+        <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: 15, background: 'linear-gradient(#FFD84A, #F7C800)'}} />
+        {[27, 37, 47].map((y) => (
+          <div key={y} style={{position: 'absolute', left: 9, right: 9, top: y, height: 1.2, background: '#D1D1D6'}} />
+        ))}
+      </div>
+    );
+  if (kind === 'photos')
+    return (
+      <div style={squircle('#FFFFFF')}>
+        <svg width={ICON} height={ICON} viewBox="0 0 63 63" style={{position: 'absolute', inset: 0}}>
+          {['#FFB800', '#FF8A00', '#FF3D5A', '#C64BD8', '#5E5CE6', '#2D9CFF', '#2ECC71', '#B4D234'].map((c, i) => (
+            <ellipse key={c} cx="31.5" cy="19.5" rx="6.6" ry="11.5" fill={c} fillOpacity=".86" transform={`rotate(${i * 45} 31.5 31.5)`} />
+          ))}
+        </svg>
+      </div>
+    );
+  if (kind === 'phone')
+    return (
+      <div style={squircle('linear-gradient(#5BF675, #0CBD2A)')}>
+        <svg width={ICON} height={ICON} viewBox="0 0 63 63" style={{position: 'absolute', inset: 0}}>
+          <path d="M22.3 15.5c1.4-.4 2.9.3 3.5 1.6l2.6 5.6c.5 1.2.2 2.6-.8 3.4l-2.7 2.2c1.9 4 5 7.2 9 9.2l2.3-2.6c.9-1 2.3-1.3 3.5-.7l5.5 2.7c1.3.6 1.9 2.1 1.5 3.5l-1 3.4c-.5 1.6-2 2.7-3.7 2.6-12.9-.8-23.2-11.2-24-24.1-.1-1.7 1-3.2 2.6-3.7z" fill="#FFF" />
+        </svg>
+      </div>
+    );
+  if (kind === 'messages')
+    return (
+      <div style={squircle('linear-gradient(#5BF675, #0CBD2A)')}>
+        <svg width={ICON} height={ICON} viewBox="0 0 63 63" style={{position: 'absolute', inset: 0}}>
+          <ellipse cx="31.5" cy="29.5" rx="20" ry="16.5" fill="#FFF" />
+          <path d="M17.5 38.5c-.6 3.6-2.7 6.4-4.9 7.6 4.6.4 8.7-1.1 11-3.3z" fill="#FFF" />
+        </svg>
+      </div>
+    );
+  if (kind === 'safari')
+    return (
+      <div style={squircle('#FFFFFF')}>
+        <svg width={ICON} height={ICON} viewBox="0 0 63 63" style={{position: 'absolute', inset: 0}}>
+          <defs>
+            <linearGradient id="saf" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#1FC4FF" />
+              <stop offset="1" stopColor="#1A6BFF" />
+            </linearGradient>
+          </defs>
+          <circle cx="31.5" cy="31.5" r="25" fill="url(#saf)" />
+          <path d="M40 23 L34.2 34.2 L23 40 L28.8 28.8 Z" fill="#FFF" />
+          <path d="M40 23 L34.2 34.2 L28.8 28.8 Z" fill="#FF3B30" />
+        </svg>
+      </div>
+    );
+  // music
+  return (
+    <div style={squircle('linear-gradient(#FF6A80, #FA2D48)')}>
+      <svg width={ICON} height={ICON} viewBox="0 0 63 63" style={{position: 'absolute', inset: 0}}>
+        <path d="M25 18.5l18-4v22.2c0 2.9-2.6 5-5.4 4.7-2.3-.3-3.9-2.3-3.6-4.5.3-2 2.1-3.5 4.1-3.6l1.9-.1V22.4l-11.9 2.7v15.6c0 2.9-2.6 5-5.4 4.7-2.3-.3-3.9-2.3-3.6-4.5.3-2 2.1-3.5 4.1-3.6l1.9-.1z" fill="#FFF" />
+      </svg>
+    </div>
+  );
+};
+const HOME_COLS = [63, 155, 248, 340];
+const DOCK_COLS = [68.6, 156, 245, 333];
+const HomeScreen16: React.FC<{f: number}> = ({f}) => {
+  const k = homeIn(f);
+  const sc = lerp(1.12, 1, k); // iOS: the icons fly in from slightly too large
+  return (
+    <div style={{position: 'absolute', inset: 0, background: '#FFFFFF'}}>
+      <div style={{position: 'absolute', inset: 0, opacity: k, transform: `scale(${sc})`, transformOrigin: '50% 45%'}}>
+        {['tomorrow', 'calendar', 'notes', 'photos'].map((kind, i) => (
+          <div key={kind} style={{position: 'absolute', left: HOME_COLS[i] - ICON / 2, top: 118, width: ICON, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6}}>
+            <AppIcon kind={kind} />
+            <div style={{...sf(12, 1, 500), color: '#1C1C1E', whiteSpace: 'nowrap', lineHeight: 1}}>{['to.morrow', 'Calendar', 'Notes', 'Photos'][i]}</div>
+          </div>
+        ))}
+        {/* search pill */}
+        <div style={{position: 'absolute', left: 201 - 42, top: 704, width: 84, height: 28, borderRadius: 14, background: 'rgba(118,118,128,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, ...sf(14, 1, 500), color: '#6C6C70'}}>
+          <svg width="12" height="12" viewBox="0 0 24 24">
+            <circle cx="10" cy="10" r="7" fill="none" stroke="#6C6C70" strokeWidth="2.8" />
+            <path d="M15.2 15.2l6 6" stroke="#6C6C70" strokeWidth="2.8" strokeLinecap="round" />
+          </svg>
+          Search
+        </div>
+        {/* dock */}
+        <div style={{position: 'absolute', left: 17.5, top: 754, width: 367, height: 101, borderRadius: 38, background: 'rgba(118,118,128,.12)'}} />
+        {['phone', 'messages', 'safari', 'music'].map((kind, i) => (
+          <div key={kind} style={{position: 'absolute', left: DOCK_COLS[i] - ICON / 2, top: 804.5 - ICON / 2}}>
+            <AppIcon kind={kind} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ─── Lock Screen: white (Lucas) ─────────────────────────────────────── */
+const LockLayer16: React.FC<{f: number}> = ({f}) => {
+  const p = DARK;
+  const nIn = sp(f, ARRIVE, 'present');
+  const u = unlockU(f);
+  if (u >= 1) return null;
+  const lift = -u * 150; // the whole Lock Screen rides up with the swipe…
+  return (
+    <div style={{position: 'absolute', inset: 0, background: '#FFFFFF', opacity: 1 - u}}>
+      <div style={{position: 'absolute', inset: 0, transform: `translateY(${lift}px)`}}>
+        <div style={{position: 'absolute', top: 96, width: '100%', textAlign: 'center', ...sf(19, 1, 600), color: 'rgba(28,28,30,.72)'}}>Friday 4 September</div>
         <div
-          key={x}
           style={{
             position: 'absolute',
-            left: x,
-            top: 740,
-            width: 50,
-            height: 50,
-            borderRadius: 999,
-            background: 'rgba(18,19,22,.42)',
-            boxShadow: 'inset 0 0 0 0.5px rgba(214,229,255,.10)',
-            display: 'grid',
-            placeItems: 'center',
+            top: 113,
+            width: '100%',
+            textAlign: 'center',
+            fontFamily: '"SF Pro Rounded", -apple-system, sans-serif',
+            fontSize: 108,
+            fontWeight: 600,
+            letterSpacing: '-0.02em',
+            color: 'rgba(28,28,30,.88)',
           }}
         >
-          {i === 0 ? (
-            <svg width="13" height="24" viewBox="0 0 13 24">
-              <path
-                d="M1.2 0.8h10.6c.4 0 .7.3.7.7v3.1c0 .3-.1.6-.3.8L10 7.9c-.2.3-.3.6-.3.9v13.4c0 .9-.7 1.6-1.6 1.6H4.9c-.9 0-1.6-.7-1.6-1.6V8.8c0-.3-.1-.6-.3-.9L.8 5.4C.6 5.2.5 4.9.5 4.6V1.5c0-.4.3-.7.7-.7z M6.5 11.6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 1 0 0-3z"
-                fill={p.ink}
-                fillRule="evenodd"
-              />
-            </svg>
-          ) : (
-            <svg width="26" height="20" viewBox="0 0 26 20">
-              <path
-                d="M8.9 1.2h8.2c.8 0 1.5.4 1.9 1.1l1 1.7h2.7c1.6 0 2.8 1.3 2.8 2.8v9.6c0 1.6-1.3 2.8-2.8 2.8H3.3C1.7 19.2.5 17.9.5 16.4V6.8C.5 5.3 1.7 4 3.3 4H6l1-1.7c.4-.7 1.1-1.1 1.9-1.1z M13 6.4a5.2 5.2 0 1 0 0 10.4 5.2 5.2 0 1 0 0-10.4z M13 8.4a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 1 1 0-6.4z"
-                fill={p.ink}
-                fillRule="evenodd"
-              />
-            </svg>
-          )}
+          16:39
         </div>
-      ))}
+        <div
+          style={{
+            position: 'absolute',
+            left: CARD.x,
+            top: CARD.y,
+            opacity: clamp01(nIn * 1.5),
+            transform: `translateY(${(1 - nIn) * 44}px) scale(${0.9 + 0.1 * nIn})`,
+          }}
+        >
+          <LockCard w={CARD.w} z={1} p={p} title={TASK} done={0} strike={0} />
+        </div>
+        {/* torch and camera, in the light-wallpaper style */}
+        {[46, SCREEN_W - 46 - 50].map((x, i) => (
+          <div key={x} style={{position: 'absolute', left: x, top: 770, width: 50, height: 50, borderRadius: 999, background: 'rgba(118,118,128,.16)', display: 'grid', placeItems: 'center'}}>
+            {i === 0 ? (
+              <svg width="13" height="24" viewBox="0 0 13 24">
+                <path d="M1.2 0.8h10.6c.4 0 .7.3.7.7v3.1c0 .3-.1.6-.3.8L10 7.9c-.2.3-.3.6-.3.9v13.4c0 .9-.7 1.6-1.6 1.6H4.9c-.9 0-1.6-.7-1.6-1.6V8.8c0-.3-.1-.6-.3-.9L.8 5.4C.6 5.2.5 4.9.5 4.6V1.5c0-.4.3-.7.7-.7z M6.5 11.6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 1 0 0-3z" fill="#1C1C1E" fillRule="evenodd" />
+              </svg>
+            ) : (
+              <svg width="26" height="20" viewBox="0 0 26 20">
+                <path d="M8.9 1.2h8.2c.8 0 1.5.4 1.9 1.1l1 1.7h2.7c1.6 0 2.8 1.3 2.8 2.8v9.6c0 1.6-1.3 2.8-2.8 2.8H3.3C1.7 19.2.5 17.9.5 16.4V6.8C.5 5.3 1.7 4 3.3 4H6l1-1.7c.4-.7 1.1-1.1 1.9-1.1z M13 6.4a5.2 5.2 0 1 0 0 10.4 5.2 5.2 0 1 0 0-10.4z M13 8.4a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 1 1 0-6.4z" fill="#1C1C1E" fillRule="evenodd" />
+              </svg>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* The right-hand phone: Lock Screen over Home Screen, the island over both. */
+const RightScreen16: React.FC<{f: number}> = ({f}) => {
+  const wake = ease(f, ARRIVE - 6, ARRIVE + 6);
+  return (
+    <div style={{position: 'absolute', inset: 0, background: '#FFFFFF'}}>
+      {f >= UNLOCK + 6 ? <HomeScreen16 f={f} /> : null}
+      <LockLayer16 f={f} />
+      <StatusBar16 color="#1C1C1E" />
       <div style={{position: 'absolute', inset: 0, background: '#000', opacity: 1 - wake}} />
     </div>
   );
@@ -849,14 +1162,13 @@ const LockScreen: React.FC<{f: number}> = ({f}) => {
 /* Camera: s = zoom, (fx, fy) = the point at frame centre. Each close-up
    centres its phone; the caption sits in the empty half beside it. */
 type Cam = {s: number; fx: number; fy: number};
-/* One phone at a time, low in the frame, its caption stacked above it; the
-   wide shot (both phones, the Live ring travelling between them) is the only
-   one that shows two. Phone centre (world y 675) lands at screen y 818. */
-const PHONE_S = 1.1;
-const PHONE_FY = 675 - (818 - H / 2) / PHONE_S;
-const CAM_WIDE: Cam = {s: 0.86, fx: (PL_CX + PR_CX) / 2, fy: 700};
-const CAM_L: Cam = {s: PHONE_S, fx: PL_CX, fy: PHONE_FY};
-const CAM_R: Cam = {s: PHONE_S, fx: PR_CX, fy: PHONE_FY};
+const CAM_WIDE: Cam = {s: 1, fx: W / 2, fy: H / 2};
+const CAM_L: Cam = {s: 1.28, fx: PL_CX, fy: H / 2};
+const CAM_R: Cam = {s: 1.28, fx: PR_CX, fy: H / 2};
+/* In on the Dynamic Island for the new ending: 2.18x puts the expanded
+   island at ~750px wide; the focus sits 200pt down the screen so the island
+   lands in the upper third with the home row under it. */
+const CAM_I: Cam = {s: 2.18, fx: PR_CX, fy: PTOP + PS.y + 200 * PS.z};
 const CAM_KEYS: Array<[number, Cam]> = [
   [LIVE_CUT + 12, CAM_WIDE],
   [LIVE_CUT + 38, CAM_L],
@@ -864,6 +1176,8 @@ const CAM_KEYS: Array<[number, Cam]> = [
   [GO + 30, CAM_WIDE],
   [ARRIVE + 2, CAM_WIDE],
   [ARRIVE + 28, CAM_R],
+  [UNLOCK + 22, CAM_R],
+  [ISL_IN + 44, CAM_I], // the push ends where it did; the extra second is held, not stretched
 ];
 const camAt = (f: number): Cam => {
   if (f <= CAM_KEYS[0][0]) return CAM_KEYS[0][1];
@@ -890,24 +1204,21 @@ const Caption: React.FC<{lines: string[]; f: number; start: number; x: number; a
 }) => {
   const fade = (1 - ease(f, out, out + 8)) * mul;
   if (f < start || fade <= 0) return null;
-  void x;
-  void align;
-  // vertical: stacked ABOVE the phone, centred
   return (
     <div
       style={{
         position: 'absolute',
-        top: 122,
-        left: 0,
-        right: 0,
+        top: H / 2,
+        ...(align === 'left' ? {left: x} : {right: W - x}),
+        transform: 'translateY(-50%)',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
+        alignItems: align === 'left' ? 'flex-start' : 'flex-end',
         opacity: fade,
       }}
     >
       {lines.map((line, i) => (
-        <Rise key={line} text={line} f={f} start={start + i * 5} step={3} style={{...sf(66, 1, 650), letterSpacing: '-0.025em', lineHeight: 1.1, color: DARK.ink}} />
+        <Rise key={line} text={line} f={f} start={start + i * 5} step={3} style={{...sf(54, 1, 650), letterSpacing: '-0.025em', lineHeight: 1.12, color: DARK.ink}} />
       ))}
     </div>
   );
@@ -927,7 +1238,11 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
   // the Go pill / Live switch sits left of centre in its row (the bin is on its right)
   const ctrlG = toGlobal(PL_CX, SCREEN_W / 2 - (12 + 44.4) / 2, CTRL_Y + 22.2);
   const cardG = toGlobal(PR_CX, CARD.x + CARD.w / 2, CARD.y + 48);
-  const checkG = toGlobal(PR_CX, CHECK_C[0], CHECK_C[1]);
+  // the ending's touch points, on the right-hand phone
+  const unlockA = toGlobal(PR_CX, SCREEN_W / 2, SCREEN_H - 14);
+  const unlockB = toGlobal(PR_CX, SCREEN_W / 2, SCREEN_H - 330);
+  const islandG = toGlobal(PR_CX, ISL.cx + 30, ISL.top + 18);
+  const islCheckG = toGlobal(PR_CX, ISL_CHECK[0], ISL_CHECK[1]);
 
   // the Live ring travelling from the switch to the Lock Screen
   const P0: P = [ctrlG[0] - 40, ctrlG[1] - 10];
@@ -975,12 +1290,12 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
     <Canvas p={p}>
       {rv.frame < 1 ? <AbsoluteFill style={{background: p.canvas, opacity: 1 - rv.frame, top: -extTop, height: H + extTop}} /> : null}
       <AbsoluteFill style={{transformOrigin: '0 0', transform: `translate(${W / 2 - cam.fx * cam.s}px, ${H / 2 - cam.fy * cam.s}px) scale(${cam.s})`}}>
-        <Phone left={PL_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame}>
+        <Phone16 left={PL_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame}>
           <AppScreen f={f} rv={rv} forceGo={forceGo} breathOv={breathOv} />
-        </Phone>
-        <Phone left={PR_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame} style={{opacity: rv.frame}}>
-          <LockScreen f={f} />
-        </Phone>
+        </Phone16>
+        <Phone16 left={PR_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame} style={{opacity: rv.frame}} over={<Island16 f={f} />}>
+          <RightScreen16 f={f} />
+        </Phone16>
         {rings(ctrlG, GO + 1, 120)}
         {dots}
         {f >= TA && f <= TB ? (
@@ -990,10 +1305,40 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
         ) : null}
         {rings(cardG, ARRIVE - 1, 240, 2)}
         {fingerAt(ctrlG, GO)}
-        {fingerAt(checkG, TICK)}
+        {/* unlock: up from the bottom edge, fast, like a real swipe home */}
+        {f >= UNLOCK - 4 && f <= UNLOCK + 22 ? (
+          <FingerOnLight
+            x={unlockA[0]}
+            y={lerp(unlockA[1], unlockB[1], ease(f, UNLOCK + 6, UNLOCK + 15, Easing.in(Easing.quad)))}
+            d={60}
+            opacity={ease(f, UNLOCK - 4, UNLOCK + 2) * (1 - ease(f, UNLOCK + 13, UNLOCK + 20))}
+            scale={1 - 0.08 * sp(f, UNLOCK + 2, 'press')}
+          />
+        ) : null}
+        {/* press the island, then the tick inside it */}
+        {[
+          [islandG, ISL_TAP],
+          [islCheckG, TICK],
+        ].map(([c, down]) => {
+          const [x, y] = c as P;
+          const d0 = down as number;
+          if (f < d0 - 12 || f > d0 + 14) return null;
+          return (
+            <FingerOnLight
+              key={d0}
+              x={x + lerp(40, 0, ease(f, d0 - 12, d0 - 1))}
+              y={y + lerp(46, 0, ease(f, d0 - 12, d0 - 1))}
+              d={30}
+              opacity={ease(f, d0 - 12, d0 - 7) * (1 - ease(f, d0 + 6, d0 + 14))}
+              scale={(1 - 0.08 * sp(f, d0, 'press')) * lerp(1, 1.15, ease(f, d0 + 6, d0 + 14))}
+              ripple={f >= d0 && f <= d0 + 16 ? (f - d0) / 16 : -1}
+            />
+          );
+        })}
       </AbsoluteFill>
       <Caption lines={['One task,', 'always in view.']} f={f} start={LIVE_CUT + 34} out={GO + 4} x={W / 2 - (PS.W * CAM_L.s) / 2 - 70} align="right" mul={capMul} />
-      <Caption lines={['Right on your', 'Lock Screen.']} f={f} start={ARRIVE + 22} x={W / 2 + (PS.W * CAM_R.s) / 2 + 70} align="left" />
+      <Caption lines={['Right on your', 'Lock Screen.']} f={f} start={ARRIVE + 22} out={UNLOCK + 4} x={W / 2 + (PS.W * CAM_R.s) / 2 + 70} align="left" />
+      <Caption lines={['And in the', 'Dynamic Island.']} f={f} start={ISL_IN + 14} x={W / 2 + (PS.w * CAM_I.s) / 2 + 70} align="left" />
     </Canvas>
   );
 };
@@ -1001,7 +1346,7 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
 /* ─── Back to the start: light floods out of the tick into frame 0 ──── */
 const FLOOD = {start: TICK + 28, end: TICK + 56};
 const FLOOD_R = 2300;
-const checkScreen = toScreen(toGlobal(PR_CX, CHECK_C[0], CHECK_C[1]), camAt(FLOOD.start));
+const checkScreen = toScreen(toGlobal(PR_CX, ISL_CHECK[0], ISL_CHECK[1]), camAt(FLOOD.start));
 
 /* ─── E: the typed "Go Live" becomes the button ─────────────────────────
    At the cut the Live section opens with its camera so far in on the Go
@@ -1027,7 +1372,7 @@ const labelAnchor = (): P => {
 const camButton = (): Cam => {
   // where SwipeScene leaves the words on screen (its final close-up)
   const sSw = CLOSE; // E's close-up never pushes in
-  const xSw = W / 2 - CL_OFF * PZ * sSw; // left edge of the words
+  const xSw = W / 2 - 26 * PZ * sSw; // left edge of the words
   const ySw = H / 2; // their centre line (the camera sits on it)
   const s = (16.4 * PZ * sSw) / (16.4 * PS.z);
   const [lx, ly] = labelAnchor();
@@ -1093,7 +1438,7 @@ const PromoE: React.FC<{variant: Variant; f0: number; ins?: boolean}> = ({varian
 const GOLIVE_CUT_D = GOLIVE.fade[1] + 43; // ~1.4 s alone on dark (Lucas)
 export const GOLIVE_HOLD = GOLIVE_CUT_D - LIVE_CUT; // D's Live section runs this much later
 export const DURATION = FLOOD.end + 2;
-export const PromoV: React.FC<{variant: Variant; transition?: Transition}> = ({variant, transition = 'line'}) => {
+export const Promo16: React.FC<{variant: Variant; transition?: Transition}> = ({variant, transition = 'line'}) => {
   const f0 = useCurrentFrame();
   if (transition === 'golive2' || transition === 'golive3') return <PromoE variant={variant} f0={f0} ins={transition === 'golive3'} />;
   const off = transition === 'golive' ? GOLIVE_HOLD : 0;
@@ -1113,19 +1458,3 @@ export const PromoV: React.FC<{variant: Variant; transition?: Transition}> = ({v
   );
 };
 
-
-/* The project page's phone hero: the vertical film with EXT_V px of empty
-   canvas on top, so it can run up under the nav bar while every caption and
-   headline of the film itself stays clear of it (the Live captions start
-   122px down the frame; at 390 css px wide the band is ~65 css px). Same
-   mechanism as the landscape PromoTall — see ExtTop. */
-export const EXT_V = 180;
-export const PromoVTall: React.FC<{variant: Variant; transition?: Transition}> = (props) => (
-  <ExtTop.Provider value={EXT_V}>
-    <AbsoluteFill style={{background: LIGHT.canvas}}>
-      <div style={{position: 'absolute', left: 0, top: EXT_V, width: W, height: H}}>
-        <PromoV {...props} />
-      </div>
-    </AbsoluteFill>
-  </ExtTop.Provider>
-);

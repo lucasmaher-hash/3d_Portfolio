@@ -132,9 +132,10 @@ spring-surface version (fluid.js, MIT) sat between the two and was rejected on t
 The rebuild of the Unify page from `unify-casestudy-plan.md` happens in a **separate, unlinked
 file** so it can be committed and deployed without anyone reaching it: Lucas views it at
 `lucasmaher.com/unify2d1.html`. **Nothing on the site may link to it** (no Craft dropdown entry, no
-landing tile, no prev/next), it carries `<meta name="robots" content="noindex, nofollow">`, and a
-fixed orange `.draft-flag` pill marks it. **The live `unify2d.html` is not touched until the draft
-is finished** — then the draft is copied over it and the flag + `noindex` removed.
+landing tile, no prev/next) and it carries `<meta name="robots" content="noindex, nofollow">`. (A
+fixed "Draft · not linked" pill used to mark it; removed 2026-10-05 at Lucas's request.) **The live
+`unify2d.html` is not touched until the draft is finished** — then the draft is copied over it and
+the `noindex` removed.
 
 It is a copy of `unify2d.html` (same head, nav, hero blob, scripts), so every Unify gotcha below
 still applies. The nav iframe recognises it because its checks are substring matches on
@@ -946,9 +947,11 @@ of view — `hero.getBoundingClientRect().bottom < 80` on scroll — so it never
 hero it exists to declutter. The active link is whichever section's top has most recently crossed
 35% down the viewport (a reading-position line, not "biggest on screen"), rAF-throttled. **Desktop
 only** (`display: none` below 1080px) — six lines plus a back link is exactly the clutter a phone's
-`.mobile-menu` already exists to avoid. Sits left of the `#scroll-track` (right edge) and clear of
-the fixed `.draft-flag` pill (bottom-left, `bottom: 16px`) — the sidebar's own `bottom: 96px` sits
-above it.
+`.mobile-menu` already exists to avoid. **Hidden wherever it would crowd the page's border line**
+(2026-10-05, Lucas): a resize/fonts-ready check measures the longest link ("CONSTRAINTS") against
+`.page-wrapper`'s left edge and adds `.is-cramped` (visibility: hidden — so it stays measurable)
+when it comes within 24px. Measured: hidden at 1280/1440/1512 (MacBook widths, where it ran into
+the border — visible once the hero film made that ground dark), shown from 1728 up.
 
 **Four gaps were widened individually, by name, not by touching a shared rule** (Lucas: 80% above
 "Why the 68% stopped trying" and above Research, 300% above "How the overlap is found"). Each is an
@@ -1060,6 +1063,59 @@ The posters stay the landscape ones (frame 0 is an empty canvas in both cuts). V
 390 touch → `tomorrow-promo-mobile-hero.mp4` in a 390×553 box from y=1, and
 `tomorrow-promo-mobile.mp4` in a 350×438 (0.800) tile; 1440 → the landscape files as before;
 all playing, no overflow, no console errors.
+
+**The site's colour is blue ×4 (2026-10-04, Lucas picked review render 4).** `BLUE` now defaults
+to 4 in `ui.tsx`, and all four site files (landscape, landscape tall, vertical, vertical tall) and
+both posters were re-rendered with it; pass `"blue": 1` for the original slate.
+
+**Alternate — `TomorrowPromo16` (`motion/src/Promo16.tsx`), review only, NOT on the site.** A
+copy of the landscape F (blue ×4) with modern phones and a longer ending (33.3 s):
+- **Frame**: no iPhone 16 mockup exists in the project, so it uses the only Dynamic-Island one,
+  `public/images/unify/iphone-17-frame.png` (copied to `motion/public/iphone17-frame.png`) —
+  its screen is the 16 Pro's 402×874pt (804×1748px at 2px/pt, hole radius 128px; its own island
+  at (201, 32.5)pt, 105.5×35.5).
+- **App screen re-laid** off Lucas's 16 Pro screenshot (1206×2622 → pt = px/3): status bar time
+  at x 63.7 / cluster at 326 on y 32.5; top bar row at 65.8; Live box (20.5, 290.3, 361×257.7);
+  controls at 566; tab bar at 874 − 34 − 51. `CUT_FIX` refit for it {textY 0.36, ringX 0.44,
+  ringY 0.09}: text matches in y, 0.39px in x; ring ≤0.1px.
+- **White Lock Screen** (dark text, light-style torch/camera discs; the Live Activity card keeps
+  the app's dark material) and a **white, minimal Home Screen** (one row: to.morrow — its real
+  icon, `motion/public/tomorrow-icon.webp` — Calendar, Notes, Photos; Search pill; dock with
+  Phone, Messages, Safari, Music; all generic drawings, not Apple artwork).
+- **New ending** (instead of the tick on the Lock Screen): swipe up from the bottom to unlock
+  (`UNLOCK`; the Lock Screen rides up and fades, the icons fly in from 1.12×), the island grows
+  into the compact Live Activity (`ISL_IN`; 190pt wide, Live ring leading, the title's first three
+  letters "Bri" trailing, right-aligned 14pt in so it clears the hardware cutout — Lucas), the camera pushes in
+  (`CAM_I`, 2.18×), the closed island is held ~2.7 s (1 s more than at first — Lucas), a press
+  squishes the island 4% (`ISL_TAP` = `ISL_IN` + 82) and on release it expands to
+  374×84pt, radius 40 (`ISL_EXP`), the task is ticked off on its right-hand button (`TICK`), the
+  island shuts (`ISL_DONE`) and light floods out of the tick to frame 0 as before. A third caption,
+  "And in the / Dynamic Island.", replaces "Right on your Lock Screen." for that part.
+- **Island motion** (researched — the morph-physics write-ups of community Dynamic Island
+  rebuilds): every footprint change is a damped spring, growth response .45 / damping .75 (a small
+  overshoot), collapse .40 / .90 (firmer); the island never scales its content — it clips it, the
+  old content blurring (≤6px) and fading out as the new content blurs and fades in a beat later.
+- **The island is drawn ABOVE the frame image** (`Phone16`'s `over` slot): beneath it, the
+  mockup's own island (a lens and highlights up to luminance 166) showed through ours as a second
+  shape. Over it, compact and expanded are one black. The status bar on these phones has no
+  cellular bars (they ran under the compact island's end — Lucas); Wi-Fi and battery stay put.
+- **The tick button springs** when pressed: squashed to 78% under the finger, then released on an
+  underdamped spring (response .38, damping .42, ~23% overshoot).
+- Touches on the white screens use a grey finger (`FingerOnLight`) — the film's half-white disc
+  vanishes on white.
+- **Render it through `src/tomorrow-entry.tsx`** (`npx remotion render src/tomorrow-entry.tsx
+  <id> out/<file>.mp4`): an entry with only the to.morrow compositions, so they render even while
+  `Root.tsx` carries unfinished work from elsewhere (the Unify promo imports modules that did not
+  exist yet on 2026-10-04 and broke the default bundle).
+- Review copy: `~/Downloads/tomorrow-promo-iphone16-island.mp4`.
+
+**Blue-intensity switch (review only, 2026-10-04).** `--props='{"variant":"A","transition":"golive3","blue":k}'`
+on any composition scales the chroma of every palette colour (`LIGHT`/`DARK`, `CHECK_RING`, the
+`Canvas` gradient stops, the box→ring colour) by k around its own luma — the slate's blue deepens,
+greys stay grey; the phone frame and Lock Screen wallpaper are untouched. No prop = k 1 = the
+site's videos exactly (`blueHex` returns its input). Four review renders of F at k 1.75 / 2.5 /
+3.25 / 4.0 are in `~/Downloads/tomorrow-promo-blue-1…4-x<k>.mp4` (light canvas 199,204,212 →
+197,204,218 / 191,204,223 / 188,204,229 / 186,206,236).
 
 **Only F is the site's version.** The A–D compositions were removed from `Root.tsx` and their
 renders deleted; E stays registered (F is built on it). Their branches (`variant` B/C, the `line`

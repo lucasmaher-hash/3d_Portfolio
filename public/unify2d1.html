@@ -1602,15 +1602,6 @@
        Plan: /unify-casestudy-plan.md. Every [ bracketed ] value and every
        .ph box is a placeholder waiting for a real study result or asset. */
 
-    /* Draft marker — only Lucas ever sees this page, so it can say so. */
-    .draft-flag {
-      position: fixed; left: 16px; bottom: 16px; z-index: 50;
-      font-family: 'VT323', monospace; font-size: 16px; letter-spacing: 0.06em;
-      text-transform: uppercase; color: #fff;
-      background: var(--accent-orange); border-radius: 999px;
-      padding: 4px 12px 3px; pointer-events: none;
-    }
-
     .cs-section { border-bottom: none; }
     .cs-section + .cs-section { padding-top: clamp(16px, 3vw, 32px); }
 
@@ -1641,6 +1632,11 @@
     .cs-map a:hover { color: var(--text-secondary); }
     .cs-map a.is-active { color: var(--text-primary); }
     @media (max-width: 1080px) { .cs-map { display: none; } }
+    /* Where the gutter is too narrow for its longest word to clear the page's
+       border line, the whole sidebar steps aside (Lucas) — set by the script at
+       the end of the page, which measures it. visibility, not display, so it
+       can still be measured. */
+    .cs-map.is-cramped { visibility: hidden; }
 
     /* .pilot-stats removed 2026-09-27 — it sat under "The idea" as results
        data (a two-week pilot can't exist before the app does), and its
@@ -2529,7 +2525,6 @@
       .fact-bar, .cs-grid-3 { grid-template-columns: minmax(0, 1fr); }
       .pivot-screens { gap: 10px; }
       .ph--chart { aspect-ratio: 4 / 3; }
-      .draft-flag { font-size: 14px; left: 10px; bottom: 10px; }
     }
   </style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
@@ -2537,7 +2532,6 @@
   <script src="/theme/theme.js" defer></script>
 </head>
 <body>
-  <div class="draft-flag">Draft · not linked</div>
   <iframe id="top-bar" src="/top_row_permanent_V3.html" allowtransparency="true" scrolling="no"></iframe>
 
   <div id="mobile-menu" class="mobile-menu">
@@ -4387,6 +4381,20 @@
         requestAnimationFrame(function () { syncActive(); ticking = false; });
       }, { passive: true });
       syncActive();
+
+      // Room check: the sidebar sits in the gutter left of the page's border
+      // line. Wherever its longest word would come within CLEAR px of that line
+      // (MacBook widths), the whole thing is hidden; on wider windows it shows.
+      var wrapper = document.querySelector('.page-wrapper');
+      var CLEAR = 24;
+      function fit() {
+        var right = 0;
+        links.forEach(function (a) { right = Math.max(right, a.getBoundingClientRect().right); });
+        map.classList.toggle('is-cramped', right + CLEAR > wrapper.getBoundingClientRect().left);
+      }
+      fit();
+      addEventListener('resize', fit);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);   // VT323 changes the widths
     })();
   </script>
 </body>
