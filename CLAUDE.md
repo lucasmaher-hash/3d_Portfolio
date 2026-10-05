@@ -1357,7 +1357,9 @@ timetable {start 270, end 525, top 0.93, curve 0.85} (an even 0.93 under the cap
 so it only fades in with the move to the course stop (`ttWash`, over ZOOM_COURSES) — before that
 nothing runs up under the caption. The detail stops sit a tenth of the frame (135px, `TT_NUDGE`)
 higher than the overview (Lucas: less gap between a caption and what it describes), easing up over
-the first zoom. On the first appearance all three timetable sections fade in together with the
+the first zoom. On top of that, per stop (Lucas): the room-number zoom a further tenth up
+(`ROOM_NUDGE`, with the zoom in/out) and the friends' timetable a tenth back down
+(`FRIENDS_TT_NUDGE`, from the zoom back out to the list on). On the first appearance all three timetable sections fade in together with the
 card (`blockT` = 1; they used to slide in one after another) — in every cut. **Tune them with `wash-tuner/`** (repo root — the Vite dev server serves it at
 `/wash-tuner/`, the build never ships it): real frames of the vertical cut rendered with no wash
 and no captions (`npx remotion still UnifyPromoV wash-tuner/f<N>.png --frame=<N>

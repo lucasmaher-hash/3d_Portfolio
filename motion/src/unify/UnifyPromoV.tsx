@@ -37,6 +37,10 @@ const TT_DY = 800 - H / 2; // the timetable's focus point, under its caption (th
    between a caption and what it describes); it moves up with the first zoom, so the
    overview card, the blob's landing and the captions stay where they were. */
 const TT_NUDGE = VH / 10;
+/* ...and per stop on top of that (Lucas): the room-number zoom another tenth up,
+   the friends' timetable a tenth back down; each moves with its own camera move. */
+const ROOM_NUDGE = -VH / 10;
+const FRIENDS_TT_NUDGE = VH / 10;
 const CN = {dx: VW / 2 - LEFT3, dy: 780 - H / 2}; // the connect card, then the customize character
 const MAP = {dx: VW / 2 - W / 2, dy: 675 - H / 2}; // the map, and the phone that closes round it (= the chat's phone)
 
@@ -138,7 +142,7 @@ export const UnifyPromoV: React.FC<{tune?: boolean}> = ({tune}) => {
 
         {/* 2 — the shared timetable, caption above */}
         {f >= T.CARD_IN0 && f < T.TT_OUT + 16 ? (
-          <Stage dx={ttDx} dy={TT_DY - TT_NUDGE * ease(f, T.ZOOM_TOP[0], T.ZOOM_TOP[1], Easing.inOut(Easing.cubic))}>
+          <Stage dx={ttDx} dy={TT_DY - TT_NUDGE * ease(f, T.ZOOM_TOP[0], T.ZOOM_TOP[1], Easing.inOut(Easing.cubic)) + ROOM_NUDGE * room + FRIENDS_TT_NUDGE * ease(f, T.ROOM_OUT[0], T.ROOM_OUT[1], Easing.inOut(Easing.cubic))}>
             <div style={{position: 'absolute', inset: 0, transform: boost !== 1 ? `scale(${boost})` : undefined, transformOrigin: `${ttCx(f)}px ${H / 2}px`}}>
               <TimetableScene f={f} />
             </div>
