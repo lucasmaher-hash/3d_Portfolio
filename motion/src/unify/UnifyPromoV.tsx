@@ -5,7 +5,7 @@ import {ChatScene} from './ChatScene';
 import {CampusMap, MAP_V} from './MapScene';
 import {APP_W, MapAppUI} from './MapUI';
 import {CREAM, DARK, ease, ExtTop, H, NUNITO, PINK, W, Wash, washStops, wordAnim} from './lib';
-import {charWidth, ConnectScene, CustomizeChar, CYCLE, FINAL_CHAR, LEFT3, T, TimetableScene, TT_CAPS, TT_SIL, ttCx, useFilmFrame} from './UnifyPromo';
+import {charWidth, ConnectScene, CustomizeChar, CYCLE, FINAL_CHAR, LEFT3, T, TimetableScene, TT_BLOCKS, TT_CAPS, ttCx, useFilmFrame} from './UnifyPromo';
 
 /* ─────────────────────────────────────────────────────────────────────────
    Unify — the VERTICAL cut, 1080x1350 (4:5) @ 30 fps, what phones get (the
@@ -102,11 +102,11 @@ export const UnifyPromoV: React.FC<{tune?: boolean}> = ({tune}) => {
   const f = useFilmFrame();
   const ext = React.useContext(ExtTop);
 
-  // the chat's blob lands on the timetable card where the TIMETABLE stage puts it (boosted)
-  const cardBox = {
-    x: W / 2 + (TT_SIL.x - W / 2) * BOOST, y: H / 2 + (TT_SIL.y - H / 2) * BOOST + (TT_DY - CHAT.dy),
-    w: TT_SIL.w * BOOST, h: TT_SIL.h * BOOST, r: TT_SIL.r * BOOST,
-  };
+  // the phone's screen splits into the timetable's sections where the TIMETABLE stage draws them (boosted)
+  const blocks = TT_BLOCKS.map((b) => ({
+    ...b, x: W / 2 + (b.x - W / 2) * BOOST, y: H / 2 + (b.y - H / 2) * BOOST + (TT_DY - CHAT.dy),
+    w: b.w * BOOST, h: b.h * BOOST, r: b.r * BOOST,
+  }));
   // the timetable stays centred: the landscape slide toward the left is undone
   const room = ease(f, T.ROOM_IN[0], T.ROOM_IN[1], Easing.inOut(Easing.cubic)) * (1 - ease(f, T.ROOM_OUT[0], T.ROOM_OUT[1], Easing.inOut(Easing.cubic)));
   const ttDx = VW / 2 - ttCx(f) + ROOM_DX * room;
@@ -136,7 +136,7 @@ export const UnifyPromoV: React.FC<{tune?: boolean}> = ({tune}) => {
         {/* 1 — the chat, the flood, the suck, the puff and the morph */}
         {f < T.CARD_IN1 + 4 ? (
           <Stage dx={CHAT.dx} dy={CHAT.dy}>
-            <ChatScene f={f} cardBox={cardBox} cardIn={[T.CARD_IN0, T.CARD_IN1]} vertical maxW={VW * 0.9} />
+            <ChatScene f={f} blocks={blocks} until={T.CARD_IN1} vertical maxW={VW * 0.9} />
           </Stage>
         ) : null}
 

@@ -112,7 +112,14 @@ const StatusIcons: React.FC<{u: number}> = ({u}) => (
 );
 
 /* `black` darkens the screen (the film's last frames end on a black phone; the first wake it) */
-export const Phone: React.FC<{cx: number; cy: number; black?: number; style?: CSS}> = ({cx, cy, black = 0, style}) => {
+/* The phone's screen hole as a box, for a phone centred on (cx, cy): r is its corner radius. */
+export const phoneScreen = (cx: number, cy: number) => ({
+  x: cx - PHONE_W / 2 + SCR.left * PHONE_W, y: cy - PHONE_H / 2 + SCR.top * PHONE_H,
+  w: SCR.w * PHONE_W, h: SCR.h * PHONE_H, r: 0.160891 * SCR.w * PHONE_W,
+});
+export const PHONE_FRAME_SRC = 'unify/iphone-17-frame.png';
+
+export const Phone: React.FC<{cx: number; cy: number; black?: number; style?: CSS; noFrame?: boolean}> = ({cx, cy, black = 0, style, noFrame}) => {
   const u = PHONE_W / 100;
   const bar = '#F7F7F8';
   return (
@@ -159,7 +166,7 @@ export const Phone: React.FC<{cx: number; cy: number; black?: number; style?: CS
         </div>
       </div>
       {black > 0 ? <ScreenHole style={{background: '#000', opacity: black}} /> : null}
-      <Img src={staticFile('unify/iphone-17-frame.png')} style={{position: 'absolute', inset: 0, width: '100%', height: '100%'}} />
+      {noFrame ? null : <Img src={staticFile(PHONE_FRAME_SRC)} style={{position: 'absolute', inset: 0, width: '100%', height: '100%'}} />}
     </div>
   );
 };

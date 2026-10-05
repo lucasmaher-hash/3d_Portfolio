@@ -2,7 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Easing, useCurrentFrame} from 'remotion';
 import {CampusMap} from './MapScene';
 import {Character, CharId, viewBox} from './Character';
-import {ChatScene, OPEN, SUCK} from './ChatScene';
+import {Block, ChatScene, OPEN, SUCK} from './ChatScene';
 import {ConnectCard, friendFigure, MC, MonsterCard, PANEL_H, PANEL_W} from './Connect';
 import {APP, clamp01, CREAM, DARK, ease, ExtTop, fullBg, H, lerp, NUNITO, PINK, POPB, sp, W, wordAnim} from './lib';
 import {PhoneFrameClose, SCREEN_H, SCREEN_W} from './Chat';
@@ -41,8 +41,9 @@ const P = SUCK.PUFF;
 export const T = {
   // timetable
   PUFF: P,
-  CARD_IN0: P + 10,
-  CARD_IN1: P + 24,
+  // the card's content fades in once the phone's screen has settled into its sections (ChatScene MORPH1 = P + 18)
+  CARD_IN0: P + 16,
+  CARD_IN1: P + 28,
   SLIDE: [P + 28, P + 50] as const, // the timetable lands centred, then makes room for its caption
   CAP_TT: P + 40,
   // the overview holds 1 s more; each stop holds ~20% + 0.3 s longer than the
@@ -254,11 +255,20 @@ const ttScreen = (f: number, px: number, py: number): Pt => {
   const c = ttCam(f);
   return [ttCx(f) + (px - c.x) * c.s, H / 2 + (py - c.y) * c.s];
 };
-/* the blob morphs into the pink panel at the overview (every section still closed) */
-export const TT_SIL = (() => {
+/* the timetable's three sections at the overview (every section still closed):
+   what the phone's screen splits into (ChatScene), to the pixel where the card draws them */
+export const TT_BLOCKS: Block[] = (() => {
   const s = 1.25;
   const L = ttLayout(0, 0, 0);
-  return {x: W / 2 - (377 / 2) * s, y: H / 2 - (L.h / 2) * s, w: 377 * s, h: L.pink * s, r: 22 * s};
+  const x = W / 2 - (377 / 2) * s;
+  const top = H / 2 - (L.h / 2) * s;
+  const r = 22 * s;
+  const w = 377 * s;
+  return [
+    {x, y: top, w, h: L.pink * s, r, color: PINK},
+    {x, y: top + L.breakTop * s, w, h: L.breakH * s, r, color: PINK},
+    {x, y: top + L.creamTop * s, w, h: L.creamH * s, r, color: CREAM},
+  ];
 })();
 
 /* What the caption says at each stop */
@@ -492,7 +502,7 @@ export const UnifyPromo: React.FC = () => {
         {f >= T.ZOOM1 && f < T.BOOM + 32 ? <div style={fullBg(ext, {background: PINK})} /> : null}
 
         {/* 1 — the chat, the flood, the suck, the puff and the morph */}
-        {f < T.CARD_IN1 + 4 ? <ChatScene f={f} cardBox={TT_SIL} cardIn={[T.CARD_IN0, T.CARD_IN1]} /> : null}
+        {f < T.CARD_IN1 + 4 ? <ChatScene f={f} blocks={TT_BLOCKS} until={T.CARD_IN1} /> : null}
 
         {/* 2 — the shared timetable */}
         <div style={{position: 'absolute', inset: 0, transform: ttDx + roomDx ? `translateX(${ttDx + roomDx}px)` : undefined}}>

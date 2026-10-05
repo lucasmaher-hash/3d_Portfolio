@@ -1,11 +1,16 @@
 import React from 'react';
 import {Easing} from 'remotion';
-import {BFS, bubbleH, COL_PAD, COL_W, IMG_W, ImgId, imgH, Message, MGAP, NAME_H, Phone} from './Chat';
-import {clamp01, CREAM, CSS, ease, H, lerp, MSGPOP, PINK, rnd, sp, W} from './lib';
+import {Img, staticFile} from 'remotion';
+import {BFS, bubbleH, COL_PAD, COL_W, IMG_W, ImgId, imgH, Message, MGAP, NAME_H, Phone, PHONE_FRAME_SRC, PHONE_H, PHONE_W, phoneScreen} from './Chat';
+import {clamp01, CSS, ease, lerp, mix, MSGPOP, rnd, W, H} from './lib';
 
 /* ─────────────────────────────────────────────────────────────────────────
    Scene 1 — the group chat (the case-study page's Problem animation, made
-   deterministic), the flood, and the suck into the shared timetable.
+   deterministic), the flood, and the hand-over to the shared timetable: the
+   messages are pulled INTO the phone, its screen clears, and the screen
+   itself splits into the timetable's three sections (Lucas, 2026-10-05: the
+   spiral → pink blob → puff → circle-to-card morph read as busy and the
+   circle never became the card; now one rounded rectangle becomes three).
 
    The column works like the page's: CENTRED on the screen, newest message at
    the bottom; each add re-lays the column rigidly (everything moves by half
@@ -153,7 +158,7 @@ const makeFlood = (g: FloodGrid): FloodItem[] => {
 const FLOOD = makeFlood(GRID_H);
 const FLOOD_V = makeFlood(GRID_V);
 
-/* ── The suck: everything spirals into the middle ──────────────────────── */
+/* ── The pull: everything is drawn into the phone's screen ──────────────── */
 const suckP = (f: number, seed: number) => {
   const d = 4 * rnd(seed * 11 + 7);
   return ease(f, SUCK.SUCK0 + d, SUCK.SUCK0 + d + SUCK.LEN, Easing.in(Easing.cubic));
@@ -166,7 +171,7 @@ const sucked = (f: number, c0: [number, number], r0: number, k0: number, seed: n
   const vx = (c0[0] - CHAT_C[0]) * inh;
   const vy = (c0[1] - CHAT_C[1]) * inh;
   const r = Math.hypot(vx, vy) * (1 - p);
-  const th = Math.atan2(vy, vx) + 1.15 * p * p;
+  const th = Math.atan2(vy, vx) + 0.35 * p * p; // a slight curve in, not a spiral
   const x = CHAT_C[0] + r * Math.cos(th);
   const y = CHAT_C[1] + r * Math.sin(th);
   const s = k0 * inh * Math.pow(1 - p, 1.25);
@@ -174,8 +179,8 @@ const sucked = (f: number, c0: [number, number], r0: number, k0: number, seed: n
     p,
     style: {
       position: 'absolute', left: 0, top: 0, transformOrigin: '0 0',
-      transform: `translate(${x}px, ${y}px) rotate(${r0 + 70 * p * p}deg) scale(${Math.max(0.001, s)}) translate(-50%, -50%)`,
-      opacity: 1 - ease(p, 0.8, 1),
+      transform: `translate(${x}px, ${y}px) rotate(${r0 * (1 - p)}deg) scale(${Math.max(0.001, s)}) translate(-50%, -50%)`,
+      opacity: 1 - ease(p, 0.5, 0.9), // gone before the screen starts to turn
     },
   };
 };
@@ -192,16 +197,23 @@ const popIn = (f: number, at: number, right: boolean): CSS => {
 
 export const chatElements = () => FLOOD.length;
 
+/* A timetable section the phone's screen becomes, in this scene's coordinates. */
+export type Block = {x: number; y: number; w: number; h: number; r: number; color: string};
+/* the hand-over: the screen clears over CLEAR frames before MORPH0, splits and
+   settles by MORPH1; the shapes stay until `until`, when the card covers them */
+export const MORPH0 = SUCK.SUCK0 + 18;
+export const MORPH1 = SUCK.PUFF + 18;
+const CLEAR = 8;
+
 export const ChatScene: React.FC<{
   f: number;
-  cardBox: {x: number; y: number; w: number; h: number; r: number};
-  cardIn: [number, number];
+  blocks: Block[];
+  until: number;
   vertical?: boolean;
   /* the widest the 3x opener may be: the vertical frame is narrower than it */
   maxW?: number;
-}> = ({f, cardBox, cardIn, vertical, maxW = Infinity}) => {
+}> = ({f, blocks, until, vertical, maxW = Infinity}) => {
   const sucking = f >= SUCK.INHALE;
-  const phone = sucked(f, CHAT_C, 0, 1, 999);
   const els: React.ReactNode[] = [];
 
   /* the opener's size: 3x, or as much as fits (the page's rule: min(3, width * .92 / bubble)) */
@@ -271,64 +283,54 @@ export const ChatScene: React.FC<{
     );
   });
 
-  /* the blob, the puff, the morph into the card */
-  const P = SUCK.PUFF;
-  // the blob gathers as the chat arrives, then gives one fat pulse — the puff
-  const bump = Math.sin(Math.PI * clamp01((f - P + 3) / 9));
-  const R = 74 * ease(f, SUCK.SUCK0 + 12, P + 2, Easing.out(Easing.cubic)) * (1 + 0.32 * bump);
-  const morph = f < P + 4 ? 0 : sp(f, P + 4, 'soft');
-  // the silhouette holds until the card is mostly in, so the two never wash each other out
-  const silhouetteO = 1 - ease(f, cardIn[0] + 6, cardIn[1] + 2);
-  const blob: React.ReactNode[] = [];
-  if (R > 0 && silhouetteO > 0) {
-    if (morph <= 0) {
-      const pts: string[] = [];
-      for (let j = 0; j <= 48; j++) {
-        const a = (j / 48) * Math.PI * 2;
-        const rr = R * (1 + 0.07 * Math.sin(6 * a + f * 0.45) + 0.04 * Math.sin(3 * a - f * 0.3));
-        pts.push(`${(CHAT_C[0] + rr * Math.cos(a)).toFixed(1)},${(CHAT_C[1] + rr * Math.sin(a)).toFixed(1)}`);
-      }
-      blob.push(
-        <svg key="blob" width={W} height={H} style={{position: 'absolute', inset: 0}}>
-          <polygon points={pts.join(' ')} fill={PINK} />
-        </svg>,
-      );
-    } else {
-      const x = lerp(CHAT_C[0] - R, cardBox.x, morph);
-      const y = lerp(CHAT_C[1] - R, cardBox.y, morph);
-      const w = lerp(2 * R, cardBox.w, morph);
-      const h = lerp(2 * R, cardBox.h, morph);
-      const r = lerp(R, cardBox.r, clamp01(morph));
-      blob.push(<div key="sil" style={{position: 'absolute', left: x, top: y, width: Math.max(0, w), height: Math.max(0, h), borderRadius: r, background: PINK, opacity: silhouetteO}} />);
-    }
-  }
-  const puffT = ease(f, P, P + 18, Easing.out(Easing.cubic));
-  if (f >= P && puffT < 1) {
-    for (let j = 0; j < 16; j++) {
-      const a = (j / 16) * Math.PI * 2 + rnd(j + 40) * 0.5;
-      const dist = 60 + (190 + 140 * rnd(j + 50)) * puffT;
-      const rr = (26 + 30 * rnd(j + 60)) * (1 - puffT) + 1;
-      blob.push(
-        <div
-          key={`p${j}`}
-          style={{
-            position: 'absolute', left: CHAT_C[0] + dist * Math.cos(a) - rr, top: CHAT_C[1] + dist * Math.sin(a) - rr,
-            width: rr * 2, height: rr * 2, borderRadius: '50%', background: j % 3 === 2 ? CREAM : PINK, opacity: 1 - puffT * puffT,
-          }}
-        />,
-      );
-    }
-  }
+  /* the phone: a small gulp as the chat goes in, its screen clears, then the
+     screen splits into the timetable's sections while the frame dissolves */
+  const gulp = 1 + 0.03 * Math.sin(Math.PI * clamp01((f - SUCK.SUCK0 - 2) / 10));
+  const scr = phoneScreen(CHAT_C[0], CHAT_C[1]);
+  const clear = ease(f, MORPH0 - CLEAR, MORPH0, Easing.inOut(Easing.quad));
+  const frameO = 1 - ease(f, MORPH0, MORPH0 + 12, Easing.in(Easing.quad));
+  const frameS = 1 + 0.06 * ease(f, MORPH0, MORPH0 + 12, Easing.out(Easing.quad));
+  const phoneBox: CSS = {position: 'absolute', left: CHAT_C[0] - PHONE_W / 2, top: CHAT_C[1] - PHONE_H / 2, width: PHONE_W, height: PHONE_H};
+  // shape: a smooth ease, no overshoot; colour: white to the sections' own by 60% of the move
+  const mt = ease(f, MORPH0, MORPH1, Easing.bezier(0.65, 0, 0.35, 1));
+  const ct = ease(f, MORPH0, MORPH0 + (MORPH1 - MORPH0) * 0.6, Easing.inOut(Easing.quad));
+  const total = blocks.reduce((a, b) => a + b.h, 0);
+  let acc = 0;
+  const parts = blocks.map((b, i) => {
+    // at the start the sections tile the screen top to bottom (heights in proportion);
+    // only the outer corners carry the screen's radius
+    const h0 = (scr.h * b.h) / total;
+    const y0 = scr.y + (scr.h * acc) / total;
+    acc += b.h;
+    const rt = lerp(i === 0 ? scr.r : 0, b.r, mt);
+    const rb = lerp(i === blocks.length - 1 ? scr.r : 0, b.r, mt);
+    return (
+      <div
+        key={`part${i}`}
+        style={{
+          position: 'absolute', left: lerp(scr.x, b.x, mt), top: lerp(y0, b.y, mt), width: lerp(scr.w, b.w, mt), height: lerp(h0, b.h, mt),
+          borderRadius: `${rt}px ${rt}px ${rb}px ${rb}px`, background: mix('#FFFFFF', b.color, ct),
+        }}
+      />
+    );
+  });
 
   return (
     <>
-      {phone.p < 1 ? (
-        <div style={phone.style}>
-          <Phone cx={0} cy={0} black={1 - ease(f, 0, 10, Easing.out(Easing.quad))} />
+      {f < MORPH0 ? (
+        <div style={{position: 'absolute', inset: 0, transform: `scale(${gulp})`, transformOrigin: `${CHAT_C[0]}px ${CHAT_C[1]}px`}}>
+          <Phone cx={CHAT_C[0]} cy={CHAT_C[1]} black={1 - ease(f, 0, 10, Easing.out(Easing.quad))} noFrame />
+          {clear > 0 ? <div style={{position: 'absolute', left: scr.x, top: scr.y, width: scr.w, height: scr.h, borderRadius: scr.r, background: '#fff', opacity: clear}} /> : null}
+        </div>
+      ) : null}
+      {f >= MORPH0 && f <= until ? parts : null}
+      {frameO > 0 ? (
+        <div style={{...phoneBox, transform: `scale(${(f < MORPH0 ? gulp : 1) * frameS})`, opacity: frameO}}>
+          <Img src={staticFile(PHONE_FRAME_SRC)} style={{position: 'absolute', inset: 0, width: '100%', height: '100%'}} />
         </div>
       ) : null}
       {els}
-      {blob}
     </>
   );
 };
+

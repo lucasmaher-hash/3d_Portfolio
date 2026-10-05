@@ -1455,8 +1455,14 @@ scenes scale them:
   student's different app, built in `motion/unify-tt-source.html` and captured over CDP at 2x
   into `public/unify/tt-flood-*.webp` (sizes in `Chat.tsx`'s `IMGS`).
 
-Story: chat → flood around it → everything spirals into the centre, a pink blob puffs and morphs
-into the timetable, landing centred, which then slides to the left third as its caption rises
+Story: chat → flood around it → everything is pulled INTO the phone (a slight curve, straightening
+as it goes; a small gulp), its screen clears to white, and the screen itself splits into the
+timetable's three sections — courses, break, activity — compressing and separating into the
+card's blocks while turning pink/cream and the bezel dissolves (`ChatScene` MORPH0→MORPH1; the
+target boxes are `TT_BLOCKS`, exactly where the card draws them, so the card's content just fades
+in over them). This replaced spiral → pink blob → puff → circle-to-card (Lucas, 2026-10-05: busy,
+and a circle never reads as becoming a card). The card lands centred, then slides to the left
+third as its caption rises
 → the camera goes in: days (tap Tuesday, then Wednesday — the film's Wednesday is Ergonomics plus
 the app's own Wednesday course CAD Modeling under it) → the camera scrolls DOWN to CAD Modeling
 and only its friends bounce in (Lucas: the course-overlap beat must read apart from the day
