@@ -12,6 +12,7 @@
   <!-- Roboto Flex is the site's body face; added for .card-description, which no
        longer uses the VT323 pixel font (headings still do). -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="/fonts/roboto-flex-ui.css" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A-BT';
@@ -30,7 +31,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; }
-    body { background: var(--bg-base); font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; padding: 32px; display: flex; justify-content: center; }
+    body { background: var(--bg-base); font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; padding: 32px; display: flex; justify-content: center; }
 
     /* Body copy is Roboto Flex at EVERY width, not just on phones. The mobile
        block below already made this switch and explains why (real body copy
@@ -505,6 +506,10 @@
       .touch-joystick-thumb { box-shadow: 1.95px 1.95px 4.55px rgba(174,174,192,0.65), -1.95px -1.95px 4.55px rgba(255,255,255,1); }
       .touch-swipe, .touch-tap { box-shadow: 3.25px 3.25px 7.8px rgba(174,174,192,0.65), -3.25px -3.25px 7.8px rgba(255,255,255,1); }
     }
+  
+    /* Former pixel-font labels that are buttons or carry weight: one step
+       heavier than body text so they still read as UI (Lucas, 2026-10-06). */
+    .card-title { font-weight: 500; }
   </style>
   <!-- Dark mode, decided by the 3D page around this frame — see /theme/overlay-theme.js -->
   <link rel="stylesheet" href="/theme/dark-3d-overlays.css" />

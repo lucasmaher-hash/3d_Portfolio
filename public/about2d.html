@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="/fonts/roboto-flex-ui.css" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A-BT';
@@ -182,7 +183,7 @@
 
     .item-label {
       flex: 1;
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 20px;
       line-height: 1.1;
       color: var(--text-primary);
@@ -198,7 +199,7 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 22px;
       color: #f0f0f2;
       pointer-events: none;
@@ -318,7 +319,7 @@
 
     .mobile-mode-btn {
       border: none; background: transparent; border-radius: 9999px;
-      padding: 11px 0; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
+      padding: 11px 0; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
          line-height, so a segment's text box is identical to a nav button's. The
          segment keeps 11px vertical padding, which is exactly what makes the TRACK
          come out level with a nav button: the track adds its own 5px padding top and
@@ -387,7 +388,7 @@
     .mobile-nav-btn {
       display: block; background: var(--bg-surface); border-radius: 9999px;
       box-shadow: var(--shadow-raised-sm);
-      padding: 16px 24px; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
+      padding: 16px 24px; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
       color: #555; text-transform: uppercase; text-decoration: none;
       text-align: center; cursor: pointer;
       -webkit-tap-highlight-color: transparent;
@@ -515,6 +516,27 @@
         box-shadow: inset -3.25px -3.25px 6.5px 0 rgba(255,255,255,1), inset 3.25px 3.25px 6.5px 0 rgba(174,174,192,0.6);
       }
     }
+  
+    /* Former pixel-font labels that are buttons or carry weight: one step
+       heavier than body text so they still read as UI (Lucas, 2026-10-06). */
+    .mobile-nav-btn,
+    .mobile-mode-btn,
+    .item-label,
+    .pill__seg,
+    .machine-overlay-btn { font-weight: 500; }
+  
+    /* Contact links under Design Philosophy (2026-10-06): plain body text —
+       same face, size and weight as the page's running text — spread evenly
+       across the column. */
+    .about-links {
+      display: flex; justify-content: space-between;
+      padding: 8px 24px 0;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
+      font-size: 15px; font-weight: 400; line-height: 1.7;
+    }
+    .about-links a { color: var(--text-secondary); text-decoration: none; transition: color 150ms ease; }
+    .about-links a:hover { color: var(--text-primary); text-decoration: underline; text-underline-offset: 3px; }
+    @media (max-width: 640px) { .about-links { font-size: 16px; padding: 4px 8px 0; } }
   </style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
@@ -608,6 +630,18 @@
                   <p style="margin-top: 12px;">I work at the intersection of bold aesthetics and real problem-solving. I'm not afraid to experiment, to try what hasn't been done, or to borrow from unexpected places. The best ideas often live at the edges — between physical and digital, between 2D and 3D, between what exists and what could.</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Contact merged into About (2026-10-06, Lucas): the contact page's
+               three links as plain text, spread evenly under Design Philosophy.
+               The email href is set by the script below (split address, as on
+               contact2d.html, so the raw HTML never holds an "@"). -->
+          <div class="anim anim-5">
+            <div class="about-links">
+              <a href="#" id="email-link" data-i18n="label-email">Email</a>
+              <a href="https://www.linkedin.com/in/lucas-maher-5b53163bb/" target="_blank" rel="noopener">LinkedIn</a>
+              <a href="https://www.instagram.com/lucas.maher.visuals" target="_blank" rel="noopener">Instagram</a>
             </div>
           </div>
 
@@ -782,6 +816,7 @@
         'label-things-i-love': 'Things I Love',
         'love-text': '<p>What excites me most right now is spatial computing — VR & AR. The idea that digital experiences can exist in three-dimensional space, that you can step inside a design rather than just look at it through a screen, feels like the most radical shift in how humans interact with technology. I want to be at the forefront of that.</p><p style="margin-top:12px;">Outside of that, I find a lot of inspiration in film — the way directors use composition, light, and pacing to guide attention and evoke emotion isn\'t so different from what we do as designers. And sport keeps me grounded: the discipline, the consistency, the reminder that good results come from showing up every day.</p>',
         'label-design-philosophy': 'Design Philosophy',
+        'label-email': 'Email',
         'philosophy-text': '<p>Design that only looks good has already failed. I came to this field from fine art and craft — and that background taught me one thing above all: beauty without purpose is decoration, not design.</p><p style="margin-top:12px;">I work at the intersection of bold aesthetics and real problem-solving. I\'m not afraid to experiment, to try what hasn\'t been done, or to borrow from unexpected places. The best ideas often live at the edges — between physical and digital, between 2D and 3D, between what exists and what could.</p>',
       },
       de: {
@@ -791,6 +826,7 @@
         'label-things-i-love': 'Interessen',
         'love-text': '<p>Am meisten begeistert mich gerade Spatial Computing — VR & AR. Dass digitale Erlebnisse im Raum existieren und man ein Design betreten kann, statt es nur am Bildschirm zu sehen, ist für mich der radikalste Umbruch im Umgang mit Technik. Da will ich vorne dabei sein.</p><p style="margin-top:12px;">Viel Inspiration finde ich im Film — wie Regisseure Komposition, Licht und Rhythmus einsetzen, um Aufmerksamkeit zu lenken und Emotionen zu wecken, ist gar nicht so weit von unserer Arbeit entfernt. Und Sport hält mich geerdet: Disziplin, Konsequenz, tägliches Dranbleiben.</p>',
         'label-design-philosophy': 'Designphilosophie',
+        'label-email': 'E-Mail',
         'philosophy-text': '<p>Design, das nur gut aussieht, hat bereits versagt. Ich komme aus Kunst und Handwerk — und das hat mich vor allem eines gelehrt: Schönheit ohne Zweck ist Dekoration, kein Design.</p><p style="margin-top:12px;">Ich arbeite zwischen mutiger Ästhetik und echter Problemlösung. Ich experimentiere gern, probiere Unerprobtes und schaue mir anderswo etwas ab. Die besten Ideen entstehen oft an den Rändern — zwischen physisch und digital, zwischen 2D und 3D, zwischen dem, was ist, und dem, was sein könnte.</p>',
       }
     };
@@ -963,5 +999,14 @@
     })();
   </script>
 
+  <script>
+    /* Email href assembled at runtime so the raw HTML never contains the
+       address (same as contact2d.html). */
+    (function () {
+      var user = 'lucas.maher.design', domain = 'gmail.com';
+      var link = document.getElementById('email-link');
+      if (link) link.href = 'mailto:' + user + '@' + domain;
+    })();
+  </script>
 </body>
 </html>

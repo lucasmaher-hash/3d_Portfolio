@@ -147,6 +147,15 @@ and in the pages that say "VT323" describe the old state.
 and mobile (markup + both `tagline1` keys). Only the "More about me →" link is left in
 `.tagline-block`. (For a few minutes "pixel" was set in VT323 as a word play — that went with it.)
 
+## About + Contact merged (2026-10-06, Lucas) — in progress
+
+`about2d.html` now ends with the contact page's three links — Email / LinkedIn / Instagram — as
+plain body text (`.about-links`: Roboto Flex 15px / 16px on phones, weight 400, secondary grey,
+underline on hover), spread evenly (`space-between`) under Design Philosophy, fading in as
+`.anim-5`. The email `href` is assembled at runtime from a split address, as on `contact2d.html`.
+`label-email` added to About's `TRANSLATIONS` (Email / E-Mail). The nav's Contact link and
+`contact2d.html` itself are unchanged pending Lucas's call.
+
 ## Page map
 
 | File | What it is |
@@ -801,6 +810,18 @@ NOT mirrored: videos left, text right, matching the live page's own alternation)
   own side padding. Below 1280 nothing changed. Measured: text at 401/271/241 at 1920/1440/1280,
   headings and dividers on the same line; 1279 and 1100 identical to before. The block is the last rule
   in `<style>`.
+  **On a MacBook-shaped SCREEN the inset is 112px, not 160** (2026-10-06, Lucas: started at the midpoint
+  120, then dialled in to 112 on his 1280×832 MacBook). It is `--page-pad` (160 on `:root`, 112 on `html[data-screen="macbook"]`);
+  an inline `<head>` script sets that attribute when `screen` is landscape at 1.45:1–1.7:1 — the
+  SCREEN, not the window, because a MacBook browser window is ~1.8:1, as wide as a 16:9 monitor's.
+  The dev dial that set it is removed; `dev-tuner/save-server.mjs` (generic POST → `dev-tuner/<name>.json`,
+  port 5175) stays for the next tuner.
+  **The same format is on ALL six project pages** (2026-10-06, Lucas): unify2d, virtual_cooking2d,
+  kaffeemaschine2d, mac-lamp2d, vaccine2d, to-shove2d each carry the same `<head>` screen script and,
+  last in `<style>`, `--page-pad` + `@media (min-width: 1280px) { .page-wrapper > :is(.section,
+  .guide-section, .process-section, .hero-top) { padding-inline: var(--page-pad) } .page-wrapper >
+  .scrolly .scrolly-sticky { … } }`. Heroes/films/project-nav untouched. Measured: titles at 271
+  (1440, wide screen) / 193 (1280, MacBook) / 127 (1100, unchanged) on all six, no new overflow.
 - **"Before and after the home screen" (2026-10-05, Lucas)** — a second `.res-block` in Results,
   right after the pie: paired bars (`.ba-chart`, reusing `.chart-key/-track/-fill/-val`), opens per
   person per week on ONE 0–10 scale (`--v` = value × 10), grey = week 1 without the home screen,

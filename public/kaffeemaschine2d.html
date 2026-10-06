@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script>
+  <script>/* MacBook-shaped screen (landscape, 1.45:1-1.7:1) -> html[data-screen="macbook"], read by --page-pad. Before first paint so the column never jumps. */(function(){try{var w=screen.width,h=screen.height,r=w/h;if(w>h&&r>=1.45&&r<1.7)document.documentElement.setAttribute('data-screen','macbook')}catch(e){}})()</script>
   <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
   <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
@@ -12,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="/fonts/roboto-flex-ui.css" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A-BT';
@@ -164,7 +166,7 @@
       background: none;
       border: none;
       padding: 0;
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 28px;
       letter-spacing: 0.06em;
       color: var(--text-primary);
@@ -190,7 +192,7 @@
     .project-header { display: flex; flex-direction: column; gap: 16px; }
 
     .breadcrumb {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 14px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -255,7 +257,7 @@
     }
 
     .meta-label {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 24px;
       color: var(--accent-orange);
       text-transform: uppercase;
@@ -295,7 +297,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 22px;
       color: var(--text-primary);
       flex-shrink: 0;
@@ -473,14 +475,14 @@
     }
 
     .project-nav-number {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(14px, 1.5vw, 18px);
       color: var(--text-secondary);
       letter-spacing: 1px;
     }
 
     .project-nav-label {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(14px, 1.5vw, 18px);
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -695,7 +697,7 @@
 
     .mobile-mode-btn {
       border: none; background: transparent; border-radius: 9999px;
-      padding: 11px 0; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
+      padding: 11px 0; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
          line-height, so a segment's text box is identical to a nav button's. The
          segment keeps 11px vertical padding, which is exactly what makes the TRACK
          come out level with a nav button: the track adds its own 5px padding top and
@@ -764,7 +766,7 @@
     .mobile-nav-btn {
       display: block; background: var(--bg-surface); border-radius: 9999px;
       box-shadow: var(--shadow-raised-sm);
-      padding: 16px 24px; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
+      padding: 16px 24px; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
       color: #555; text-transform: uppercase; text-decoration: none;
       text-align: center; cursor: pointer;
       -webkit-tap-highlight-color: transparent;
@@ -1036,6 +1038,34 @@
         --shadow-raised: 5.2px 5.2px 11.7px rgba(174,174,192,0.65), -5.2px -5.2px 11.7px rgba(255,255,255,1);
         --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
       }
+    }
+  
+    /* Former pixel-font labels that are buttons or carry weight: one step
+       heavier than body text so they still read as UI (Lucas, 2026-10-06). */
+    .meta-label,
+    .step-badge,
+    .project-nav-label,
+    .project-nav-number,
+    .mobile-nav-btn,
+    .mobile-mode-btn,
+    .pill__seg,
+    .machine-overlay-btn { font-weight: 500; }
+  
+    /* ── Inset content column from 1280px up (2026-10-06, Lucas) ───────────
+       The format from the Unify case-study draft (unify2d1.html): every
+       content section's side padding goes from 80px to --page-pad — 160px on
+       a wide monitor, 112px on a MacBook-shaped SCREEN (Lucas's dialled
+       value). "MacBook-shaped" is the screen's ratio, not the window's (a
+       MacBook browser window is as wide as a 16:9 monitor's): the inline
+       script at the top of <head> sets html[data-screen="macbook"] for a
+       landscape screen between 1.45:1 and 1.7:1. Full-bleed heroes, films
+       and the project nav are untouched; the scrollys carry their padding
+       on their sticky child. Below 1280px nothing changes. */
+    :root { --page-pad: 160px; }
+    html[data-screen="macbook"] { --page-pad: 112px; }
+    @media (min-width: 1280px) {
+      .page-wrapper > :is(.section, .guide-section, .process-section, .hero-top) { padding-inline: var(--page-pad); }
+      .page-wrapper > .scrolly .scrolly-sticky { padding-inline: var(--page-pad); }
     }
   </style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
@@ -1629,7 +1659,7 @@
       var style = document.createElement('style');
       // Both shadows are gated on .is-raised — see updateExitShadow() below.
       // The transform lift is NOT gated: it works on any background.
-      style.textContent = '.exit-3d-btn{position:fixed;top:24px;left:24px;z-index:10000;background:var(--bg-surface);border:none;border-radius:9999px;padding:10px 24px;font-family:"Roboto Flex",sans-serif;font-size-adjust:0.4;font-size:16px;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-primary);box-shadow:none;cursor:pointer;text-decoration:none;transition:left 200ms ease, transform 150ms ease, box-shadow 260ms cubic-bezier(.2,.7,.2,1);}.exit-3d-btn.is-raised{box-shadow:var(--shadow-raised-sm);}.exit-3d-btn:hover{transform:translateY(-2px) scale(1.03);transition:left 200ms ease, transform 150ms ease, box-shadow 150ms ease;}.exit-3d-btn.is-raised:hover{box-shadow:11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);}';
+      style.textContent = '.exit-3d-btn{position:fixed;top:24px;left:24px;z-index:10000;background:var(--bg-surface);border:none;border-radius:9999px;padding:10px 24px;font-family:"Roboto Flex UI","Roboto Flex",sans-serif;font-size-adjust:0.4;font-weight:500;font-size:16px;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-primary);box-shadow:none;cursor:pointer;text-decoration:none;transition:left 200ms ease, transform 150ms ease, box-shadow 260ms cubic-bezier(.2,.7,.2,1);}.exit-3d-btn.is-raised{box-shadow:var(--shadow-raised-sm);}.exit-3d-btn:hover{transform:translateY(-2px) scale(1.03);transition:left 200ms ease, transform 150ms ease, box-shadow 150ms ease;}.exit-3d-btn.is-raised:hover{box-shadow:11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);}';
       style.textContent += /* keyframes start AND end in the :hover pose: an animation replaces the
          whole transform, so plain scale(1) frames made the button first DROP
          out of its hover lift on click. The mouse is on the button when this

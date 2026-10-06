@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script>
+  <script>/* MacBook-shaped screen (landscape, 1.45:1-1.7:1) -> html[data-screen="macbook"], read by --page-pad. Before first paint so the column never jumps. */(function(){try{var w=screen.width,h=screen.height,r=w/h;if(w>h&&r>=1.45&&r<1.7)document.documentElement.setAttribute('data-screen','macbook')}catch(e){}})()</script>
   <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
   <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
@@ -23,6 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&family=Nunito:wght@300;500;700;800&display=swap" rel="stylesheet" />
+  <link href="/fonts/roboto-flex-ui.css" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A-BT';
@@ -257,7 +259,7 @@
     .project-header { display: flex; flex-direction: column; gap: 16px; }
 
     .breadcrumb {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 14px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -322,7 +324,7 @@
     }
 
     .meta-label {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 24px;
       color: var(--accent-ink);   /* pink type is always the readable ink, never the pale fill */
       text-transform: uppercase;
@@ -370,7 +372,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 22px;
       color: var(--text-primary);
       flex-shrink: 0;
@@ -407,7 +409,7 @@
     }
 
     .glance-label {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 17px;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -825,14 +827,14 @@
     }
 
     .project-nav-number {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(14px, 1.5vw, 18px);
       color: var(--text-secondary);
       letter-spacing: 1px;
     }
 
     .project-nav-label {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(14px, 1.5vw, 18px);
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -887,7 +889,7 @@
 
     .mobile-mode-btn {
       border: none; background: transparent; border-radius: 9999px;
-      padding: 11px 0; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
+      padding: 11px 0; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
          line-height, so a segment's text box is identical to a nav button's. The
          segment keeps 11px vertical padding, which is exactly what makes the TRACK
          come out level with a nav button: the track adds its own 5px padding top and
@@ -956,7 +958,7 @@
     .mobile-nav-btn {
       display: block; background: var(--bg-surface); border-radius: 9999px;
       box-shadow: var(--shadow-raised-sm);
-      padding: 16px 24px; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
+      padding: 16px 24px; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
       color: #555; text-transform: uppercase; text-decoration: none;
       text-align: center; cursor: pointer;
       -webkit-tap-highlight-color: transparent;
@@ -1073,7 +1075,7 @@
     }
 
     .color-swatch-code {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(13px, 1.5vw, 16px);
       font-weight: 500;
       color: rgba(255, 255, 255, 0.8);
@@ -1082,7 +1084,7 @@
     }
 
     .color-label {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: clamp(13px, 1.5vw, 16px);
       color: var(--text-primary);
       text-align: center;
@@ -1721,7 +1723,7 @@
       display: flex; flex-direction: column; gap: 10px;
     }
     .cs-map a {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 16px; letter-spacing: 0.04em;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 16px; letter-spacing: 0.04em;
       text-transform: uppercase; color: var(--text-tertiary); text-decoration: none;
       transition: color 200ms ease;
     }
@@ -1761,7 +1763,7 @@
     }
     .fact-label { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
     .fact-src {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 15px; letter-spacing: 0.04em;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 15px; letter-spacing: 0.04em;
       text-transform: uppercase; color: var(--text-secondary); opacity: 0.8;
     }
 
@@ -1779,14 +1781,14 @@
     .ph--tall   { aspect-ratio: 4 / 5; }
     .ph--phone  { aspect-ratio: 876 / 1808; border-radius: 28px; }
     .ph-tag {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 18px; letter-spacing: 0.06em;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 18px; letter-spacing: 0.06em;
       text-transform: uppercase; color: var(--accent-ink);
     }
     .ph-desc { font-size: 13px; line-height: 1.5; color: var(--text-secondary); max-width: 40ch; }
 
     /* Caption: states the finding, never decorates. */
     .cs-caption {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 17px; line-height: 1.3;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 17px; line-height: 1.3;
       letter-spacing: 0.02em; color: var(--text-secondary);
       margin-top: -8px;
     }
@@ -1815,7 +1817,7 @@
     .pivot-compare { display: flex; flex-direction: column; gap: clamp(24px, 4vw, 44px); }
     .pivot-row { display: flex; flex-direction: column; gap: 14px; }
     .pivot-label {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 18px; letter-spacing: 0.06em;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 18px; letter-spacing: 0.06em;
       text-transform: uppercase; color: var(--text-secondary);
     }
     .pivot-label b { color: var(--accent-ink); font-weight: 400; }
@@ -1984,7 +1986,7 @@
        invented usability iteration). */
     .cs-table { width: 100%; border-collapse: collapse; font-size: 14px; color: var(--text-secondary); }
     .cs-table th {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 17px; font-weight: 400;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 17px; font-weight: 400;
       letter-spacing: 0.04em; text-transform: uppercase; text-align: left;
       color: var(--text-primary); padding: 10px 12px 10px 0;
       border-bottom: 1px solid var(--border-color);
@@ -1995,7 +1997,7 @@
        broken column rather than a deliberate one. `.num` cells override to
        right below. */
     .cs-table td { padding: 10px 12px 10px 0; border-bottom: 1px dotted var(--border-color); text-align: left; }
-    .cs-table td.num, .cs-table th.num { text-align: right; font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 18px; }
+    .cs-table td.num, .cs-table th.num { text-align: right; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 18px; }
     .cs-table tr.is-highlight td { color: var(--text-primary); }
     .cs-table tr.is-highlight td.num:last-child { color: var(--accent-ink); }
 
@@ -2652,7 +2654,7 @@
     }
     .voice p { font-size: 14.4px; line-height: 1.6; color: var(--text-primary); }
     .voice cite {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-style: normal; font-size: 16px;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-style: normal; font-size: 16px;
       letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary);
     }
     @media (max-width: 860px) {
@@ -2690,11 +2692,20 @@
        default resolution and wider); below that the page keeps its old
        padding. The components that carried this inset themselves (and the
        scrollys' own side padding) give it back here, or it would apply twice. */
+    /* --page-pad: 160px on wide monitors; on a MacBook-shaped SCREEN
+       (2026-10-06, Lucas) it is the midpoint between the old pages' 80px and
+       this 160px, i.e. 120px — then dialled to 112px by Lucas. "MacBook-shaped" is the SCREEN's ratio, not
+       the window's (a MacBook browser window is ~1.8:1, as wide as a 16:9
+       monitor's) — the inline script at the top of <head> sets
+       html[data-screen="macbook"] for a landscape screen between 1.45:1 and
+       1.7:1 (every MacBook is ~1.54-1.6). */
+    :root { --page-pad: 160px; }
+    html[data-screen="macbook"] { --page-pad: 112px; }   /* dialled in by Lucas, 2026-10-06 */
     @media (min-width: 1280px) {
-      .cs-section:not(#top) { padding-inline: 160px; }
+      .cs-section:not(#top) { padding-inline: var(--page-pad); }
       /* and the header block above the sections too (Lucas): breadcrumb,
          title + divider, the lead line and the meta tiles */
-      .hero-top, #top, .page-wrapper > .section { padding-inline: 160px; }
+      .hero-top, #top, .page-wrapper > .section { padding-inline: var(--page-pad); }
       .stat-block { padding-inline: 0; }
       /* the scrollys carried their own 80px of side padding on top of the
          section's; that now IS the section's, so it goes */
@@ -2743,7 +2754,18 @@
       .feature-row + .scrolly,
       .scrolly + .scrolly { margin-top: clamp(40px, 5.5vw, 80px); }
     }
-</style>
+
+    /* Former pixel-font labels that are buttons or carry weight: one step
+       heavier than body text so they still read as UI (Lucas, 2026-10-06). */
+    .meta-label,
+    .step-badge,
+    .project-nav-label,
+    .project-nav-number,
+    .mobile-nav-btn,
+    .mobile-mode-btn,
+    .pill__seg,
+    .machine-overlay-btn { font-weight: 500; }
+  </style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
   <script src="/theme/theme.js" defer></script>
@@ -3948,7 +3970,7 @@
       var style = document.createElement('style');
       // Both shadows are gated on .is-raised — see updateExitShadow() below.
       // The transform lift is NOT gated: it works on any background.
-      style.textContent = '.exit-3d-btn{position:fixed;top:24px;left:24px;z-index:10000;background:var(--bg-surface);border:none;border-radius:9999px;padding:10px 24px;font-family:"Roboto Flex",sans-serif;font-size-adjust:0.4;font-size:16px;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-primary);box-shadow:none;cursor:pointer;text-decoration:none;transition:left 200ms ease, transform 150ms ease, box-shadow 260ms cubic-bezier(.2,.7,.2,1);}.exit-3d-btn.is-raised{box-shadow:var(--shadow-raised-sm);}.exit-3d-btn:hover{transform:translateY(-2px) scale(1.03);transition:left 200ms ease, transform 150ms ease, box-shadow 150ms ease;}.exit-3d-btn.is-raised:hover{box-shadow:11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);}';
+      style.textContent = '.exit-3d-btn{position:fixed;top:24px;left:24px;z-index:10000;background:var(--bg-surface);border:none;border-radius:9999px;padding:10px 24px;font-family:"Roboto Flex UI","Roboto Flex",sans-serif;font-size-adjust:0.4;font-weight:500;font-size:16px;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-primary);box-shadow:none;cursor:pointer;text-decoration:none;transition:left 200ms ease, transform 150ms ease, box-shadow 260ms cubic-bezier(.2,.7,.2,1);}.exit-3d-btn.is-raised{box-shadow:var(--shadow-raised-sm);}.exit-3d-btn:hover{transform:translateY(-2px) scale(1.03);transition:left 200ms ease, transform 150ms ease, box-shadow 150ms ease;}.exit-3d-btn.is-raised:hover{box-shadow:11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);}';
       style.textContent += /* keyframes start AND end in the :hover pose: an animation replaces the
          whole transform, so plain scale(1) frames made the button first DROP
          out of its hover lift on click. The mouse is on the button when this

@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap"
     rel="stylesheet" />
+  <link href="/fonts/roboto-flex-ui.css" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'OCR-A BT';
@@ -164,7 +165,7 @@
     .lang-btn {
       background: none;
       border: none;
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 14px;
       color: var(--text-secondary);
       cursor: pointer;
@@ -180,7 +181,7 @@
     }
 
     .lang-sep {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 14px;
       color: var(--text-secondary);
       opacity: 0.5;
@@ -247,7 +248,7 @@
       min-width: 70px;
       padding: 6px 18px;
       border-radius: 18px;
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 16px;
       color: var(--text-secondary);
       background: transparent;
@@ -348,7 +349,7 @@
 
     .craft-dropdown-item {
       padding: 7px 14px;
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 16px;
       color: #111114;
       text-transform: uppercase;
@@ -410,7 +411,7 @@
          properties were dropped when the logo text became an <img>), so the "?"
          must set the pixel font itself or it renders in system sans. The
          explicit colour also overrides iOS's default blue button text. */
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 18px;
       line-height: 1;
       color: var(--text-primary);
@@ -504,6 +505,13 @@
         --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
       }
     }
+  
+    /* Former pixel-font labels that are buttons or carry weight: one step
+       heavier than body text so they still read as UI (Lucas, 2026-10-06). */
+    .pill__seg,
+    .craft-dropdown-item,
+    .help-btn,
+    #help-fab { font-weight: 500; }
   </style>
   <link rel="stylesheet" href="/theme/dark-mobile.css" />
   <script>
