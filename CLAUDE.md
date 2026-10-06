@@ -155,9 +155,26 @@ underline on hover), spread evenly (`space-between`) under Design Philosophy, fa
 `.anim-5`. The email `href` is assembled at runtime from a split address, as on `contact2d.html`.
 `label-email` added to About's `TRANSLATIONS` (Email / E-Mail). **`contact2d.html` is DELETED**,
 and "Contact" is gone from the nav bar (`top_row_permanent_V3.html`'s `pill__seg`) and from every
-burger menu (index.html + all 2D pages), with the menus' `/contact2d.html` click branches. Left on
-purpose: `contact3d.html`, which the 3D world's contact wall plaque still opens; the now-unused
-`menu-contact`/`contact` translation keys and the nav's `isContact2D` checks are inert.
+burger menu (index.html + all 2D pages), with the menus' `/contact2d.html` click branches. The 3D side
+followed the same day: `about3d.html` carries the same three links (same CSS, underline drawn left
+to right on hover; Email hands its `mailto:` to the top document via `window.top.openExternalScheme`
+because mobile Safari drops a mailto from inside a frame), and the **contact wall plaque is gone**:
+`removeContactPlaque()` in `src/main.js` takes `WallIcon_Mail` out of the scene at load (render,
+raycast, collision), it left `CONTENT` and `POP_ENABLED`, and its "contact" caption left
+`ROOM_TITLES` — code only, no GLB re-export. `contact3d.html` is now unreachable but kept; the
+`menu-contact`/`contact` keys and the nav's `isContact2D` checks are inert. The links on both About
+pages draw their underline left → right on hover (`background-size` 0 → 100% over 320ms).
+**Nav About pill:** its segment's side padding is `--about-pad` 10.5px (dialled in by Lucas; was 14),
+also the underline's inset.
+
+## Craft / Projekte nav item removed (2026-10-06, Lucas)
+
+"Craft" (DE "Projekte") is gone from the nav bar (2D and 3D) and every burger menu — the home
+page's grid already lists every project, and prev/next covers moving between them. The nav is now
+the logo, the 2D/3D toggle and "About" alone. Inert leftovers on purpose: the `#craft-dropdown`
+markup and its init script (it returns early with no `[data-page="craft"]` segment), the menus'
+`craft` click branches, the `menu-craft`/`craft` translation keys, and `craft3d.html` (no longer
+opened from anywhere).
 
 ## Page map
 
@@ -421,7 +438,7 @@ section on the page behaves, not with Problem's specially-inset finding block.
 
 **The Problem section's evidence is one bar, after Jessica Im's tax case study** (2026-09-26,
 Lucas's reference): a VT323 kicker, a headline that STATES the finding with its number in it, then `.statbar` — its labels and the brace text set at the HEADLINE’s own ramp, `clamp(22px, 2.5vw, 32px)` (Lucas asked twice; caption-sized numbers read as a footnote) — a single track split into the share who
-coordinate by texting (pink) and the share who have stopped trying (empty), with a thick black `.statbar-brace`
+coordinate by texting (pink) and the share who have stopped trying (since 2026-10-06 a flat solid block in the app's dark `#292925`, no pressed well, its number and words in one light `#EDEDEF` — Lucas), with a thick black `.statbar-brace`
 under everything that came to nothing — the failed texting AND the ones who never tried — carrying
 the headline's figure, nothing else. **There is no paragraph between the
 headline and the bar** (Lucas: "do you even need it") — it only repeated what the bar already
@@ -556,6 +573,17 @@ bars (`v1-*-bar.webp`) sit on top at the bottom. Building screens are full 720×
 button's height (top 41cqw) → timetable (left 55%, top 5cqw), phones 26% wide. Pivot: all five at
 17% wide, staggered tops -7 / 15 / 3 / 25 / -3 cqw. `.wf-*` and `.v1-collage*` CSS marked UNUSED.
 Everything below about `.wf-frame` and `.v1-collage` is history.
+**The Idea scene's two phones were then replaced by the bare Figma frames** (2026-10-06, Lucas):
+`fig-connect.webp` (the Connect now card alone, node 971:2102) and `fig-timetable.webp` (frame
+971:2165, Lucas's copy of the edited 302:4445) from the Figma file `unify` (fZpKZpih18tEiVkeYPoCWs), exported at 4x, no phone around them
+(`.v1-card`: 28% of the canvas wide, the Connect card 32%; the exports come with square light-grey/black
+corners, so each was given an alpha mask at its own corner radius — 89px at 4x — when saved; drop shadow). **The timetable frame was edited IN FIGMA first** (several rounds with Lucas): rows are now Interface
+Design 08:15–09:45 1.019 (3 friends) / **Break 11:30–12:00 Mensa** (the Connect now window, 5 friends:
+Paul, Zoe, Luis, Tom, Paula) / Materials & Processes 12:00–13:30 1.035 (2) / **Book Club 18:00–19:30
+Library** (the blue row, a free-time uni activity). Prototyping Lab was removed. Rows 1–2 are clones of
+the original "open blue" row 302:4763 (swapping the variant lost the chips' icons); unused friend
+chips are hidden, not deleted. Frame is 368×557. Re-export the same two nodes if the Figma changes. The Pivot collage still uses the old v1
+screen exports.
 
 **`.wf-frame`: two CONSTRUCTED wireframes under "Who's free now", built the same day as the cut
 above, after Lucas pointed at a Jessica Im case-study screenshot as the exact reference** (two

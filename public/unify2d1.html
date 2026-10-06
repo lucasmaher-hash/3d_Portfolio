@@ -1912,6 +1912,11 @@
     .v1s-scroll { height: auto; margin-top: var(--y, 0%); }
     .v1s-bar { position: absolute; left: 0; bottom: 0; }
     .v1-arrow { position: absolute; width: 7%; height: auto; }
+    /* a bare Figma frame (no phone): 28% of the canvas wide, its own shape;
+       the exports' square corners were cut to the frames' own rounding
+       (alpha mask, r 89 of 1408/1472 at 4x) when they were saved */
+    .v1-card { position: absolute; width: 28%; height: auto; display: block;
+      filter: drop-shadow(0 1.2cqw 2.4cqw rgba(0, 0, 0, .18)); }
 
     /* UNUSED as of 2026-10-06 (replaced by .v1-scene), see CLAUDE.md */
     .v1-collage {
@@ -2616,7 +2621,9 @@
     .statbar { width: 100%; }
     .statbar-track {
       display: flex; height: clamp(64px, 7vw, 96px); border-radius: 16px; overflow: hidden;
-      background: var(--bg-surface); box-shadow: var(--shadow-pressed);
+      /* the "stopped trying" part is a solid block in the app's own dark
+         #292925, flat — no pressed well (Lucas, 2026-10-06) */
+      background: #292925;
     }
     .statbar-seg {
       width: calc(var(--w) * 1%);
@@ -2627,7 +2634,9 @@
       white-space: nowrap; overflow: hidden;
     }
     .statbar-seg b { font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: clamp(22px, 2.5vw, 32px); font-weight: 400; color: var(--text-primary); }
-    .statbar-seg.is-main { background: var(--accent-orange); color: #4a2338; border-radius: 16px; }
+    /* text on the dark part: one light shade for number and words alike */
+    .statbar-seg:not(.is-main), .statbar-seg:not(.is-main) b { color: #EDEDEF; }
+    .statbar-seg.is-main { background: var(--accent-orange); color: #4a2338; }
     .statbar-seg.is-main b { color: #4a2338; }
     /* the brace: two ticks and a rule under the span it names */
     .statbar-brace { position: relative; height: 128px; }
@@ -2783,7 +2792,6 @@
         <button class="mobile-mode-btn" data-theme-choice="light" aria-label="Hell"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="5" y="3" width="3" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="0" y="6" width="2" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="11" y="6" width="2" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="3" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="1" y="11" width="1" height="1"/><rect x="6" y="11" width="1" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/></svg></button>
         <button class="mobile-mode-btn" data-theme-choice="dark" aria-label="Dunkel"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="0" width="5" height="1"/><rect x="2" y="1" width="4" height="1"/><rect x="1" y="2" width="4" height="1"/><rect x="1" y="3" width="3" height="1"/><rect x="0" y="4" width="4" height="1"/><rect x="0" y="5" width="4" height="1"/><rect x="0" y="6" width="4" height="1"/><rect x="0" y="7" width="4" height="1"/><rect x="0" y="8" width="5" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="1" y="9" width="6" height="1"/><rect x="10" y="9" width="2" height="1"/><rect x="1" y="10" width="11" height="1"/><rect x="2" y="11" width="9" height="1"/><rect x="4" y="12" width="5" height="1"/></svg></button>
       </div>
-      <a class="mobile-nav-btn" data-page="craft" data-i18n="menu-craft">Craft</a>
       <a class="mobile-nav-btn" data-page="about" data-i18n="menu-about">About</a>
       <!-- Language toggle. Deliberately the SAME component as the 2D/3D toggle
            above — same two classes, no styling of its own — so the pair can
@@ -2999,16 +3007,17 @@
       <h3 class="cs-sub">Who's free now</h3>
       <p class="guide-text">I wanted two ways into the same overlap, not one screen doing both jobs. Connect now is the glance — who is free right now, and until when, answered before you have typed anything. Tap open Calendar and it opens into the full week: everyone's actual timetable, side by side, for the times a two-second glance can't answer.</p>
 
-      <!-- 2026-10-06 (Lucas): the hand-built wireframes are gone. This is the
-           real v1 Figma export, two screens upright in one fixed-aspect canvas
-           that scales like an image (everything inside is in cqw / %), the
-           phones running off the bottom edge. --y is where the long export's
-           window starts, in % of the screen's width. -->
-      <div class="v1-scene v1-scene--idea" role="img" aria-label="The v1 design: the home screen's Connect now card, showing who is free from 11:30 till 12:00, and an arrow from its open Calendar button to the full timetable it opens into.">
+      <!-- 2026-10-06 (Lucas): the two v1 frames straight from the Figma file
+           (unify: the Connect now card 971:2102 and the timetable 971:2165,
+           exported at 4x) — just the frames, no phone around
+           them. In the Figma file the rows became Interface Design / Break /
+           Materials & Processes / Book Club, with fewer friends on most. Fixed-aspect canvas, cqw units,
+           scales like an image. -->
+      <div class="v1-scene v1-scene--idea" role="img" aria-label="The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, and an arrow from its open Calendar button to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, and the evening's Book Club.">
         <div class="v1-canvas">
-          <div class="v1-phone " style="left: 19%; top: 12cqw;"><img class="v1s-scroll" src="/images/unify/v1/v1-home.webp" alt="" style="--y: -65%;" /></div>
-          <div class="v1-phone " style="left: 55%; top: 5cqw;"><img class="v1s-scroll" src="/images/unify/v1/v1-timetable.webp" alt="" style="--y: 0%;" /></div>
-          <svg class="v1-arrow" style="left: 46.5%; top: 41cqw;" viewBox="0 0 60 12" aria-hidden="true"><path d="M0 6 H57 M51 1 L57 6 L51 11" fill="none" stroke="#2010FF" stroke-width="1.6"/></svg>
+          <img class="v1-card" src="/images/unify/v1/fig-connect.webp?v=2" alt="" style="left: 13%; top: 13.1cqw; width: 32%;" />
+          <img class="v1-card" src="/images/unify/v1/fig-timetable.webp?v=3" alt="" style="left: 55%; top: 6.9cqw;" />
+          <svg class="v1-arrow" style="left: 47%; top: 40.1cqw; width: 6%;" viewBox="0 0 60 12" aria-hidden="true"><path d="M0 6 H57 M51 1 L57 6 L51 11" fill="none" stroke="#2010FF" stroke-width="1.6"/></svg>
         </div>
       </div>
 

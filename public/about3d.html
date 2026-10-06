@@ -246,6 +246,23 @@
        heavier than body text so they still read as UI (Lucas, 2026-10-06). */
     .mobile-nav-btn,
     .item-label { font-weight: 500; }
+
+    /* Contact links (2026-10-06): plain body text, spread evenly, the
+       underline drawn left to right on hover — same as about2d.html. */
+    .about-links {
+      display: flex; justify-content: space-between;
+      padding: 8px 24px 0;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
+      font-size: 15px; font-weight: 400; line-height: 1.7;
+    }
+    .about-links a {
+      color: var(--text-secondary); text-decoration: none;
+      background: linear-gradient(currentColor, currentColor) left bottom / 0% 1px no-repeat;
+      padding-bottom: 2px;
+      transition: color 150ms ease, background-size 320ms cubic-bezier(.4, 0, .2, 1);
+    }
+    .about-links a:hover { color: var(--text-primary); background-size: 100% 1px; }
+    @media (prefers-reduced-motion: reduce) { .about-links a { transition: color 150ms ease; } }
   </style>
   <!-- Dark mode, decided by the 3D page around this frame — see /theme/overlay-theme.js -->
   <link rel="stylesheet" href="/theme/dark-3d-overlays.css" />
@@ -300,6 +317,17 @@
         </div>
       </div>
 
+      <!-- Contact merged into About (2026-10-06): the three links as plain
+           text, spread evenly, as on about2d.html. Email's href is assembled
+           at runtime and handed to the top document on click (mobile Safari
+           drops a mailto: launched from inside a frame) — same as the old
+           contact3d.html. -->
+      <div class="about-links">
+        <a href="#" id="email-link" target="_top" data-i18n="label-email">Email</a>
+        <a href="https://www.linkedin.com/in/lucas-maher-5b53163bb/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.instagram.com/lucas.maher.visuals" target="_blank" rel="noopener">Instagram</a>
+      </div>
+
     </div>
 
   </div>
@@ -315,6 +343,7 @@
           'label-things-i-love': 'Interessen',
           'love-text': '<p>Am meisten begeistert mich gerade Spatial Computing — VR & AR. Dass digitale Erlebnisse im Raum existieren und man ein Design betreten kann, statt es nur am Bildschirm zu sehen, ist für mich der radikalste Umbruch im Umgang mit Technik. Da will ich vorne dabei sein.</p><p style="margin-top:12px;">Viel Inspiration finde ich im Film — wie Regisseure Komposition, Licht und Rhythmus einsetzen, um Aufmerksamkeit zu lenken und Emotionen zu wecken, ist gar nicht so weit von unserer Arbeit entfernt. Und Sport hält mich geerdet: Disziplin, Konsequenz, tägliches Dranbleiben.</p>',
           'label-design-philosophy': 'Designphilosophie',
+          'label-email': 'E-Mail',
           'philosophy-text': '<p>Design, das nur gut aussieht, hat bereits versagt. Ich komme aus Kunst und Handwerk — und das hat mich vor allem eines gelehrt: Schönheit ohne Zweck ist Dekoration, kein Design.</p><p style="margin-top:12px;">Ich arbeite zwischen mutiger Ästhetik und echter Problemlösung. Ich experimentiere gern, probiere Unerprobtes und schaue mir anderswo etwas ab. Die besten Ideen entstehen oft an den Rändern — zwischen physisch und digital, zwischen 2D und 3D, zwischen dem, was ist, und dem, was sein könnte.</p>'
         },
         en: {
@@ -324,6 +353,7 @@
           'label-things-i-love': 'Things I Love',
           'love-text': '<p>What excites me most right now is spatial computing — VR & AR. The idea that digital experiences can exist in three-dimensional space, that you can step inside a design rather than just look at it through a screen, feels like the most radical shift in how humans interact with technology. I want to be at the forefront of that.</p><p style="margin-top:12px;">Outside of that, I find a lot of inspiration in film — the way directors use composition, light, and pacing to guide attention and evoke emotion isn\'t so different from what we do as designers. And sport keeps me grounded: the discipline, the consistency, the reminder that good results come from showing up every day.</p>',
           'label-design-philosophy': 'Design Philosophy',
+          'label-email': 'Email',
           'philosophy-text': '<p>Design that only looks good has already failed. I came to this field from fine art and craft — and that background taught me one thing above all: beauty without purpose is decoration, not design.</p><p style="margin-top:12px;">I work at the intersection of bold aesthetics and real problem-solving. I\'m not afraid to experiment, to try what hasn\'t been done, or to borrow from unexpected places. The best ideas often live at the edges — between physical and digital, between 2D and 3D, between what exists and what could.</p>'
         }
       };
@@ -388,6 +418,20 @@
       if (window.ResizeObserver) new ResizeObserver(report).observe(el);
       window.addEventListener('load', report);
       report();
+    })();
+  </script>
+  <script>
+    (function () {
+      var user = 'lucas.maher.design', domain = 'gmail.com';
+      var link = document.getElementById('email-link');
+      if (!link) return;
+      link.href = 'mailto:' + user + '@' + domain;
+      link.addEventListener('click', function (e) {
+        if (window.top === window) return;
+        var fn; try { fn = window.top.openExternalScheme; } catch (err) { return; }
+        if (typeof fn !== 'function') return;
+        e.preventDefault(); fn(link.href);
+      });
     })();
   </script>
 </body>

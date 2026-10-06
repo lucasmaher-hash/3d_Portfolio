@@ -1788,7 +1788,8 @@ const CONTENT = {
   // (contact3d.html / about3d.html) and leaving the room for them would be a
   // one-way trip. `action` instead of `url`; both are handled in the click
   // handler below, and both plaques are in POP_ENABLED so they press first.
-  'WallIcon_Mail':       { title: 'Contact', action: () => openContact() },
+  // WallIcon_Mail (the contact plaque) is removed from the scene at load
+  // since 2026-10-06 — Contact was merged into About (see removeContactPlaque).
   'WallIcon_Logo':       { title: 'About',   action: () => openAbout() },
 }
 
@@ -1957,9 +1958,24 @@ const ROOM_TITLES = [
   // Plaque captions. Angles match WallIcon_Mail / WallIcon_Logo exactly; y is
   // just under each plaque's lower edge (plaques span y 1.89–2.61 after the
   // +0.30 raise on 2026-08-28).
-  wallLabel('contact', 126.975, 1.60),
   wallLabel('about',   138.225, 1.60),
 ]
+
+// The contact plaque (WallIcon_Mail, the envelope between the mac-lamp and
+// packaging doors) is taken out of the scene at load (2026-10-06, Lucas):
+// Contact was merged into About, so only the About plaque stays. Removed in
+// code rather than in the .blend, so no GLB re-export; it is gone from the
+// render, the raycast and CONTENT alike. Its "contact" caption went from
+// ROOM_TITLES too.
+function removeContactPlaque(model) {
+  const hits = []
+  model.traverse(o => { if (o.name === 'WallIcon_Mail' || (o.parent && o.parent.name === 'WallIcon_Mail')) hits.push(o) })
+  const root = hits.find(o => o.name === 'WallIcon_Mail')
+  if (root && root.parent) root.parent.remove(root)
+  for (let i = clickables.length - 1; i >= 0; i--) if (hits.includes(clickables[i])) clickables.splice(i, 1)
+  for (let i = collidables.length - 1; i >= 0; i--) if (hits.includes(collidables[i])) collidables.splice(i, 1)
+  console.log('Contact-Plakette entfernt:', !!root)
+}
 
 function addRoomTitles(model) {
   new TTFLoader().load('/Roboto-Regular.ttf', ttf => {
@@ -2119,6 +2135,7 @@ loader.load(
     // Pixel-font room titles above each room entrance — same timing
     // requirement (positions are model-local + model.position).
     addRoomTitles(model)
+    removeContactPlaque(model)
 
     const fixedClearance = size.y * 0.20
     const roofCutoff     = size.y * 0.35  // obere 35% = Dach, wird ausgeschlossen
@@ -2298,7 +2315,7 @@ const POP_ENABLED = new Set([
   // Wall plaques — centre-anchored: they are flat against the wall, so growing
   // about the middle keeps them centred in their panel. The extra depth goes
   // INTO the wall, which is already where their back face sits.
-  'WallIcon_Mail', 'WallIcon_Logo',
+  'WallIcon_Logo',
 ])
 // Objects that sit ON a surface (podium, table): the pop scales about the
 // bbox's BOTTOM centre instead of its middle, so they grow upward and their

@@ -286,9 +286,12 @@
     }
 
     /* ── Nav-pill variant: underline-active instead of pressed ── */
+    /* The About pill's width (2026-10-06) is set by the segment's side
+       padding, --about-pad (10.5px, dialled in by Lucas; was 14): the underline's inset uses the
+       same value, so it always spans exactly the label at any width. */
     .nav-pill .pill__seg {
       min-width: 0;
-      padding: 6px 14px 4px;
+      padding: 6px var(--about-pad, 10.5px) 4px;
       border-radius: 0;
       position: relative;
     }
@@ -296,8 +299,8 @@
     .nav-pill .pill__seg::after {
       content: '';
       position: absolute;
-      left: 14px;
-      right: 14px;
+      left: var(--about-pad, 10.5px);
+      right: var(--about-pad, 10.5px);
       bottom: 2px;
       height: 1px;
       background: var(--text-primary);
@@ -583,7 +586,6 @@
       <!-- Right side: nav + hamburger + help button -->
       <div class="nav-right">
         <nav class="pill nav-pill" role="tablist" aria-label="Primary">
-          <a href="#" class="pill__seg" role="tab" aria-selected="false" data-page="craft">Craft</a>
           <a href="#" class="pill__seg" role="tab" aria-selected="false" data-page="about">About</a>
         </nav>
         <button class="logo help-btn" id="help-btn" aria-label="Help">?</button>
