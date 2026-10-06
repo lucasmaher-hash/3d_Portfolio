@@ -213,7 +213,11 @@ down, half the hero's size (`--bh: clamp(220px, 25vw, 340px)`, the hero clamp ha
 scale and width (Lucas: "taller without making him bigger") — bottom-right
 of "What we learned", its head sunk into the line above the next-project panel so it pokes up out
 of it; the paragraphs make room on its left, and below 640px it gets its own space under the text.
-Same Figma paths as the hero; an inner `<g>` rotates it 180° about (370, 328), which maps the box
+**Its height follows the text** (2026-10-06, Lucas): a script at the end of `<body>` measures the first
+paragraph and sets the svg so its top sits at that paragraph's vertical middle at every width; the
+width (`--blob-w`) stays fixed so the eyes keep their size, and only the straight body below them
+grows or shrinks — the `viewBox` height U (min 600 units, else the cut reaches the eyes) and the
+path's straight sides lengthened by `U − 864`, rebuilt in JS. Phones keep the default. Same Figma paths as the hero; an inner `<g>` rotates it 180° about (370, 328), which maps the box
 x -10–750, y -104–760 onto itself, so that box is the viewBox (x to 750 because the right eye bulges
 past the body). The pupil script drives both blobs from one set of listeners, each through its own
 coordinate space (the hero's `<svg>`, the rotated `<g>` — its `getScreenCTM` includes the turn).
@@ -582,8 +586,21 @@ Design 08:15–09:45 1.019 (3 friends) / **Break 11:30–12:00 Mensa** (the Conn
 Paul, Zoe, Luis, Tom, Paula) / Materials & Processes 12:00–13:30 1.035 (2) / **Book Club 18:00–19:30
 Library** (the blue row, a free-time uni activity). Prototyping Lab was removed. Rows 1–2 are clones of
 the original "open blue" row 302:4763 (swapping the variant lost the chips' icons); unused friend
-chips are hidden, not deleted. Frame is 368×557. Re-export the same two nodes if the Figma changes. The Pivot collage still uses the old v1
-screen exports.
+chips are hidden, not deleted. Frame is 368×557. Re-export the same two nodes if the Figma changes. The Connect card's button reads "open Timetable" (changed in Figma, was "open Calendar"), and the hand-off
+is drawn over the canvas as one SVG in canvas units (`.v1-handoff`, viewBox 100×56.25): a pink ring round
+the button, a cursor clicking it, and an arrow curving from the ring into the timetable.
+**The Pivot section is ONE image composed in Figma** (`v1-collage.webp`, 3200×1800, from frame
+"v1 collage (website)" 977:2543 on "design old" — 1600×900, filled with the canvas blue). It is
+assembled from the old design's own components and panels (Components Old page): Hello Lucas, the
+Timetable/Socialplan switch, the day row, one course row (Interface Design 08:15–09:45, Luis/Mira/Ben —
+matches the Idea timetable), a friend's open timetable (Francesco until 16:30: Typography, Design
+History, Photography Basics, Wood Workshop), the friends list (Paula, Francesco), the menu bar, the
+Public Possession and Zeig dein Zeug event cards, the floor switcher and the classes search
+(Interface Design / Industrial Design / Model Making). **No home-screen summary cards except Connect
+now** (Lucas) — the activities and Map cards were swapped out for those two panels — with white panels added behind the loose pieces. Texts corrected there:
+"avalible" → available, "Posession" → Possession, the two event cards' identical date/room made
+distinct (21.04 Aula / 22.04 0.015, matching the poster copy), each floor's room range its own. To
+change it: edit that frame in Figma, re-export at 2x, bump `?v=`.
 
 **`.wf-frame`: two CONSTRUCTED wireframes under "Who's free now", built the same day as the cut
 above, after Lucas pointed at a Jessica Im case-study screenshot as the exact reference** (two

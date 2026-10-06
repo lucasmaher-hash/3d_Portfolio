@@ -1912,6 +1912,8 @@
     .v1s-scroll { height: auto; margin-top: var(--y, 0%); }
     .v1s-bar { position: absolute; left: 0; bottom: 0; }
     .v1-arrow { position: absolute; width: 7%; height: auto; }
+    .v1-collage-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .v1-handoff { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
     /* a bare Figma frame (no phone): 28% of the canvas wide, its own shape;
        the exports' square corners were cut to the frames' own rounding
        (alpha mask, r 89 of 1408/1472 at 4x) when they were saved */
@@ -3013,11 +3015,20 @@
            them. In the Figma file the rows became Interface Design / Break /
            Materials & Processes / Book Club, with fewer friends on most. Fixed-aspect canvas, cqw units,
            scales like an image. -->
-      <div class="v1-scene v1-scene--idea" role="img" aria-label="The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, and an arrow from its open Calendar button to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, and the evening's Book Club.">
+      <div class="v1-scene v1-scene--idea" role="img" aria-label="The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, and its open Timetable button ringed and clicked, and an arrow from it to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, and the evening's Book Club.">
         <div class="v1-canvas">
-          <img class="v1-card" src="/images/unify/v1/fig-connect.webp?v=2" alt="" style="left: 13%; top: 13.1cqw; width: 32%;" />
+          <img class="v1-card" src="/images/unify/v1/fig-connect.webp?v=3" alt="" style="left: 13%; top: 13.1cqw; width: 32%;" />
           <img class="v1-card" src="/images/unify/v1/fig-timetable.webp?v=3" alt="" style="left: 55%; top: 6.9cqw;" />
-          <svg class="v1-arrow" style="left: 47%; top: 40.1cqw; width: 6%;" viewBox="0 0 60 12" aria-hidden="true"><path d="M0 6 H57 M51 1 L57 6 L51 11" fill="none" stroke="#2010FF" stroke-width="1.6"/></svg>
+          <!-- the hand-off: a ring round "open Timetable", a cursor clicking it,
+               and an arrow curving from the ring into the timetable it opens.
+               One SVG over the whole canvas, in canvas units (viewBox 100 x
+               56.25 = the 16:9 canvas), so it scales with the picture. -->
+          <svg class="v1-handoff" viewBox="0 0 100 56.25" aria-hidden="true">
+            <rect x="28.85" y="38.06" width="15.28" height="3.9" rx="1.95" fill="none" stroke="#FF88C8" stroke-width=".42"/>
+            <path d="M44.6 40 C 50.2 40, 49.6 28, 54.1 28" fill="none" stroke="#FF88C8" stroke-width=".42" stroke-linecap="round"/>
+            <path d="M52.9 26.9 L54.2 28 L52.9 29.1" fill="none" stroke="#FF88C8" stroke-width=".42" stroke-linecap="round" stroke-linejoin="round"/>
+            <path transform="translate(42.6 40.5) scale(.62)" d="M0 0 L0 4.4 L1.1 3.4 L1.9 5.2 L2.6 4.9 L1.8 3.2 L3.3 3.2 Z" fill="#fff" stroke="#1A1A1A" stroke-width=".28" stroke-linejoin="round"/>
+          </svg>
         </div>
       </div>
 
@@ -3049,14 +3060,12 @@
            All five v1 Figma exports upright, side by side, staggered so they
            run off the top and bottom edges, in a fixed-aspect canvas that
            scales like an image. -->
-      <div class="v1-scene v1-scene--pivot" role="img" aria-label="Five screens from the v1 design side by side: the home screen, the timetable, and the building map with its floor switcher, its friends list and full screen.">
-        <div class="v1-canvas">
-          <div class="v1-phone " style="left: 4.5%; top: -7cqw;"><img class="v1s-scroll" src="/images/unify/v1/v1-home.webp" alt="" style="--y: -56%;" /><img class="v1s-bar" src="/images/unify/v1/v1-home-bar.webp" alt="" /></div>
-          <div class="v1-phone " style="left: 23%; top: 15cqw;"><img class="v1s-scroll" src="/images/unify/v1/v1-timetable.webp" alt="" style="--y: 0%;" /><img class="v1s-bar" src="/images/unify/v1/v1-timetable-bar.webp" alt="" /></div>
-          <div class="v1-phone " style="left: 41.5%; top: 3cqw;"><img class="v1s-fill" src="/images/unify/v1/v1-building.webp" alt="" /></div>
-          <div class="v1-phone " style="left: 60%; top: 25cqw;"><img class="v1s-fill" src="/images/unify/v1/v1-building-friends.webp" alt="" /></div>
-          <div class="v1-phone " style="left: 78.5%; top: -3cqw;"><img class="v1s-fill" src="/images/unify/v1/v1-building-open.webp" alt="" /></div>
-        </div>
+      <div class="v1-scene v1-scene--pivot" role="img" aria-label="A collage of the v1 design's parts: the Hello Lucas header, the Timetable and Socialplan switch with a course row, the activities card, the friends list, the menu bar, two event cards, the floor switcher and the map.">
+        <!-- 2026-10-06 (Lucas): composed IN FIGMA from the old design's own
+             components and panels (file "unify", page "design old", frame
+             "v1 collage (website)" 977:2543, 1600x900 = 16:9), texts corrected
+             there, exported at 2x. Re-export that frame after any change. -->
+        <div class="v1-canvas"><img class="v1-collage-img" src="/images/unify/v1/v1-collage.webp?v=3" alt="" /></div>
       </div>
 
       <h3 class="cs-sub">It felt like a tool</h3>
@@ -4676,6 +4685,51 @@
         });
       });
       frames.forEach(function (f) { ro.observe(f.parentNode); });
+    })();
+  </script>
+  <script>
+    /* The end blob's height follows the text beside it (2026-10-06, Lucas):
+       its top sits at the middle of the first paragraph of "What we learned",
+       whatever the window does to the paragraphs' wrapping. Width stays
+       fixed (--blob-w), so the eyes keep their size; only the straight part
+       of the body under them gets longer or shorter. The svg shows the
+       rotated drawing from y -104 (the bumps) down to -104 + U units, and
+       the path's straight sides are lengthened by E units to always reach
+       the cut, where they stand on the section's bottom line. Phones keep
+       the default (the blob sits under the text there). */
+    (function () {
+      var sec = document.getElementById('learned'), svg = document.getElementById('learned-blob');
+      if (!sec || !svg) return;
+      var body = svg.querySelector('#learned-blob-g path');
+      var MIN_U = 600;            // below this the cut would reach the eyes (they end at y 500)
+      var DEFAULT_U = 864;
+      function d(E) {
+        var y = function (v) { return (v - E).toFixed(3); };
+        return 'M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741L25.2783 ' + y(-60.859) +
+          'C25.2772 ' + y(-412.6) + ' -6.99887 ' + y(-386.6) + ' 202.306 ' + y(-386.6) + 'L429.004 ' + y(-386.6) + 'C709.5 ' + y(-381.6) + ' 694.991 ' + y(-428.6) + ' 694.991 ' + y(-155.048) +
+          'L694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z';
+      }
+      function fit() {
+        var mobile = matchMedia('(max-width: 640px)').matches;
+        var U = DEFAULT_U;
+        if (!mobile) {
+          var p1 = sec.querySelector('.guide-text');
+          var w = svg.getBoundingClientRect().width;
+          if (p1 && w) {
+            var pr = p1.getBoundingClientRect(), sr = sec.getBoundingClientRect();
+            var want = sr.bottom - (pr.top + pr.height / 2);      // px from the line up to mid-paragraph
+            U = Math.max(MIN_U, want / (w / 760));
+          }
+        }
+        var E = Math.max(0, U - DEFAULT_U);
+        svg.setAttribute('viewBox', '-10 -104 760 ' + U.toFixed(1));
+        svg.style.height = mobile ? '' : 'calc(var(--blob-w) * ' + (U / 760).toFixed(4) + ')';
+        body.setAttribute('d', d(E));
+      }
+      fit();
+      addEventListener('resize', fit);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+      if ('ResizeObserver' in window) new ResizeObserver(fit).observe(sec);
     })();
   </script>
 </body>
