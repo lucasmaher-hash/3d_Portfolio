@@ -1436,7 +1436,6 @@
       </div>
       <a class="mobile-nav-btn" data-page="craft" data-i18n="menu-craft">Craft</a>
       <a class="mobile-nav-btn" data-page="about" data-i18n="menu-about">About</a>
-      <a class="mobile-nav-btn" data-page="contact" data-i18n="menu-contact">Contact</a>
       <!-- Language toggle. Deliberately the SAME component as the 2D/3D toggle
            above — same two classes, no styling of its own — so the pair can
            never drift apart. The nav bar's own de/en text is hidden below
@@ -1678,7 +1677,6 @@
           e.preventDefault(); closeMenu();
           if      (btn.dataset.page === 'craft')   window.location.href = '/2D.html#craft-section';
           else if (btn.dataset.page === 'about')   window.location.href = '/about2d.html';
-          else if (btn.dataset.page === 'contact') window.location.href = '/contact2d.html';
         });
       });
 

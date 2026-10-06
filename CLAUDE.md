@@ -147,14 +147,17 @@ and in the pages that say "VT323" describe the old state.
 and mobile (markup + both `tagline1` keys). Only the "More about me →" link is left in
 `.tagline-block`. (For a few minutes "pixel" was set in VT323 as a word play — that went with it.)
 
-## About + Contact merged (2026-10-06, Lucas) — in progress
+## About + Contact merged (2026-10-06, Lucas)
 
 `about2d.html` now ends with the contact page's three links — Email / LinkedIn / Instagram — as
 plain body text (`.about-links`: Roboto Flex 15px / 16px on phones, weight 400, secondary grey,
 underline on hover), spread evenly (`space-between`) under Design Philosophy, fading in as
 `.anim-5`. The email `href` is assembled at runtime from a split address, as on `contact2d.html`.
-`label-email` added to About's `TRANSLATIONS` (Email / E-Mail). The nav's Contact link and
-`contact2d.html` itself are unchanged pending Lucas's call.
+`label-email` added to About's `TRANSLATIONS` (Email / E-Mail). **`contact2d.html` is DELETED**,
+and "Contact" is gone from the nav bar (`top_row_permanent_V3.html`'s `pill__seg`) and from every
+burger menu (index.html + all 2D pages), with the menus' `/contact2d.html` click branches. Left on
+purpose: `contact3d.html`, which the 3D world's contact wall plaque still opens; the now-unused
+`menu-contact`/`contact` translation keys and the nav's `isContact2D` checks are inert.
 
 ## Page map
 
