@@ -460,7 +460,11 @@ move — Lucas: proof belongs later, not up front). `.fact-bar` is unchanged CSS
 `.pilot-stats` wraps it with the same kicker/heading pair as the Problem statbar (`.stat-kicker` +
 `.stat-head`), and sits in "The idea" section right after the "who's free now" showcase and before
 "How the overlap is found" — the numbers next to the feature they are evidence for, not before it.
-The hero (`#top`) now carries only the lead line. **The three numbers themselves changed too**,
+The hero (`#top`) now carries only the lead line. **That line (`.cs-lead`) is set like every other
+project page's At-a-Glance lead** (2026-10-06, Lucas, off virtual_cooking2d's `.glance-lead`):
+Roboto Flex 300, `clamp(18px, 2.2vw, 24px)` / 1.4, −0.01em, `--text-secondary`, full column width
+(the old 36ch cap and 30px size are gone), primary ink below 640px. Measured identical to the
+Virtual Cooking lead at 1280, 1920 and 390 touch. There is no "At a Glance" heading above it. **The three numbers themselves changed too**,
 since this is no longer a before/after (Problem) vs after (Results) split but one PILOT-only
 snapshot: 2.2× more meetups/week, 68% less time spent arranging one, 20 students across 5 friend
 groups. Chain them if the real pilot numbers ever land: 1.4 → 3.1 meetups already matches
@@ -581,14 +585,15 @@ Everything below about `.wf-frame` and `.v1-collage` is history.
 `fig-connect.webp` (the Connect now card alone, node 971:2102) and `fig-timetable.webp` (frame
 971:2165, Lucas's copy of the edited 302:4445) from the Figma file `unify` (fZpKZpih18tEiVkeYPoCWs), exported at 4x, no phone around them
 (`.v1-card`: 28% of the canvas wide, the Connect card 32%; the exports come with square light-grey/black
-corners, so each was given an alpha mask at its own corner radius — 89px at 4x — when saved; drop shadow). **The timetable frame was edited IN FIGMA first** (several rounds with Lucas): rows are now Interface
+corners, so each was given an alpha mask at its own corner radius — 89px at 4x — when saved; no shadow). **The timetable frame was edited IN FIGMA first** (several rounds with Lucas): rows are now Interface
 Design 08:15–09:45 1.019 (3 friends) / **Break 11:30–12:00 Mensa** (the Connect now window, 5 friends:
 Paul, Zoe, Luis, Tom, Paula) / Materials & Processes 12:00–13:30 1.035 (2) / **Book Club 18:00–19:30
 Library** (the blue row, a free-time uni activity). Prototyping Lab was removed. Rows 1–2 are clones of
 the original "open blue" row 302:4763 (swapping the variant lost the chips' icons); unused friend
 chips are hidden, not deleted. Frame is 368×557. Re-export the same two nodes if the Figma changes. The Connect card's button reads "open Timetable" (changed in Figma, was "open Calendar"), and the hand-off
 is drawn over the canvas as one SVG in canvas units (`.v1-handoff`, viewBox 100×56.25): a pink ring round
-the button, a cursor clicking it, and an arrow curving from the ring into the timetable.
+the button and an arrow curving from the ring into the timetable. **No cursor, no drop shadow under
+the two frames** (removed 2026-10-06, Lucas): they sit flat on the solid `#90A4BD` canvas (sampled: one colour).
 **The Pivot section is ONE image composed in Figma** (`v1-collage.webp`, 3200×1800, from frame
 "v1 collage (website)" 977:2543 on "design old" — 1600×900, filled with the canvas blue). It is
 assembled from the old design's own components and panels (Components Old page): Hello Lucas, the

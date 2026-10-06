@@ -1705,14 +1705,20 @@
     .cs-section { border-bottom: none; }
     .cs-section + .cs-section { padding-top: clamp(16px, 3vw, 32px); }
 
-    /* Hero one-liner: the spine of the whole page, in one sentence. */
+    /* Hero one-liner: the spine of the whole page, in one sentence. Set exactly
+       like the other project pages' At-a-Glance lead (.glance-lead on
+       virtual_cooking2d.html, Lucas 2026-10-06): light grey, full column width,
+       and primary ink on phones. */
     .cs-lead {
       font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
-      font-size: clamp(20px, 2.4vw, 30px);
+      font-size: clamp(18px, 2.2vw, 24px);
       font-weight: 300;
-      line-height: 1.35;
-      color: var(--text-primary);
-      max-width: 36ch;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      color: var(--text-secondary);
+    }
+    @media (max-width: 640px) {
+      .cs-lead { color: var(--text-primary); }
     }
 
     /* Page map: a fixed sidebar, after Jessica Im's reference — off the hero,
@@ -1919,8 +1925,8 @@
     /* a bare Figma frame (no phone): 28% of the canvas wide, its own shape;
        the exports' square corners were cut to the frames' own rounding
        (alpha mask, r 89 of 1408/1472 at 4x) when they were saved */
-    .v1-card { position: absolute; width: 28%; height: auto; display: block;
-      filter: drop-shadow(0 1.2cqw 2.4cqw rgba(0, 0, 0, .18)); }
+    .v1-card { position: absolute; width: 28%; height: auto; display: block; }
+    /* no drop shadow under the frames: they sit flat on the solid canvas (Lucas, 2026-10-06) */
 
     /* UNUSED as of 2026-10-06 (replaced by .v1-scene), see CLAUDE.md */
     .v1-collage {
@@ -3019,19 +3025,19 @@
            them. In the Figma file the rows became Interface Design / Break /
            Materials & Processes / Book Club, with fewer friends on most. Fixed-aspect canvas, cqw units,
            scales like an image. -->
-      <div class="v1-scene v1-scene--idea" role="img" aria-label="The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, and its open Timetable button ringed and clicked, and an arrow from it to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, and the evening's Book Club.">
+      <div class="v1-scene v1-scene--idea" role="img" aria-label="The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, and its open Timetable button ringed, and an arrow from it to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, and the evening's Book Club.">
         <div class="v1-canvas">
           <img class="v1-card" src="/images/unify/v1/fig-connect.webp?v=3" alt="" style="left: 13%; top: 13.1cqw; width: 32%;" />
           <img class="v1-card" src="/images/unify/v1/fig-timetable.webp?v=3" alt="" style="left: 55%; top: 6.9cqw;" />
-          <!-- the hand-off: a ring round "open Timetable", a cursor clicking it,
-               and an arrow curving from the ring into the timetable it opens.
+          <!-- the hand-off: a ring round "open Timetable" and an arrow curving
+               from the ring into the timetable it opens (the cursor that clicked
+               it was removed 2026-10-06, Lucas).
                One SVG over the whole canvas, in canvas units (viewBox 100 x
                56.25 = the 16:9 canvas), so it scales with the picture. -->
           <svg class="v1-handoff" viewBox="0 0 100 56.25" aria-hidden="true">
             <rect x="28.85" y="38.06" width="15.28" height="3.9" rx="1.95" fill="none" stroke="#FF88C8" stroke-width=".42"/>
             <path d="M44.6 40 C 50.2 40, 49.6 28, 54.1 28" fill="none" stroke="#FF88C8" stroke-width=".42" stroke-linecap="round"/>
             <path d="M52.9 26.9 L54.2 28 L52.9 29.1" fill="none" stroke="#FF88C8" stroke-width=".42" stroke-linecap="round" stroke-linejoin="round"/>
-            <path transform="translate(42.6 40.5) scale(.62)" d="M0 0 L0 4.4 L1.1 3.4 L1.9 5.2 L2.6 4.9 L1.8 3.2 L3.3 3.2 Z" fill="#fff" stroke="#1A1A1A" stroke-width=".28" stroke-linejoin="round"/>
           </svg>
         </div>
       </div>
@@ -3069,7 +3075,7 @@
              components and panels (file "unify", page "design old", frame
              "v1 collage (website)" 977:2543, 1600x900 = 16:9), texts corrected
              there, exported at 2x. Re-export that frame after any change. -->
-        <div class="v1-canvas"><img class="v1-collage-img" src="/images/unify/v1/v1-collage.webp?v=3" alt="" /></div>
+        <div class="v1-canvas"><img class="v1-collage-img" src="/images/unify/v1/v1-collage.webp?v=4" alt="" /></div>
       </div>
 
       <h3 class="cs-sub">It felt like a tool</h3>
