@@ -1,3 +1,5 @@
+/* DETACHED 2026-10-06 (Lucas): no page links this file any more — dark mode is
+   switched off site-wide but kept for a future return. See CLAUDE.md "Dark mode — detached". */
 /* ── Dark mode for the 3D view's overlay pages (2026-09-14) ───────────────────
    about3d / contact3d / craft3d / controls_open3d / controls_fullscreen3d are
    iframes inside index.html. They cannot use the 2D pages' approach — a

@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script>
+  <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". This pre-paint script no longer runs, so nothing sets
+       data-theme: no stored choice, no evening clock.
+  <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script> -->
   <script>/* MacBook-shaped screen (landscape, 1.45:1-1.7:1) -> html[data-screen="macbook"], read by --page-pad. Before first paint so the column never jumps. */(function(){try{var w=screen.width,h=screen.height,r=w/h;if(w>h&&r>=1.45&&r<1.7)document.documentElement.setAttribute('data-screen','macbook')}catch(e){}})()</script>
   <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
@@ -1599,23 +1601,25 @@
       .page-wrapper > .scrolly .scrolly-sticky { padding-inline: var(--page-pad); }
     }
   </style>
-  <link rel="stylesheet" href="/theme/dark-mobile.css" />
+  <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
-  <script src="/theme/theme.js" defer></script>
+  <!-- <script src="/theme/theme.js" defer></script>  dark mode detached 2026-10-06 -->
 </head>
 <body>
   <iframe id="top-bar" src="/top_row_permanent_V3.html" allowtransparency="true" scrolling="no"></iframe>
 
   <div id="mobile-menu" class="mobile-menu">
     <div class="mobile-menu-panel">
-      <!-- Light/dark toggle, first in the panel above Craft, built from the
+      <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". The burger menu's light/dark toggle — restore by
+     un-commenting it and re-linking the two /theme files in <head>.
+     Light/dark toggle, first in the panel above Craft, built from the
            same two classes, so the pair always match. Mobile-only, like the menu.
            The labels are 13x13 pixel-art glyphs (sun / moon), not text, so they carry
-           no data-i18n — /theme/theme.js sets the aria-label in the current language. -->
+           no data-i18n — /theme/theme.js sets the aria-label in the current language.
       <div class="mobile-view-toggle mobile-theme-toggle">
         <button class="mobile-mode-btn" data-theme-choice="light" aria-label="Hell"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="5" y="3" width="3" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="0" y="6" width="2" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="11" y="6" width="2" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="3" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="1" y="11" width="1" height="1"/><rect x="6" y="11" width="1" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/></svg></button>
         <button class="mobile-mode-btn" data-theme-choice="dark" aria-label="Dunkel"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="0" width="5" height="1"/><rect x="2" y="1" width="4" height="1"/><rect x="1" y="2" width="4" height="1"/><rect x="1" y="3" width="3" height="1"/><rect x="0" y="4" width="4" height="1"/><rect x="0" y="5" width="4" height="1"/><rect x="0" y="6" width="4" height="1"/><rect x="0" y="7" width="4" height="1"/><rect x="0" y="8" width="5" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="1" y="9" width="6" height="1"/><rect x="10" y="9" width="2" height="1"/><rect x="1" y="10" width="11" height="1"/><rect x="2" y="11" width="9" height="1"/><rect x="4" y="12" width="5" height="1"/></svg></button>
-      </div>
+      </div> -->
       <a class="mobile-nav-btn" data-page="about" data-i18n="menu-about">About</a>
       <!-- Language toggle. Deliberately the SAME component as the 2D/3D toggle
            above — same two classes, no styling of its own — so the pair can

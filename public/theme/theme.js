@@ -1,3 +1,5 @@
+/* DETACHED 2026-10-06 (Lucas): no page links this file any more — dark mode is
+   switched off site-wide but kept for a future return. See CLAUDE.md "Dark mode — detached". */
 /* ── Light / dark toggle for the burger menu (2026-09-14) ─────────────────────
    The attribute itself is set BEFORE first paint by a two-line inline script at
    the top of every page's <head> — this file only has to keep the toggle's

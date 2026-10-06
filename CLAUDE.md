@@ -2097,6 +2097,21 @@ off it.
 
 ## Dark mode — mobile only (2026-09-14)
 
+> **DETACHED 2026-10-06 (Lucas): the site is light-only for now, but nothing was deleted.**
+> Every hook is commented out in place, each comment starting `DARK MODE DETACHED 2026-10-06`
+> (grep that to find them all): the pre-paint `<head>` script on all 10 pages + the nav iframe
+> (so neither a stored `localStorage.theme` nor the 20:00–08:00 evening clock does anything any
+> more), the `/theme/dark-mobile.css` and `/theme/theme.js` links, the nav's own theme listener,
+> the burger menu's sun/moon toggle (gone from every menu, 2D and 3D), and the
+> `dark-3d-overlays.css` / `overlay-theme.js` hooks on the five 3D overlays. The four files in
+> `public/theme/` stay on disk with a `DETACHED` header (`mobile-menu.css` is pill sizing, not
+> dark mode, and is still linked). Two scripts still run but are inert because nothing sets
+> `data-theme`: `2D.html`'s Cybercoffee light/dark clip switch (always plays the light clip) and
+> `blob_morph_bouncy.html`'s parent check. **To bring it back:** un-comment each block and drop
+> the comment wrappers — the rest of this section describes the system as it was built.
+> Verified over CDP at 390 touch with `theme=dark` stored and the clock forced to 22:00: all 9
+> 2D pages and the 3D page render light, nav light, no toggle in any menu, no console errors.
+
 **Palette "Slate"** (`#1C1C22`, the literal inversion of `#DCDCE3`, keeping its blue-violet
 cast), picked by Lucas from six candidates. Text `#E8E8E9` / `#99999C`, border `#404045`. The
 neumorphic pair is DERIVED from the surface: shadow = surface × 0.42 → `rgb(12,12,14)`,
