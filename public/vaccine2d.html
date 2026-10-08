@@ -29,7 +29,7 @@
       --text-primary: #1A1A1A;
       --text-secondary: #8E8E93;
       --text-tertiary: #c7c7cc;
-      --accent-orange: #FF5C00;
+      --accent-orange: #809BBC;
       --border-color: #6f6f6f;
 
       --shadow-raised-sm: 5px 5px 12px rgba(174,174,192,0.65), -5px -5px 12px rgba(255,255,255,1);
@@ -570,20 +570,20 @@
        --accent-orange is undefined on index.html (the 3D page declares no such custom
        property), hence the literal fallback. */
     .mobile-mode-btn[data-mode].is-active {
-      background: var(--accent-orange, #FF5C00);
+      background: var(--accent-orange, #809BBC);
       /* Black, overriding the base rule's #555. That grey is tuned for an UNSELECTED
-         segment on the grey surface; over #FF5C00 it measures 2.4:1 and the label reads
+         segment on the grey surface; over #809BBC it measures 2.4:1 and the label reads
          as disabled rather than selected. Black on this orange is 6.8:1. Scoped to
          [data-mode], so the language segments keep #555 on their grey well. */
       color: #000;
       /* Same well as the language toggle above — same offsets, same blur, same
          alphas — recoloured so it reads on orange instead of on the grey
-         surface. The grey/white pair was built to sit on #DCDCE3; over #FF5C00
+         surface. The grey/white pair was built to sit on #DCDCE3; over #809BBC
          a white highlight desaturates to a pale wash and the cool grey shadow
          reads as dirt. So the two hues are re-derived from the orange itself:
          top-left gets a darker orange, bottom-right a lighter one, keeping the
          site's light-from-top-left convention. */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(168, 56, 0, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 173, 122, 1);
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(78, 104, 138, 0.6), inset -3.25px -3.25px 6.5px rgba(190, 208, 228, 1);
     }
     .mobile-mode-btn:active:not(.is-active) {
       /* Scale is the tap feedback both toggles share. */
@@ -630,7 +630,7 @@
     }
     .scroll-dot {
       width: 5px; height: 5px; border-radius: 50%;
-      background: var(--accent-orange, #FF5C00); display: block; flex-shrink: 0;
+      background: var(--accent-orange, #809BBC); display: block; flex-shrink: 0;
     }
     /* Desktop: the dot column doubles as a real scrollbar — drag the dots, or
        click the strip to jump there (macOS behaviour). The grab area is

@@ -25,7 +25,7 @@
       --bg-surface: #DCDCE3;
       --text-primary: #1A1A1A;
       --text-secondary: #8E8E93;
-      --accent-orange: #FF5C00;
+      --accent-orange: #809BBC;
 
       --shadow-raised-sm:
         5px 5px 12px rgba(174, 174, 192, 0.65),
@@ -216,12 +216,19 @@
       transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
     }
 
+    /* The mark is a mask, not an <img>, so its colour can change on hover: the accent
+       blue at rest, the dark hover blue of the View Work buttons under the cursor. */
     .logo-mark {
       width: 34.56px;
-      height: auto;
+      aspect-ratio: 400 / 265;
       display: block;
       pointer-events: none;
+      background-color: #809BBC;
+      -webkit-mask: url(/images/site/logo-lm.png) center / contain no-repeat;
+      mask: url(/images/site/logo-lm.png) center / contain no-repeat;
+      transition: background-color 260ms var(--ease);
     }
+    .logo:hover .logo-mark { background-color: #475F7E; transition-duration: 150ms; }
 
     .logo:hover {
       transform: translateY(-2px) scale(1.03);
@@ -367,7 +374,7 @@
     }
 
     .craft-dropdown-item:hover {
-      color: #FF5C00;
+      color: #809BBC;
       background: rgba(255, 255, 255, 0.45);
       opacity: 1;
     }
@@ -566,7 +573,7 @@
 
       <!-- Left: lang toggle + logo -->
       <div class="nav-left">
-        <a href="#" class="logo" aria-label="Lucas Maher home" id="logo-btn"><img src="/images/site/logo-lm.png" alt="" class="logo-mark" /></a>
+        <a href="#" class="logo" aria-label="Lucas Maher home" id="logo-btn"><span class="logo-mark" aria-hidden="true"></span></a>
         <!-- Deliberately still "de / en", NOT the "Deutsch / English" used in the mobile
              menu: .lang-toggle is hidden below 640px (see the @media block above), so this
              is the DESKTOP control and the bar's width budget is tight here — it has been

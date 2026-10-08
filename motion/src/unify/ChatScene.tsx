@@ -204,7 +204,7 @@ export type Block = {x: number; y: number; w: number; h: number; r: number; colo
 export const MORPH0 = SUCK.SUCK0 + 18;
 export const MORPH1 = SUCK.PUFF + 18;
 const CLEAR = 8;
-/* The VERTICAL cut (Lucas, 2026-10-08): the phone's screen collapses into the
+/* ALL cuts, landscape and vertical (Lucas, 2026-10-08): the phone's screen collapses into the
    sections in PARALLEL with the messages being pulled in, instead of after they
    are gone, and it lands on a damped spring — it overshoots the final shape once
    and recoils instead of just easing in. Same end frame (MORPH1) as the
@@ -229,7 +229,7 @@ export const ChatScene: React.FC<{
   maxW?: number;
 }> = ({f, blocks, until, vertical, maxW = Infinity}) => {
   const sucking = f >= SUCK.INHALE;
-  const M0 = vertical ? MORPH0_V : MORPH0;
+  const M0 = MORPH0_V;
   const els: React.ReactNode[] = [];
 
   /* the opener's size: 3x, or as much as fits (the page's rule: min(3, width * .92 / bubble)) */
@@ -307,8 +307,8 @@ export const ChatScene: React.FC<{
   const frameO = 1 - ease(f, M0, M0 + 12, Easing.in(Easing.quad));
   const frameS = 1 + 0.06 * ease(f, M0, M0 + 12, Easing.out(Easing.quad));
   const phoneBox: CSS = {position: 'absolute', left: CHAT_C[0] - PHONE_W / 2, top: CHAT_C[1] - PHONE_H / 2, width: PHONE_W, height: PHONE_H};
-  // shape: a smooth ease, no overshoot (vertical: a spring that recoils once); colour: white to the sections' own by 60% of the move
-  const mt = vertical ? springOut((f - M0) / (MORPH1 - M0)) : ease(f, MORPH0, MORPH1, Easing.bezier(0.65, 0, 0.35, 1));
+  // shape: a smooth ease, no overshoot (a spring that recoils once); colour: white to the sections' own by 60% of the move
+  const mt = springOut((f - M0) / (MORPH1 - M0));
   const ct = ease(f, M0, M0 + (MORPH1 - M0) * 0.6, Easing.inOut(Easing.quad));
   const total = blocks.reduce((a, b) => a + b.h, 0);
   let acc = 0;

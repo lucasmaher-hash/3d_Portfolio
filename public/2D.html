@@ -26,7 +26,7 @@
       --text-primary: #1A1A1A;
       --text-secondary: #8E8E93;
       --text-tertiary: #c7c7cc;
-      --accent-orange: #FF5C00;
+      --accent-orange: #809BBC;
       --border-color: #6f6f6f;
 
       --shadow-raised-sm: 5px 5px 12px rgba(174,174,192,0.65), -5px -5px 12px rgba(255,255,255,1);
@@ -169,7 +169,7 @@
       width: clamp(12px, 1.8vw, 20px);
       height: clamp(12px, 1.8vw, 20px);
       border-radius: 50%;
-      background: #FF5C00;
+      background: #809BBC;
       transform: translateY(calc(-50% + 24px));
       animation: blink 1.5s step-end infinite;
     }
@@ -506,14 +506,11 @@
       white-space: nowrap;
     }
 
-    /* The site's new accent blue (2026-10-08, Lucas): the to.morrow step-badge blue #7A92B0,
-       as OKLCH so brightness (L) and colour (C) can be dialled apart. Defaults are #7A92B0
-       exactly; the TEMPORARY tuner at the end of <body> overrides these three. Hover goes
-       darker by 0.2 of L. */
-    :root { --blue-L: 0.652; --blue-C: 0.053; --blue-H: 254.2; }
-    .btn-view-work {
-      background: #7A92B0;
-      background: oklch(var(--blue-L) var(--blue-C) var(--blue-H));
+    /* The site's accent is blue now (2026-10-08, Lucas): #809BBC = oklch(0.68 0.058 254.2),
+       dialled from the to.morrow step-badge blue. The token keeps its old name,
+       --accent-orange. Hover goes 0.2 darker in L: #475F7E. */
+        .btn-view-work {
+      background: var(--accent-orange);
       border-radius: 999px;
       padding: clamp(10px, 1.3vw, 17px) clamp(24px, 3.5vw, 48px);
       border: none;
@@ -527,12 +524,16 @@
       display: inline-block;
       transition: box-shadow 300ms ease-out, transform 300ms ease-out, background-color 300ms ease-out;
       white-space: nowrap;
+      /* Own compositing layer from the start: the text used to be re-rasterised the
+         moment the hover transform began, which showed as a small downward jitter. */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
     .btn-view-work:hover {
-      background: #3F5670;
-      background: oklch(calc(var(--blue-L) - 0.2) var(--blue-C) var(--blue-H));
-      transform: translateY(-2px) scale(1.03);   /* standard site hover-lift magnitude */
+      background: #475F7E;
+      transform: translate3d(0, -2px, 0) scale(1.03);   /* standard site hover-lift magnitude */
       transition: transform 150ms ease, background-color 150ms ease;
     }
 
@@ -829,20 +830,20 @@
        --accent-orange is undefined on index.html (the 3D page declares no such custom
        property), hence the literal fallback. */
     .mobile-mode-btn[data-mode].is-active {
-      background: var(--accent-orange, #FF5C00);
+      background: var(--accent-orange, #809BBC);
       /* Black, overriding the base rule's #555. That grey is tuned for an UNSELECTED
-         segment on the grey surface; over #FF5C00 it measures 2.4:1 and the label reads
+         segment on the grey surface; over #809BBC it measures 2.4:1 and the label reads
          as disabled rather than selected. Black on this orange is 6.8:1. Scoped to
          [data-mode], so the language segments keep #555 on their grey well. */
       color: #000;
       /* Same well as the language toggle above — same offsets, same blur, same
          alphas — recoloured so it reads on orange instead of on the grey
-         surface. The grey/white pair was built to sit on #DCDCE3; over #FF5C00
+         surface. The grey/white pair was built to sit on #DCDCE3; over #809BBC
          a white highlight desaturates to a pale wash and the cool grey shadow
          reads as dirt. So the two hues are re-derived from the orange itself:
          top-left gets a darker orange, bottom-right a lighter one, keeping the
          site's light-from-top-left convention. */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(168, 56, 0, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 173, 122, 1);
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(78, 104, 138, 0.6), inset -3.25px -3.25px 6.5px rgba(190, 208, 228, 1);
     }
 
     .mobile-mode-btn:active:not(.is-active) {
@@ -1004,7 +1005,7 @@
     }
     .scroll-dot {
       width: 5px; height: 5px; border-radius: 50%;
-      background: var(--accent-orange, #FF5C00); display: block; flex-shrink: 0;
+      background: var(--accent-orange, #809BBC); display: block; flex-shrink: 0;
     }
     /* Desktop: the dot column doubles as a real scrollbar — drag the dots, or
        click the strip to jump there (macOS behaviour). The grab area is
@@ -1206,12 +1207,12 @@
       var ctx    = canvas.getContext('2d');
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      var ORANGE = '#FF5C00';
+      var ORANGE = '#809BBC';
       // The back layer is the SAME orange at part opacity, not a second
       // colour: two hues in a 192px ball reads as a graphic, and the point of
       // the layer is to be glimpsed through the front one where the two
       // surfaces cross.
-      var ORANGE_BACK = 'rgba(255, 92, 0, 0.42)';
+      var ORANGE_BACK = 'rgba(128, 155, 188, 0.42)';
 
       // Every one of these is a fraction of the ball, not a pixel count. The
       // library's own numbers (maxAmplitude 12, frequency 30, speed ±150) are
@@ -1422,8 +1423,6 @@
 
     <!-- Project 02 -->
     <div class="project-section reverse" style="align-items: stretch;">
-      <a href="/to-shove2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
-      </div>
       <a href="/to-shove2d.html" style="display:block;">
         <div class="project-tile morrow-video-tile" style="cursor: pointer;">
           <!-- The promo loop: the landscape cut above 640px, the vertical (4:5) one
@@ -1447,7 +1446,8 @@
           <div class="tag">SwiftUI</div>
           <div class="tag">Design System</div>
         </div>
-  
+        <a href="/to-shove2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
+      </div>
     </div>
 
     <!-- Project 03 -->
@@ -1459,7 +1459,7 @@
         </div>
         <div class="project-tags">
           <div class="tag">2026</div>
-          <div class="tag">3D</div>
+          <div class="tag">VR</div>
           <div class="tag">Blender</div>
           <div class="tag">Three.js</div>
         </div>
@@ -1494,7 +1494,7 @@
              The dark source is a keyed composite, not a crop (a crop tried
              first cut real content off the frame and was reverted). The
              recording had the page's OWN orange scroll-dots bleed into the
-             bottom-right corner — the site's `#FF5C00` UI leaking into the
+             bottom-right corner — the site's `#809BBC` UI leaking into the
              capture, not part of the machine at all. Cropping the edge to
              remove them shaved a slice off the actual footage; instead the
              machine's own UI is left untouched and only pixels matching that
@@ -1980,30 +1980,5 @@
     })();
   </script>
 
-  <!-- TEMPORARY (2026-10-08): accent-blue dial. Remove once Lucas has settled the values, then
-       bake them into --blue-L / --blue-C above. Grep "TEMPORARY blue tuner". -->
-  <div id="blue-tuner" style="position:fixed;left:16px;bottom:16px;z-index:100000;background:#fff;color:#1a1a1a;border:1px solid #bbb;border-radius:12px;padding:12px 14px;font:13px/1.4 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.18);width:250px;">
-    <b>Blue dial</b> <span id="bt-swatch" style="display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-left:6px;"></span>
-    <label style="display:block;margin-top:8px;">Brightness <span id="bt-lv"></span><input id="bt-l" type="range" min="0.30" max="0.90" step="0.005" style="width:100%"></label>
-    <label style="display:block;margin-top:6px;">Colour <span id="bt-cv"></span><input id="bt-c" type="range" min="0" max="0.20" step="0.002" style="width:100%"></label>
-    <div id="bt-out" style="margin-top:8px;font-family:monospace;font-size:12px;"></div>
-  </div>
-  <script>
-    // TEMPORARY blue tuner
-    (function () {
-      var root = document.documentElement, l = document.getElementById('bt-l'), c = document.getElementById('bt-c');
-      var st = {}; try { st = JSON.parse(localStorage.getItem('blueTuner') || '{}'); } catch (e) {}
-      l.value = st.l || 0.652; c.value = st.c || 0.053;
-      function apply() {
-        root.style.setProperty('--blue-L', l.value); root.style.setProperty('--blue-C', c.value);
-        document.getElementById('bt-lv').textContent = l.value; document.getElementById('bt-cv').textContent = c.value;
-        var o = 'oklch(' + l.value + ' ' + c.value + ' 254.2)';
-        document.getElementById('bt-swatch').style.background = o;
-        document.getElementById('bt-out').textContent = '--blue-L: ' + l.value + '; --blue-C: ' + c.value;
-        try { localStorage.setItem('blueTuner', JSON.stringify({ l: l.value, c: c.value })); } catch (e) {}
-      }
-      l.addEventListener('input', apply); c.addEventListener('input', apply); apply();
-    })();
-  </script>
 </body>
 </html>

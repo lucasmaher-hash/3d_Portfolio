@@ -2848,12 +2848,12 @@
          frame that is taller than wide */
       .home-previews {
         display: block; position: relative; container-type: inline-size;
-        padding: 0; aspect-ratio: 1 / 1.24; border-radius: 5% / 4%;
+        padding: 0; aspect-ratio: 1 / 1.4; border-radius: 5% / 3.6%;
       }
       .home-panel { position: absolute; width: 41%; }
-      .home-panel:nth-child(1) { left: 4cqw;    top: 4cqw;  z-index: 1; }
-      .home-panel:nth-child(2) { left: 29.5cqw; top: 40cqw; z-index: 2; }
-      .home-panel:nth-child(3) { left: 55cqw;   top: 76cqw; z-index: 3; }
+      .home-panel:nth-child(1) { left: 4cqw;    top: 3cqw;  z-index: 3; }
+      .home-panel:nth-child(2) { left: 29.5cqw; top: 44.5cqw; z-index: 2; }
+      .home-panel:nth-child(3) { left: 55cqw;   top: 87cqw; z-index: 1; }
 
       /* Usage pie: moved left so its labels stay on screen */
       .pie-stage { width: 168px; align-self: flex-start; margin-left: 4px; }
@@ -2867,7 +2867,15 @@
          beside it instead of above */
       #learned { --blob-w: calc(50vw - 20px); --blob-h: calc(var(--blob-w) * 682 / 760); padding-bottom: 32px; }
       .learned-blob { left: 50vw; right: auto; }
-      #learned .guide-text:last-of-type { max-width: calc(50vw - 32px); }
+      /* the last paragraph runs full width, then a right-hand float (pushed
+         down by --wrap-top, set by the blob script) makes its last lines go
+         round the monster, so no empty column is left above its head */
+      #learned .guide-text:last-of-type { display: flow-root; }
+      #learned .guide-text:last-of-type::before {
+        content: ''; float: right; width: calc(50vw - 8px);
+        height: calc(var(--wrap-top, 0px) + var(--blob-h) - 32px);
+        shape-outside: inset(var(--wrap-top, 0px) 0 0 0);   /* only the part below --wrap-top pushes text away */
+      }
     }
 </style>
   <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
@@ -2972,7 +2980,7 @@
          moved into "The idea", after the app's own showcase, per Lucas: the
          proof belongs next to the thing it is proof of, not before it. -->
     <div class="guide-section cs-section" id="top">
-      <p class="cs-lead">Unify shows you when your friends are free at the same time as you — so meeting up between classes stops taking a group chat.</p>
+      <p class="cs-lead" data-i18n-html="cs-lead">Unify shows when your friends are free at the same time as you, so meeting up between classes no longer takes a group chat.</p>
     </div>
 
     <!-- Meta -->
@@ -2980,7 +2988,7 @@
       <div class="meta-grid">
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-timeline">Timeline</div>
-          <div class="meta-inset">February 2026 —<br>June 2026</div>
+          <div class="meta-inset" data-i18n-html="val-timeline">February to June 2026</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-team">Team</div>
@@ -2991,7 +2999,7 @@
           <!-- New role line (plan §5). No data-i18n yet, or the old value would overwrite it.
                Lucas's OWN role only — the Team tile beside it says who else was on it, and
                the character-design credit sits in "What replaced it", next to the work. -->
-          <div class="meta-inset">Concept<br>UX<br>Design<br>Prototype</div>
+          <div class="meta-inset" data-i18n-html="val-role">Concept<br>UX<br>Design<br>Prototype</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-skills">Skills</div>
@@ -3003,15 +3011,15 @@
     <!-- 1 · The problem -->
     <section class="guide-section cs-section" id="problem">
       <div class="section-heading-row">
-        <h2 class="section-title">The problem</h2>
+        <h2 class="section-title" data-i18n-html="h-problem">The problem</h2>
         <span class="step-badge">1</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">My friends and I study different subjects. We share a campus but rarely a course, so every week the three of us swapped screenshots of our timetables to work out when we could meet. In a week-long diary study, arranging a 30-minute coffee took an average of 20 minutes of texting — and a third of the attempts never happened at all.</p>
+      <p class="guide-text" data-i18n-html="p-problem">My friends and I study different subjects. We share a campus but rarely a course, so every week we swapped screenshots of our timetables to find a time to meet. In a week-long diary study, arranging a 30-minute coffee took 20 minutes of texting on average, and a third of the attempts never happened.</p>
       <!-- The evidence: an empty iMessage group chat whose messages lift off the
            screen one by one (script at the end of the page). Reconstructed from the
            real chats, names changed. -->
-      <div class="imsg-stage" role="img" aria-label="Group chat: friends post screenshots of their timetables, fail to find a shared free slot by hand, and the one who replies late misses lunch.">
+      <div class="imsg-stage" role="img" data-i18n-aria="a-chat" aria-label="Group chat: friends post screenshots of their timetables and fail to find a shared slot by hand. The one who replies late misses lunch.">
         <div class="phone-shot imsg-phone">
           <div class="phone-shot-screen">
             <div class="imsg">
@@ -3030,7 +3038,7 @@
                   <span class="imsg-name">HM Group ›</span>
                 </div>
               </div>
-              <div class="imsg-chat"><div class="imsg-day"><b>Today</b> 09:12</div></div>
+              <div class="imsg-chat"><div class="imsg-day" data-i18n-html="imsg-day"><b>Today</b> 09:12</div></div>
               <div class="imsg-input"><span class="imsg-plus"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="imsg-field">iMessage</span></div>
             </div>
           </div>
@@ -3044,24 +3052,24 @@
       <div class="stat-block">
         <!-- The finding, stated: a headline carrying the number, one paragraph
              under it, then the bar it comes from. -->
-        <p class="stat-kicker">Survey · 30 students · before Unify</p>
-        <h3 class="stat-head">85 % of students never actually meet a friend from another course between classes</h3>
+        <p class="stat-kicker" data-i18n-html="kick-survey">Survey · 30 students · before Unify</p>
+        <h3 class="stat-head" data-i18n-html="head-85">85 % of students never meet a friend from another course between classes</h3>
   
-        <div class="statbar" role="img" aria-label="Of everyone asked, 30 % still text or swap screenshots and 70 % have stopped trying. Half of the texting group never met, which with the ones who never tried is 85 % of everyone.">
+        <div class="statbar" role="img" data-i18n-aria="a-bar" aria-label="Of everyone asked, 30 % still text or swap screenshots and 70 % have stopped trying. Half of the texting group never met, which with the ones who never tried makes 85 % of everyone.">
           <div class="statbar-track">
-            <span class="statbar-seg is-main" style="--w: 30"><b>30 %</b><span class="seg-words">still text</span></span>
-            <span class="statbar-seg" style="--w: 70"><b>70 %</b><span class="seg-words">have stopped trying</span></span>
+            <span class="statbar-seg is-main" style="--w: 30"><b>30 %</b><span class="seg-words" data-i18n-html="seg-text">still text</span></span>
+            <span class="statbar-seg" style="--w: 70"><b>70 %</b><span class="seg-words" data-i18n-html="seg-quit">have stopped trying</span></span>
           </div>
           <div class="statbar-brace" style="--from: 15; --to: 100">
             <span class="statbar-brace-line"></span>
-            <p class="statbar-brace-text"><b>85 % never met anyone</b></p>
+            <p class="statbar-brace-text" data-i18n-html="brace-85"><b>85 % never met anyone</b></p>
           </div>
         </div>
 
         <!-- The other side of the bar, in their own words. -->
-        <h3 class="stat-head is-section" style="margin-top: clamp(28.8px, 4.32vw, 50.4px);">Why the 70 % stopped trying</h3>
-        <p class="guide-text">I went back to nine of the students who said they no longer try to arrange anything between classes. <b>Not one of them said they didn't want to meet.</b> They said it costs more than it is worth: “I'd meet them if I knew when — working it out takes longer than the break does.” <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
-        <p class="guide-text">The second thing they all said was about the size of the window. “By the time everyone has answered, I'm already in the next lecture.” <b>For forty minutes it isn't worth the back and forth</b> — so, as one of them put it, “we say next week, and next week never comes.”</p>
+        <h3 class="stat-head is-section" style="margin-top: clamp(28.8px, 4.32vw, 50.4px);" data-i18n-html="head-why">Why the 70 % stopped trying</h3>
+        <p class="guide-text" data-i18n-html="p-int1">I went back to nine students who had stopped arranging anything between classes. Not one said they didn't want to meet. It simply costs more than it is worth: "I'd meet them if I knew when, but working it out takes longer than the break." <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
+        <p class="guide-text" data-i18n-html="p-int2">The second thing was the size of the window: "By the time everyone has answered, I'm already in the next lecture." <b>For forty minutes it isn't worth the back and forth</b>, and as one of them put it, "we say next week, and next week never comes."</p>
       </div>
     </section>
 
@@ -3070,7 +3078,7 @@
          .cs-section + .cs-section stays the shared default for every other pair. -->
     <section class="guide-section cs-section" id="research">
       <div class="section-heading-row">
-        <h2 class="section-title">The constraints</h2>
+        <h2 class="section-title" data-i18n-html="h-constraints">The constraints</h2>
         <span class="step-badge">2</span>
       </div>
       <div class="dot-divider"></div>
@@ -3081,16 +3089,16 @@
            reframed around "had to" (a condition satisfied) rather than "does"
            (a feature built) to carry that. Still plain .guide-text throughout
            — no kicker, no card, no size hierarchy (unchanged from the 09-26 pass). -->
-      <p class="guide-text">Before I designed anything, the research set three constraints the app had to work inside:</p>
-      <p class="guide-text"><b>It had to answer inside the break, not after it.</b> “For forty minutes it isn't worth the back and forth.” The window itself was the constraint — not willingness.</p>
-      <p class="guide-text"><b>It had to work across faculties, not just one course.</b> 65 % of students have a close friend outside their own course — exactly why a shared timetable never already existed. Survey · n=30.</p>
-      <p class="guide-text"><b>It had to cost nothing to check.</b> The 70 % who stopped trying didn't stop wanting to meet — checking cost more than the break was worth.</p>
+      <p class="guide-text" data-i18n-html="p-con0">Before I designed anything, the research set three constraints:</p>
+      <p class="guide-text" data-i18n-html="p-con1"><b>It had to answer inside the break, not after it.</b> The window was the constraint, not willingness.</p>
+      <p class="guide-text" data-i18n-html="p-con2"><b>It had to work across faculties.</b> 65 % of students have a close friend outside their own course, which is why a shared timetable never existed. Survey, n=30.</p>
+      <p class="guide-text" data-i18n-html="p-con3"><b>It had to cost nothing to check.</b> The 70 % who stopped trying still wanted to meet; checking cost more than the break was worth.</p>
     </section>
 
     <!-- 3 · The idea: shared free time -->
     <section class="guide-section cs-section" id="idea">
       <div class="section-heading-row">
-        <h2 class="section-title">The idea</h2>
+        <h2 class="section-title" data-i18n-html="h-idea">The idea</h2>
         <span class="step-badge">3</span>
       </div>
       <div class="dot-divider"></div>
@@ -3101,8 +3109,8 @@
            appear; the two panels below are CONSTRUCTED wireframes (built from
            the v1 screenshots, not the screenshots themselves) — monochrome,
            simplified, existing only to explain why there are two views. -->
-      <h3 class="cs-sub">Who's free now</h3>
-      <p class="guide-text">I wanted two ways into the same overlap, not one screen doing both jobs. Connect now is the glance — who is free right now, and until when, answered before you have typed anything. Tap open <b>Timetable</b> and it opens into the full week: everyone's actual timetable, side by side, for the times a two-second glance can't answer.</p>
+      <h3 class="cs-sub" data-i18n-html="sub-free">Who's free now</h3>
+      <p class="guide-text" data-i18n-html="p-idea1">I wanted two ways into the same overlap instead of one screen doing both jobs. Connect now is the glance: who is free right now and until when, before you have typed anything. Tap open <b>Timetable</b> and it opens into the full week, with everyone's timetable side by side, for the questions a glance can't answer.</p>
 
       <!-- 2026-10-06 (Lucas): the two v1 frames straight from the Figma file
            (unify: the Connect now card 971:2102 and the timetable 971:2165,
@@ -3110,7 +3118,7 @@
            them. In the Figma file the rows became Interface Design / Break /
            Materials & Processes / Book Club, with fewer friends on most. Fixed-aspect canvas, cqw units,
            scales like an image. -->
-      <div class="v1-scene v1-scene--idea" role="img" aria-label="The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, and its open Timetable button ringed, and an arrow from it to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, and the evening's Book Club.">
+      <div class="v1-scene v1-scene--idea" role="img" data-i18n-aria="a-v1idea" aria-label="The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, with its open Timetable button ringed, and an arrow to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, followed by the evening's Book Club.">
         <div class="v1-canvas">
           <div class="v1-zoom">
           <img class="v1-card" src="/images/unify/v1/fig-connect.webp?v=3" alt="" style="left: 13%; top: 13.1cqw; width: 32%;" />
@@ -3134,17 +3142,17 @@
            wireframes instead of its own heading + diagram. .ovl's CSS is
            left in place, unused, same convention as the other dormant
            blocks noted in this file (see CLAUDE.md). -->
-      <p class="guide-text"><b>The overlap is found by</b> reading the gaps between everyone's timetables, keeping only the stretches every friend has free at once, dropping anything shorter than 20 minutes, and taking the walk between buildings off both ends — the thing the group chat used to work out by eye.</p>
+      <p class="guide-text" data-i18n-html="p-idea2"><b>To find the overlap</b>, Unify reads the gaps between everyone's timetables, keeps only the stretches every friend has free, drops anything under 20 minutes and takes the walk between buildings off both ends. The group chat used to do this by eye.</p>
     </section>
 
     <!-- 4 · The pivot: v1 → character design -->
     <section class="guide-section cs-section" id="pivot">
       <div class="section-heading-row">
-        <h2 class="section-title">The pivot</h2>
+        <h2 class="section-title" data-i18n-html="h-pivot">The pivot</h2>
         <span class="step-badge">4</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">I designed the first version: blue, typewriter type, hard lines. The information architecture and the timetable logic — the merged view, the room-level map, the overlap logic — were already right here; only the visual language was about to change.</p>
+      <p class="guide-text" data-i18n-html="p-piv1">I designed the first version in blue, with typewriter type and hard lines. The structure worked; only the look was about to change.</p>
 
       <!-- v1 in detail, non-linear (2026-09-27, replacing the old phone-framed
            3-screen row + the removed final-design comparison and .diff chart —
@@ -3157,7 +3165,7 @@
            All five v1 Figma exports upright, side by side, staggered so they
            run off the top and bottom edges, in a fixed-aspect canvas that
            scales like an image. -->
-      <div class="v1-scene v1-scene--pivot" role="img" aria-label="A collage of the v1 design's parts: the Hello Lucas header, the Timetable and Socialplan switch with a course row, the activities card, the friends list, the menu bar, two event cards, the floor switcher and the map.">
+      <div class="v1-scene v1-scene--pivot" role="img" data-i18n-aria="a-v1col" aria-label="A collage of the v1 design's parts: the Hello Lucas header, the Timetable and Socialplan switch with a course row, the activities card, the friends list, the menu bar, two event cards, the floor switcher and the map.">
         <!-- 2026-10-06 (Lucas): composed IN FIGMA from the old design's own
              components and panels (file "unify", page "design old", frame
              "v1 collage (website)" 977:2543, 1600x900 = 16:9), texts corrected
@@ -3165,10 +3173,10 @@
         <div class="v1-canvas"><img class="v1-collage-img" src="/images/unify/v1/v1-collage.webp?v=4" alt="" /></div>
       </div>
 
-      <h3 class="cs-sub">It felt like a tool</h3>
-      <p class="guide-text">It was clear and structured, but the team's feedback round said the same thing back: it wasn't really a chill university vibe, especially for a design faculty. So the visual language was replaced.</p>
+      <h3 class="cs-sub" data-i18n-html="sub-tool">It felt like a tool</h3>
+      <p class="guide-text" data-i18n-html="p-piv2">It was clear and structured, but the team's feedback said the same thing back: it wasn't really a chill university vibe, especially for a design faculty. So the look was replaced.</p>
 
-      <h3 class="cs-sub">What replaced it</h3>
+      <h3 class="cs-sub" data-i18n-html="sub-replaced">What replaced it</h3>
       <!-- Compressed 2026-09-27 from a full color/typography/character exhibit
            (three swatch cards, three typography specimen pills, three
            illustrated character rows) down to this one paragraph — see
@@ -3176,7 +3184,7 @@
            Supporting Features' own final-app showcase; here the same facts
            work as the RATIONALE for the pivot, which is the only job this
            section has. -->
-      <p class="guide-text">The answer to "it feels like a tool" was not a nicer blue. Sophie and Moritz drew a cast of characters and built the palette and type around them: a pink you rarely see in an app <span class="inline-swatch" style="background: #FF88C8;"></span>, a warm off-white behind it <span class="inline-swatch" style="background: #F9F2EB;"></span>, and Nunito's rounded letterforms in place of the typewriter type. The same cast turns up inside the interface itself — on the map bar, on the mode toggle, in the empty states — so a friend becomes a shape you recognise rather than a name you read. The structure underneath — the merged timetable, the room-level map, the overlap logic — generally stayed the same.</p>
+      <p class="guide-text" data-i18n-html="p-piv3">The answer to "it feels like a tool" wasn't a nicer blue. Sophie and Moritz drew a cast of characters and built the palette and type around them: a pink you rarely see in an app <span class="inline-swatch" style="background: #FF88C8;"></span>, a warm off-white behind it <span class="inline-swatch" style="background: #F9F2EB;"></span>, and Nunito's rounded letterforms instead of typewriter type. The characters also appear in the interface itself, on the map bar, the mode toggle and the empty states, so a friend becomes a shape you recognise instead of a name you read. The structure underneath generally stayed the same.</p>
     </section>
 
     <!-- 5 · The final design: was two sections ("Designing the merged
@@ -3189,7 +3197,7 @@
          results" as a pie chart instead (see that section). -->
     <section class="guide-section cs-section" id="features">
       <div class="section-heading-row">
-        <h2 class="section-title">The final design</h2>
+        <h2 class="section-title" data-i18n-html="h-final">The final design</h2>
         <span class="step-badge">5</span>
       </div>
       <div class="dot-divider"></div>
@@ -3231,12 +3239,12 @@
           </div>
           <div class="scrolly-copy">
             <div class="scrolly-panel is-active" data-step="timetable">
-              <h3 class="feature-title">Your Timetable, and Everyone's</h3>
-              <p class="guide-text">See your own timetable alongside your friends', and who shares each course. Your schedule splits in two: <b>pink for regular courses</b>, beige for the social activities you add from the Socials page. Below it sit your friends' timetables. Location tracking detects when you're inside the building and <b>lights up your current room in green</b>.</p>
+              <h3 class="feature-title" data-i18n-html="ft-tt">Your Timetable, and Everyone's</h3>
+              <p class="guide-text" data-i18n-html="fp-tt">See your own timetable next to your friends' and who shares each course. Your schedule splits in two: <b>pink for courses</b>, beige for social activities you add from Socials. Your friends' timetables sit below. Location tracking detects when you're in the building and <b>lights up your current room in green</b>.</p>
             </div>
             <div class="scrolly-panel" data-step="socials">
-              <h3 class="feature-title">Beyond the Group Chat</h3>
-              <p class="guide-text">Every uni has that one group chat where events and social plans get buried under hundreds of messages. <b>Socials replaces it</b> — activities get posted here instead, so nothing slips through. Scroll through the week, and when something appeals to you, add it <b>straight to your timetable</b> in a tap. This part stayed a concept: it only makes sense with far more users than the pilot had.</p>
+              <h3 class="feature-title" data-i18n-html="ft-soc">Beyond the Group Chat</h3>
+              <p class="guide-text" data-i18n-html="fp-soc">Every uni has a group chat where events get buried under hundreds of messages. <b>Socials replaces it</b>: activities get posted here, so nothing slips through. Scroll through the week and add what appeals to you <b>to your timetable</b> in one tap. This part stayed a concept, since it only makes sense with far more users than the pilot had.</p>
             </div>
           </div>
         </div>
@@ -3275,12 +3283,12 @@
           </div>
           <div class="scrolly-copy">
             <div class="scrolly-panel is-active" data-step="friends">
-              <h3 class="feature-title">Find Your Friends Indoors</h3>
-              <p class="guide-text">Apps like Find My are great for locating friends — until everyone's inside the same building and the map turns useless. Unify syncs <b>room-level location</b> with the university's <b>floor plans</b>, so you can see exactly who's around you on the map, or search for someone specific from the menu.</p>
+              <h3 class="feature-title" data-i18n-html="ft-fri">Find Your Friends Indoors</h3>
+              <p class="guide-text" data-i18n-html="fp-fri">Apps like Find My work until everyone is in the same building and the map stops being useful. Unify syncs <b>room-level location</b> with the university's <b>floor plans</b>, so you see exactly who is around you, or search for someone from the menu.</p>
             </div>
             <div class="scrolly-panel" data-step="courses">
-              <h3 class="feature-title">Find the Right Room</h3>
-              <p class="guide-text">The same idea, now for your courses. Universities are huge — hundreds of rooms across sprawling buildings — and working out where each class is can be overwhelming, especially when you're new. Unify syncs with your timetable to plot <b>every course room on the map</b>; tap one to see the full details of that class.</p>
+              <h3 class="feature-title" data-i18n-html="ft-room">Find the Right Room</h3>
+              <p class="guide-text" data-i18n-html="fp-room">The same idea for your courses. Universities have hundreds of rooms across sprawling buildings, and finding your class can be overwhelming, especially when you're new. Unify syncs with your timetable and plots <b>every course room on the map</b>. Tap one to see the details of that class.</p>
             </div>
           </div>
         </div>
@@ -3299,8 +3307,8 @@
           </div>
         </div>
         <div class="feature-copy">
-          <h3 class="feature-title">Profile &amp; Friends</h3>
-          <p class="guide-text">The menu is where you set yourself up. Customise your profile, and connect your courses in one step — everything <b>syncs automatically</b> from your matriculation number. It's also home to your <b>friends list</b>, where you add or remove people whenever you need.</p>
+          <h3 class="feature-title" data-i18n-html="ft-prof">Profile &amp; Friends</h3>
+          <p class="guide-text" data-i18n-html="fp-prof">The menu is where you set yourself up. Customise your profile and connect your courses in one step; everything <b>syncs automatically</b> from your matriculation number. Your <b>friends list</b> lives here too, so you can add or remove people whenever you like.</p>
         </div>
       </div>
 
@@ -3312,19 +3320,19 @@
            each is the app's real panel (see .home-previews CSS). Two reasons, kept
            apart on purpose: a glance is usually enough, and a preview pulls
            you into the full screen. -->
-      <div class="home-previews" role="img" aria-label="The three cards on the Unify home screen, opened: connect now (who's free and until when), socials (what's on today), map (friends nearby).">
+      <div class="home-previews" role="img" data-i18n-aria="a-home" aria-label="The three cards on the Unify home screen, opened: connect now (who's free and until when), socials (what's on today), map (friends nearby).">
         <div class="home-panel" style="aspect-ratio: 377 / 402;"><iframe class="home-frame" src="/unify/app-home/home.html?open=connect&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
         <div class="home-panel" style="aspect-ratio: 377 / 411;"><iframe class="home-frame" src="/unify/app-home/home.html?open=socials&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
         <div class="home-panel" style="aspect-ratio: 377 / 402;"><iframe class="home-frame" src="/unify/app-home/home.html?open=map&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
       </div>
       <div class="home-copy">
         <div>
-          <h3 class="feature-title">A glance is usually enough</h3>
-          <p class="guide-text">We started with the three features as full screens: the timetable, the socials, the map. Using them, we noticed that most of the time nobody needs a friend's whole week, only who is free right now. Socials worked the same way: you rarely scroll the full list, you want to know what's on today. So the home screen became three summaries, one card per feature, each holding only its most important piece.</p>
+          <h3 class="feature-title" data-i18n-html="ft-glance">A glance is usually enough</h3>
+          <p class="guide-text" data-i18n-html="fp-glance">We built the timetable, socials and map as full screens first. Using them, we noticed that most of the time nobody needs a friend's whole week, only who is free right now. Socials was the same: you rarely scroll the full list, you just want to know what's on today. So the home screen became three summary cards, each showing only the most important piece of its feature.</p>
         </div>
         <div>
-          <h3 class="feature-title">A preview pulls you in</h3>
-          <p class="guide-text">The second reason is what the summaries do for the screens behind them. A YouTube video that plays a few seconds of itself in the feed gets clicked more than a still thumbnail, and the cards are meant to work the same way. Who's free, what's on and who's nearby all sit on the first screen you see, so each card is an invitation to open the full feature behind it, instead of a feature waiting for you to go looking.</p>
+          <h3 class="feature-title" data-i18n-html="ft-prev">A preview pulls you in</h3>
+          <p class="guide-text" data-i18n-html="fp-prev">The summaries also pull people into the screens behind them. A YouTube video that plays a few seconds of itself in the feed gets clicked more than a still thumbnail, and the cards work the same way. Who's free, what's on and who's nearby all sit on the first screen, so each card invites you to open the full feature behind it.</p>
         </div>
       </div>
 
@@ -3333,7 +3341,7 @@
     <!-- 6 · Testing + results -->
     <section class="guide-section cs-section" id="results">
       <div class="section-heading-row">
-        <h2 class="section-title">Testing and results</h2>
+        <h2 class="section-title" data-i18n-html="h-results">Testing and results</h2>
         <span class="step-badge">6</span>
       </div>
       <div class="dot-divider"></div>
@@ -3350,16 +3358,16 @@
            intro AND implicitly a third time as a separate "12 participants"
            moderated test further down — three different framings of what is
            one study. Everything below this paragraph now belongs to it. -->
-      <p class="guide-text">Five friend groups — twenty students in all — used the coded prototype for three weeks. Everything below comes out of those three weeks: what the app recorded while they used it, and the interviews I ran with them at the end.</p>
-      <p class="guide-text">One part could not be tested: the social plan, the activities you add to your timetable. It only makes sense with many more users than a pilot of twenty, and it would have to be tested at a much larger scale — so it remained a concept.</p>
+      <p class="guide-text" data-i18n-html="p-res1">Five friend groups, twenty students in all, used the coded prototype for three weeks. Everything below comes from what the app recorded in that time and from interviews I ran with them at the end.</p>
+      <p class="guide-text" data-i18n-html="p-res2">One part could not be tested: the social plan, the activities you add to your timetable. It only makes sense with many more users than a pilot of twenty and would need testing at a much larger scale, so it remained a concept.</p>
 
       <div class="res-block">
-        <h3 class="cs-sub">Where the time went</h3>
+        <h3 class="cs-sub" data-i18n-html="sub-time">Where the time went</h3>
         <!-- Leader-line coordinates are derived from the gradient's own start
              angle (106.4deg) — see the .pie-stage CSS note. Per slice: a point
              on its arc, a radial step out, then horizontal to x=118. Labels sit
              at the matching `top` so each one lines up with its own line. -->
-        <div class="pie-stage" role="img" aria-label="Share of pilot time per feature: who's free now 70%, timetable 20%, friends map 5%, room map 5%.">
+        <div class="pie-stage" role="img" data-i18n-aria="a-pie" aria-label="Share of pilot time per feature: who's free now 70%, timetable 20%, friends map 5%, room map 5%.">
           <div class="pie-chart" id="usage-pie" style="background: conic-gradient(from 106.4deg, #FF88C8 0deg 252deg, #1A1A1A 252deg 324deg, #8E8E93 324deg 342deg, #F9F2EB 342deg 360deg);"></div>
           <svg class="pie-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             <polyline points="88.3,17.9 95.2,12.1 118,12.1" />
@@ -3367,12 +3375,12 @@
             <polyline points="99.6,56.4 108.5,57.6 118,57.6" />
             <polyline points="88.3,82.1 95.2,87.9 118,87.9" />
           </svg>
-          <span class="pie-label" style="top: 12.1%;">Timetable <b>20 %</b></span>
-          <span class="pie-label" style="top: 39.1%;">Friends map <b>5 %</b></span>
-          <span class="pie-label" style="top: 57.6%;">Room map <b>5 %</b></span>
-          <span class="pie-label" style="top: 87.9%;">Who's free now <b>70 %</b></span>
+          <span class="pie-label" style="top: 12.1%;" data-i18n-html="pie-tt">Timetable <b>20 %</b></span>
+          <span class="pie-label" style="top: 39.1%;" data-i18n-html="pie-fr">Friends map <b>5 %</b></span>
+          <span class="pie-label" style="top: 57.6%;" data-i18n-html="pie-rm">Room map <b>5 %</b></span>
+          <span class="pie-label" style="top: 87.9%;" data-i18n-html="pie-free">Who's free now <b>70 %</b></span>
         </div>
-        <p class="guide-text res-note">Once the home screen was in, seven in ten of the pilot's minutes were spent on "who's free now" alone; everything else — the full timetable first, then the friends map and the room map — split the remaining 30 %. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
+        <p class="guide-text res-note" data-i18n-html="p-pie">Once the home screen was in, seven in ten of the pilot's minutes went to "who's free now". The full timetable, the friends map and the room map split the remaining 30 %. Meetups per person per week rose from 1.4 before the app to 3.1 with it.</p>
       </div>
 
       <!-- Before / after the home screen (2026-10-05, Lucas): the evidence for
@@ -3384,21 +3392,21 @@
            home screen arrived after the first pilot week) — see the list at
            the top of the file. -->
       <div class="res-block">
-        <h3 class="cs-sub">Before and after the home screen</h3>
-        <div class="ba-chart" role="img" aria-label="Opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify 4 to 6, map 1 to 2.">
-          <div class="ba-legend"><span><i></i>Week 1, no home screen</span><span><i class="is-after"></i>Weeks 2–3, with it</span></div>
+        <h3 class="cs-sub" data-i18n-html="sub-ba">Before and after the home screen</h3>
+        <div class="ba-chart" role="img" data-i18n-aria="a-ba" aria-label="Opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify 4 to 6, map 1 to 2.">
+          <div class="ba-legend"><span data-i18n-html="ba-l1"><i></i>Week 1, no home screen</span><span data-i18n-html="ba-l2"><i class="is-after"></i>Weeks 2 and 3, with it</span></div>
           <div class="ba-group">
-            <span class="chart-key">Opened Unify</span>
-            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 40;"></span></span><span class="chart-val">4 / week</span></div>
-            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 60;"></span></span><span class="chart-val">6 / week</span></div>
+            <span class="chart-key" data-i18n-html="ba-k1">Opened Unify</span>
+            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 40;"></span></span><span class="chart-val" data-i18n-html="ba-v4">4 / week</span></div>
+            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 60;"></span></span><span class="chart-val" data-i18n-html="ba-v6">6 / week</span></div>
           </div>
           <div class="ba-group">
-            <span class="chart-key">Opened the map</span>
-            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 10;"></span></span><span class="chart-val">1 / week</span></div>
-            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 20;"></span></span><span class="chart-val">2 / week</span></div>
+            <span class="chart-key" data-i18n-html="ba-k2">Opened the map</span>
+            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 10;"></span></span><span class="chart-val" data-i18n-html="ba-v1">1 / week</span></div>
+            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 20;"></span></span><span class="chart-val" data-i18n-html="ba-v2">2 / week</span></div>
           </div>
         </div>
-        <p class="guide-text res-note">For the first week of the pilot the prototype opened straight onto the timetable; the home screen arrived for weeks two and three. Once it did, people opened Unify half as often again, and the map — barely touched in week one — was opened twice as often, most of the time straight from its card.</p>
+        <p class="guide-text res-note" data-i18n-html="p-ba">In week one the prototype opened straight onto the timetable. The home screen arrived for weeks two and three, and people then opened Unify half as often again. The map, barely touched in week one, was opened twice as often, mostly straight from its card.</p>
       </div>
 
 
@@ -3413,17 +3421,17 @@
       <div class="fact-bar" style="margin-top: clamp(60px, 9vw, 84px);">
         <div class="fact">
           <span class="fact-num">20 min</span>
-          <span class="fact-label">spent texting to arrange one meetup between classes</span>
-          <span class="fact-src">Before Unify · diary study</span>
+          <span class="fact-label" data-i18n-html="f1">spent texting to arrange one meetup between classes</span>
+          <span class="fact-src" data-i18n-html="f1s">Before Unify · diary study</span>
         </div>
         <div class="fact">
           <span class="fact-num">5 min</span>
-          <span class="fact-label">to arrange one meetup with Unify, 75 % less than before</span>
+          <span class="fact-label" data-i18n-html="f2">to arrange one meetup with Unify, 75 % less than before</span>
           <span class="fact-src">During the pilot</span>
         </div>
         <div class="fact">
-          <span class="fact-num">2.2×</span>
-          <span class="fact-label">more meetups per person per week, 1.4 to 3.1</span>
+          <span class="fact-num" data-i18n-html="f3n">2.2×</span>
+          <span class="fact-label" data-i18n-html="f3">more meetups per person per week, 1.4 to 3.1</span>
           <span class="fact-src">During the pilot</span>
         </div>
       </div>
@@ -3432,7 +3440,7 @@
     <!-- 7 · What we learned + next -->
     <section class="guide-section cs-section" id="learned">
       <div class="section-heading-row">
-        <h2 class="section-title">What we learned</h2>
+        <h2 class="section-title" data-i18n-html="h-learned">What we learned</h2>
         <span class="step-badge">7</span>
       </div>
       <div class="dot-divider"></div>
@@ -3440,9 +3448,9 @@
            first and the home screen last (the order they were built in), so
            this paragraph no longer claims the page walks the app in usage
            order; it ties the usage finding to the home screen instead. -->
-      <p class="guide-text">The feature everyone argued about was not the one that got used. Seven in ten of the pilot's minutes sat in a single block on the home screen, while the indoor map — the part that was hardest to build — barely registered in it. It backed up the home screen: the full screens came first, and the summary of all three turned out to be where people actually spent their time.</p>
-      <p class="guide-text">A visual language is not decoration. My v1 was clear, structured and cold, and the feedback round said so in the politest possible way: it looked like something the university had issued. The same screens in the character design read as the group's own, and the information architecture underneath stayed largely the same.</p>
-      <p class="guide-text">What I would do next: widgets, so the free-now block never needs the app opened at all, and a proper look at what happens when a group grows past six people — the shared lane in the timetable starts to crowd at around eight.</p>
+      <p class="guide-text" data-i18n-html="p-l1">The feature everyone argued about was not the one that got used. Seven in ten of the pilot's minutes went to a single block on the home screen, while the indoor map, the hardest part to build, barely registered. The summary of all three features turned out to be where people actually spent their time.</p>
+      <p class="guide-text" data-i18n-html="p-l2">A visual language is not decoration. My v1 was clear, structured and cold, and the feedback round said so politely: it looked like something the university had issued. The same screens in the character design read as the group's own, and the structure underneath stayed largely the same.</p>
+      <p class="guide-text" data-i18n-html="p-l3">Next I would build widgets, so the free-now block never needs the app opened, and look at what happens when a group grows past six people. The shared lane in the timetable starts to crowd at around eight.</p>
       <!-- The hero's blob, reused (Lucas, 2026-10-05): upside down, half the
            hero's size, its head sunk into the line above the next-project panel
            so it pokes up out of it. It is the LONG body the phone hero uses
@@ -3651,6 +3659,90 @@
         'feat-settings-text': 'The menu is where you set yourself up. Customise your profile, and connect your courses in one step — everything <b class="kw">syncs automatically</b> from your matriculation number. It\'s also home to your <b class="kw">friends list</b>, where you add or remove people whenever you need.',
         'nav-next': 'NEXT >>',
         'nav-virtual-cooking': 'Virtual Cooking',
+        "cs-lead": "Unify shows when your friends are free at the same time as you, so meeting up between classes no longer takes a group chat.",
+        "val-timeline": "February to June 2026",
+        "val-role": "Concept<br>UX<br>Design<br>Prototype",
+        "h-problem": "The problem",
+        "p-problem": "My friends and I study different subjects. We share a campus but rarely a course, so every week we swapped screenshots of our timetables to find a time to meet. In a week-long diary study, arranging a 30-minute coffee took 20 minutes of texting on average, and a third of the attempts never happened.",
+        "imsg-day": "<b>Today</b> 09:12",
+        "kick-survey": "Survey · 30 students · before Unify",
+        "head-85": "85 % of students never meet a friend from another course between classes",
+        "seg-text": "still text",
+        "seg-quit": "have stopped trying",
+        "brace-85": "<b>85 % never met anyone</b>",
+        "head-why": "Why the 70 % stopped trying",
+        "p-int1": "I went back to nine students who had stopped arranging anything between classes. Not one said they didn't want to meet. It simply costs more than it is worth: \"I'd meet them if I knew when, but working it out takes longer than the break.\" <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.",
+        "p-int2": "The second thing was the size of the window: \"By the time everyone has answered, I'm already in the next lecture.\" <b>For forty minutes it isn't worth the back and forth</b>, and as one of them put it, \"we say next week, and next week never comes.\"",
+        "h-constraints": "The constraints",
+        "p-con0": "Before I designed anything, the research set three constraints:",
+        "p-con1": "<b>It had to answer inside the break, not after it.</b> The window was the constraint, not willingness.",
+        "p-con2": "<b>It had to work across faculties.</b> 65 % of students have a close friend outside their own course, which is why a shared timetable never existed. Survey, n=30.",
+        "p-con3": "<b>It had to cost nothing to check.</b> The 70 % who stopped trying still wanted to meet; checking cost more than the break was worth.",
+        "h-idea": "The idea",
+        "sub-free": "Who's free now",
+        "p-idea1": "I wanted two ways into the same overlap instead of one screen doing both jobs. Connect now is the glance: who is free right now and until when, before you have typed anything. Tap open <b>Timetable</b> and it opens into the full week, with everyone's timetable side by side, for the questions a glance can't answer.",
+        "p-idea2": "<b>To find the overlap</b>, Unify reads the gaps between everyone's timetables, keeps only the stretches every friend has free, drops anything under 20 minutes and takes the walk between buildings off both ends. The group chat used to do this by eye.",
+        "h-pivot": "The pivot",
+        "p-piv1": "I designed the first version in blue, with typewriter type and hard lines. The structure worked; only the look was about to change.",
+        "sub-tool": "It felt like a tool",
+        "p-piv2": "It was clear and structured, but the team's feedback said the same thing back: it wasn't really a chill university vibe, especially for a design faculty. So the look was replaced.",
+        "sub-replaced": "What replaced it",
+        "p-piv3": "The answer to \"it feels like a tool\" wasn't a nicer blue. Sophie and Moritz drew a cast of characters and built the palette and type around them: a pink you rarely see in an app <span class=\"inline-swatch\" style=\"background: #FF88C8;\"></span>, a warm off-white behind it <span class=\"inline-swatch\" style=\"background: #F9F2EB;\"></span>, and Nunito's rounded letterforms instead of typewriter type. The characters also appear in the interface itself, on the map bar, the mode toggle and the empty states, so a friend becomes a shape you recognise instead of a name you read. The structure underneath generally stayed the same.",
+        "h-final": "The final design",
+        "ft-tt": "Your Timetable, and Everyone's",
+        "fp-tt": "See your own timetable next to your friends' and who shares each course. Your schedule splits in two: <b>pink for courses</b>, beige for social activities you add from Socials. Your friends' timetables sit below. Location tracking detects when you're in the building and <b>lights up your current room in green</b>.",
+        "ft-soc": "Beyond the Group Chat",
+        "fp-soc": "Every uni has a group chat where events get buried under hundreds of messages. <b>Socials replaces it</b>: activities get posted here, so nothing slips through. Scroll through the week and add what appeals to you <b>to your timetable</b> in one tap. This part stayed a concept, since it only makes sense with far more users than the pilot had.",
+        "ft-fri": "Find Your Friends Indoors",
+        "fp-fri": "Apps like Find My work until everyone is in the same building and the map stops being useful. Unify syncs <b>room-level location</b> with the university's <b>floor plans</b>, so you see exactly who is around you, or search for someone from the menu.",
+        "ft-room": "Find the Right Room",
+        "fp-room": "The same idea for your courses. Universities have hundreds of rooms across sprawling buildings, and finding your class can be overwhelming, especially when you're new. Unify syncs with your timetable and plots <b>every course room on the map</b>. Tap one to see the details of that class.",
+        "ft-prof": "Profile &amp; Friends",
+        "fp-prof": "The menu is where you set yourself up. Customise your profile and connect your courses in one step; everything <b>syncs automatically</b> from your matriculation number. Your <b>friends list</b> lives here too, so you can add or remove people whenever you like.",
+        "ft-glance": "A glance is usually enough",
+        "fp-glance": "We built the timetable, socials and map as full screens first. Using them, we noticed that most of the time nobody needs a friend's whole week, only who is free right now. Socials was the same: you rarely scroll the full list, you just want to know what's on today. So the home screen became three summary cards, each showing only the most important piece of its feature.",
+        "ft-prev": "A preview pulls you in",
+        "fp-prev": "The summaries also pull people into the screens behind them. A YouTube video that plays a few seconds of itself in the feed gets clicked more than a still thumbnail, and the cards work the same way. Who's free, what's on and who's nearby all sit on the first screen, so each card invites you to open the full feature behind it.",
+        "h-results": "Testing and results",
+        "p-res1": "Five friend groups, twenty students in all, used the coded prototype for three weeks. Everything below comes from what the app recorded in that time and from interviews I ran with them at the end.",
+        "p-res2": "One part could not be tested: the social plan, the activities you add to your timetable. It only makes sense with many more users than a pilot of twenty and would need testing at a much larger scale, so it remained a concept.",
+        "sub-time": "Where the time went",
+        "pie-tt": "Timetable <b>20 %</b>",
+        "pie-fr": "Friends map <b>5 %</b>",
+        "pie-rm": "Room map <b>5 %</b>",
+        "pie-free": "Who's free now <b>70 %</b>",
+        "p-pie": "Once the home screen was in, seven in ten of the pilot's minutes went to \"who's free now\". The full timetable, the friends map and the room map split the remaining 30 %. Meetups per person per week rose from 1.4 before the app to 3.1 with it.",
+        "sub-ba": "Before and after the home screen",
+        "ba-l1": "<i></i>Week 1, no home screen",
+        "ba-l2": "<i class=\"is-after\"></i>Weeks 2 and 3, with it",
+        "ba-k1": "Opened Unify",
+        "ba-k2": "Opened the map",
+        "ba-v4": "4 / week",
+        "ba-v6": "6 / week",
+        "ba-v1": "1 / week",
+        "ba-v2": "2 / week",
+        "p-ba": "In week one the prototype opened straight onto the timetable. The home screen arrived for weeks two and three, and people then opened Unify half as often again. The map, barely touched in week one, was opened twice as often, mostly straight from its card.",
+        "f1": "spent texting to arrange one meetup between classes",
+        "f1s": "Before Unify · diary study",
+        "f2": "to arrange one meetup with Unify, 75 % less than before",
+        "f3": "more meetups per person per week, 1.4 to 3.1",
+        "f3n": "2.2×",
+        "h-learned": "What we learned",
+        "p-l1": "The feature everyone argued about was not the one that got used. Seven in ten of the pilot's minutes went to a single block on the home screen, while the indoor map, the hardest part to build, barely registered. The summary of all three features turned out to be where people actually spent their time.",
+        "p-l2": "A visual language is not decoration. My v1 was clear, structured and cold, and the feedback round said so politely: it looked like something the university had issued. The same screens in the character design read as the group's own, and the structure underneath stayed largely the same.",
+        "p-l3": "Next I would build widgets, so the free-now block never needs the app opened, and look at what happens when a group grows past six people. The shared lane in the timetable starts to crowd at around eight.",
+        "a-chat": "Group chat: friends post screenshots of their timetables and fail to find a shared slot by hand. The one who replies late misses lunch.",
+        "a-bar": "Of everyone asked, 30 % still text or swap screenshots and 70 % have stopped trying. Half of the texting group never met, which with the ones who never tried makes 85 % of everyone.",
+        "a-v1idea": "The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, with its open Timetable button ringed, and an arrow to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, followed by the evening's Book Club.",
+        "a-v1col": "A collage of the v1 design's parts: the Hello Lucas header, the Timetable and Socialplan switch with a course row, the activities card, the friends list, the menu bar, two event cards, the floor switcher and the map.",
+        "a-home": "The three cards on the Unify home screen, opened: connect now (who's free and until when), socials (what's on today), map (friends nearby).",
+        "a-pie": "Share of pilot time per feature: who's free now 70%, timetable 20%, friends map 5%, room map 5%.",
+        "a-ba": "Opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify 4 to 6, map 1 to 2.",
+        "val-team": "Lucas Maher<br>Sophie Meyer<br>Moritz Ackermann",
+        "val-skills": "Figma<br>UX research<br>Vibe coding",
+        "label-skills": "Skills",
+        "label-role": "Role",
+        "label-timeline": "Timeline",
       },
       de: {
         'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
@@ -3692,12 +3784,97 @@
         'feat-settings-text': 'Im Menü richtest du dich ein. Passe dein Profil an und verbinde deine Kurse in einem Schritt — alles <b class="kw">synchronisiert sich automatisch</b> über deine Matrikelnummer. Hier liegt auch deine <b class="kw">Freundesliste</b>, in der du jederzeit Leute hinzufügen oder entfernen kannst.',
         'nav-next': 'WEITER >>',
         'nav-virtual-cooking': 'Virtual Cooking',
+        "cs-lead": "Unify zeigt dir, wann deine Freunde gleichzeitig mit dir frei sind. Für ein Treffen zwischen den Vorlesungen braucht es keinen Gruppenchat mehr.",
+        "val-timeline": "Februar bis Juni 2026",
+        "val-role": "Konzept<br>UX<br>Design<br>Prototyp",
+        "h-problem": "Das Problem",
+        "p-problem": "Meine Freunde und ich studieren unterschiedliche Fächer. Wir teilen uns einen Campus, aber selten einen Kurs. Also tauschten wir jede Woche Screenshots unserer Stundenpläne, um einen Termin zu finden. In einer Tagebuchstudie über eine Woche dauerte es im Schnitt 20 Minuten Schreiberei, einen Kaffee von 30 Minuten zu verabreden, und ein Drittel der Versuche scheiterte ganz.",
+        "imsg-day": "<b>Heute</b> 09:12",
+        "kick-survey": "Umfrage · 30 Studierende · vor Unify",
+        "head-85": "85 % der Studierenden treffen zwischen den Vorlesungen nie einen Freund aus einem anderen Studiengang",
+        "seg-text": "schreiben noch",
+        "seg-quit": "haben aufgegeben",
+        "brace-85": "<b>85 % haben sich nie getroffen</b>",
+        "head-why": "Warum die 70 % aufgegeben haben",
+        "p-int1": "Ich habe mit neun Studierenden gesprochen, die zwischen den Vorlesungen nichts mehr verabreden. Keiner sagte, dass er sich nicht treffen will. Es kostet nur mehr, als es bringt: „Ich würde sie treffen, wenn ich wüsste, wann. Aber das herauszufinden dauert länger als die Pause.“ <b>Herauszufinden, ob deine Freunde frei sind, ist die eigentliche Arbeit</b>, und die Pause ist vorbei, bis du damit fertig bist.",
+        "p-int2": "Das Zweite war das Zeitfenster: „Bis alle geantwortet haben, sitze ich schon in der nächsten Vorlesung.“ <b>Für vierzig Minuten lohnt sich das Hin und Her nicht</b>, und wie einer sagte: „Wir sagen nächste Woche, und nächste Woche kommt nie.“",
+        "h-constraints": "Die Rahmenbedingungen",
+        "p-con0": "Bevor ich irgendetwas gestaltet habe, hat die Recherche drei Rahmenbedingungen gesetzt:",
+        "p-con1": "<b>Die App musste innerhalb der Pause antworten, nicht danach.</b> Das Zeitfenster war die Grenze, nicht die Bereitschaft.",
+        "p-con2": "<b>Sie musste über Fakultäten hinweg funktionieren.</b> 65 % der Studierenden haben einen engen Freund außerhalb ihres Studiengangs, deshalb gab es nie einen gemeinsamen Stundenplan. Umfrage, n=30.",
+        "p-con3": "<b>Das Nachschauen durfte nichts kosten.</b> Die 70 %, die aufgegeben haben, wollten sich weiterhin treffen; das Nachschauen kostete mehr, als die Pause wert war.",
+        "h-idea": "Die Idee",
+        "sub-free": "Wer gerade frei ist",
+        "p-idea1": "Ich wollte zwei Wege zur selben Überschneidung, statt eines Bildschirms, der beides erledigt. „Connect now“ ist der Blick: wer jetzt frei ist und bis wann, bevor du etwas getippt hast. Mit „open <b>Timetable</b>“ öffnet sich die ganze Woche, alle Stundenpläne nebeneinander, für die Fragen, die ein Blick nicht beantwortet.",
+        "p-idea2": "<b>Um die Überschneidung zu finden</b>, liest Unify die Lücken zwischen allen Stundenplänen, behält nur die Zeiten, in denen alle Freunde frei sind, streicht alles unter 20 Minuten und zieht den Weg zwischen den Gebäuden an beiden Enden ab. Das hat früher der Gruppenchat nach Augenmaß erledigt.",
+        "h-pivot": "Die Kehrtwende",
+        "p-piv1": "Die erste Version habe ich in Blau gestaltet, mit Schreibmaschinenschrift und harten Linien. Die Struktur funktionierte, nur das Aussehen sollte sich ändern.",
+        "sub-tool": "Es wirkte wie ein Werkzeug",
+        "p-piv2": "Sie war klar und strukturiert, aber das Feedback des Teams sagte dasselbe zurück: kein entspanntes Uni-Gefühl, schon gar nicht für eine Designfakultät. Also wurde die Optik ersetzt.",
+        "sub-replaced": "Was sie ersetzt hat",
+        "p-piv3": "Die Antwort auf „wirkt wie ein Werkzeug“ war kein schöneres Blau. Sophie und Moritz haben eine Reihe von Charakteren gezeichnet und Farbpalette und Schrift darum herum gebaut: ein Pink, das man in Apps selten sieht <span class=\"inline-swatch\" style=\"background: #FF88C8;\"></span>, ein warmes Off-White dahinter <span class=\"inline-swatch\" style=\"background: #F9F2EB;\"></span> und Nunitos runde Buchstaben statt der Schreibmaschinenschrift. Die Charaktere tauchen auch im Interface selbst auf, in der Kartenleiste, im Modus-Schalter und in leeren Zuständen, sodass ein Freund zu einer Form wird, die du wiedererkennst, statt zu einem Namen, den du liest. Die Struktur darunter blieb im Großen und Ganzen gleich.",
+        "h-final": "Das finale Design",
+        "ft-tt": "Dein Stundenplan und der aller anderen",
+        "fp-tt": "Sieh deinen eigenen Stundenplan neben dem deiner Freunde und wer welchen Kurs mit dir teilt. Dein Plan teilt sich in zwei: <b>Pink für Kurse</b>, Beige für soziale Aktivitäten, die du aus Socials hinzufügst. Darunter liegen die Stundenpläne deiner Freunde. Die Standortverfolgung erkennt, wenn du im Gebäude bist, und <b>leuchtet deinen aktuellen Raum grün auf</b>.",
+        "ft-soc": "Mehr als der Gruppenchat",
+        "fp-soc": "Jede Uni hat einen Gruppenchat, in dem Events zwischen hunderten Nachrichten untergehen. <b>Socials ersetzt ihn</b>: Aktivitäten werden hier gepostet, damit nichts durchrutscht. Scroll durch die Woche und füge, was dir gefällt, mit einem Tipp <b>deinem Stundenplan</b> hinzu. Dieser Teil blieb ein Konzept, weil er nur mit deutlich mehr Nutzern Sinn ergibt, als der Pilot hatte.",
+        "ft-fri": "Freunde drinnen finden",
+        "fp-fri": "Apps wie „Wo ist“ funktionieren, bis alle im selben Gebäude sind und die Karte nichts mehr hergibt. Unify gleicht den <b>Standort auf Raumebene</b> mit den <b>Gebäudeplänen der Uni</b> ab. So siehst du genau, wer in deiner Nähe ist, oder suchst im Menü nach einer bestimmten Person.",
+        "ft-room": "Den richtigen Raum finden",
+        "fp-room": "Dieselbe Idee für deine Kurse. Unis haben hunderte Räume in weitläufigen Gebäuden, und den eigenen Kurs zu finden kann überfordern, besonders am Anfang. Unify gleicht sich mit deinem Stundenplan ab und zeigt <b>jeden Kursraum auf der Karte</b>. Tippe einen an, um die Details zum Kurs zu sehen.",
+        "ft-prof": "Profil &amp; Freunde",
+        "fp-prof": "Im Menü richtest du dich ein. Passe dein Profil an und verbinde deine Kurse in einem Schritt; alles <b>synchronisiert sich automatisch</b> über deine Matrikelnummer. Hier liegt auch deine <b>Freundesliste</b>, in der du jederzeit Leute hinzufügen oder entfernen kannst.",
+        "ft-glance": "Ein Blick reicht meistens",
+        "fp-glance": "Zuerst habe ich Stundenplan, Socials und Karte als volle Bildschirme gebaut. Beim Benutzen fiel uns auf, dass meistens niemand die ganze Woche eines Freundes braucht, sondern nur, wer gerade frei ist. Bei Socials war es genauso: Die volle Liste scrollt kaum jemand, man will wissen, was heute los ist. Also wurde der Startbildschirm zu drei Zusammenfassungen, jede zeigt nur das Wichtigste ihrer Funktion.",
+        "ft-prev": "Eine Vorschau zieht dich rein",
+        "fp-prev": "Die Zusammenfassungen ziehen die Leute auch in die Bildschirme dahinter. Ein YouTube-Video, das im Feed ein paar Sekunden von sich selbst abspielt, wird öfter geklickt als ein stehendes Vorschaubild, und die Kacheln funktionieren genauso. Wer frei ist, was los ist und wer in der Nähe ist, steht alles auf dem ersten Bildschirm, jede Kachel lädt also dazu ein, die ganze Funktion dahinter zu öffnen.",
+        "h-results": "Tests und Ergebnisse",
+        "p-res1": "Fünf Freundesgruppen, zusammen zwanzig Studierende, haben den programmierten Prototyp drei Wochen lang genutzt. Alles Folgende stammt aus dem, was die App in dieser Zeit aufgezeichnet hat, und aus Interviews, die ich am Ende mit ihnen geführt habe.",
+        "p-res2": "Ein Teil ließ sich nicht testen: der Social Plan, also die Aktivitäten, die du in deinen Stundenplan übernimmst. Er ergibt nur mit viel mehr Nutzern als in einem Pilot von zwanzig Sinn und müsste in viel größerem Maßstab getestet werden, deshalb blieb er ein Konzept.",
+        "sub-time": "Wohin die Zeit ging",
+        "pie-tt": "Stundenplan <b>20 %</b>",
+        "pie-fr": "Freundeskarte <b>5 %</b>",
+        "pie-rm": "Raumkarte <b>5 %</b>",
+        "pie-free": "Wer jetzt frei ist <b>70 %</b>",
+        "p-pie": "Sobald der Startbildschirm da war, ging sieben von zehn Pilotminuten an „Wer jetzt frei ist“. Stundenplan, Freundeskarte und Raumkarte teilten sich die übrigen 30 %. Die Treffen pro Person und Woche stiegen von 1,4 vor der App auf 3,1 mit ihr.",
+        "sub-ba": "Vor und nach dem Startbildschirm",
+        "ba-l1": "<i></i>Woche 1, ohne Startbildschirm",
+        "ba-l2": "<i class=\"is-after\"></i>Woche 2 und 3, damit",
+        "ba-k1": "Unify geöffnet",
+        "ba-k2": "Karte geöffnet",
+        "ba-v4": "4 / Woche",
+        "ba-v6": "6 / Woche",
+        "ba-v1": "1 / Woche",
+        "ba-v2": "2 / Woche",
+        "p-ba": "In Woche eins öffnete der Prototyp direkt den Stundenplan. Der Startbildschirm kam in Woche zwei und drei dazu, und danach öffneten die Leute Unify anderthalb Mal so oft. Die Karte, in Woche eins kaum angefasst, wurde doppelt so oft geöffnet, meist direkt über ihre Kachel.",
+        "f1": "Schreiberei, um ein Treffen zwischen den Vorlesungen zu verabreden",
+        "f1s": "Vor Unify · Tagebuchstudie",
+        "f2": "um mit Unify ein Treffen zu verabreden, 75 % weniger als zuvor",
+        "f3": "mehr Treffen pro Person und Woche, 1,4 auf 3,1",
+        "f3n": "2,2×",
+        "h-learned": "Was wir gelernt haben",
+        "p-l1": "Das Feature, über das alle gestritten haben, war nicht das, das genutzt wurde. Sieben von zehn Pilotminuten gingen an einen einzigen Block auf dem Startbildschirm, während die Indoor-Karte, der aufwendigste Teil, kaum auftauchte. Die Zusammenfassung aller drei Funktionen war am Ende der Ort, an dem die Leute ihre Zeit tatsächlich verbrachten.",
+        "p-l2": "Eine visuelle Sprache ist keine Dekoration. Meine v1 war klar, strukturiert und kalt, und die Feedbackrunde hat das höflich ausgedrückt: Sie sah aus, als hätte die Uni sie herausgegeben. Dieselben Screens im Charakter-Design wirkten wie die der Gruppe selbst, und die Struktur darunter blieb im Großen und Ganzen gleich.",
+        "p-l3": "Als Nächstes würde ich Widgets bauen, damit der Block „Wer ist frei“ die App gar nicht mehr braucht, und mir ansehen, was passiert, wenn eine Gruppe über sechs Leute wächst. Die gemeinsame Spur im Stundenplan wird ab etwa acht eng.",
+        "a-chat": "Gruppenchat: Freunde posten Screenshots ihrer Stundenpläne und finden von Hand keinen gemeinsamen Termin. Wer zu spät antwortet, verpasst das Mittagessen.",
+        "a-bar": "Von allen Befragten schreiben 30 % noch oder tauschen Screenshots, 70 % haben aufgegeben. Die Hälfte der Schreibenden hat sich nie getroffen, zusammen mit denen, die es nie versucht haben, sind das 85 % aller.",
+        "a-v1idea": "Das v1-Design: Die Connect-now-Karte zeigt, wer von 11:30 bis 12:00 frei ist, der Button „open Timetable“ ist eingekreist, und ein Pfeil führt zum Stundenplan des Tages, in dem die Pause von 11:30 bis 12:00 dieselben Freunde zeigt, danach der Book Club am Abend.",
+        "a-v1col": "Eine Collage aus Teilen des v1-Designs: der Kopf „Hello Lucas“, der Schalter zwischen Timetable und Socialplan mit einer Kurszeile, die Aktivitätenkarte, die Freundesliste, die Menüleiste, zwei Event-Karten, der Etagenwechsler und die Karte.",
+        "a-home": "Die drei Kacheln auf dem Unify-Startbildschirm, geöffnet: connect now (wer frei ist und bis wann), socials (was heute los ist), map (Freunde in der Nähe).",
+        "a-pie": "Anteil der Pilotzeit pro Funktion: wer jetzt frei ist 70 %, Stundenplan 20 %, Freundeskarte 5 %, Raumkarte 5 %.",
+        "a-ba": "Öffnungen pro Person und Woche, Woche 1 ohne Startbildschirm gegenüber Woche 2 und 3 damit: Unify 4 auf 6, Karte 1 auf 2.",
+        "val-team": "Lucas Maher<br>Sophie Meyer<br>Moritz Ackermann",
+        "val-skills": "Figma<br>UX-Research<br>Vibe-Coding",
+        "label-skills": "Skills",
+        "label-role": "Rolle",
+        "label-timeline": "Zeitraum",
       }
     };
     function applyLang(lang) {
       const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
       document.querySelectorAll('[data-i18n]').forEach(el => { if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n]; });
       document.querySelectorAll('[data-i18n-html]').forEach(el => { if (t[el.dataset.i18nHtml] !== undefined) el.innerHTML = t[el.dataset.i18nHtml]; });
+      document.querySelectorAll('[data-i18n-aria]').forEach(el => { if (t[el.dataset.i18nAria] !== undefined) el.setAttribute('aria-label', t[el.dataset.i18nAria]); });
     }
     applyLang(localStorage.getItem('lang') || 'de');
 
@@ -3730,14 +3907,35 @@
           space: document.getElementById(ids[0]),
           eyes: [Object.assign({ el: pr }, EYE_R), Object.assign({ el: pl }, EYE_L)],
           tx: null, ty: null,                  // target in this blob's space; null ⇒ rest
+          // The bottom blob (phones): never follows the pointer, always looks at the
+          // "next project" button under it (2026-10-08, Lucas). Re-aimed every frame,
+          // so a rotating phone or a resize cannot leave the eyes looking elsewhere.
+          fixedLook: ids[0] === 'learned-blob-g',
         };
       }).filter(function (b) { return b.space && b.eyes[0].el && b.eyes[1].el; });
       if (!BLOBS.length) return;
       BLOBS.forEach(function (b) { b.eyes.forEach(function (e) { e.x = e.rx; e.y = e.ry; }); });
       const MAX = 108;            // max pupil travel from eye centre (eyeR - pupilR ≈ 115)
 
+      const PHONE = window.matchMedia('(max-width: 640px)');
+      function toSpace(b, cx, cy) {
+        const ctm = b.space.getScreenCTM();
+        if (!ctm) return null;
+        const pt = (b.space.ownerSVGElement || b.space).createSVGPoint();
+        pt.x = cx; pt.y = cy;
+        return pt.matrixTransform(ctm.inverse());
+      }
+      function lookAtNext(b) {
+        const btn = document.querySelector('.project-nav a.project-nav-item');
+        if (!btn) { b.tx = b.ty = null; return; }
+        const r = btn.getBoundingClientRect();
+        const p = toSpace(b, r.left + r.width / 2, r.top + r.height / 2);
+        if (!p) { b.tx = b.ty = null; return; }
+        b.tx = p.x; b.ty = p.y;
+      }
       function aimAt(cx, cy) {
         BLOBS.forEach(function (b) {
+          if (b.fixedLook && PHONE.matches) return;
           const ctm = b.space.getScreenCTM();
           if (!ctm) { b.tx = b.ty = null; return; }
           const pt = (b.space.ownerSVGElement || b.space).createSVGPoint();
@@ -3778,11 +3976,12 @@
       // centre the instant the finger lifted, undoing the tap they just followed.
       document.addEventListener('mouseleave', function () {
         if (lastPointerType !== 'mouse') return;
-        BLOBS.forEach(function (b) { b.tx = b.ty = null; });
+        BLOBS.forEach(function (b) { if (!(b.fixedLook && PHONE.matches)) b.tx = b.ty = null; });
       });
 
       function frame() {
         BLOBS.forEach(function (b) {
+          if (b.fixedLook && PHONE.matches) lookAtNext(b);
           b.eyes.forEach(function (e) {
             let tx, ty;
             if (b.tx === null) {                  // ease back to rest
@@ -4480,16 +4679,16 @@
         // Anna on the left — so the column zig-zags instead of stacking up on
         // one side. Only mine (out) is blue; Sophia's right-hand bubbles are
         // the same grey as everyone else's.
-        { out: true,     text: "when's your next break??" },
-        { who: 'Ben',    img: 'tt-ben',    text: 'idk, check mine' },
-        { who: 'Sophia', right: true, img: 'tt-sophia', text: 'mine, materials till 13:00 😑' },
-        { who: 'Anna',   text: "which break tho 😅 can't read all of these" },
-        { out: true,     img: 'tt-me',     text: 'mine too. mensa?' },
-        { who: 'Ben',    text: "12:15? i've got 45 min" },
-        { who: 'Sophia', right: true, text: "that's exactly when I'm still in class" },
-        { who: 'Anna',   text: "and ben's back in prototyping at 13:00" },
-        { out: true,     text: 'so nobody 🙃 next week then' },
-        { who: 'Ben · next day', text: 'sorry just saw this — are you guys still at the mensa?' }
+        { out: true,     text: { en: "when's your next break??", de: "wann hast du deine nächste Pause??" } },
+        { who: 'Ben',    img: 'tt-ben',    text: { en: 'idk, check mine', de: 'keine Ahnung, schau in meinen' } },
+        { who: 'Sophia', right: true, img: 'tt-sophia', text: { en: 'mine, materials till 13:00 😑', de: 'meiner: Materialien bis 13:00 😑' } },
+        { who: 'Anna',   text: { en: "which break tho 😅 can't read all of these", de: "welche Pause denn 😅 kann die alle nicht lesen" } },
+        { out: true,     img: 'tt-me',     text: { en: 'mine too. mensa?', de: 'bei mir auch. Mensa?' } },
+        { who: 'Ben',    text: { en: "12:15? i've got 45 min", de: "12:15? hab 45 Min" } },
+        { who: 'Sophia', right: true, text: { en: "that's exactly when I'm still in class", de: "da bin ich genau noch in der Vorlesung" } },
+        { who: 'Anna',   text: { en: "and ben's back in prototyping at 13:00", de: "und Ben ist ab 13:00 wieder im Prototyping" } },
+        { out: true,     text: { en: 'so nobody 🙃 next week then', de: 'also keiner 🙃 dann nächste Woche' } },
+        { who: { en: 'Ben · next day', de: 'Ben · am nächsten Tag' }, text: { en: 'sorry just saw this, are you guys still at the mensa?', de: 'sorry grad erst gesehen, seid ihr noch in der Mensa?' } }
       ];
       var STEP = 2600, GLIDE = 1100, POP = 560, FADE = 450, WIPE = 520, PAUSE = 700;
       var IN = 450, HOLD = 2000, MOVE = 750, INTRO = IN + HOLD + MOVE;   // the opening message
@@ -4499,10 +4698,13 @@
 
       function make(m) {
         var el = document.createElement('div');
+        // The conversation follows the site language, picked as each message is made.
+        var lg = (localStorage.getItem('lang') === 'en') ? 'en' : 'de';
+        var pick = function (v) { return (v && typeof v === 'object') ? v[lg] : v; };
         el.className = 'imsg-msg ' + (m.out ? 'out' : 'in') + (m.right ? ' right' : '');
-        el.innerHTML = (m.who ? '<span class="imsg-float-from">' + m.who + '</span>' : '') +
+        el.innerHTML = (m.who ? '<span class="imsg-float-from">' + pick(m.who) + '</span>' : '') +
                        (m.img ? '<img src="' + IMG + m.img + '.webp" width="' + SIZE[m.img][0] + '" height="' + SIZE[m.img][1] + '" alt="" />' : '') +
-                       '<p class="b ' + (m.out ? 'out' : 'in') + ' tail">' + m.text + '</p>';
+                       '<p class="b ' + (m.out ? 'out' : 'in') + ' tail">' + pick(m.text) + '</p>';
         return el;
       }
       function gap() { return parseFloat(getComputedStyle(track).rowGap) || 0; }
@@ -4822,6 +5024,17 @@
         svg.setAttribute('viewBox', '-10 -104 760 ' + U.toFixed(1));
         svg.style.height = mobile ? '' : 'calc(var(--blob-w) * ' + (U / 760).toFixed(4) + ')';
         body.setAttribute('d', d(E));
+        // phones: how many of the last paragraph's lines run full width before
+        // it wraps round the monster — the fewest that still lets it all fit
+        var last = sec.querySelectorAll('.guide-text'); last = last[last.length - 1];
+        if (last) {
+          if (!mobile) { last.style.removeProperty('--wrap-top'); return; }
+          var lh = parseFloat(getComputedStyle(last).lineHeight) || 24, fh = svg.getBoundingClientRect().height - 32;
+          for (var M = 0; M < 40 * lh; M += lh) {
+            last.style.setProperty('--wrap-top', M + 'px');
+            if (last.offsetHeight <= M + fh + 1) break;
+          }
+        }
       }
       fit();
       addEventListener('resize', fit);

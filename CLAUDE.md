@@ -110,6 +110,18 @@ spring-surface version (fluid.js, MIT) sat between the two and was rejected on t
 - **Dropdown expand height:** Increased from 280px to 400px to ensure full dropdown visibility without clipping
 - **Collapse height must match the default (140px), not shrink to 90px.** See "Nav bar iframe" below — this was a live bug (nav bottom shadow got clipped after the Craft dropdown closed) fixed this session.
 
+## Accent is blue, not orange (2026-10-08, Lucas)
+
+The site accent is **#809BBC** (= oklch(0.68 0.058 254.2), dialled off the to.morrow badge blue); hover on
+"Ansehen"/View Work goes to **#475F7E** (L − 0.2). Every `#FF5C00` and its rgba/shading twins (168,56,0 and
+255,173,122 → 78,104,138 and 190,208,228) were replaced on every page, the 3D page and the 3D overlays; the
+token keeps its old name **`--accent-orange`**, so grep for that, not for "blue". The nav logo (`logo-lm.png`)
+and the favicons (svg, ico, 32, 180) were recoloured to the same blue. **Deliberately untouched:**
+`unify2d.html`, `unify2d1.html` (pink) and `to-shove2d.html` (its own #7A92B0). Comments elsewhere in this
+file that say "orange" describe the old state. The 3D About plaque (`WallIcon_Logo`) was removed too, next
+to the contact one (`removeContactPlaque`). Project order is now 01 Unify, 02 to.morrow, 03 Virtual Cooking,
+04 Cybercoffee, 05 Mac-Lamp, 06 Double Packaging (page map and older notes still show the old order).
+
 ## No blinking dots, no breadcrumbs (2026-10-06, Lucas)
 
 The blinking accent dot beside every project title (`<span class="accent-dot">`) and beside
