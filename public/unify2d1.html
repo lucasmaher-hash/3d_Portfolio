@@ -10,16 +10,6 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
   <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Unlinked draft of the Unify case study. Nothing on the site links here; keep it out of search too.
-       ⚠ EVERY NUMBER ON THIS PAGE IS INVENTED. They were written 2026-09-25 so Lucas could see the
-       finished layout, and they must ALL be replaced with real results before this goes live:
-       23 min diary average · 32/68 % split, 47 % of the texters never met, 83 % overall · the quotes ·
-       n=120 survey, n=12 diary, n=28 preference test, n=20 pilot, n=12 usability ·
-       2.1 → 5.8 warmth, 24 of 28 preferred · 14.2/11.5/4.1 s and 30/45/5 % variants ·
-       71/18/6/4/1 % feature use · 1.4 → 3.1 meetups ·
-       before/after the home screen: opens 4.2 → 9.1, socials 0.7 → 2.6, map 0.5 → 1.9 per person per week,
-       and the week-1-without / weeks-2-3-with timeline itself ·
-       task table 92/83/75/92/42 → 100/92/92/92/92 · SUS 71 → 83 · "7 of 12 diary participants". -->
   <meta name="robots" content="noindex, nofollow" />
   <title>lucasmaher.com</title>
   <script src="/analytics.js"></script>
@@ -215,36 +205,6 @@
       .unify-film video { aspect-ratio: 1920 / 1276; }
     }
 
-    /* ── The hero's blob, reused at the page's end (2026-10-05, Lucas) ──
-       Upside down, HALF the hero's size, bottom-right of "What we learned",
-       its head sunk into the line above the next-project panel (.cs-section has
-       no border, so the section's bottom edge IS that line). --bh is the height
-       the whole 830-unit hero viewBox would get — the hero's own clamp halved —
-       and the svg shows 760 x 864 units of it (the long body: 20% taller than
-       the 720 a plain cut showed, same width). The text makes room on its left. */
-    #learned {
-      position: relative;
-      --bh: clamp(220px, 25vw, 340px);
-      --blob-w: calc(var(--bh) * 760 / 830);
-      --blob-h: calc(var(--bh) * 864 / 830);
-    }
-    #learned .guide-text { max-width: calc(100% - var(--blob-w) - clamp(24px, 4vw, 56px)); }
-    .learned-blob {
-      position: absolute;
-      right: clamp(40px, 8vw, 80px);
-      bottom: 0;
-      width: var(--blob-w);
-      height: var(--blob-h);
-      display: block;
-      pointer-events: none;
-    }
-    /* Phones: the text keeps the full column and the blob gets its own room under it. */
-    @media (max-width: 640px) {
-      #learned .guide-text { max-width: none; }
-      #learned { padding-bottom: calc(var(--blob-h) + 24px); }
-      .learned-blob { right: 20px; }
-    }
-
     /* ── Shared section padding ── */
     .section {
       border-bottom: 1px solid var(--border-color);
@@ -328,7 +288,7 @@
     .meta-label {
       font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 24px;
-      color: var(--accent-ink);   /* pink type is always the readable ink, never the pale fill */
+      color: var(--accent-orange);
       text-transform: uppercase;
     }
 
@@ -387,7 +347,6 @@
     }
 
     .guide-text + .guide-text { margin-top: -8px; }
-    .guide-text b { color: var(--text-primary); font-weight: 500; }   /* picked-out phrases, as elsewhere on the site */
 
     /* ── At a glance ── */
     .glance-list {
@@ -503,65 +462,6 @@
       pointer-events: none;
       display: block;
     }
-
-    /* ── Home previews (end of "The final design", 2026-10-05) ────────────
-       The three cards of the app's home screen, opened (connect now / socials
-       / map), side by side on the page — just the panels, no phone (Lucas).
-       Not screenshots: each is the app's own panel from its source
-       (/unify/app-home/home.html?open=<card>&only=1, a transparent page
-       exactly one panel big, lip included) in an iframe, so the friends and
-       posters drift and the map dots pulse exactly as in the app. Each iframe
-       is the panel at its native 377px width, scaled to its column by the
-       small script at the bottom of the page (a transform can't be sized in
-       percent); the box's aspect-ratio is the panel's own 377 x H. */
-    /* The three sit in one dark frame, the app's own #292925 (the
-       ground they sit on in the app), so the row reads as a widescreen
-       screenshot rather than three loose cards on the page grey. The socials
-       panel carries five smaller posters instead of the app's four so all
-       three come out the same height (see app-home/home.html). */
-    .home-previews {
-      display: grid;
-      /* Fixed proportions at every width, like a still from a video (Lucas,
-         2026-10-06): padding and gap are percentages of the frame's width,
-         the panels are thirds of what's left, so the whole thing scales and
-         never re-flows. Numbers are the 1440 layout divided by its 898px
-         frame width; the radius is the 24px corner as an x / y percentage
-         pair so it stays round. */
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      align-items: start;          /* tops in one line */
-      column-gap: 4%;
-      padding: 5.8% 4.9% 6.2%;
-      margin-inline: clamp(0px, 8vw, 80px);   /* same inset as .home-copy / .stat-block */
-      background: #292925;
-      border-radius: 2.67% / 6.5%;
-      margin-top: clamp(60px, 9vw, 96px);
-    }
-    .home-panel { position: relative; width: 100%; }
-    .home-frame {
-      position: absolute; top: 0; left: 0;
-      width: 377px; height: 100%;
-      border: 0; display: block;
-      transform-origin: 0 0;
-      pointer-events: none;
-      background: transparent;
-      overflow: hidden;
-    }
-    /* The two reasons one under the other, inset like the Problem section's
-       finding (.stat-block's padding-inline), not side by side (Lucas). */
-    .home-copy {
-      display: flex; flex-direction: column;
-      gap: clamp(28px, 4vw, 44px);
-      padding-inline: clamp(0px, 8vw, 80px);
-      margin-top: clamp(40px, 5vw, 64px);
-    }
-    .home-copy .feature-title { margin: 0 0 12px; }
-    .home-copy .guide-text { margin: 0; }
-    @media (max-width: 640px) {
-      /* No phone layout of its own: the three panels stay side by side and
-         the frame just gets smaller, like a picture (Lucas). */
-      .home-previews { margin-top: 72px; margin-inline: 0; }
-      .home-copy { gap: 28px; margin-top: 36px; }
-    }
     .phone-shot-video[data-vid="homepage"] { top: -0.3831%; left: -1.3252%; width: 102.6885%; height: 101.4183%; }
     .phone-shot-video[data-vid="timetable"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.8972%; }
     .phone-shot-video[data-vid="socials"] { top: -0.2147%; left: -0.9969%; width: 102.0367%; height: 100.8972%; }
@@ -611,11 +511,7 @@
       margin-left: 50px;          /* nudge the pair toward centre */
     }
 
-    /* Only mirror layout for the Timetable+Socials pairing — Friends+Courses
-       keeps the default (videos left, text right), matching the live page's
-       own alternation. Was #support-scrolly (Socials+Friends) before the
-       2026-09-28 restructure; renamed to the new Timetable+Socials
-       section's id when that pairing changed. */
+    /* Only mirror layout for steps 2 & 5 (Timetable/Socials) */
     #timetable-socials-scrolly .scrolly-sticky {
       flex-direction: row-reverse;  /* text left, videos right */
     }
@@ -689,14 +585,13 @@
       }
       .scrolly-media { justify-content: center; margin-left: 0; }
       /* The mirrored desktop layout is declared at ID strength
-         (#timetable-socials-scrolly .scrolly-sticky, specificity 1,0,1), so
-         the plain `.scrolly-sticky { flex-direction: column }` above (0,1,0)
-         loses to it and this one section stays row-reverse for the whole
-         stacked band — which squeezes .scrolly-copy and both its panels to
-         ZERO width and pushes the videos off the left edge. Sibling
-         #friends-courses-scrolly has no ID-level direction rule, which is
-         why only this one needs restating. Restating at ID strength is what
-         actually overrides it. */
+         (#timetable-socials-scrolly .scrolly-sticky, specificity 1,0,1), so the
+         plain `.scrolly-sticky { flex-direction: column }` above (0,1,0) lost to
+         it and this one section stayed row-reverse for the whole stacked band —
+         which squeezed .scrolly-copy and both its panels to ZERO width and pushed
+         the videos off the left edge. Sibling #nav-friends-scrolly has no
+         ID-level direction rule, which is why only this one broke.
+         Restating at ID strength is what actually overrides it. */
       #timetable-socials-scrolly .scrolly-sticky { flex-direction: column; }
       #timetable-socials-scrolly .scrolly-media { margin-left: 0; margin-right: 0; }
       .scrolly-vid .phone-shot,
@@ -1034,21 +929,7 @@
       letter-spacing: -0.04em;
     }
 
-    /* A tiny colour reference sitting inline in a sentence — see "What replaced
-       it" in Pivot. Replaces the full color-grid/typography-grid/character-list
-       exhibit below, which is now unused on this page (kept, not deleted: see
-       CLAUDE.md — it may come back if the design-system detail ever earns its
-       own section again). */
-    .inline-swatch {
-      display: inline-block;
-      width: 0.85em; height: 0.85em;
-      border-radius: 3px;
-      vertical-align: middle;
-      margin: 0 1px -0.05em;
-      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
-    }
-
-    /* Color palette boxes — UNUSED as of 2026-09-27, see CLAUDE.md */
+    /* Color palette boxes */
     .color-grid {
       display: flex;
       gap: clamp(20px, 4vw, 40px);
@@ -1095,8 +976,7 @@
       letter-spacing: 0.05em;
     }
 
-    /* UNUSED as of 2026-09-27, see CLAUDE.md.
-       Typography cards. Every stop of the desktop treatment is 30% down from
+    /* Typography cards. Every stop of the desktop treatment is 30% down from
        where it started (card 160 -> 112px tall, preview 72 -> 50px, and so on
        through the padding, gaps and labels), so the three pills scale as one
        piece. The <=640px block further down re-specs these cards for phones —
@@ -1158,8 +1038,7 @@
       line-height: 1;
     }
 
-    /* UNUSED as of 2026-09-27, see CLAUDE.md.
-       Character design section — staggered character + text rows */
+    /* Character design section — staggered character + text rows */
     .character-list {
       display: flex;
       flex-direction: column;
@@ -1687,1013 +1566,6 @@
       .vid-press,
       .vid-press.is-pressed { transition: none; transform: none; }
     }
-
-    /* The case study runs on the app's own pink (the hero character's #FF88C8)
-       rather than the site orange — type included. A darker mix was tried for
-       label-sized type and dropped: per Lucas it is the light pink everywhere.
-       --accent-ink stays as the one switch if that is ever revisited. */
-    :root {
-      --accent-orange: #FF88C8;
-      --accent-ink: #FF88C8;
-    }
-
-    /* ══ Case-study rebuild (unify2d1.html) ═══════════════════════════════
-       Everything below is new for the draft page and only exists here.
-       Plan: /unify-casestudy-plan.md. Every [ bracketed ] value and every
-       .ph box is a placeholder waiting for a real study result or asset. */
-
-    .cs-section { border-bottom: none; }
-    .cs-section + .cs-section { padding-top: clamp(16px, 3vw, 32px); }
-
-    /* Hero one-liner: the spine of the whole page, in one sentence. Set exactly
-       like the other project pages' At-a-Glance lead (.glance-lead on
-       virtual_cooking2d.html, Lucas 2026-10-06): light grey, full column width,
-       and primary ink on phones. */
-    .cs-lead {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
-      font-size: clamp(18px, 2.2vw, 24px);
-      font-weight: 300;
-      line-height: 1.4;
-      letter-spacing: -0.01em;
-      color: var(--text-secondary);
-    }
-    @media (max-width: 640px) {
-      .cs-lead { color: var(--text-primary); }
-    }
-
-    /* Page map: a fixed sidebar, after Jessica Im's reference — off the hero,
-       so the hero itself only carries the line and the three numbers. Stays on
-       screen at every scroll position, including at the very top (Lucas) — no
-       fade/visibility gate any more. Desktop only: six lines is exactly the
-       clutter a phone doesn't have room for. */
-    .cs-map {
-      position: fixed; left: clamp(20px, 3vw, 40px); bottom: 96px; z-index: 40;
-      display: flex; flex-direction: column; gap: 10px;
-    }
-    .cs-map a {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 16px; letter-spacing: 0.04em;
-      text-transform: uppercase; color: var(--text-tertiary); text-decoration: none;
-      transition: color 200ms ease;
-    }
-    .cs-map a:hover { color: var(--text-secondary); }
-    .cs-map a.is-active { color: var(--text-primary); }
-    @media (max-width: 1080px) { .cs-map { display: none; } }
-    /* Where the gutter is too narrow for its longest word to clear the page's
-       border line, the whole sidebar steps aside (Lucas) — set by the script at
-       the end of the page, which measures it. visibility, not display, so it
-       can still be measured. */
-    .cs-map.is-cramped { visibility: hidden; }
-
-    /* .pilot-stats removed 2026-09-27 — it sat under "The idea" as results
-       data (a two-week pilot can't exist before the app does), and its
-       headline stat duplicated Supporting Features' own "1.4 → 3.1 meetups"
-       caption. See CLAUDE.md. */
-
-    /* Fact bar: three big numbers. IN USE AGAIN as of 2026-09-29 — it was
-       dormant twice over (out of the hero 2026-09-26, out of "The idea"
-       2026-09-27) and is now the closing beat of "Testing and results", which
-       is the one place on the page where all three numbers have already been
-       earned by the sections above. Each number chains to a figure stated
-       elsewhere: 23 min from the Problem section's diary study, 2.2x is the
-       pie note's 1.4 -> 3.1 meetups. Change one and change its twin. (The third,
-       SUS 71 -> 83, went 2026-10-05 with the usability iteration it came from.) */
-    .fact-bar {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: clamp(14px, 2.4vw, 28px);
-    }
-    .fact { display: flex; flex-direction: column; gap: 8px; }   /* no card: the numbers sit on the page */
-    .fact-num {
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
-      font-size: clamp(28px, 3.4vw, 44px);
-      line-height: 1; letter-spacing: -0.04em;
-      color: var(--accent-ink);
-    }
-    .fact-label { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
-    .fact-src {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 15px; letter-spacing: 0.04em;
-      text-transform: uppercase; color: var(--text-secondary); opacity: 0.8;
-    }
-
-    /* Placeholder visual: a pressed well that names what goes there. */
-    .ph {
-      background: var(--bg-surface);
-      border-radius: 20px;
-      box-shadow: var(--shadow-pressed);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 6px; text-align: center; padding: 24px;
-      aspect-ratio: 16 / 9; width: 100%;
-    }
-    .ph--chart  { aspect-ratio: 16 / 6; }
-    .ph--square { aspect-ratio: 1 / 1; }
-    .ph--tall   { aspect-ratio: 4 / 5; }
-    .ph--phone  { aspect-ratio: 876 / 1808; border-radius: 28px; }
-    .ph-tag {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 18px; letter-spacing: 0.06em;
-      text-transform: uppercase; color: var(--accent-ink);
-    }
-    .ph-desc { font-size: 13px; line-height: 1.5; color: var(--text-secondary); max-width: 40ch; }
-
-    /* Caption: states the finding, never decorates. */
-    .cs-caption {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 17px; line-height: 1.3;
-      letter-spacing: 0.02em; color: var(--text-secondary);
-      margin-top: -8px;
-    }
-    .cs-caption b { color: var(--text-primary); font-weight: 400; }
-
-    .cs-sub {
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
-      font-size: clamp(20px, 2.6vw, 26px);
-      line-height: 1.1; letter-spacing: -0.02em;
-      color: var(--text-primary);
-      margin-top: clamp(12px, 2vw, 24px);
-    }
-
-    .cs-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(18px, 3vw, 36px); align-items: start; }
-    .cs-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); align-items: start; }
-    .cs-figure { display: flex; flex-direction: column; gap: 14px; }
-
-    /* Pivot: v1 and the final design on the SAME three screens.
-       UNUSED as of 2026-09-27, see CLAUDE.md — Pivot's phone-framed v1 row
-       (`.pivot-compare` > `.pivot-row` > `.pivot-screens`) was replaced by
-       the scattered `.v1-collage` below, and everything from here down to
-       `.pivot-screens .phone-shot` (the whole "v1 screens in an iPhone
-       frame" system: `.v1-screen`/`.v1-still`/`.v1-window`/`.v1-bar`/
-       `.v1-carousel`) has no markup left referencing it. Kept, not deleted,
-       same convention as the other dormant blocks tracked in CLAUDE.md. */
-    .pivot-compare { display: flex; flex-direction: column; gap: clamp(24px, 4vw, 44px); }
-    .pivot-row { display: flex; flex-direction: column; gap: 14px; }
-    .pivot-label {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 18px; letter-spacing: 0.06em;
-      text-transform: uppercase; color: var(--text-secondary);
-    }
-    .pivot-label b { color: var(--accent-ink); font-weight: 400; }
-    .pivot-screens {
-      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(14px, 2.4vw, 28px); align-items: start; justify-items: center;
-    }
-    /* v1 screens in the same iPhone frame as the final design. The Figma
-       frames have no safe area, so the page runs right up under the frame's
-       island, the way it would on the phone. The tab bar is cut off each
-       scrolling export and laid over the bottom so it stays put while the page
-       scrolls under it, like the real app. */
-    .v1-screen {
-      position: absolute; inset: 0; background: #000;
-      display: flex; flex-direction: column;
-    }
-    .v1-still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; background: #000; }
-    .v1-window {
-      flex: 1 1 0; min-height: 0; overflow: hidden;
-      container-type: size;   /* 100cqh = the window's own height */
-    }
-    .v1-window img, .v1-bar { display: block; width: 100%; height: auto; }
-    .v1-bar { flex: none; }
-    /* The timetable's Timetable/Socialplan buttons sit right at the top of the
-       export, where the frame's island covers them; a black band pushes them
-       below it. Padding is in the image's box, so the scroll travel
-       (calc(-100% + 100cqh)) still lands on the last row. */
-    /* The band has to clear the FRAME's island, and that is 12.6% of the screen
-       box's width below its top edge (measured off iphone-17-frame.png's alpha:
-       the pill ends at y 130, the screen box starts at y 28, over a 808px box).
-       At 10% the card's top edge landed 0.6px under the island — touching, and
-       on a device it rounded the wrong way and the island cut into the white.
-       15% leaves ~2.4% of the width as real black between the two. */
-    .v1-window img.v1-clear-island { padding-top: 15%; background: #000; box-sizing: content-box; }
-    /* Home and timetable scroll their whole length, but only while they are
-       the phone in the middle of the carousel — the script plays it with the
-       Web Animations API (see the carousel script). The travel is
-       calc(-100% + 100cqh): the image's own height minus the window's, so it
-       lands exactly on the last row whatever size the phone renders at. */
-    /* Nothing inside the carousel is selectable or draggable: a click on a
-       phone should move the carousel, not highlight it or pick up an image. */
-    .v1-carousel {
-      touch-action: pan-y;
-      user-select: none; -webkit-user-select: none;
-      -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
-    }
-    .v1-carousel img { -webkit-user-drag: none; user-drag: none; }
-    .v1-carousel > .phone-shot { cursor: pointer; }
-    .v1-carousel > .phone-shot[data-slot="0"] { cursor: default; }
-    .pivot-screens .phone-shot { width: 100%; max-width: 220px; }
-
-    /* ── v1 in detail: a non-linear collage of the real v1 screens ──────────
-       Replaces the old phone-framed 3-screen row above (now unused). No
-       phone bezel this time — plain rotated photo-like cards scattered on a
-       dot-grid canvas, matching the Jessica Im "audit" reference Lucas
-       pointed to rather than this page's usual phone-mockup idiom. One crop
-       per screen: v1-home.webp/v1-timetable.webp are tall scrolling
-       captures, so `object-fit: cover; object-position: top` crops each to
-       its top screen, the same technique `.v1-still` already used for the
-       building exports (which are already single-screen images). A single
-       shared aspect-ratio box (3/4) is used for all five regardless of the
-       source image's own ratio, so the scatter reads as one consistent set
-       of "photos" rather than five different-shaped crops. */
-    /* ── v1 scenes (2026-10-06, Lucas) ─────────────────────────────────────
-       The real v1 Figma exports, upright (no tilt), in a canvas that keeps
-       its aspect ratio at every width and scales like an image: the canvas is
-       a size container and every length inside it is in cqw or %, so nothing
-       re-flows when the window changes shape. Phones may run off the top or
-       bottom edge (the canvas clips). Long exports (home, timetable) are
-       windows onto the scrolling page: --y is where the window starts, in %
-       of the screen width (margin-top percentages resolve against width),
-       and their own tab bar sits on top at the bottom. The black rounded
-       frame is v1's own (its Figma screens sit in black cards). */
-    .v1-scene { container-type: inline-size; width: 100%; }
-    .v1-canvas {
-      position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
-      border-radius: 2cqw;
-      /* flat: no dot grid, no pressed shadow (Lucas). To.morrow's step-badge
-         blue #7A92B0, 7% lighter; fixed, so dark mode doesn't change it. */
-      background: #90A4BD;
-    }
-    .v1-phone {
-      position: absolute; box-sizing: border-box;
-      width: 26%; aspect-ratio: 402 / 874;
-      border: .55cqw solid #000; border-radius: 3.2cqw;
-      overflow: hidden; background: #fff;
-      box-shadow: 0 1.4cqw 2.8cqw rgba(0, 0, 0, .16), 0 .3cqw .8cqw rgba(0, 0, 0, .10);
-    }
-    .v1-scene--pivot .v1-phone { width: 17%; border-width: .4cqw; border-radius: 2.2cqw; }
-    .v1-phone img { display: block; width: 100%; }
-    .v1s-fill { height: 100%; object-fit: cover; object-position: top; }
-    .v1s-scroll { height: auto; margin-top: var(--y, 0%); }
-    .v1s-bar { position: absolute; left: 0; bottom: 0; }
-    .v1-arrow { position: absolute; width: 7%; height: auto; }
-    .v1-collage-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-    .v1-handoff { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-    /* a bare Figma frame (no phone): 28% of the canvas wide, its own shape;
-       the exports' square corners were cut to the frames' own rounding
-       (alpha mask, r 89 of 1408/1472 at 4x) when they were saved */
-    .v1-card { position: absolute; width: 28%; height: auto; display: block; }
-    /* no drop shadow under the frames: they sit flat on the solid canvas (Lucas, 2026-10-06) */
-
-    /* UNUSED as of 2026-10-06 (replaced by .v1-scene), see CLAUDE.md */
-    .v1-collage {
-      display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center;
-      gap: clamp(22px, 3.4vw, 40px);
-      width: 100%;
-      padding: clamp(40px, 6vw, 68px) clamp(24px, 5vw, 56px);
-      border-radius: 24px;
-      background:
-        radial-gradient(circle, rgba(0, 0, 0, .08) 1px, transparent 1.5px) 0 0 / 16px 16px,
-        var(--bg-surface);
-      box-shadow: var(--shadow-pressed);
-    }
-    .v1-collage-card {
-      width: clamp(140px, 15vw, 190px);
-      aspect-ratio: 3 / 4;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #fff;
-      box-shadow: 0 18px 32px rgba(0, 0, 0, .18), 0 4px 10px rgba(0, 0, 0, .10);
-    }
-    .v1-collage-card img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
-    /* The three building-map cards are screen RECORDINGS, not scrolling web
-       exports like home/timetable — they carry black letterbox bars top and
-       bottom, with the actual floor plan sitting vertically centred, not at
-       the top. `top` cropped straight into the dead letterbox space (visible
-       as a near-black or near-solid-blue card). Centring the crop instead
-       catches the actual content on all three. */
-    .v1-collage-card:nth-child(3) img,
-    .v1-collage-card:nth-child(4) img,
-    .v1-collage-card:nth-child(5) img { object-position: center; }
-    /* Rotation + vertical offset per card is what reads as "scattered", not a
-       grid — z-index on the centre card so it visually sits in front, the
-       way a photo dropped last on a table would. */
-    .v1-collage-card:nth-child(1) { transform: rotate(-4deg) translateY(14px); }
-    .v1-collage-card:nth-child(2) { transform: rotate(3deg) translateY(-10px); }
-    .v1-collage-card:nth-child(3) { transform: rotate(-2deg); width: clamp(160px, 17vw, 220px); z-index: 2; }
-    .v1-collage-card:nth-child(4) { transform: rotate(4deg) translateY(20px); }
-    .v1-collage-card:nth-child(5) { transform: rotate(-3deg) translateY(-16px); }
-    @media (max-width: 640px) {
-      /* Two per row, not one — the first pass clamped cards to ~148px, which
-         with the 20px gap and 18px side padding came out to 316px against
-         only ~314px of actual inner width (measured: .v1-collage's own
-         `clientWidth` minus its padding), 2px over. flex-wrap dutifully
-         wrapped every card to its own line. Sized with real margin this
-         time, not recomputed to the exact edge. */
-      .v1-collage { padding: 24px 16px; gap: 16px; }
-      .v1-collage-card { width: clamp(100px, 32vw, 136px); }
-      .v1-collage-card:nth-child(3) { width: clamp(112px, 36vw, 154px); }
-    }
-
-    /* Timetable variants A / B / C with their metrics underneath.
-       UNUSED as of 2026-09-28, see CLAUDE.md — the whole A/B/C comparison
-       (.cs-grid-3 of .variant/.tv diagrams, further down) was cut from "The
-       final design" (was "Designing the merged timetable"): it visualized
-       invented numbers, not the shipped app, and Lucas asked to go straight
-       to the real screens instead. Kept, not deleted. */
-    .variant { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
-    .variant-name {
-      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 15.2px; letter-spacing: 0.04em;
-      text-transform: uppercase; color: var(--text-primary);
-    }
-    .variant.is-winner .variant-name { color: var(--accent-ink); }
-    .variant.is-winner .ph { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
-    .variant-metrics {
-      display: flex; gap: 16px;
-      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 12.9px; color: var(--text-secondary);
-    }
-
-    /* Results: task success before / after one iteration. */
-    /* UNUSED as of 2026-10-05, see CLAUDE.md (the task table went with the
-       invented usability iteration). */
-    .cs-table { width: 100%; border-collapse: collapse; font-size: 14px; color: var(--text-secondary); }
-    .cs-table th {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 17px; font-weight: 400;
-      letter-spacing: 0.04em; text-transform: uppercase; text-align: left;
-      color: var(--text-primary); padding: 10px 12px 10px 0;
-      border-bottom: 1px solid var(--border-color);
-    }
-    /* text-align is explicit because the table now lives inside .res-block,
-       which centres its children's text — without this the task names centre
-       in their column while the `th` above them stays left, which reads as a
-       broken column rather than a deliberate one. `.num` cells override to
-       right below. */
-    .cs-table td { padding: 10px 12px 10px 0; border-bottom: 1px dotted var(--border-color); text-align: left; }
-    .cs-table td.num, .cs-table th.num { text-align: right; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 18px; }
-    .cs-table tr.is-highlight td { color: var(--text-primary); }
-    .cs-table tr.is-highlight td.num:last-child { color: var(--accent-ink); }
-
-    /* UNUSED as of 2026-09-29, see CLAUDE.md — the SUS card was the last raised
-       neumorphic panel in Testing and results and the odd one out once both
-       halves of that section moved into the flat, centred .res-block shape;
-       its 71 -> 83 now sits as a picked-out number in the note under the task
-       table. Kept, not deleted. */
-    .sus {
-      display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
-      background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-raised-sm);
-      padding: clamp(20px, 3vw, 32px);
-    }
-
-    /* Pie chart: pure CSS via conic-gradient, no canvas. Stops are hardcoded
-       cumulative degrees for the four fixed shares (76/19/4/1%) rather than
-       computed from custom properties — this chart has one instance and
-       isn't meant to be a reusable component the way .chart/.ovl/.tv are, so
-       there was nothing to gain from the extra indirection. If the numbers
-       ever change, recompute: deg = cumulative% * 3.6.
-       Colours are the app's own (pink / near-black / greys / cream).
-
-       SOCIALS WAS DROPPED 2026-09-29 (Lucas: "it wasn't used in the
-       prototype"). It was 6%; the remaining four were renormalised to sum to
-       100 again — 71/18/4/1 of 94 -> 76/19/4/1. The Socials FEATURE still
-       exists everywhere else on the page; only its usage-data slice is gone.
-
-       `from 106.4deg` is load-bearing, not decoration. The three small slices
-       (19/4/1%) are adjacent, so wherever their arc lands, their labels land
-       on top of each other. Rotating the whole gradient so that 24% arc spans
-       absolute 20deg -> 106.4deg puts all three on the RIGHT side of the
-       circle, and leaves the big pink slice's arc (106.4 -> 380/20) crossing
-       the lower right as well — so every one of the four labels can sit on the
-       right with no crossings and no collisions. Both the mask (below) and
-       every leader-line coordinate are derived from this same start angle;
-       change it and all of them have to move together. */
-    /* One shared shape for BOTH halves of "Testing and results" (2026-09-29):
-       heading, then the evidence, then a plain note under it, centred in a
-       column narrower than the section. The pie uses it and so does the task
-       table, so the two movements of that section read as a matched pair
-       instead of one centred chart followed by a full-width two-column grid.
-       Centred heading, centred text, heading above — the TEMPORARY toggles
-       that let Lucas compare those against left-aligned text and a heading
-       below are gone; these are the settings he kept. The generous margin-top
-       is the "3x the spacing" he asked for: 3x this block's own internal gap. */
-    .res-block {
-      display: flex; flex-direction: column; align-items: center; text-align: center;
-      gap: clamp(20px, 3vw, 28px);
-      max-width: 720px;
-      margin: clamp(60px, 9vw, 84px) auto 0;
-    }
-    /* .cs-sub carries its own margin-top for use in normal flow; inside this
-       flex column the `gap` already does that job, so it's zeroed. */
-    .res-block > .cs-sub { margin-top: 0; }
-
-    /* Before/after paired bars (2026-10-05). Reuses the .chart-track /
-       .chart-fill / .chart-key / .chart-val pieces (pressed trough, grey fill)
-       and adds the pairing: two bars per metric, the second (.is-after) in
-       the accent. Left-aligned inside the centred .res-block. */
-    .ba-chart { width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 22px; text-align: left; }
-    .ba-legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-weight: 500; font-size: 12.9px; color: var(--text-secondary); }
-    .ba-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; background: var(--text-tertiary); }
-    .ba-legend i.is-after { background: var(--accent-orange); }
-    .ba-group { display: flex; flex-direction: column; gap: 6px; }
-    .ba-group .chart-key { margin-bottom: 2px; }
-    .ba-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
-    .ba-row .chart-track { display: block; }
-    .ba-row.is-after .chart-fill { background: var(--accent-orange); }
-    .ba-row.is-after .chart-val { color: var(--accent-ink); }
-
-    /* The stage is exactly the circle's box; the labels and their leader
-       lines hang outside it (overflow visible), so the PIE ITSELF is what's
-       centred on the page, per Lucas — not the pie+labels group. */
-    .pie-stage {
-      position: relative;
-      width: clamp(189px, 21.6vw, 270px);
-      aspect-ratio: 1;
-      align-self: center;
-    }
-    .pie-chart { width: 100%; height: 100%; border-radius: 50%; }
-    /* viewBox is 0 0 100 100 mapped onto the circle's own box, so every
-       coordinate below is a percentage of the pie — x = 50 + 50*sin(angle),
-       y = 50 - 50*cos(angle), angle measured clockwise from 12 o'clock, the
-       same convention conic-gradient uses. Each polyline is: a point on the
-       slice's arc -> a short radial step outward -> horizontal to the labels'
-       shared left edge. non-scaling-stroke keeps the hairline 1px however
-       large the pie renders. */
-    .pie-lines {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      overflow: visible; pointer-events: none;
-      fill: none; stroke: var(--text-tertiary); stroke-width: 1;
-    }
-    .pie-lines polyline { vector-effect: non-scaling-stroke; }
-    .pie-label {
-      position: absolute; left: 120%;
-      transform: translateY(-50%);
-      white-space: nowrap; text-align: left;
-      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 13px;
-      color: var(--text-secondary);
-    }
-    .pie-label b { color: var(--text-primary); font-weight: 500; }
-    /* Plain-text takeaway under each piece of evidence — deliberately NOT a
-       .cs-caption (VT323, small, decorative): Lucas asked for "normal plain
-       text form, no fancy design", so it's .guide-text as-is. Widened from
-       46ch — .res-block went 560px -> 720px to make room. */
-    .res-note { max-width: 64ch; }
-
-    /* The pie fills in by SWEEPING open, clockwise, rather than simply fading
-       or popping in. `--reveal` (0–100) is registered so the browser can
-       animate it like a plain number; a `mask` built from the SAME angle
-       formula as the chart's own conic-gradient stops (deg = percent * 3.6)
-       reveals the wedge up to that angle and hides the rest, so the sweep
-       uncovers real colour rather than crossfading over it.
-       `from 106.4deg` MUST match the background gradient's own start angle
-       (see the long note above) — otherwise the sweep begins mid-slice and
-       the reveal no longer follows the slice boundaries.
-       Browsers without @property support see the pie appear at full colour
-       immediately (the transition simply can't run) — acceptable
-       degradation, not a broken state. */
-    @property --reveal {
-      syntax: '<number>';
-      inherits: false;
-      initial-value: 0;
-    }
-    .pie-chart {
-      --reveal: 0;
-      -webkit-mask: conic-gradient(from 106.4deg, #000 calc(var(--reveal) * 3.6deg), transparent 0deg);
-      mask: conic-gradient(from 106.4deg, #000 calc(var(--reveal) * 3.6deg), transparent 0deg);
-      transition: --reveal 1.6s cubic-bezier(.4, 0, .2, 1);
-    }
-    .pie-chart.is-visible { --reveal: 100; }
-    /* The labels and their leader lines fade in WITH the sweep rather than
-       sitting there from the start pointing at an empty circle — delayed to
-       .9s so they arrive as the 1.6s sweep is finishing. General sibling
-       combinator because .is-visible lands on .pie-chart, and both the svg
-       and the labels follow it inside .pie-stage. */
-    .pie-lines, .pie-label { opacity: 0; transition: opacity .5s ease .9s; }
-    .pie-chart.is-visible ~ .pie-lines,
-    .pie-chart.is-visible ~ .pie-label { opacity: 1; }
-    @media (prefers-reduced-motion: reduce) {
-      .pie-chart { --reveal: 100 !important; transition: none !important; }
-      .pie-lines, .pie-label { opacity: 1 !important; transition: none !important; }
-    }
-
-    /* UNUSED as of 2026-09-27 (see CLAUDE.md) — the only .v1-carousel instance
-       was removed from "The idea"; kept here since the component may be reused.
-       v1 carousel: five phones on five slots (-2..2), the middle one largest.
-       Every 3s the whole row steps one slot to the right; the phone leaving
-       the right edge fades out and comes back in on the far left, so it
-       loops. Geometry is pure CSS per data-slot; the script only changes
-       each phone's slot. The outer pair tuck behind their neighbours.
-       Offsets are in phone widths (translateX %), so the
-       layout scales with the container. */
-    .v1-carousel {
-      position: relative; aspect-ratio: 2.325 / 1;
-      --w: 20.8%;
-    }
-    .v1-carousel > .phone-shot {
-      position: absolute; left: 50%; top: 50%;
-      width: var(--w); max-width: none;
-      --k: 0; --sc: 1;
-      transform: translate(-50%, -50%) translateX(calc(var(--k) * 100%)) scale(var(--sc));
-      transition: transform 900ms cubic-bezier(.65, 0, .35, 1), opacity 450ms ease;
-      /* Keep each phone on its own compositing layer all the time. Without it
-         Safari promotes the phone to a layer when a move starts and drops it
-         again when it ends, re-rasterising at a slightly different subpixel
-         offset — the small jolt as a phone settles into place. */
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-    }
-    .v1-carousel > [data-slot="0"]  { --k: 0;     --sc: 1;   z-index: 3; }
-    .v1-carousel > [data-slot="1"]  { --k: .96;   --sc: .84; z-index: 2; }
-    .v1-carousel > [data-slot="-1"] { --k: -.96;  --sc: .84; z-index: 2; }
-    .v1-carousel > [data-slot="2"]  { --k: 1.56;  --sc: .68; z-index: 1; }
-    .v1-carousel > [data-slot="-2"] { --k: -1.56; --sc: .68; z-index: 1; }
-    .v1-carousel > [data-slot="out-right"] { --k: 1.74;  --sc: .42; opacity: 0; z-index: 0; }
-    .v1-carousel > [data-slot="out-left"]  { --k: -1.74; --sc: .42; opacity: 0; z-index: 0; }
-    .v1-carousel.no-anim > .phone-shot { transition: none; }
-    /* Folded: all five stacked behind the middle phone, peeking out a little. */
-    .v1-carousel.is-folded > [data-slot="1"]  { --k: .07;  --sc: .92; }
-    .v1-carousel.is-folded > [data-slot="-1"] { --k: -.07; --sc: .92; }
-    .v1-carousel.is-folded > [data-slot="2"]  { --k: .12;  --sc: .84; }
-    .v1-carousel.is-folded > [data-slot="-2"] { --k: -.12; --sc: .84; }
-    @media (max-width: 640px) {
-      /* Phones are 30% larger than they were here, and the container's own
-         aspect ratio is divided by the same 1.3 so its height grows with them —
-         otherwise the taller phones would be cropped by the overflow: hidden.
-         The neighbours come in from .96 to .6 of a phone width, which overlaps
-         them with the middle phone by about a fifth of its width while keeping
-         their outer edges inside the screen. They keep z-index 2 against the
-         middle phone's 3, so the overlap reads as them sitting UNDER it.
-         The outer pair is still off screen at this width. */
-      .v1-carousel { aspect-ratio: 1.0096 / 1; --w: 45.8%; margin-inline: -20px; overflow: hidden; }
-      .v1-carousel > [data-slot="1"]  { --k: .6;  }
-      .v1-carousel > [data-slot="-1"] { --k: -.6; }
-    }
-
-    /* ── Problem: an empty iMessage group chat whose messages lift off the screen ──
-       The phone shows the HM Group thread with nothing in it. Each message
-       appears at the bottom of the thread, then lifts off the screen to a spot
-       around the phone, partly over the frame; once a few are out, the oldest
-       dissolves. The sequence is driven by the script at the end of the page;
-       CSS only styles the pieces. The stage is a size container (floats sized in
-       cqw), the phone an inline-size container (its UI sized in cqi). iMessage
-       keeps its own light material in dark mode, like the SkeuKit exhibits. */
-    .imsg-stage {
-      position: relative; width: 100%; aspect-ratio: 16 / 9;
-      container-type: size;
-      user-select: none; -webkit-user-select: none;
-      --bubble-in: #E9E9EB; --bubble-out: #0A7CFF;
-      --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-    }
-    .imsg-phone {
-      position: absolute; left: 50%; top: 50%;
-      width: 27cqw; transform: translate(-50%, -50%);
-      container-type: inline-size;
-    }
-    .imsg-phone .phone-shot-screen { isolation: isolate; }   /* keep the screen's layers under the frame */
-    .imsg {
-      position: absolute; inset: 0; background: #fff;
-      display: flex; flex-direction: column;
-      font-family: var(--ui); font-size-adjust: none; color: #000; -webkit-font-smoothing: antialiased;
-    }
-    /* The status bar sits on the same grey as the nav bar, as it does in iOS —
-       the bar runs up under the island to the top of the screen. */
-    .imsg-status {
-      flex: none; display: flex; justify-content: space-between; align-items: center;
-      padding: 4.4cqi 7.5cqi 0 11.5cqi; height: 11.5cqi; background: #F7F7F8;
-      font-size: 4.3cqi; font-weight: 600; letter-spacing: -.01em;
-    }
-    .imsg-icons { display: flex; align-items: center; gap: 1.5cqi; }
-    .imsg-icons svg { height: 3cqi; width: auto; fill: currentColor; display: block; }
-    .imsg-icons svg:last-child { height: 3.1cqi; }
-    .imsg-head {
-      flex: none; position: relative;
-      display: flex; justify-content: center; align-items: center;
-      padding: 1cqi 0 2.6cqi;
-      background: #F7F7F8; border-bottom: .3cqi solid rgba(0, 0, 0, .1);
-    }
-    .imsg-back { position: absolute; left: 4cqi; top: 2cqi; font-size: 10cqi; line-height: 1; color: #0A7CFF; font-weight: 300; }
-    .imsg-group { display: flex; flex-direction: column; align-items: center; gap: .9cqi; }
-    .imsg-avs { display: flex; }
-    .imsg-avs span {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 9cqi; height: 9cqi; border-radius: 50%; border: .5cqi solid #F7F7F8;
-      background: linear-gradient(#A5ABB8, #848993); color: #fff; font-size: 4cqi; font-weight: 600;
-    }
-    .imsg-avs span + span { margin-left: -3cqi; }
-    .imsg-name { font-size: 3.3cqi; }
-    .imsg-chat { flex: 1 1 0; position: relative; }
-    .imsg-day { position: absolute; top: 4cqi; left: 0; right: 0; text-align: center; font-size: 2.9cqi; color: #8A8A8E; }
-    .imsg-day b { font-weight: 600; }
-    .imsg-input { flex: none; display: flex; align-items: center; gap: 2.4cqi; padding: 2cqi 4cqi 9cqi; }
-    .imsg-plus {
-      flex: none; width: 8cqi; height: 8cqi; border-radius: 50%; background: #E9E9EB;
-      display: flex; align-items: center; justify-content: center; color: #7C7C80;
-    }
-    .imsg-plus svg { width: 4.2cqi; height: 4.2cqi; display: block; }   /* drawn, not a "+" glyph: a glyph sits off-centre on its baseline */
-    .imsg-field { flex: 1; border: .3cqi solid #D1D1D6; border-radius: 99px; padding: 1.6cqi 3.4cqi; font-size: 3.9cqi; color: #B6B6BB; }
-
-    /* The lifted conversation: a column wider than the phone, centred on it, so
-       incoming messages hang off its left edge and yours off its right, over the
-       screen and the frame. The column is BOTTOM-ANCHORED: the newest message
-       always lands on the same line just above the input field and the stack
-       grows upward, filling about 70% of the screen. Nothing is clipped or
-       masked — a message is either fully there or gone, it only ever eases
-       between the two. */
-    .imsg-lifted {
-      position: absolute; left: 50%; top: 50%; z-index: 3;
-      width: 54cqw; transform: translate(-50%, -50%);
-      /* No height: the column is its content, and being centred it grows by
-         half its new message up and half down — so the stack always sits
-         around the middle of the screen while messages still arrive at its
-         bottom edge. */
-    }
-    .imsg-track {
-      position: relative;
-      display: flex; flex-direction: column; gap: 1.45cqw;
-      padding: 0 1.3cqw;
-      will-change: transform;
-    }
-    .imsg-msg { display: flex; flex-direction: column; align-items: flex-start; gap: .45cqw; max-width: 35cqw; }
-    /* Right-hand side. .out is mine (blue); .right is someone else answering
-       from the right — same grey bubble, only the side and the tail flip. */
-    .imsg-msg.out, .imsg-msg.right { align-self: flex-end; align-items: flex-end; }
-    .imsg-msg.right .imsg-float-from { padding-left: 0; padding-right: .9em; }
-    .imsg-msg.right .b.in.tail::before { left: auto; right: -.42em; transform: scaleX(-1); }
-    .imsg-msg.is-new { transform-origin: 0 100%; }
-    .imsg-msg.out.is-new { transform-origin: 100% 100%; }
-    .imsg-float-from { font-family: var(--ui); font-size-adjust: none; font-size: 1.24cqw; color: var(--text-secondary); padding-left: .9em; }
-    .imsg-msg img {
-      display: block; width: 24.7cqw; height: auto;
-      border-radius: 1.8cqw; border: 1px solid rgba(0, 0, 0, .08);
-      box-shadow: 0 .5cqw 1.4cqw rgba(60, 60, 90, .16);
-    }
-    .imsg-msg .b {
-      position: relative; margin: 0; width: max-content; max-width: 100%;
-      padding: .45em .8em; border-radius: 1.1em;
-      font-family: var(--ui); font-size-adjust: none; font-size: 1.72cqw; line-height: 1.3; letter-spacing: -.01em;
-      box-shadow: 0 .5cqw 1.4cqw rgba(60, 60, 90, .16);
-    }
-    /* The tail is a mask in the bubble's own colour, so it looks right over the
-       phone and over the page alike (a background-coloured cut-out does not). */
-    .b.in  { background: var(--bubble-in); color: #000; }
-    .b.out { background: var(--bubble-out); color: #fff; }
-    .b.tail::before {
-      content: ""; position: absolute; bottom: 0; left: -.42em;
-      width: 1.15em; height: 1.25em; background: inherit;
-      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M20 0C20 9 14 16 0 19.6C7 20.4 15 19.6 20 16Z'/%3E%3C/svg%3E") no-repeat 0 0 / 100% 100%;
-              mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M20 0C20 9 14 16 0 19.6C7 20.4 15 19.6 20 16Z'/%3E%3C/svg%3E") no-repeat 0 0 / 100% 100%;
-    }
-    .b.out.tail::before { left: auto; right: -.42em; transform: scaleX(-1); }
-
-    @media (max-width: 640px) {
-      .imsg-stage { aspect-ratio: 3 / 4; margin-inline: -20px; width: calc(100% + 40px); }
-      .imsg-phone { width: 54cqw; }
-      .imsg-lifted { width: 92cqw; }
-      .imsg-track { gap: 2.9cqw; padding: 0 2.6cqw; }
-      .imsg-msg { max-width: 70cqw; gap: 1cqw; }
-      .imsg-msg .b { font-size: 4cqw; }
-      .imsg-float-from { font-size: 3.1cqw; }
-      .imsg-msg img { width: 52cqw; border-radius: 3.9cqw; }
-    }
-
-    /* ── Charts, drawn in the page's own style ────────────────────────────────
-       Every chart is markup, not an image: VT323 labels, the neumorphic surface,
-       one colour (the accent) for the bar that carries the finding and grey for
-       the rest. The numbers are placeholders — a value lives in one place, the
-       `--v` on its row (0–100) with the label beside it — so filling a study in
-       is a number swap, never a rebuild.
-       .chart/.chart-row are UNUSED as of 2026-09-28 (.chart-key/-track/-fill/
-       -val are back in use since 2026-10-05, by .ba-chart in Results), see CLAUDE.md — this was the bar chart in the
-       old "Supporting features" section; its data now renders as a pie chart
-       (.pie-chart) inside "Testing and results" instead. Kept, not deleted. */
-    .chart { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-    .chart-row { display: grid; grid-template-columns: minmax(84px, 26%) 1fr auto; align-items: center; gap: 12px; }
-    .chart-key {
-      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 12.2px; letter-spacing: .04em;
-      text-transform: uppercase; color: var(--text-primary); line-height: 1.15;
-    }
-    .chart-track { position: relative; height: 22px; border-radius: 999px; background: var(--bg-surface); box-shadow: var(--shadow-pressed); }
-    .chart-fill {
-      position: absolute; inset: 2px auto 2px 2px; width: calc((100% - 4px) * var(--v) / 100);
-      border-radius: 999px; background: var(--text-tertiary);
-    }
-    .chart-row.is-lead .chart-fill { background: var(--accent-orange); }
-    .chart-val {
-      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 12.9px; color: var(--text-secondary);
-      min-width: 74px; text-align: right;
-    }
-    .chart-row.is-lead .chart-val { color: var(--accent-ink); }
-
-    /* Funnel: each step is a bar of its own width, centred, so the drop-off is
-       the shape itself rather than three numbers in a row. */
-    .funnel { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
-    .funnel-step {
-      width: calc(var(--v) * 1%); min-width: 120px;
-      background: var(--bg-surface); box-shadow: var(--shadow-raised-sm);
-      border-radius: 14px; padding: 12px 16px;
-      display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
-    }
-    .funnel-step:last-child { box-shadow: var(--shadow-raised-sm), 0 0 0 2px var(--accent-orange); }
-    .funnel-step b { font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 15.2px; font-weight: 400; color: var(--text-primary); }
-    .funnel-step span { font-size: 12.5px; color: var(--text-secondary); }
-
-    /* Semantic differential: one line per word pair, a dot for each design.
-       UNUSED as of 2026-09-27, see CLAUDE.md — the chart it belonged to (the
-       "sliders" in Pivot) was removed along with the final-design comparison
-       row; kept in case a chart like this is wanted again. `.chart-legend`
-       below is unused for the same reason (nothing else on this page uses
-       it — the shared `.chart-row`/`.chart-key`/etc. classes used by
-       "Testing and results" are separate and still live). */
-    .diff { display: flex; flex-direction: column; gap: 16px; }
-    .diff-row { display: grid; grid-template-columns: minmax(70px, 18%) 1fr minmax(70px, 18%); align-items: center; gap: 12px; }
-    .diff-end { font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 12.2px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary); }
-    .diff-end:last-child { text-align: right; }
-    .diff-line { position: relative; height: 12px; }
-    .diff-line::before { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 2px; background: var(--text-tertiary); border-radius: 2px; }
-    .diff-dot {
-      position: absolute; top: 0; width: 12px; height: 12px; border-radius: 50%;
-      left: calc(var(--v) * 1%); transform: translateX(-50%);
-      background: var(--text-secondary);
-    }
-    .diff-dot.is-final { background: var(--accent-orange); }
-    .chart-legend {
-      display: flex; gap: 18px; font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 12.2px;
-      letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary);
-    }
-    .chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--text-secondary); margin-right: 6px; }
-    .chart-legend i.is-final { background: var(--accent-orange); }
-
-    /* ── "Who's free now": two constructed wireframes, not real screenshots ──
-       Recreates the ACTUAL colours and shapes of two v1 screens (a glance vs.
-       the full week) to explain WHY there are two views, without pulling in
-       v1's own screenshot files — those are Pivot's job (see CLAUDE.md,
-       2026-09-27). Rebuilt 2026-09-27 (same day, second pass) from a grey/
-       pink abstraction to this — Lucas: "the wireframes are totally off, not
-       accurate", after pointing at his own v1 exports. `--v1-blue: #2010FF`
-       is SAMPLED off the real files (`public/images/unify/v1/v1-home.webp`,
-       a solid fill on the "Zoe" bubble — not eyeballed), and every colour,
-       border and shape below (thick black card border, solid-fill pill
-       bubbles, the full-bleed blue highlight on the last row) matches what
-       is actually in those two exports, not an invented wireframe idiom.
-       Hardcoding white/black/v1-blue rather than the page's `--text-*`
-       tokens is deliberate and doubles as the dark-mode fix: these are meant
-       to always render as the literal light v1 UI, the same reasoning as
-       "SkeuKit exhibits keep their own light material" in the dark-mode
-       section above, and none of it touches the tokens dark-mobile.css swaps. */
-    /* UNUSED as of 2026-10-06 (replaced by .v1-scene), see CLAUDE.md */
-    .wf-frame {
-      --v1-blue: #2010FF;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: clamp(20px, 4vw, 48px);
-      width: 100%;
-      padding: clamp(28px, 5vw, 52px) clamp(20px, 5vw, 56px);
-      border-radius: 24px;
-      background:
-        radial-gradient(circle, rgba(0, 0, 0, .08) 1px, transparent 1.5px) 0 0 / 16px 16px,
-        var(--bg-surface);
-      box-shadow: var(--shadow-pressed);
-    }
-    .wf-screen {
-      flex: 1 1 240px;
-      max-width: 260px;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      background: #fff;
-      border: 5px solid #000;
-      border-radius: 30px;
-      padding: 20px 18px;
-      overflow: hidden;
-    }
-    .wf-arrow { flex: none; width: clamp(36px, 6vw, 64px); height: 24px; color: var(--v1-blue); margin-bottom: 34px; }
-
-    /* Connect now — the glance */
-    .wf-connect-title {
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: 19px; color: var(--v1-blue);
-      padding-bottom: 8px; border-bottom: 1.5px solid var(--v1-blue);
-    }
-    .wf-connect-range {
-      display: flex; justify-content: space-between;
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: 12px; color: var(--v1-blue); opacity: .8;
-    }
-    .wf-bubbles { position: relative; height: 132px; }
-    .wf-bubble {
-      position: absolute;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 9999px;
-      background: var(--v1-blue);
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: 11px;
-      color: #fff;
-    }
-    .wf-bubble--zoe   { z-index: 1; width: 98px; height: 60px; left: 50%; top: 54%; transform: translate(-50%, -50%); font-size: 15px; }
-    .wf-bubble--paul1 { z-index: 2; width: 60px; height: 32px; left: 20%; top: -4%; }
-    .wf-bubble--luis  { z-index: 2; width: 54px; height: 30px; right: 0%; top: 10%; }
-    .wf-bubble--paul2 { z-index: 2; width: 56px; height: 32px; left: -4%; bottom: 14%; }
-    .wf-bubble--tom   { z-index: 2; width: 80px; height: 40px; right: -2%; bottom: 0%; }
-    .wf-cal-btn {
-      align-self: flex-end;
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: 12px;
-      color: var(--v1-blue);
-      background: #fff;
-      border: 1.5px solid var(--v1-blue);
-      border-radius: 9999px;
-      padding: 9px 18px;
-      cursor: default;
-    }
-
-    /* Stundenplan — the full week */
-    .wf-sp-tabs { display: flex; gap: 8px; }
-    .wf-sp-tab {
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: 12px;
-      border: 1.5px solid var(--v1-blue); border-radius: 14px;
-      padding: 7px 14px; color: var(--v1-blue); background: #fff;
-    }
-    .wf-sp-tab.is-active { background: var(--v1-blue); color: #fff; }
-    .wf-sp-divider { height: 1.5px; background: var(--v1-blue); opacity: .55; }
-    .wf-sp-nav { display: flex; align-items: center; justify-content: space-between; font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: 13px; color: var(--v1-blue); }
-    .wf-sp-days { display: flex; justify-content: space-between; }
-    .wf-sp-day {
-      width: 26px; height: 26px; border-radius: 50%; flex: none;
-      border: 1.5px solid var(--v1-blue);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: 11px; color: var(--v1-blue); background: #fff;
-    }
-    .wf-sp-day.is-active { background: var(--v1-blue); color: #fff; }
-    .wf-sp-rows { display: flex; flex-direction: column; gap: 10px; margin: 0 -18px; padding: 0 18px; }
-    .wf-sp-row {
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      border-bottom: 1.5px solid var(--v1-blue);
-      padding-bottom: 10px;
-    }
-    .wf-sp-row-lines { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-    .wf-sp-line-a { font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: 13px; color: var(--v1-blue); }
-    .wf-sp-line-b { font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: 10px; line-height: 1.3; color: var(--v1-blue); opacity: .6; }
-    .wf-sp-chev { flex: none; color: var(--v1-blue); font-size: 12px; width: 22px; height: 22px; border: 1.5px solid var(--v1-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    /* The real screenshot's last row bleeds edge to edge, solid blue, no
-       border — .wf-sp-rows gives back its own padding as negative margin so
-       this row alone can reach past it; the others keep the card's padding. */
-    .wf-sp-row.is-active {
-      background: var(--v1-blue);
-      border-bottom: none;
-      border-radius: 0 0 25px 25px;
-      margin: 0 -18px -20px;
-      padding: 12px 18px 20px;
-    }
-    .wf-sp-row.is-active .wf-sp-line-a,
-    .wf-sp-row.is-active .wf-sp-line-b { color: #fff; }
-    .wf-sp-row.is-active .wf-sp-line-b { opacity: .75; }
-    .wf-sp-avatars { flex: none; font-size: 12px; letter-spacing: -1px; color: #fff; white-space: nowrap; }
-
-    @media (max-width: 640px) {
-      .wf-frame { flex-direction: column; padding: 24px 18px; align-items: center; }
-      .wf-screen { max-width: 320px; width: 100%; }
-      .wf-arrow { transform: rotate(90deg); width: 32px; height: 40px; margin: -4px 0; }
-    }
-
-    /* ── The overlap, step by step ────────────────────────────────────────────
-       UNUSED as of 2026-09-27, see CLAUDE.md — "How the overlap is found"
-       (the section this diagram illustrated) was folded into one paragraph
-       under the wireframes above; kept in case a diagram is wanted again.
-       A day from 08:00 to 18:00 on every row, so the rows can be read straight
-       down: three timetables, then what the app does with them. Blocks are
-       placed with two custom properties, --s and --e, in hours. */
-    .ovl { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-    .ovl-row { display: grid; grid-template-columns: minmax(96px, 22%) 1fr; align-items: center; gap: 12px; }
-    .ovl-key { font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 12.2px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-primary); }
-    .ovl-key small { display: block; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--text-secondary); }
-    .ovl-day { position: relative; height: 26px; border-radius: 8px; background: var(--bg-surface); box-shadow: var(--shadow-pressed); }
-    .ovl-b {
-      position: absolute; top: 3px; bottom: 3px; border-radius: 6px;
-      left: calc((var(--s) - 8) / 10 * 100%); width: calc((var(--e) - var(--s)) / 10 * 100%);
-    }
-    .ovl-b.busy { background: var(--text-tertiary); }
-    .ovl-b.free { background: rgba(255, 92, 0, .28); }
-    .ovl-b.hit  { background: var(--accent-orange); }
-    .ovl-b.out  { background: var(--text-tertiary); opacity: .55; }
-    .ovl-scale { display: flex; justify-content: space-between; font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 10.6px; color: var(--text-secondary); }
-    /* three lanes inside one row, so the gaps of the three days can be read
-       apart instead of blending into one another */
-    .ovl-b.l1 { top: 3px; height: 6px; bottom: auto; }
-    .ovl-b.l2 { top: 10px; height: 6px; bottom: auto; }
-    .ovl-b.l3 { top: 17px; height: 6px; bottom: auto; }
-    .ovl-note { font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 12.2px; color: var(--text-secondary); }
-    @media (max-width: 640px) {
-      .chart-row { grid-template-columns: 1fr auto; }
-      .chart-row .chart-track { grid-column: 1 / -1; grid-row: 2; }
-      .ovl-row { grid-template-columns: 1fr; gap: 4px; }
-      .diff-row { grid-template-columns: 1fr; gap: 4px; }
-      .diff-end:last-child { text-align: left; }
-    }
-
-    /* ── Requirements: three tries, this is the third ────────────────────────
-       1. A 2x2 positioning quadrant — rejected as generic-deck.
-       2. A numbered card (pink OCR-A-BT index, bold claim, smaller evidence
-          line) — rejected too: Lucas wanted no card, no size hierarchy, no
-          pink, just plain paragraphs. That's what's live now (see the section
-          markup) — .guide-text throughout, no dedicated CSS of its own. */
-
-    /* ── The three timetable variants, drawn ────────────────────────────────
-       UNUSED as of 2026-09-28, see CLAUDE.md — see the note on `.variant`
-       above; this is the other half of the same removed A/B/C comparison. */
-    .tv {
-      aspect-ratio: 876 / 1808; width: 100%;
-      background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-pressed);
-      padding: 12px; overflow: hidden;
-    }
-    .tv.is-winner { box-shadow: var(--shadow-pressed), 0 0 0 2px var(--accent-orange); }
-    .tv-cols { display: flex; gap: 6px; height: 100%; }
-    .tv-col { position: relative; flex: 1; background: rgba(0, 0, 0, .04); border-radius: 8px; }
-    .tv-col i, .tv-stack i {
-      position: absolute; left: 6%; right: 6%; border-radius: 6px;
-      top: calc(var(--s) * 1%); height: calc((var(--e) - var(--s)) * 1%);
-      background: var(--text-tertiary);
-    }
-    .tv-stack { position: relative; height: 100%; background: rgba(0, 0, 0, .04); border-radius: 8px; }
-    .tv-stack i { left: 8%; right: 8%; background: rgba(120, 120, 140, .38); }
-    .tv-lane { position: relative; height: 100%; background: rgba(0, 0, 0, .04); border-radius: 8px; }
-    .tv-slot {
-      position: absolute; left: 6%; right: 6%; border-radius: 8px;
-      top: calc(var(--s) * 1%); height: calc((var(--e) - var(--s)) * 1%);
-      background: var(--accent-orange); color: #fff;
-      display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
-      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 9.9px;
-    }
-    .tv-slot em { font-style: normal; letter-spacing: -1px; opacity: .85; }
-
-    /* The finding and the interviews run in a narrower column than the phone
-       above them: the section's own side padding again, so twice it in total. */
-    .stat-block {
-      display: flex; flex-direction: column; gap: clamp(20px, 3vw, 28px);
-      padding-inline: clamp(0px, 8vw, 80px);
-      padding-bottom: clamp(36px, 5vw, 60px);   /* and as much again before the next section */
-    }
-
-    /* ── A finding, stated: kicker, headline, one line of detail ──────────── */
-    .stat-kicker {
-      font-weight: 500; font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: 12.9px; letter-spacing: .06em;
-      text-transform: uppercase; color: var(--text-secondary);
-      margin-top: clamp(56px, 6vw, 84px);   /* twice the air again, under the phone */
-    }
-    .stat-head {
-      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-weight: 300;
-      font-size: clamp(22px, 2.5vw, 32px); line-height: 1.25;
-      color: var(--text-primary); margin-top: -6px;   /* full content width, like the reference */
-    }
-    .stat-head.is-section { margin-top: clamp(16px, 2.4vw, 28px); }
-    .stat-sub { font-size: 14.4px; line-height: 1.7; color: var(--text-secondary); margin-top: -8px; }
-    .stat-sub b { color: var(--text-primary); font-weight: 500; }
-
-    /* ── One bar, two parts, and a brace under the part that matters ──────── */
-    .statbar { width: 100%; }
-    .statbar-track {
-      display: flex; height: clamp(64px, 7vw, 96px); border-radius: 16px; overflow: hidden;
-      /* the "stopped trying" part is a solid block in the app's own dark
-         #292925, flat — no pressed well (Lucas, 2026-10-06) */
-      background: #292925;
-    }
-    .statbar-seg {
-      width: calc(var(--w) * 1%);
-      display: flex; align-items: center; gap: 10px; padding: 0 20px;
-      /* as large as the headline's own ramp, one step down: a label in the bar
-         should read like part of the sentence, not like a caption */
-      font-size: clamp(22px, 2.5vw, 32px); color: var(--text-secondary);
-      white-space: nowrap; overflow: hidden;
-    }
-    .statbar-seg b { font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: clamp(22px, 2.5vw, 32px); font-weight: 400; color: var(--text-primary); }
-    /* text on the dark part: one light shade for number and words alike */
-    .statbar-seg:not(.is-main), .statbar-seg:not(.is-main) b { color: #EDEDEF; }
-    .statbar-seg.is-main { background: var(--accent-orange); color: #4a2338; }
-    .statbar-seg.is-main b { color: #4a2338; }
-    /* the brace: two ticks and a rule under the span it names */
-    .statbar-brace { position: relative; height: 128px; }
-    .statbar-brace-line {
-      position: absolute; top: 0; left: calc(var(--from) * 1%); width: calc((var(--to) - var(--from)) * 1%);
-      height: 26px; border: 2.5px solid var(--text-primary); border-top: none; border-radius: 0 0 6px 6px;
-    }
-    .statbar-brace-line::after {
-      content: ""; position: absolute; left: 50%; top: 100%; width: 2.5px; height: 12px; background: var(--text-primary);
-    }
-    .statbar-brace-text {
-      position: absolute; top: 54px; left: calc((var(--from) + (var(--to) - var(--from)) / 2) * 1%);
-      transform: translateX(-50%); text-align: center; white-space: nowrap;
-      font-size: clamp(22px, 2.5vw, 32px); line-height: 1.45; color: var(--text-secondary);
-    }
-    .statbar-brace-text b { font-family: 'Roboto Flex', sans-serif; font-size-adjust: none; font-size: clamp(22px, 2.5vw, 32px); font-weight: 400; color: var(--text-primary); }
-
-    /* ── Quotes from the other side of the bar ────────────────────────────── */
-    .voices { display: flex; flex-direction: column; gap: clamp(14px, 2vw, 22px); }
-    .voice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); }
-    .voice {
-      margin: 0; background: var(--bg-surface); border-radius: 20px; box-shadow: var(--shadow-pressed);
-      padding: clamp(18px, 2vw, 26px); display: flex; flex-direction: column; gap: 12px;
-    }
-    .voice p { font-size: 14.4px; line-height: 1.6; color: var(--text-primary); }
-    .voice cite {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-style: normal; font-size: 16px;
-      letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary);
-    }
-    @media (max-width: 860px) {
-      .voice-grid { grid-template-columns: minmax(0, 1fr); }
-    }
-    @media (max-width: 640px) {
-      .statbar-track { height: 58px; }
-      .statbar-seg { padding: 0 12px; font-size: 15px; }
-      .statbar-seg.is-main .seg-words { display: none; }   /* 32 % of a phone's width is the number alone */
-      .statbar-seg b { font-size: 18px; }
-      .statbar-brace-text { font-size: 15px; }
-    }
-    @media (max-width: 860px) {
-      .cs-grid-2 { grid-template-columns: minmax(0, 1fr); }
-    }
-    @media (max-width: 640px) {
-      .fact-bar, .cs-grid-3 { grid-template-columns: minmax(0, 1fr); }
-      .pivot-screens { gap: 10px; }
-      .ph--chart { aspect-ratio: 4 / 3; }
-    }
   
     /* Phones: the vertical film is the hero (see .unify-film), so the blob-sized
        hero box goes and the title sits right under the film. Last in the sheet:
@@ -2702,78 +1574,6 @@
       .hero-top { min-height: 0; padding-top: 18px; }
     }
   
-    /* ── Inset text column, MacBook widths and up (2026-10-05, Lucas) ──────
-       Every case-study section's content sits on the inset the Problem
-       section's finding (.stat-block) and the home-screen text (.home-copy)
-       already used: 80px further in than the section padding, so lines stop
-       running the full card width — headings and dotted dividers included
-       (Lucas). From 1280px up (every MacBook
-       default resolution and wider); below that the page keeps its old
-       padding. The components that carried this inset themselves (and the
-       scrollys' own side padding) give it back here, or it would apply twice. */
-    /* --page-pad: 160px on wide monitors; on a MacBook-shaped SCREEN
-       (2026-10-06, Lucas) it is the midpoint between the old pages' 80px and
-       this 160px, i.e. 120px — then dialled to 112px by Lucas. "MacBook-shaped" is the SCREEN's ratio, not
-       the window's (a MacBook browser window is ~1.8:1, as wide as a 16:9
-       monitor's) — the inline script at the top of <head> sets
-       html[data-screen="macbook"] for a landscape screen between 1.45:1 and
-       1.7:1 (every MacBook is ~1.54-1.6). */
-    :root { --page-pad: 160px; }
-    html[data-screen="macbook"] { --page-pad: 112px; }   /* dialled in by Lucas, 2026-10-06 */
-    @media (min-width: 1280px) {
-      .cs-section:not(#top) { padding-inline: var(--page-pad); }
-      /* and the header block above the sections too (Lucas): breadcrumb,
-         title + divider, the lead line and the meta tiles */
-      .hero-top, #top, .page-wrapper > .section { padding-inline: var(--page-pad); }
-      .stat-block { padding-inline: 0; }
-      /* the scrollys carried their own 80px of side padding on top of the
-         section's; that now IS the section's, so it goes */
-      .cs-section .scrolly-sticky { padding-inline: 0; }
-      .home-copy { padding-inline: 0; }
-      .home-previews { margin-inline: 0; }
-    }
-
-    /* ── Breathing room, after Jessica Im's TurboTax case study (2026-10-05) ──
-       Lucas: the page felt cramped. Measured off imjiwoo.com/tt-onboarding at
-       1440 wide: body 18px on a 1.4 line, sub-heads 28px, stat numbers 48px
-       over an 18px label; ~240-280px between major sections, ~40-80px
-       between sub-sections inside one, 40px from a label to its heading and
-       from text to the media under it, ~19px from a heading to its text, and
-       a 1036px column at 1440. Translated here, desktop only (861px+), with
-       clamps so the 861-1440 band scales down to it instead of jumping:
-       - body text 14.4 -> 18px at 1440 (line 1.55: this face is lighter and
-         greyer than Figtree and wants a little more air than 1.4)
-       - section-to-section ~244px at 1440 (122px top + bottom each; the old
-         .cs-section + .cs-section shortcut that cut the top to 32px is
-         overridden, and #research's own inline top padding is gone)
-       - every gap inside a section 28 -> 40px
-       - sub-headings get ~64px more above them, the results blocks ~120px
-       - fact labels 13 -> 16px under their numbers
-       Mobile (<=860) is untouched. */
-    @media (min-width: 861px) {
-      .guide-section.cs-section:not(#top) { padding-block: clamp(64px, 8.5vw, 136px); }
-      .guide-section.cs-section { gap: clamp(28px, 2.8vw, 40px); }
-      .cs-section .guide-text,
-      .cs-section .stat-sub { font-size: clamp(16px, 1.25vw, 18px); line-height: 1.55; }
-      .cs-section .cs-sub { margin-top: clamp(32px, 4.4vw, 64px); }
-      #pivot .cs-sub { margin-top: 0; }   /* collage -> heading -> text -> heading all at the section gap (Lucas) */
-      .cs-section .stat-head.is-section { margin-top: clamp(32px, 4.4vw, 64px) !important; }
-      .res-block { margin-top: clamp(80px, 8.5vw, 120px); gap: clamp(24px, 2.8vw, 40px); }
-      .home-previews { margin-top: clamp(80px, 8.5vw, 120px); }
-      /* Lucas: frame -> text, and block -> block, at the same 40px as the
-         wireframes -> their paragraph in The idea (i.e. just the section gap) */
-      .home-copy { margin-top: 0; gap: clamp(28px, 2.8vw, 40px); }
-      .home-copy .feature-title { margin-bottom: 19px; }
-      .stat-block { gap: clamp(28px, 2.8vw, 40px); }
-      .imsg-stage + .stat-block { margin-top: clamp(48px, 6.9vw, 99px); }   /* chat -> finding: 124 -> 223px at 1440, +80% (Lucas) */
-      .fact-label { font-size: 16px; line-height: 1.45; }
-      .fact-bar { margin-top: clamp(80px, 8.5vw, 120px) !important; }
-      .feature-row + .feature-row,
-      .scrolly + .feature-row,
-      .feature-row + .scrolly,
-      .scrolly + .scrolly { margin-top: clamp(40px, 5.5vw, 80px); }
-    }
-
     /* Former pixel-font labels that are buttons or carry weight: one step
        heavier than body text so they still read as UI (Lucas, 2026-10-06). */
     .meta-label,
@@ -2784,6 +1584,23 @@
     .mobile-mode-btn,
     .pill__seg,
     .machine-overlay-btn { font-weight: 500; }
+  
+    /* ── Inset content column from 1280px up (2026-10-06, Lucas) ───────────
+       The format from the Unify case-study draft (unify2d1.html): every
+       content section's side padding goes from 80px to --page-pad — 160px on
+       a wide monitor, 112px on a MacBook-shaped SCREEN (Lucas's dialled
+       value). "MacBook-shaped" is the screen's ratio, not the window's (a
+       MacBook browser window is as wide as a 16:9 monitor's): the inline
+       script at the top of <head> sets html[data-screen="macbook"] for a
+       landscape screen between 1.45:1 and 1.7:1. Full-bleed heroes, films
+       and the project nav are untouched; the scrollys carry their padding
+       on their sticky child. Below 1280px nothing changes. */
+    :root { --page-pad: 160px; }
+    html[data-screen="macbook"] { --page-pad: 112px; }
+    @media (min-width: 1280px) {
+      .page-wrapper > :is(.section, .guide-section, .process-section, .hero-top) { padding-inline: var(--page-pad); }
+      .page-wrapper > .scrolly .scrolly-sticky { padding-inline: var(--page-pad); }
+    }
   </style>
   <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
@@ -2817,18 +1634,6 @@
   </div>
 
   <div class="page-wrapper">
-
-    <!-- Fixed section sidebar, off the hero (see .cs-map). Stays on screen at
-         every scroll position (Lucas: including at the very top), tracks
-         whichever section is currently in view, and smooth-scrolls on click. -->
-    <nav class="cs-map" aria-label="Page sections">
-      <a href="#problem">Problem</a>
-      <a href="#research">Constraints</a>
-      <a href="#idea">Idea</a>
-      <a href="#pivot">Pivot</a>
-      <a href="#features">Design</a>
-      <a href="#results">Results</a>
-    </nav>
 
     <!-- Hero film (desktop): the Unify promo loop's tall cut — silent, seamless,
          ~54s. The poster is the loop's own first frame (the phone, screen off). -->
@@ -2878,16 +1683,12 @@
       </div>
     </div>
 
-    <!-- ══ CASE-STUDY DRAFT ══════════════════════════════════════════════
-         Order follows unify-casestudy-plan.md §2. Every [ bracketed ] value
-         and every .ph box is a placeholder. New copy is English-only and
-         carries no data-i18n yet — German comes when the copy is final. -->
-
-    <!-- Hero one-liner. The three pink numbers used to sit right under it —
-         moved into "The idea", after the app's own showcase, per Lucas: the
-         proof belongs next to the thing it is proof of, not before it. -->
-    <div class="guide-section cs-section" id="top">
-      <p class="cs-lead">Unify shows you when your friends are free at the same time as you — so meeting up between classes stops taking a group chat.</p>
+    <!-- At a Glance -->
+    <div class="guide-section" style="border-bottom: none;">
+      <div class="section-heading-row">
+        <h2 class="section-title" data-i18n="section-overview">At a Glance</h2>
+      </div>
+      <p class="guide-text" data-i18n-html="overview-text">Unify started from a problem in my own campus life: my friends study different subjects, so even though we're all on the same campus, we're rarely in the same courses. Meeting up between classes meant memorising everyone's timetable or texting around every break. We began by swapping screenshots of our schedules — Unify turns that into one place where you see your own timetable alongside your friends'. Open it during a break and you can tell at a glance who's on campus right now and who you can meet up with.</p>
     </div>
 
     <!-- Meta -->
@@ -2895,7 +1696,7 @@
       <div class="meta-grid">
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-timeline">Timeline</div>
-          <div class="meta-inset">Summer semester 2026</div>
+          <div class="meta-inset" data-i18n-html="val-timeline">[ Timeline ]</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-team">Team</div>
@@ -2903,10 +1704,7 @@
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-role">Role</div>
-          <!-- New role line (plan §5). No data-i18n yet, or the old value would overwrite it.
-               Lucas's OWN role only — the Team tile beside it says who else was on it, and
-               the character-design credit sits in "What replaced it", next to the work. -->
-          <div class="meta-inset">Concept<br>UX<br>v1 visual design<br>Figma &amp; coded prototype</div>
+          <div class="meta-inset" data-i18n-html="val-role">[ Role ]</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-skills">Skills</div>
@@ -2915,470 +1713,221 @@
       </div>
     </div>
 
-    <!-- 1 · The problem -->
-    <section class="guide-section cs-section" id="problem">
+    <!-- Design Process -->
+    <div class="process-section" style="border-bottom: none;">
       <div class="section-heading-row">
-        <h2 class="section-title">The problem</h2>
+        <h2 class="section-title" data-i18n="section-design-process">Design Process</h2>
         <span class="step-badge">1</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text">My friends and I study different subjects. We share a campus but rarely a course, so every week the three of us swapped screenshots of our timetables to work out when we could meet. In a week-long diary study, arranging a 30-minute coffee took an average of 23 minutes of texting — and a third of the attempts never happened at all.</p>
-      <!-- The evidence: an empty iMessage group chat whose messages lift off the
-           screen one by one (script at the end of the page). Reconstructed from the
-           real chats, names changed. -->
-      <div class="imsg-stage" role="img" aria-label="Group chat: friends post screenshots of their timetables, fail to find a shared free slot by hand, and the one who replies late misses lunch.">
-        <div class="phone-shot imsg-phone">
-          <div class="phone-shot-screen">
-            <div class="imsg">
-              <div class="imsg-status">
-                <span>9:12</span>
-                <span class="imsg-icons" aria-hidden="true">
-                  <svg viewBox="0 0 18 12"><rect x="0" y="8.2" width="3.2" height="3.8" rx=".9"/><rect x="4.9" y="5.8" width="3.2" height="6.2" rx=".9"/><rect x="9.8" y="3.2" width="3.2" height="8.8" rx=".9"/><rect x="14.7" y="0" width="3.2" height="12" rx=".9"/></svg>
-                  <svg viewBox="-.5 -.5 17 13" stroke="currentColor" stroke-width=".7" stroke-linejoin="round"><path d="M.22 3.72A11 11 0 0 1 15.78 3.72L13.94 5.56A8.4 8.4 0 0 0 2.06 5.56Z"/><path d="M3.05 6.55A7 7 0 0 1 12.95 6.55L11.11 8.39A4.4 4.4 0 0 0 4.89 8.39Z"/><path d="M8 11.5L5.88 9.38A3 3 0 0 1 10.12 9.38Z"/></svg>
-                  <svg viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".38"/><rect x="2.2" y="2.2" width="16.5" height="7.6" rx="2"/><path d="M25 4.1v3.8c.8-.3 1.3-1 1.3-1.9S25.8 4.4 25 4.1Z" fill-opacity=".4"/></svg>
-                </span>
-              </div>
-              <div class="imsg-head">
-                <span class="imsg-back">‹</span>
-                <div class="imsg-group">
-                  <div class="imsg-avs"><span>B</span><span>A</span><span>S</span></div>
-                  <span class="imsg-name">HM Group ›</span>
-                </div>
-              </div>
-              <div class="imsg-chat"><div class="imsg-day"><b>Today</b> 09:12</div></div>
-              <div class="imsg-input"><span class="imsg-plus"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="imsg-field">iMessage</span></div>
-            </div>
-          </div>
-          <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-        </div>
-        <div class="imsg-lifted"><div class="imsg-track"></div></div>
-      </div>
-      <!-- The finding and the interviews sit in their own column: twice the
-           section's side padding on a desktop, flush on a phone. The chat stage
-           above stays full width. -->
-      <div class="stat-block">
-        <!-- The finding, stated: a headline carrying the number, one paragraph
-             under it, then the bar it comes from. -->
-        <p class="stat-kicker">Survey · 120 students · before Unify</p>
-        <h3 class="stat-head">83 % of students never actually meet a friend from another course between classes</h3>
-  
-        <div class="statbar" role="img" aria-label="Of everyone asked, 32 % still text or swap screenshots and 68 % have stopped trying. 47 % of the texting group never met, which with the ones who never tried is 83 % of everyone.">
-          <div class="statbar-track">
-            <span class="statbar-seg is-main" style="--w: 32"><b>32 %</b><span class="seg-words">still text</span></span>
-            <span class="statbar-seg" style="--w: 68"><b>68 %</b><span class="seg-words">have stopped trying</span></span>
-          </div>
-          <div class="statbar-brace" style="--from: 17; --to: 100">
-            <span class="statbar-brace-line"></span>
-            <p class="statbar-brace-text"><b>83 % never met anyone</b></p>
+      <h2 class="process-title" style="margin-top: 190px;" data-i18n="colors-title">Choosing the right colorpalette</h2>
+      <p class="guide-text" data-i18n-html="colors-text">We chose three soft, pastel-leaning colours: pink and beige as the primaries, with a dark grey as the accent. The goal was a look that feels young, student-y and cheerful — so we picked a bold, slightly unusual pink you don't often see in apps.</p>
+      <div class="color-grid">
+        <div class="color-box">
+          <div class="color-swatch" style="background: #FF88C8;">
+            <span class="color-swatch-code">FF88C8</span>
           </div>
         </div>
-
-        <!-- The other side of the bar, in their own words. -->
-        <h3 class="stat-head is-section" style="margin-top: clamp(28.8px, 4.32vw, 50.4px);">Why the 68 % stopped trying</h3>
-        <p class="guide-text">I went back to nine of the students who said they no longer try to arrange anything between classes. <b>Not one of them said they didn't want to meet.</b> They said it costs more than it is worth: “I'd meet them if I knew when — working it out takes longer than the break does.” <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
-        <p class="guide-text">The second thing they all said was about the size of the window. “By the time everyone has answered, I'm already in the next lecture.” <b>For forty minutes it isn't worth the back and forth</b> — so, as one of them put it, “we say next week, and next week never comes.”</p>
+        <div class="color-box">
+          <div class="color-swatch" style="background: #F9F2EB;">
+            <span class="color-swatch-code" style="color: #1A1A1A;">F9F2EB</span>
+          </div>
+        </div>
+        <div class="color-box">
+          <div class="color-swatch" style="background: #1A1A1A;">
+            <span class="color-swatch-code">1A1A1A</span>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <!-- 2 · Research → one model -->
-    <!-- +80% of the usual section gap above this one, specifically (Lucas) —
-         .cs-section + .cs-section stays the shared default for every other pair. -->
-    <section class="guide-section cs-section" id="research">
+    <!-- Typography -->
+    <div class="process-section" style="border-bottom: none; margin-top: 40px;">
+      <h2 class="process-title" data-i18n="typography-title">Typography</h2>
+      <p class="guide-text" data-i18n-html="typography-text">We set the interface in Nunito. Its rounded terminals and soft, edgeless letterforms mirror the playful, youthful feel of the whole app.</p>
+      <div class="typography-grid" style="margin-top: 35px;">
+        <div class="typography-card">
+          <div class="typography-info">
+            <span class="typography-label" data-i18n="typography-label-header">Header</span>
+            <span class="typography-spec" data-i18n="typography-spec-header">72px  ·  bold</span>
+          </div>
+          <div class="typography-preview" style="font-size: clamp(25px, 4.2vw, 50px); font-weight: 800;" data-i18n="typography-preview-header">soccer match</div>
+        </div>
+        <div class="typography-card">
+          <div class="typography-info">
+            <span class="typography-label" data-i18n="typography-label-body">Body text</span>
+            <span class="typography-spec" data-i18n="typography-spec-body">48px  ·  bold</span>
+          </div>
+          <div class="typography-preview" style="font-size: clamp(20px, 2.8vw, 34px); font-weight: 700;" data-i18n="typography-preview-body">bring all your friends</div>
+        </div>
+        <div class="typography-card">
+          <div class="typography-info">
+            <span class="typography-label" data-i18n="typography-label-info">Info text</span>
+            <span class="typography-spec" data-i18n="typography-spec-info">48px  ·  light</span>
+          </div>
+          <div class="typography-preview" style="font-size: clamp(28px, 4vw, 48px); font-weight: 300;" data-i18n="typography-preview-info">from 15:00 - 17:00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Character based design -->
+    <div class="process-section" style="border-bottom: none; margin-top: 70px;">
+      <h2 class="process-title" data-i18n="characters-title">Character based design</h2>
+      <div class="character-list">
+        <div class="character-row">
+          <div class="character-figure">
+            <img src="/images/unify/characters/char-arch.svg" alt="" />
+          </div>
+          <p class="character-copy" style="margin-left: -15px;" data-i18n-html="characters-text-1">Characters are the core of Unify's visual identity — the whole app is built around them, giving it a consistent, friendly personality from screen to screen.</p>
+        </div>
+        <div class="character-row right">
+          <div class="character-figure">
+            <img src="/images/unify/characters/char-bird.svg" alt="" />
+          </div>
+          <p class="character-copy" style="margin-right: -15px;" data-i18n-html="characters-text-2">Their main role is personalisation: you choose a character as your profile icon, so your friends can spot and recognise you at a glance across the app.</p>
+        </div>
+        <div class="character-row indent">
+          <div class="character-figure">
+            <img src="/images/unify/characters/char-mountain.svg" alt="" />
+          </div>
+          <p class="character-copy" style="margin-left: -15px;" data-i18n-html="characters-text-3">The characters also live inside the interface itself — turning up in details like the bar on the map view or the toggle between your timetable and social activities.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final Product section header -->
+    <div class="process-section" style="border-bottom: none; border-top: 1px solid var(--border-color); margin-top: 70px;">
       <div class="section-heading-row">
-        <h2 class="section-title">The constraints</h2>
+        <h2 class="section-title" data-i18n="section-final-product">Final Product</h2>
         <span class="step-badge">2</span>
       </div>
       <div class="dot-divider"></div>
-      <!-- Renamed 2026-09-27 (Lucas): "Requirements" implied a spec I wrote;
-           the German word he reached for, Rahmenbedingungen, is closer —
-           boundary conditions the RESEARCH set, that the design then had to
-           fit inside, not features I chose. Header, intro and all three leads
-           reframed around "had to" (a condition satisfied) rather than "does"
-           (a feature built) to carry that. Still plain .guide-text throughout
-           — no kicker, no card, no size hierarchy (unchanged from the 09-26 pass). -->
-      <p class="guide-text">Before I designed anything, the research set three constraints the app had to work inside:</p>
-      <p class="guide-text"><b>It had to answer inside the break, not after it.</b> “For forty minutes it isn't worth the back and forth.” The window itself was the constraint — not willingness.</p>
-      <p class="guide-text"><b>It had to work across faculties, not just one course.</b> 64 % of students have a close friend outside their own course — exactly why a shared timetable never already existed. Survey · n=120.</p>
-      <p class="guide-text"><b>It had to cost nothing to check.</b> The 68 % who stopped trying didn't stop wanting to meet — checking cost more than the break was worth.</p>
-    </section>
+    </div>
 
-    <!-- 3 · The idea: shared free time -->
-    <section class="guide-section cs-section" id="idea">
-      <div class="section-heading-row">
-        <h2 class="section-title">The idea</h2>
-        <span class="step-badge">3</span>
-      </div>
-      <div class="dot-divider"></div>
-      <!-- No real screens here on purpose (2026-09-27, see CLAUDE.md) — the
-           point of this section is the CONCEPT, and it had started re-showing
-           the exact v1 stills Pivot needs for its before/after comparison a
-           few hundred pixels later. Pivot is the only place actual v1 SCREENS
-           appear; the two panels below are CONSTRUCTED wireframes (built from
-           the v1 screenshots, not the screenshots themselves) — monochrome,
-           simplified, existing only to explain why there are two views. -->
-      <h3 class="cs-sub">Who's free now</h3>
-      <p class="guide-text">I wanted two ways into the same overlap, not one screen doing both jobs. Connect now is the glance — who is free right now, and until when, answered before you have typed anything. Tap open Calendar and it opens into the full week: everyone's actual timetable, side by side, for the times a two-second glance can't answer.</p>
-
-      <!-- 2026-10-06 (Lucas): the two v1 frames straight from the Figma file
-           (unify: the Connect now card 971:2102 and the timetable 971:2165,
-           exported at 4x) — just the frames, no phone around
-           them. In the Figma file the rows became Interface Design / Break /
-           Materials & Processes / Book Club, with fewer friends on most. Fixed-aspect canvas, cqw units,
-           scales like an image. -->
-      <div class="v1-scene v1-scene--idea" role="img" aria-label="The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, and its open Timetable button ringed, and an arrow from it to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, and the evening's Book Club.">
-        <div class="v1-canvas">
-          <img class="v1-card" src="/images/unify/v1/fig-connect.webp?v=3" alt="" style="left: 13%; top: 13.1cqw; width: 32%;" />
-          <img class="v1-card" src="/images/unify/v1/fig-timetable.webp?v=3" alt="" style="left: 55%; top: 6.9cqw;" />
-          <!-- the hand-off: a ring round "open Timetable" and an arrow curving
-               from the ring into the timetable it opens (the cursor that clicked
-               it was removed 2026-10-06, Lucas).
-               One SVG over the whole canvas, in canvas units (viewBox 100 x
-               56.25 = the 16:9 canvas), so it scales with the picture. -->
-          <svg class="v1-handoff" viewBox="0 0 100 56.25" aria-hidden="true">
-            <rect x="28.85" y="38.06" width="15.28" height="3.9" rx="1.95" fill="none" stroke="#FF88C8" stroke-width=".42"/>
-            <path d="M44.6 40 C 50.2 40, 49.6 28, 54.1 28" fill="none" stroke="#FF88C8" stroke-width=".42" stroke-linecap="round"/>
-            <path d="M52.9 26.9 L54.2 28 L52.9 29.1" fill="none" stroke="#FF88C8" stroke-width=".42" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-      </div>
-
-      <!-- "How the overlap is found" (h3 + text + the .ovl diagram) removed
-           2026-09-27, Lucas — folded into one plain paragraph under the
-           wireframes instead of its own heading + diagram. .ovl's CSS is
-           left in place, unused, same convention as the other dormant
-           blocks noted in this file (see CLAUDE.md). -->
-      <p class="guide-text"><b>The overlap is found by</b> reading the gaps between everyone's timetables, keeping only the stretches every friend has free at once, dropping anything shorter than 20 minutes, and taking the walk between buildings off both ends — the thing the group chat used to work out by eye.</p>
-    </section>
-
-    <!-- 4 · The pivot: v1 → character design -->
-    <section class="guide-section cs-section" id="pivot">
-      <div class="section-heading-row">
-        <h2 class="section-title">The pivot</h2>
-        <span class="step-badge">4</span>
-      </div>
-      <div class="dot-divider"></div>
-      <p class="guide-text">I designed the first version: blue, typewriter type, hard lines. The information architecture and the timetable logic — the merged view, the room-level map, the overlap logic — were already right here; only the visual language was about to change.</p>
-
-      <!-- v1 in detail, non-linear (2026-09-27, replacing the old phone-framed
-           3-screen row + the removed final-design comparison and .diff chart —
-           see CLAUDE.md for the full history). Real crops of the actual v1
-           exports, scattered and rotated on a shared dot-grid canvas, no phone
-           bezel — closer to the Jessica Im "audit" reference Lucas pointed to
-           than to this page's usual phone-mockup treatment. No per-screen
-           labels (Lucas: keep it to plain screens, no annotations). -->
-      <!-- 2026-10-06 (Lucas): replaces the tilted, letterboxed card collage.
-           All five v1 Figma exports upright, side by side, staggered so they
-           run off the top and bottom edges, in a fixed-aspect canvas that
-           scales like an image. -->
-      <div class="v1-scene v1-scene--pivot" role="img" aria-label="A collage of the v1 design's parts: the Hello Lucas header, the Timetable and Socialplan switch with a course row, the activities card, the friends list, the menu bar, two event cards, the floor switcher and the map.">
-        <!-- 2026-10-06 (Lucas): composed IN FIGMA from the old design's own
-             components and panels (file "unify", page "design old", frame
-             "v1 collage (website)" 977:2543, 1600x900 = 16:9), texts corrected
-             there, exported at 2x. Re-export that frame after any change. -->
-        <div class="v1-canvas"><img class="v1-collage-img" src="/images/unify/v1/v1-collage.webp?v=4" alt="" /></div>
-      </div>
-
-      <h3 class="cs-sub">It felt like a tool</h3>
-      <p class="guide-text">It was clear and structured, but the team's feedback round said the same thing back: cold, technical — not something you'd share your location in. So the visual language was replaced; nothing else was.</p>
-
-      <h3 class="cs-sub">What replaced it</h3>
-      <!-- Compressed 2026-09-27 from a full color/typography/character exhibit
-           (three swatch cards, three typography specimen pills, three
-           illustrated character rows) down to this one paragraph — see
-           CLAUDE.md. It was a standalone design-system section competing with
-           Supporting Features' own final-app showcase; here the same facts
-           work as the RATIONALE for the pivot, which is the only job this
-           section has. -->
-      <p class="guide-text">The answer to "it feels like a tool" was not a nicer blue. Sophie Meyer and Moritz Ackermann drew a cast of characters and built the palette and type around them: a pink you rarely see in an app <span class="inline-swatch" style="background: #FF88C8;"></span>, a warm off-white behind it <span class="inline-swatch" style="background: #F9F2EB;"></span>, and Nunito's rounded letterforms in place of the typewriter type. The same cast turns up inside the interface itself — on the map bar, on the mode toggle, in the empty states — so a friend becomes a shape you recognise rather than a name you read. The structure underneath — the merged timetable, the room-level map, the overlap logic — was never touched.</p>
-    </section>
-
-    <!-- 5 · The final design: was two sections ("Designing the merged
-         timetable" + "Supporting features"), merged into one 2026-09-28,
-         Lucas — see CLAUDE.md. The A/B/C variant comparison (.cs-grid-3 of
-         .tv diagrams) is gone entirely: it was an abstract diagram of
-         invented numbers, not the shipped app, and cutting it is what freed
-         this section up to just show the real thing. The usage-share data
-         that used to live here as a bar chart now lives in "Testing and
-         results" as a pie chart instead (see that section). -->
-    <section class="guide-section cs-section" id="features">
-      <div class="section-heading-row">
-        <h2 class="section-title">The final design</h2>
-        <span class="step-badge">5</span>
-      </div>
-      <div class="dot-divider"></div>
-      <!-- The cohort ("five friend groups, 20 people, three weeks") used to be
-           restated here as well; it now lives once, in Testing and results,
-           which is also where the numbers it produced live. -->
-      <p class="guide-text">What follows is the shipped design: the three features on their own screens first, then the home screen that sums them up.</p>
-
-      <!-- Timetable + Socialplan, mirrored (text left, videos right) — the
-           live page's actual scroll-driven sticky-pin mechanism, not a
-           static stand-in (Lucas asked for the real one). .scrolly's JS is
-           already generic (initScrolly runs on every .scrolly on the page),
-           so this needed no script changes — only this markup, plus moving
-           the ID-scoped mirror rule from #support-scrolly (removed) to this
-           section's own id. -->
-      <section class="scrolly" id="timetable-socials-scrolly">
-        <div class="scrolly-sticky">
-          <div class="scrolly-media">
-            <div class="scrolly-vid is-active" data-step="timetable">
-              <div class="phone-shot">
-                <div class="phone-shot-screen">
-                  <video class="phone-shot-video" autoplay loop muted playsinline data-vid="timetable">
-                    <source src="/videos/unify/timetable_screen.mov" type="video/quicktime" />
-                    <source src="/videos/unify/timetable_screen.mov" type="video/mp4" />
-                  </video>
-                </div>
-                <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-              </div>
-            </div>
-            <div class="scrolly-vid" data-step="socials">
-              <div class="phone-shot">
-                <div class="phone-shot-screen">
-                  <video class="phone-shot-video" autoplay loop muted playsinline data-vid="socials">
-                    <source src="/videos/unify/socials_screen.mov" type="video/quicktime" />
-                    <source src="/videos/unify/socials_screen.mov" type="video/mp4" />
-                  </video>
-                </div>
-                <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-              </div>
-            </div>
-          </div>
-          <div class="scrolly-copy">
-            <div class="scrolly-panel is-active" data-step="timetable">
-              <h3 class="feature-title">The chosen design</h3>
-              <p class="guide-text">One lane at the top holds only the slots everyone shares — tap any of them to expand back into the full week underneath: your courses in pink, the socials you've added in beige, your friends' days below that.</p>
-            </div>
-            <div class="scrolly-panel" data-step="socials">
-              <h3 class="feature-title">Socials</h3>
-              <p class="guide-text">Every faculty has the one group chat where events drown under three hundred messages. Socials is that noticeboard as a feed: post it once, and anyone can drop it into their own timetable with a tap — which is how it ends up in the overlap maths.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Friends + Courses, NOT mirrored (videos left, text right) —
-           matches the live page's own alternation (Timetable/Socials
-           mirrors, Friends/Navigation doesn't). "Courses" here = the room
-           finder, the same map pointed at your next class instead of a
-           friend. -->
-      <section class="scrolly" id="friends-courses-scrolly">
-        <div class="scrolly-sticky">
-          <div class="scrolly-media">
-            <div class="scrolly-vid is-active" data-step="friends">
-              <div class="phone-shot">
-                <div class="phone-shot-screen">
-                  <video class="phone-shot-video" autoplay loop muted playsinline data-vid="map-friends">
-                    <source src="/videos/unify/map-friends_screen.mov" type="video/quicktime" />
-                    <source src="/videos/unify/map-friends_screen.mov" type="video/mp4" />
-                  </video>
-                </div>
-                <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-              </div>
-            </div>
-            <div class="scrolly-vid" data-step="courses">
-              <div class="phone-shot">
-                <div class="phone-shot-screen">
-                  <video class="phone-shot-video" autoplay loop muted playsinline data-vid="map-courses">
-                    <source src="/videos/unify/map-courses_screen.mov" type="video/quicktime" />
-                    <source src="/videos/unify/map-courses_screen.mov" type="video/mp4" />
-                  </video>
-                </div>
-                <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-              </div>
-            </div>
-          </div>
-          <div class="scrolly-copy">
-            <div class="scrolly-panel is-active" data-step="friends">
-              <h3 class="feature-title">Friends indoors</h3>
-              <p class="guide-text">Once everyone is inside the same building, a dot on a city map is useless. Unify puts friends on the floor plan at room level, so "she's in 1.019" is something you can act on in a ten-minute break.</p>
-            </div>
-            <div class="scrolly-panel" data-step="courses">
-              <h3 class="feature-title">Find the right room</h3>
-              <p class="guide-text">The same floor plan, pointed at your own next class instead of a friend — point-and-go navigation for a building nobody ever hands you a map of.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div class="feature-row reverse">
+    <!-- Feature 1: Home -->
+    <div class="guide-section" style="border-bottom: none;">
+      <div class="feature-row">
         <div class="feature-media">
           <div class="phone-shot">
             <div class="phone-shot-screen">
-              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="settings">
-                <source src="/videos/unify/settings_screen.mov" type="video/quicktime" />
-                <source src="/videos/unify/settings_screen.mov" type="video/mp4" />
+              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="homepage">
+                <source src="/videos/unify/homepage_screen.mov" type="video/quicktime" />
+                <source src="/videos/unify/homepage_screen.mov" type="video/mp4" />
               </video>
             </div>
             <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
           </div>
         </div>
         <div class="feature-copy">
-          <h3 class="feature-title">Settings</h3>
-          <p class="guide-text">The profile is where you pick your character and manage who can see you. Everything else here stays in the app and out of this page.</p>
+          <h2 class="feature-title" data-i18n="feat-home-title">Your Day at a Glance</h2>
+          <p class="guide-text" data-i18n-html="feat-home-text">The home screen is your quick daily overview. At a glance it shows who you can meet up with right now or in your next break — which friends are free, and exactly when. Below that sit the day's social activities, and a map of how many friends are around you at this moment. Everything important lives on one scrollable page; when something catches your eye, the dedicated pages let you dig into the detail.</p>
         </div>
       </div>
+    </div>
 
-      <!-- Home previews (2026-10-05, Lucas): the three features above were
-           built as full screens first; the home screen that summarises them
-           came after, so it closes the walkthrough instead of opening it (Settings
-           sits just above it, so these two are the section's last word).
-           Just the three home cards, opened, side by side — no phone (Lucas):
-           each is the app's real panel (see .home-previews CSS). Two reasons, kept
-           apart on purpose: a glance is usually enough, and a preview pulls
-           you into the full screen. -->
-      <div class="home-previews" role="img" aria-label="The three cards on the Unify home screen, opened: connect now (who's free and until when), socials (what's on today), map (friends nearby).">
-        <div class="home-panel" style="aspect-ratio: 377 / 402;"><iframe class="home-frame" src="/unify/app-home/home.html?open=connect&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
-        <div class="home-panel" style="aspect-ratio: 377 / 411;"><iframe class="home-frame" src="/unify/app-home/home.html?open=socials&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
-        <div class="home-panel" style="aspect-ratio: 377 / 402;"><iframe class="home-frame" src="/unify/app-home/home.html?open=map&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
-      </div>
-      <div class="home-copy">
-        <div>
-          <h3 class="feature-title">A glance is usually enough</h3>
-          <p class="guide-text">We started with the three features as full screens: the timetable, the socials, the map. Using them, we noticed that most of the time nobody needs a friend's whole week, only who is free right now. Socials worked the same way: you rarely scroll the full list, you want to know what's on today. So the home screen became three summaries, one card per feature, each holding only its most important piece.</p>
-        </div>
-        <div>
-          <h3 class="feature-title">A preview pulls you in</h3>
-          <p class="guide-text">The second reason is what the summaries do for the screens behind them. A video that plays a few seconds of itself in the feed gets clicked more than a still thumbnail, and the cards are meant to work the same way. Who's free, what's on and who's nearby all sit on the first screen you see, so each card is an invitation to open the full feature behind it, instead of a feature waiting for you to go looking.</p>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- 6 · Testing + results -->
-    <section class="guide-section cs-section" id="results">
-      <div class="section-heading-row">
-        <h2 class="section-title">Testing and results</h2>
-        <span class="step-badge">6</span>
-      </div>
-      <div class="dot-divider"></div>
-      <!-- Usage-share data moved here from the old "Supporting features"
-           section 2026-09-28 (Lucas), as a pie chart instead of the bar
-           chart it was — "which features got used the most" reads as a
-           results question, not a walkthrough question. .pie-chart is pure
-           CSS (conic-gradient + a @property-animated mask for the sweep-in;
-           see the CSS comment); the JS below is only the on-screen trigger.
-
-           2026-09-29: the cohort is now stated ONCE, here, for the whole
-           section (Lucas: "so you don't need to restate the user amount each
-           time"). It used to appear in the pie's note AND in "The final design"'s
-           intro AND implicitly a third time as a separate "12 participants"
-           moderated test further down — three different framings of what is
-           one study. Everything below this paragraph now belongs to it. -->
-      <p class="guide-text">Five friend groups — twenty students in all — used the coded prototype for three weeks. Everything below comes out of those three weeks: what the app recorded while they used it, and the interviews I ran with them at the end.</p>
-
-      <div class="res-block">
-        <h3 class="cs-sub">Where the time went</h3>
-        <!-- Leader-line coordinates are derived from the gradient's own start
-             angle (106.4deg) — see the .pie-stage CSS note. Per slice: a point
-             on its arc, a radial step out, then horizontal to x=118. Labels sit
-             at the matching `top` so each one lines up with its own line. -->
-        <div class="pie-stage" role="img" aria-label="Share of pilot time per feature: who's free now 76%, timetable 19%, friends map 4%, room finder 1%.">
-          <div class="pie-chart" id="usage-pie" style="background: conic-gradient(from 106.4deg, #FF88C8 0deg 273.6deg, #1A1A1A 273.6deg 342deg, #8E8E93 342deg 356.4deg, #F9F2EB 356.4deg 360deg);"></div>
-          <svg class="pie-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <polyline points="90.5,20.6 97.7,15.3 118,15.3" />
-            <polyline points="100,50.9 109,51 118,51" />
-            <polyline points="96.4,63.4 104.4,65.9 118,65.9" />
-            <polyline points="88.3,82.1 95.2,87.9 118,87.9" />
-          </svg>
-          <span class="pie-label" style="top: 15.3%;">Timetable <b>19 %</b></span>
-          <span class="pie-label" style="top: 51%;">Friends map <b>4 %</b></span>
-          <span class="pie-label" style="top: 65.9%;">Room finder <b>1 %</b></span>
-          <span class="pie-label" style="top: 87.9%;">Who's free now <b>76 %</b></span>
-        </div>
-        <p class="guide-text res-note">Once the home screen was in, almost three-quarters of every session opened on "who's free now" alone; everything else — the full timetable, the indoor map, the room finder — split the remaining quarter, in that order. Meetups per person per week went from 1.4 before the app to 3.1 with it.</p>
-      </div>
-
-      <!-- Before / after the home screen (2026-10-05, Lucas): the evidence for
-           the two reasons at the end of "The final design". Same res-block
-           shape as the pie: heading -> evidence -> plain note. Paired bars on
-           ONE scale (0-10 opens per person per week, --v = value x 10), grey
-           for week 1 without the home screen, pink for weeks 2-3 with it.
-           ⚠ Invented like every number here, AND so is the timeline (that the
-           home screen arrived after the first pilot week) — see the list at
-           the top of the file. -->
-      <div class="res-block">
-        <h3 class="cs-sub">Before and after the home screen</h3>
-        <div class="ba-chart" role="img" aria-label="Opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify 4.2 to 9.1, socials 0.7 to 2.6, map 0.5 to 1.9.">
-          <div class="ba-legend"><span><i></i>Week 1, no home screen</span><span><i class="is-after"></i>Weeks 2–3, with it</span></div>
-          <div class="ba-group">
-            <span class="chart-key">Opened Unify</span>
-            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 42;"></span></span><span class="chart-val">4.2 / week</span></div>
-            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 91;"></span></span><span class="chart-val">9.1 / week</span></div>
+    <!-- Features 2 & 5: scroll-driven dual video (Timetable / Socials) —
+         videos left, text right; scroll or click swaps the active one. -->
+    <section class="scrolly" id="timetable-socials-scrolly">
+      <div class="scrolly-sticky">
+        <div class="scrolly-media">
+          <div class="scrolly-vid is-active" data-step="timetable">
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="timetable">
+              <source src="/videos/unify/timetable_screen.mov" type="video/quicktime" />
+              <source src="/videos/unify/timetable_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
           </div>
-          <div class="ba-group">
-            <span class="chart-key">Opened socials</span>
-            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 7;"></span></span><span class="chart-val">0.7 / week</span></div>
-            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 26;"></span></span><span class="chart-val">2.6 / week</span></div>
-          </div>
-          <div class="ba-group">
-            <span class="chart-key">Opened the map</span>
-            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 5;"></span></span><span class="chart-val">0.5 / week</span></div>
-            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 19;"></span></span><span class="chart-val">1.9 / week</span></div>
+          <div class="scrolly-vid" data-step="socials">
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="socials">
+              <source src="/videos/unify/socials_screen.mov" type="video/quicktime" />
+              <source src="/videos/unify/socials_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
           </div>
         </div>
-        <p class="guide-text res-note">For the first week of the pilot the prototype opened straight onto the timetable; the home screen arrived for weeks two and three. Once it did, people opened Unify more than twice as often, and the two features that had barely been touched in week one — socials and the map — were opened three to four times as often, most of the time straight from their card.</p>
-      </div>
-
-
-      <!-- The three hero stats, back (Lucas) — they were in the hero until
-           2026-09-26 and briefly in "The idea" until 2026-09-27, and were cut
-           both times for the same reason: they are RESULTS, and they sat above
-           the work that produced them. At the end of this section they finally
-           read in order. Each .fact-src names which study the number came from,
-           because they are not all from the same one — the 23 min predates the
-           app entirely — but none of them restates the cohort size, since the
-           paragraph at the top of this section already did. -->
-      <div class="fact-bar" style="margin-top: clamp(60px, 9vw, 84px);">
-        <div class="fact">
-          <span class="fact-num">23 min</span>
-          <span class="fact-label">spent texting to arrange one meetup between classes</span>
-          <span class="fact-src">Before Unify · diary study</span>
-        </div>
-        <div class="fact">
-          <span class="fact-num">2.2×</span>
-          <span class="fact-label">more meetups per person per week, 1.4 to 3.1</span>
-          <span class="fact-src">During the pilot</span>
+        <div class="scrolly-copy">
+          <div class="scrolly-panel is-active" data-step="timetable">
+            <h2 class="feature-title" data-i18n="feat-timetable-title">Your Timetable, and Everyone's</h2>
+            <p class="guide-text" data-i18n-html="feat-timetable-text">See your own timetable alongside your friends', and who shares each course. Your schedule splits in two: pink for regular courses, beige for the social activities you add from the Socials page. Below it sit your friends' timetables. Location tracking detects when you're inside the building and lights up your current room in green.</p>
+          </div>
+          <div class="scrolly-panel" data-step="socials">
+            <h2 class="feature-title" data-i18n="feat-socials-title">Beyond the Group Chat</h2>
+            <p class="guide-text" data-i18n-html="feat-socials-text">Every uni has that one group chat where events and social plans get buried under hundreds of messages. Socials replaces it — activities get posted here instead, so nothing slips through. Scroll through the week, and when something appeals to you, add it straight to your timetable in a tap.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 7 · What we learned + next -->
-    <section class="guide-section cs-section" id="learned">
-      <div class="section-heading-row">
-        <h2 class="section-title">What we learned</h2>
-        <span class="step-badge">7</span>
+    <!-- Features 3 & 4: scroll-driven dual video (Navigation / Friends) —
+         videos left, text right; scroll or click swaps the active one. -->
+    <section class="scrolly" id="nav-friends-scrolly">
+      <div class="scrolly-sticky">
+        <div class="scrolly-media">
+          <div class="scrolly-vid is-active" data-step="friends">
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="map-friends">
+              <source src="/videos/unify/map-friends_screen.mov" type="video/quicktime" />
+              <source src="/videos/unify/map-friends_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
+          </div>
+          <div class="scrolly-vid" data-step="courses">
+            <div class="phone-shot">
+              <div class="phone-shot-screen">
+                <video class="phone-shot-video" autoplay loop muted playsinline data-vid="map-courses">
+              <source src="/videos/unify/map-courses_screen.mov" type="video/quicktime" />
+              <source src="/videos/unify/map-courses_screen.mov" type="video/mp4" />
+                </video>
+              </div>
+              <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+            </div>
+          </div>
+        </div>
+        <div class="scrolly-copy">
+          <div class="scrolly-panel is-active" data-step="friends">
+            <h2 class="feature-title" data-i18n="feat-friends-title">Find Your Friends Indoors</h2>
+            <p class="guide-text" data-i18n-html="feat-friends-text">Apps like Find My are great for locating friends — until everyone's inside the same building and the map turns useless. Unify syncs room-level location with the university's floor plans, so you can see exactly who's around you on the map, or search for someone specific from the menu.</p>
+          </div>
+          <div class="scrolly-panel" data-step="courses">
+            <h2 class="feature-title" data-i18n="feat-courses-title">Find the Right Room</h2>
+            <p class="guide-text" data-i18n-html="feat-courses-text">The same idea, now for your courses. Universities are huge — hundreds of rooms across sprawling buildings — and working out where each class is can be overwhelming, especially when you're new. Unify syncs with your timetable to plot every course room on the map; tap one to see the full details of that class.</p>
+          </div>
+        </div>
       </div>
-      <div class="dot-divider"></div>
-      <!-- 2026-10-05: "The final design" now shows the three full features
-           first and the home screen last (the order they were built in), so
-           this paragraph no longer claims the page walks the app in usage
-           order; it ties the usage finding to the home screen instead. -->
-      <p class="guide-text">The feature everyone argued about was not the one that got used. Three-quarters of the pilot's time sat in a single block on the home screen, while the indoor map — the part that was hardest to build — barely registered in it. It backed up the home screen: the full screens came first, and the summary of all three turned out to be where people actually spent their time.</p>
-      <p class="guide-text">A visual language is not decoration. My v1 was clear, structured and cold, and the feedback round said so in the politest possible way: it looked like something the university had issued. The same screens in the character design read as the group's own, and none of the information architecture underneath had changed.</p>
-      <p class="guide-text">What I would do next: widgets, so the free-now block never needs the app opened at all, and a proper look at what happens when a group grows past six people — the lane that won the timetable test starts to crowd at around eight.</p>
-      <!-- The hero's blob, reused (Lucas, 2026-10-05): upside down, half the
-           hero's size, its head sunk into the line above the next-project panel
-           so it pokes up out of it. It is the LONG body the phone hero uses
-           (.blob-long: the sides drawn 326.6 units further up), cut 144 units
-           lower than the first version, so it stands 20% taller at the same
-           scale (Lucas: taller, not bigger). The <g> turns it 180° about
-           (370, 328), which maps the box x -10–750, y -104–760 onto itself — so
-           the viewBox is that box (the hero's own x range: the right eye bulges
-           past the body to x 742) and its bottom edge (the head, cut at y -104,
-           where both sides still run straight) sits on the section's bottom,
-           i.e. on the line. Pupils
-           track the cursor (the script below drives both blobs). -->
-      <svg id="learned-blob" class="learned-blob" viewBox="-10 -104 760 864" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <g id="learned-blob-g" transform="rotate(180 370 328)">
-          <path d="M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741L25.2783 -60.859C25.2772 -412.6 -6.99887 -386.6 202.306 -386.6L429.004 -386.6C709.5 -381.6 694.991 -428.6 694.991 -155.048L694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z" fill="#FF88C8"/>
-          <circle cx="266.586" cy="324.744" r="168.5" fill="#fff"/>
-          <circle cx="574.086" cy="324.744" r="168" fill="#fff"/>
-          <circle id="learned-pupil-l" cx="223.086" cy="425.744" r="52.5" fill="#292925"/>
-          <circle id="learned-pupil-r" cx="530.586" cy="425.744" r="52.5" fill="#292925"/>
-        </g>
-      </svg>
     </section>
+
+    <!-- Feature 6: Settings -->
+    <div class="guide-section" style="border-bottom: none;">
+      <div class="feature-row reverse">
+        <div class="feature-media">
+          <div class="phone-shot">
+            <div class="phone-shot-screen">
+              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="settings">
+            <source src="/videos/unify/settings_screen.mov" type="video/quicktime" />
+            <source src="/videos/unify/settings_screen.mov" type="video/mp4" />
+              </video>
+            </div>
+            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
+          </div>
+        </div>
+        <div class="feature-copy">
+          <h2 class="feature-title" data-i18n="feat-settings-title">Profile &amp; Friends</h2>
+          <p class="guide-text" data-i18n-html="feat-settings-text">The menu is where you set yourself up. Customise your profile, and connect your courses in one step — everything syncs automatically from your matriculation number. It's also home to your friends list, where you add or remove people whenever you need.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="project-nav">
       <div class="project-nav-item"></div>
       <a href="/virtual_cooking2d.html" class="project-nav-item" style="text-align: right;">
@@ -3550,7 +2099,7 @@
         'glance-what-label': 'What', 'glance-what-value': 'A campus app that helps students find each other and their shared free time.',
         'glance-core-label': 'Core idea', 'glance-core-value': 'Automatic timetable matching surfaces the overlaps that make meeting up easy.',
         'glance-nav-label': 'Navigation', 'glance-nav-value': 'Live friend locations plus interactive campus and building navigation.',
-        'glance-status-label': 'Status', 'glance-status-value': 'Course project, shipped as a working prototype',
+        'glance-status-label': 'Status', 'glance-status-value': '[ Placeholder — add specifics later ]',
         'feat-home-title': 'Your Day at a Glance',
         'feat-home-text': 'The home screen is your <b class="kw">quick daily overview</b>. At a glance it shows who you can meet up with right now or in your next break — which friends are free, and exactly when. Below that sit the day\'s social activities, and a map of how many friends are around you at this moment. Everything important lives on <b class="kw">one scrollable page</b>; when something catches your eye, the dedicated pages let you dig into the detail.',
         'feat-timetable-title': "Your Timetable, and Everyone's",
@@ -3591,7 +2140,7 @@
         'glance-what-label': 'Was', 'glance-what-value': 'Eine Campus-App, mit der Studierende einander finden — und ihre gemeinsame freie Zeit.',
         'glance-core-label': 'Kernidee', 'glance-core-value': 'Der automatische Stundenplan-Abgleich zeigt, wann ihr gleichzeitig frei habt.',
         'glance-nav-label': 'Navigation', 'glance-nav-value': 'Live-Standorte von Freunden plus interaktive Campus- und Gebäudenavigation.',
-        'glance-status-label': 'Status', 'glance-status-value': 'Semesterprojekt, als lauffähiger Prototyp abgegeben',
+        'glance-status-label': 'Status', 'glance-status-value': '[ Platzhalter — Details folgen ]',
         'feat-home-title': 'Dein Tag auf einen Blick',
         'feat-home-text': 'Der Startbildschirm ist deine <b class="kw">schnelle Tagesübersicht</b>. Auf einen Blick siehst du, mit wem du dich jetzt oder in der nächsten Pause treffen kannst — welche Freunde frei sind und von wann bis wann. Darunter die sozialen Aktivitäten des Tages und auf der Karte, wie viele Freunde gerade in der Nähe sind. Alles Wichtige liegt auf <b class="kw">einer scrollbaren Seite</b>; für mehr Details geht es auf die jeweilige Unterseite.',
         'feat-timetable-title': 'Dein Stundenplan, und alle anderen',
@@ -3625,40 +2174,27 @@
     // ── Blob pupils track the cursor ─────────────────────────────
     // Each pupil moves toward the pointer but is clamped to stay inside
     // its white eye. Coordinates come straight from the Figma export.
-    // Two blobs share the geometry: the hero's (phones only now — the film
-    // took its place on desktop) and the upside-down one in "What we learned".
-    // `space` is the element whose coordinate system the circles live in: the
-    // hero's own <svg>, and for the upside-down one the rotated <g> inside its
-    // svg (its getScreenCTM includes the rotation). A blob that is display:none
-    // has no CTM and simply rests.
     (function () {
-      // eye centre (ex,ey) + pupil rest position (rx,ry) per eye
-      const EYE_R = { ex: 574.086, ey: 324.744, rx: 530.586, ry: 425.744 };
-      const EYE_L = { ex: 266.586, ey: 324.744, rx: 223.086, ry: 425.744 };
-      const BLOBS = [
-        ['unify-blob', 'unify-pupil-l', 'unify-pupil-r'],
-        ['learned-blob-g', 'learned-pupil-l', 'learned-pupil-r'],
-      ].map(function (ids) {
-        const pl = document.getElementById(ids[1]), pr = document.getElementById(ids[2]);
-        return {
-          space: document.getElementById(ids[0]),
-          eyes: [Object.assign({ el: pr }, EYE_R), Object.assign({ el: pl }, EYE_L)],
-          tx: null, ty: null,                  // target in this blob's space; null ⇒ rest
-        };
-      }).filter(function (b) { return b.space && b.eyes[0].el && b.eyes[1].el; });
-      if (!BLOBS.length) return;
-      BLOBS.forEach(function (b) { b.eyes.forEach(function (e) { e.x = e.rx; e.y = e.ry; }); });
-      const MAX = 108;            // max pupil travel from eye centre (eyeR - pupilR ≈ 115)
+      const svg = document.getElementById('unify-blob');
+      const pr  = document.getElementById('unify-pupil-r');
+      const pl  = document.getElementById('unify-pupil-l');
+      if (!svg || !pr || !pl) return;
 
-      function aimAt(cx, cy) {
-        BLOBS.forEach(function (b) {
-          const ctm = b.space.getScreenCTM();
-          if (!ctm) { b.tx = b.ty = null; return; }
-          const pt = (b.space.ownerSVGElement || b.space).createSVGPoint();
-          pt.x = cx; pt.y = cy;
-          const p = pt.matrixTransform(ctm.inverse());
-          b.tx = p.x; b.ty = p.y;
-        });
+      // eye centre (ex,ey) + pupil rest position (rx,ry) per eye
+      const EYES = [
+        { el: pr, ex: 574.086, ey: 324.744, rx: 530.586, ry: 425.744 },
+        { el: pl, ex: 266.586, ey: 324.744, rx: 223.086, ry: 425.744 },
+      ];
+      const MAX = 108;            // max pupil travel from eye centre (eyeR - pupilR ≈ 115)
+      const state = EYES.map(e => ({ x: e.rx, y: e.ry }));
+      let targetX = null, targetY = null;   // null ⇒ rest (look toward Figma default)
+
+      function clientToSvg(cx, cy) {
+        const ctm = svg.getScreenCTM();
+        if (!ctm) return null;
+        const pt = svg.createSVGPoint();
+        pt.x = cx; pt.y = cy;
+        return pt.matrixTransform(ctm.inverse());
       }
       // Which kind of pointer was last seen. Only used by the two guards below;
       // the tracking maths is identical for mouse and touch.
@@ -3666,7 +2202,8 @@
 
       window.addEventListener('pointermove', function (e) {
         lastPointerType = e.pointerType;
-        aimAt(e.clientX, e.clientY);
+        const p = clientToSvg(e.clientX, e.clientY);
+        if (p) { targetX = p.x; targetY = p.y; }
       }, { passive: true });
 
       // TOUCH: a screen has no hover, so a tap fires pointerdown/pointerup with no
@@ -3683,7 +2220,8 @@
       window.addEventListener('pointerdown', function (e) {
         lastPointerType = e.pointerType;
         if (e.pointerType === 'mouse') return;
-        aimAt(e.clientX, e.clientY);
+        const p = clientToSvg(e.clientX, e.clientY);
+        if (p) { targetX = p.x; targetY = p.y; }
       }, { passive: true });
 
       // Ease back to rest when the cursor leaves the window — MOUSE ONLY.
@@ -3692,27 +2230,26 @@
       // centre the instant the finger lifted, undoing the tap they just followed.
       document.addEventListener('mouseleave', function () {
         if (lastPointerType !== 'mouse') return;
-        BLOBS.forEach(function (b) { b.tx = b.ty = null; });
+        targetX = targetY = null;
       });
 
       function frame() {
-        BLOBS.forEach(function (b) {
-          b.eyes.forEach(function (e) {
-            let tx, ty;
-            if (b.tx === null) {                  // ease back to rest
-              tx = e.rx; ty = e.ry;
-            } else {
-              let dx = b.tx - e.ex, dy = b.ty - e.ey;
-              const d = Math.hypot(dx, dy);
-              if (d > MAX) { dx = dx / d * MAX; dy = dy / d * MAX; }
-              tx = e.ex + dx; ty = e.ey + dy;
-            }
-            e.x += (tx - e.x) * 0.18;  // smooth follow
-            e.y += (ty - e.y) * 0.18;
-            e.el.setAttribute('cx', e.x.toFixed(2));
-            e.el.setAttribute('cy', e.y.toFixed(2));
-          });
-        });
+        for (let i = 0; i < EYES.length; i++) {
+          const e = EYES[i];
+          let tx, ty;
+          if (targetX === null) {                 // ease back to rest
+            tx = e.rx; ty = e.ry;
+          } else {
+            let dx = targetX - e.ex, dy = targetY - e.ey;
+            const d = Math.hypot(dx, dy);
+            if (d > MAX) { dx = dx / d * MAX; dy = dy / d * MAX; }
+            tx = e.ex + dx; ty = e.ey + dy;
+          }
+          state[i].x += (tx - state[i].x) * 0.18;  // smooth follow
+          state[i].y += (ty - state[i].y) * 0.18;
+          e.el.setAttribute('cx', state[i].x.toFixed(2));
+          e.el.setAttribute('cy', state[i].y.toFixed(2));
+        }
         requestAnimationFrame(frame);
       }
       requestAnimationFrame(frame);
@@ -3807,23 +2344,6 @@
       });
     }
     document.querySelectorAll('.scrolly').forEach(initScrolly);
-  </script>
-  <script>
-    // ── Usage pie: sweep in once, on first scroll into view ─────────────────
-    // The actual animation is CSS (--reveal, see the .pie-chart rule); this
-    // only flips the class that starts it, and only once — a fill-in that
-    // replayed every time you scrolled past it would read as a glitch, not
-    // an entrance.
-    (function () {
-      var pie = document.getElementById('usage-pie');
-      if (!pie) return;
-      var io = new IntersectionObserver(function (entries) {
-        if (!entries[0].isIntersecting) return;
-        pie.classList.add('is-visible');
-        io.disconnect();
-      }, { threshold: .4 });
-      io.observe(pie);
-    })();
   </script>
   <div id="scroll-track">
     <div id="scroll-thumb">
@@ -4212,534 +2732,6 @@
           if (p && p.catch) p.catch(function () {});
         });
       });
-    })();
-  </script>
-
-  <script>
-    // ── v1 carousel ───────────────────────────────────────────────────────────
-    // UNUSED as of 2026-09-27 (see CLAUDE.md) — no .v1-carousel is in the page
-    // any more, so `car` below is always null and this returns immediately.
-    // Kept in case the component is wanted again; harmless no-op meanwhile.
-    // Five phones on five slots (-2..2). It advances on its own, one slot to the
-    // right, after each screen has had its turn in the middle: 3s for a still,
-    // the full scroll for home and timetable, which only play while they are in
-    // the middle. Clicking a phone brings it to the middle and stops the
-    // autoplay there; a sideways trackpad scroll or a swipe steps through them.
-    (function () {
-      var car = document.querySelector('.v1-carousel');
-      if (!car) return;
-      var items = Array.prototype.slice.call(car.children), n = items.length;
-      var STILL = 3000, MOVE = 900, FADE = 380, GROW = 520;   // FADE + GROW = MOVE: every phone lands together
-      var SCROLL_IN = 500, SCROLL_DOWN = 5200, SCROLL_HOLD = 1200;
-      var EASE = 'cubic-bezier(.42, 0, .25, 1)';
-      var END = 'translateY(calc(-100% + 100cqh))';
-      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var center = 0, auto = !reduce, timer = null, open = false, playing = null;
-
-      function slotOf(i) {                              // left of centre = next in order
-        var d = ((center - i) % n + n) % n;
-        return d > 2 ? d - n : d;
-      }
-      function scroller(el) { return el.querySelector('.v1-window img'); }
-
-      // ── the scroll inside home / timetable
-      function play(el) {
-        var img = scroller(el);
-        if (!img || reduce) return;
-        // one pass down, then it stays at the bottom until the phone leaves
-        playing = img.animate([{ transform: 'translateY(0)', offset: 0, easing: EASE }, { transform: END }],
-                              { duration: SCROLL_DOWN, delay: SCROLL_IN, fill: 'forwards' });
-      }
-      function rewind() {                               // glide back to the top as it leaves
-        if (!playing) return;
-        var img = playing.effect.target, from = getComputedStyle(img).transform;
-        playing.cancel(); playing = null;
-        if (from && from !== 'none') img.animate([{ transform: from }, { transform: 'translateY(0)' }],
-                                                 { duration: MOVE, easing: 'cubic-bezier(.65, 0, .35, 1)' });
-      }
-
-      // ── moving the row by c slots (c > 0 = rightwards)
-      function moveBy(c) {
-        if (!c || !open) return;
-        rewind();
-        var old = items.map(function (el) { return +el.dataset.slot; });
-        center = ((center + c) % n + n) % n;
-        items.forEach(function (el, i) {
-          var to = slotOf(i), passes = old[i] + c;
-          if (passes >= -2 && passes <= 2) { el.dataset.slot = to; return; }
-          // Past an edge: step back and fade on that side, then step forward
-          // and fade in on the other side, only a third of a slot sideways.
-          el.style.transition = 'transform ' + FADE + 'ms cubic-bezier(.5, 0, .75, 0), opacity ' + FADE + 'ms ease-in';
-          el.dataset.slot = passes > 2 ? 'out-right' : 'out-left';
-          setTimeout(function () {
-            el.style.transition = 'none';
-            el.dataset.slot = passes > 2 ? 'out-left' : 'out-right';
-            void el.offsetWidth;
-            el.style.transition = 'transform ' + GROW + 'ms cubic-bezier(.2, .6, .35, 1), opacity ' + GROW + 'ms ease-out';
-            el.dataset.slot = to;
-            setTimeout(function () { el.style.transition = ''; }, GROW);
-          }, FADE);
-        });
-        setTimeout(function () { play(items[center]); }, MOVE);
-        schedule();
-      }
-
-      // ── autoplay: each screen's turn lasts as long as it needs
-      function turnLength(el) {
-        return scroller(el) ? SCROLL_IN + SCROLL_DOWN + SCROLL_HOLD : STILL;
-      }
-      function schedule() {
-        clearTimeout(timer); timer = null;
-        if (!auto || !open || document.hidden) return;
-        timer = setTimeout(function () { moveBy(1); }, MOVE + turnLength(items[center]));
-      }
-      function park() { auto = false; clearTimeout(timer); timer = null; }
-
-      items.forEach(function (el, i) {
-        el.dataset.slot = slotOf(i);
-        el.addEventListener('click', function () {
-          if (!open) return;
-          var s = +el.dataset.slot;
-          park();
-          if (s === 0) { rewind(); play(el); return; }   // restart its scroll
-          moveBy(-s);
-        });
-      });
-
-      car.addEventListener('dragstart', function (e) { e.preventDefault(); });   // Firefox ignores -webkit-user-drag
-
-      // sideways trackpad / mouse-wheel: one step per gesture
-      var acc = 0, lock = false;
-      car.addEventListener('wheel', function (e) {
-        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;   // vertical: let the page scroll
-        e.preventDefault();
-        if (lock) return;
-        acc += e.deltaX;
-        if (Math.abs(acc) < 40) return;
-        park(); moveBy(acc > 0 ? -1 : 1);
-        acc = 0; lock = true;
-        setTimeout(function () { lock = false; }, MOVE + 150);
-      }, { passive: false });
-
-      // swipe on touch
-      var x0 = null, y0 = null;
-      car.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
-      car.addEventListener('touchend', function (e) {
-        if (x0 === null) return;
-        var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
-        x0 = null;
-        if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
-        park(); moveBy(dx > 0 ? 1 : -1);
-      }, { passive: true });
-
-      // ── fold / unfold with the page scroll ─────────────────────────────────
-      // Unfolds once the carousel's middle has come up past the bottom of the
-      // window, folds again once its middle has gone out past the top (the same
-      // rule as the to.morrow fan). Both sides open and close together, at twice
-      // the speed of a carousel step. Folding resets it: the next unfold autoplays again, even after a
-      // click or a swipe had parked it.
-      var UNFOLD = MOVE / 2;
-      function setOpen(o) {
-        if (o === open) return;
-        open = o;
-        items.forEach(function (el) { el.style.transitionDuration = UNFOLD + 'ms'; });
-        car.classList.toggle('is-folded', !o);
-        setTimeout(function () { items.forEach(function (el) { el.style.transitionDuration = ''; }); }, UNFOLD + 50);
-        clearTimeout(timer); timer = null;
-        if (o) {
-          auto = !reduce;
-          setTimeout(function () { if (open && !playing) play(items[center]); }, UNFOLD);
-          schedule();
-        } else {
-          rewind();
-        }
-      }
-      function check() {
-        var r = car.getBoundingClientRect(), mid = r.top + r.height / 2;
-        setOpen(reduce || (mid < innerHeight && mid > 0));
-      }
-      var ticking = false;
-      addEventListener('scroll', function () {
-        if (ticking) return; ticking = true;
-        requestAnimationFrame(function () { ticking = false; check(); });
-      }, { passive: true });
-      addEventListener('resize', check);
-      document.addEventListener('visibilitychange', function () { if (!document.hidden) schedule(); else { clearTimeout(timer); timer = null; } });
-      check();
-    })();
-  </script>
-  <script>
-    // ── Problem: the lifted group chat ────────────────────────────────────────
-    // The conversation plays as a column lifted off the empty chat. It is
-    // CENTRED: the column hangs off the middle of the screen, so it grows half
-    // a message up and half down and the stack stays around the phone's middle,
-    // while each new message still arrives at its bottom edge. It fills about
-    // 70% of the screen (TARGET); past HARD the oldest is lifted out to the
-    // stage and eased out where it stands, so nothing it did affects the rest. A message is never half-anything at rest: it eases in whole once
-    // the glide has carried the others out of its way, and eases out whole.
-    // Loops; runs only while the stage is on screen.
-    (function () {
-      var stage = document.querySelector('.imsg-stage');
-      if (!stage) return;
-      var track = stage.querySelector('.imsg-track');
-      var screenEl = stage.querySelector('.phone-shot-screen');
-      var IMG = '/images/unify/problem/';
-      // Each image's own size goes on the <img>, so its box has its final height
-      // the moment it is added. Without it the image is 0 tall until it loads:
-      // the column glides by the wrong amount and jumps when it arrives.
-      var SIZE = { 'tt-ben': [1800, 848], 'tt-sophia': [1800, 864], 'tt-me': [1800, 960] };
-      Object.keys(SIZE).forEach(function (n) { new Image().src = IMG + n + '.webp'; });   // warm the cache
-      var MSGS = [
-        // Sides alternate all the way down: me and Sophia on the right, Ben and
-        // Anna on the left — so the column zig-zags instead of stacking up on
-        // one side. Only mine (out) is blue; Sophia's right-hand bubbles are
-        // the same grey as everyone else's.
-        { out: true,     text: "when's your next break??" },
-        { who: 'Ben',    img: 'tt-ben',    text: 'idk, check mine' },
-        { who: 'Sophia', right: true, img: 'tt-sophia', text: 'mine, materials till 13:00 😑' },
-        { who: 'Anna',   text: "which break tho 😅 can't read all of these" },
-        { out: true,     img: 'tt-me',     text: 'mine too. mensa?' },
-        { who: 'Ben',    text: "12:15? i've got 45 min" },
-        { who: 'Sophia', right: true, text: "that's exactly when I'm still in class" },
-        { who: 'Anna',   text: "and ben's back in prototyping at 13:00" },
-        { out: true,     text: 'so nobody 🙃 next week then' },
-        { who: 'Ben · next day', text: 'sorry just saw this — are you guys still at the mensa?' }
-      ];
-      var STEP = 2600, GLIDE = 1100, POP = 560, FADE = 450, WIPE = 520, PAUSE = 700;
-      var IN = 450, HOLD = 2000, MOVE = 750, INTRO = IN + HOLD + MOVE;   // the opening message
-      var TARGET = .70, HARD = .78;                   // share of the screen's height
-      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var k = 0, timer = null, introTimer = null, onScreen = false;
-
-      function make(m) {
-        var el = document.createElement('div');
-        el.className = 'imsg-msg ' + (m.out ? 'out' : 'in') + (m.right ? ' right' : '');
-        el.innerHTML = (m.who ? '<span class="imsg-float-from">' + m.who + '</span>' : '') +
-                       (m.img ? '<img src="' + IMG + m.img + '.webp" width="' + SIZE[m.img][0] + '" height="' + SIZE[m.img][1] + '" alt="" />' : '') +
-                       '<p class="b ' + (m.out ? 'out' : 'in') + ' tail">' + m.text + '</p>';
-        return el;
-      }
-      function gap() { return parseFloat(getComputedStyle(track).rowGap) || 0; }
-      function kids() {
-        return Array.prototype.slice.call(track.children).filter(function (c) { return !c.dataset.leaving; });
-      }
-      // Top of the first to bottom of the last. Measured from the rects, so the
-      // glide's transform — which moves them all alike — cancels out, and a
-      // message on its way out (absolutely positioned) does not count.
-      function stackHeight() {
-        var k2 = kids();
-        if (!k2.length) return 0;
-        return k2[k2.length - 1].getBoundingClientRect().bottom - k2[0].getBoundingClientRect().top;
-      }
-      function screenHeight() { return screenEl.getBoundingClientRect().height; }
-
-      // `at` is where the message sat BEFORE the new one was appended. Without
-      // it the rect is read after the column has already re-laid out — a centred
-      // column jumps everything half a message up — and the leaving message,
-      // pinned to the stage, kept that jump while the others glided: the little
-      // upward twitch each image made before fading.
-      function dropOldest(at) {
-        var c = kids()[0];
-        if (!c) return;
-        var st = stage.getBoundingClientRect(), r = at || c.getBoundingClientRect();
-        // Hand it to the STAGE at the spot it occupies. Inside the column it
-        // would keep moving with the layout — the column is centred, so every
-        // add and every drop shifts its box — and a message on its way out
-        // should simply stand still and fade.
-        c.dataset.leaving = '1';
-        c.style.position = 'absolute'; c.style.margin = '0';
-        c.style.left = (r.left - st.left) + 'px';
-        c.style.top = (r.top - st.top) + 'px';
-        c.style.width = r.width + 'px'; c.style.height = r.height + 'px';   // fixed box: no reflow as it leaves
-        c.style.willChange = 'opacity';
-        stage.appendChild(c);
-        // Opacity only. Scaling a message on the way out re-rasterises whatever
-        // is inside it every frame, and a timetable is a 1800px bitmap — that is
-        // the stutter each image used to make as it closed.
-        c.animate([{ opacity: 1 }, { opacity: 0 }],
-                  { duration: FADE, easing: 'cubic-bezier(.4, 0, .7, 1)', fill: 'forwards' });
-        setTimeout(function () { c.remove(); }, FADE + 60);
-      }
-
-      // Every run opens on the first message alone, large, in the middle of the
-      // phone. It holds there for two seconds and then travels to its own place
-      // in the column — left, and small — and the rest of the chat follows it.
-      function intro() {
-        var el = make(MSGS[0]); k = 1;
-        var out = !!(MSGS[0].out || MSGS[0].right);
-        track.appendChild(el);
-        var bubble = el.querySelector('.b'), name = el.querySelector('.imsg-float-from');
-        var rest = bubble.getBoundingClientRect();
-        var fs = parseFloat(getComputedStyle(bubble).fontSize);
-        var nfs = name ? parseFloat(getComputedStyle(name).fontSize) : 0;
-        var st = stage.getBoundingClientRect(), sc = screenEl.getBoundingClientRect();
-        // 3x, unless that would run past the stage — on a phone the bubble is
-        // already most of its width, so the factor comes down to what fits.
-        var f = Math.min(3, (st.width * .92) / Math.max(rest.width, 1));
-
-        // Big by LAYOUT, not by transform: a scaled-up bubble is a bitmap blown
-        // up 3x and reads soft. The type is set 3x instead, so it is drawn at
-        // the size it is seen at. Padding and radius are in em and follow it.
-        el.style.maxWidth = 'none';
-        bubble.style.fontSize = (fs * f) + 'px';
-        if (name) name.style.fontSize = (nfs * f) + 'px';
-        var big = bubble.getBoundingClientRect();
-        var tail = fs * f * .21 * (out ? -1 : 1);     // the tail hangs past the bubble on its own side
-        var dx = (sc.left + sc.width / 2) - (big.left + big.width / 2) + tail;
-        var dy = (sc.top + sc.height / 2) - (big.top + big.height / 2);
-        var hold = 'translate(' + dx + 'px, ' + dy + 'px)';
-        el.style.transform = hold;
-        el.animate([{ opacity: 0, transform: hold + ' scale(.92)' }, { opacity: 1, transform: hold + ' scale(1)' }],
-                   { duration: IN, easing: 'cubic-bezier(.2, .9, .3, 1)', fill: 'backwards' });
-
-        // Then it travels to its own place. The next message is put in first,
-        // still invisible, so the opener shrinks and rides up in ONE move —
-        // making the room it is about to hand over — instead of shrinking in
-        // the middle and moving up again a beat later. Measure where it is,
-        // drop back to the resting layout, measure again, animate between the
-        // two (a FLIP): the type is only scaled while it moves, never while
-        // it is read.
-        introTimer = setTimeout(function () {
-          var from = bubble.getBoundingClientRect();
-          el.style.transform = ''; el.style.maxWidth = '';
-          bubble.style.fontSize = ''; if (name) name.style.fontSize = '';
-          var next = make(MSGS[1 % MSGS.length]); k = 2;
-          next.style.opacity = '0';
-          track.appendChild(next);
-          var to = bubble.getBoundingClientRect(), box = el.getBoundingClientRect();
-          el.style.transformOrigin = (to.left + to.width / 2 - box.left) + 'px ' + (to.top + to.height / 2 - box.top) + 'px';
-          el.animate([{ transform: 'translate(' + ((from.left + from.width / 2) - (to.left + to.width / 2)) + 'px, ' +
-                                                 ((from.top + from.height / 2) - (to.top + to.height / 2)) + 'px) scale(' +
-                                                 (from.width / Math.max(to.width, 1)) + ')' },
-                      { transform: 'none' }],
-                     { duration: MOVE, easing: 'cubic-bezier(.5, 0, .2, 1)' });
-          next.style.opacity = '';                    // …and it arrives as the opener lands
-          next.animate([{ opacity: 0, transform: 'translateY(8px) scale(.92)' },
-                        { opacity: 1, transform: 'translateY(0) scale(1)' }],
-                       { duration: POP, delay: MOVE * .55, easing: 'cubic-bezier(.3, 1.2, .5, 1)', fill: 'backwards' });
-        }, IN + HOLD);
-      }
-
-      function add(animate) {
-        var el = make(MSGS[k % MSGS.length]); k++;
-        // Watch one message that is staying: whatever it does when the column
-        // re-lays out is the jump the glide has to undo. Measuring it beats
-        // working the offset out — a centred column moves by half the new
-        // message, and by half of anything that leaves in the same step.
-        var ref = track.lastElementChild, before = ref ? ref.getBoundingClientRect().top : 0;
-        var was = kids().map(function (c) { return [c, c.getBoundingClientRect()]; });   // where everyone stands now
-        track.appendChild(el);
-        if (!animate) return;
-        function spotOf(c) { for (var i = 0; i < was.length; i++) if (was[i][0] === c) return was[i][1]; }
-        // Anything pushed past the cap leaves in the same step.
-        for (var guard = 0; guard < 6 && kids().length > 1 && stackHeight() > screenHeight() * HARD; guard++) dropOldest(spotOf(kids()[0]));
-        var shift = (ref && !ref.dataset.leaving) ? before - ref.getBoundingClientRect().top : 0;
-        if (shift) {                                  // hold them, then glide them up
-          track.style.transition = 'none';
-          track.style.transform = 'translateY(' + shift + 'px)';
-          void track.offsetWidth;
-          track.style.transition = 'transform ' + GLIDE + 'ms cubic-bezier(.45, 0, .2, 1)';
-          track.style.transform = 'translateY(0)';
-        }
-        // …and the new one eases in whole, only once the glide has all but
-        // finished, so it is never seen sitting low over the input field.
-        el.animate([{ opacity: 0, transform: 'translateY(8px) scale(.92)' },
-                    { opacity: 1, transform: 'translateY(0) scale(1)' }],
-                   { duration: POP, delay: shift ? GLIDE * .78 : 0, easing: 'cubic-bezier(.3, 1.2, .5, 1)', fill: 'backwards' });
-      }
-
-      function fill() {                               // the still, for reduced motion
-        clear();
-        while (k < MSGS.length) {
-          add(false);
-          if (stackHeight() > screenHeight() * TARGET) { track.lastChild.remove(); k--; break; }
-        }
-      }
-      // The conversation runs once, clears itself, and starts over — the wipe
-      // is what makes the repeat read as a new run rather than a jump cut.
-      function wipe() {                               // returns how long it takes
-        var out = kids(), last = (out.length - 1) * 70;
-        out.forEach(function (c, i) {
-          c.dataset.leaving = '1'; c.style.willChange = 'opacity';
-          c.animate([{ opacity: 1 }, { opacity: 0 }],
-                    { duration: WIPE, delay: i * 70, easing: 'cubic-bezier(.4, 0, .7, 1)', fill: 'forwards' });
-        });
-        var total = WIPE + last + 60;
-        setTimeout(function () {
-          track.innerHTML = '';
-          track.style.transition = 'none'; track.style.transform = 'translateY(0)';
-        }, total);
-        return total;
-      }
-      function tick() {
-        if (k === 0) {                                  // a fresh run
-          intro();
-          timer = setTimeout(tick, INTRO + STEP - 700);   // the opener already handed over to message two
-          return;
-        }
-        if (k % MSGS.length === 0) {                    // the run is over
-          var t = wipe(); k = 0;
-          timer = setTimeout(tick, t + PAUSE);
-          return;
-        }
-        add(true);
-        timer = setTimeout(tick, STEP);
-      }
-      function clear() {
-        Array.prototype.slice.call(stage.querySelectorAll('.imsg-msg[data-leaving]')).forEach(function (c) { c.remove(); });
-        track.innerHTML = ''; k = 0;
-        track.style.transition = 'none'; track.style.transform = 'translateY(0)';
-      }
-      // Every start is a start from the top: scrolling past it and coming back,
-      // or coming back to the tab, plays the chat again rather than picking up
-      // mid-run on a frame that froze while the tab was in the background.
-      function start() { if (timer) return; clear(); timer = setTimeout(tick, 200); }
-      function stop()  { clearTimeout(timer); clearTimeout(introTimer); timer = null; clear(); }
-
-      if (reduce) { fill(); return; }
-      new IntersectionObserver(function (e) {
-        onScreen = e[0].isIntersecting;
-        onScreen ? start() : stop();
-      }, { threshold: .2 }).observe(stage);
-      // Safari stops firing timers for an occluded window, so a tab left behind
-      // for VS Code came back frozen on whatever frame it had. Restart on the
-      // way back rather than trying to resume.
-      function replay() { if (!onScreen) return; stop(); start(); }
-      document.addEventListener('visibilitychange', function () { document.hidden ? stop() : replay(); });
-      addEventListener('pageshow', replay);
-      addEventListener('focus', function () { if (onScreen && !timer) start(); });   // Safari app-switch fires this, not always visibilitychange
-      var lastW = stage.offsetWidth;                  // restart only when the width really changes —
-      addEventListener('resize', function () {        // a phone's URL bar fires resize on every scroll
-        if (stage.offsetWidth !== lastW) { lastW = stage.offsetWidth; stop(); if (onScreen) start(); }
-      });
-    })();
-  </script>
-  <script>
-    // ── Fixed section sidebar: on screen throughout, tracks scroll, smooth-scrolls ──
-    (function () {
-      var map = document.querySelector('.cs-map');
-      if (!map) return;
-      var links = Array.prototype.slice.call(map.querySelectorAll('a[href^="#"]'));
-      var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); })
-                          .filter(Boolean);
-
-      // Clicking a chapter scrolls there smoothly instead of jumping — the
-      // site elsewhere always drives scrolling through scrollTo({ behavior:
-      // 'smooth' }), not the scroll-behavior CSS property (which would also
-      // smooth-scroll unrelated in-page jumps this page doesn't have, so it's
-      // no safer a shortcut). A small gap keeps the heading off the exact
-      // viewport edge.
-      var OFFSET = 24;
-      links.forEach(function (a) {
-        a.addEventListener('click', function (e) {
-          var target = document.querySelector(a.getAttribute('href'));
-          if (!target) return;
-          e.preventDefault();
-          var top = target.getBoundingClientRect().top + scrollY - OFFSET;
-          scrollTo({ top: top, behavior: 'smooth' });
-        });
-      });
-
-      // Active section = whichever one's top has most recently crossed a line
-      // a third of the way down the viewport — reading position, not the
-      // section that happens to fill the most pixels.
-      var active = null;
-      function syncActive() {
-        var line = innerHeight * 0.35;
-        var current = sections[0];
-        for (var i = 0; i < sections.length; i++) {
-          if (sections[i].getBoundingClientRect().top <= line) current = sections[i];
-        }
-        if (current === active) return;
-        active = current;
-        links.forEach(function (a) {
-          a.classList.toggle('is-active', a.getAttribute('href') === '#' + current.id);
-        });
-      }
-      var ticking = false;
-      addEventListener('scroll', function () {
-        if (ticking) return; ticking = true;
-        requestAnimationFrame(function () { syncActive(); ticking = false; });
-      }, { passive: true });
-      syncActive();
-
-      // Room check: the sidebar sits in the gutter left of the page's border
-      // line. Wherever its longest word would come within CLEAR px of that line
-      // (MacBook widths), the whole thing is hidden; on wider windows it shows.
-      var wrapper = document.querySelector('.page-wrapper');
-      var CLEAR = 24;
-      function fit() {
-        var right = 0;
-        links.forEach(function (a) { right = Math.max(right, a.getBoundingClientRect().right); });
-        map.classList.toggle('is-cramped', right + CLEAR > wrapper.getBoundingClientRect().left);
-      }
-      fit();
-      addEventListener('resize', fit);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);   // VT323 changes the widths
-    })();
-  </script>
-  <script>
-    // Home previews: scale each panel iframe (377px wide, the app's own
-    // size) to its column. A transform can't take a percentage of the parent,
-    // so it is measured; the ResizeObserver keeps it right at any width. The
-    // iframe's height is 100% of the box divided back by the scale.
-    (function () {
-      var frames = document.querySelectorAll('.home-frame');
-      if (!frames.length || !('ResizeObserver' in window)) return;
-      var ro = new ResizeObserver(function (entries) {
-        entries.forEach(function (e) {
-          var box = e.target, f = box.querySelector('.home-frame');
-          var k = box.clientWidth / 377;
-          f.style.height = (box.clientHeight / k) + 'px';
-          f.style.transform = 'scale(' + k + ')';
-        });
-      });
-      frames.forEach(function (f) { ro.observe(f.parentNode); });
-    })();
-  </script>
-  <script>
-    /* The end blob's height follows the text beside it (2026-10-06, Lucas):
-       its top sits at the middle of the first paragraph of "What we learned",
-       whatever the window does to the paragraphs' wrapping. Width stays
-       fixed (--blob-w), so the eyes keep their size; only the straight part
-       of the body under them gets longer or shorter. The svg shows the
-       rotated drawing from y -104 (the bumps) down to -104 + U units, and
-       the path's straight sides are lengthened by E units to always reach
-       the cut, where they stand on the section's bottom line. Phones keep
-       the default (the blob sits under the text there). */
-    (function () {
-      var sec = document.getElementById('learned'), svg = document.getElementById('learned-blob');
-      if (!sec || !svg) return;
-      var body = svg.querySelector('#learned-blob-g path');
-      var MIN_U = 600;            // below this the cut would reach the eyes (they end at y 500)
-      var DEFAULT_U = 864;
-      function d(E) {
-        var y = function (v) { return (v - E).toFixed(3); };
-        return 'M323.21 756.493C234.412 756.11 213.731 661.375 202.306 549.236C199.532 554.819 196.622 560.291 193.579 565.6C178.334 592.198 142.361 636.09 118.884 632.259C3.27708 608.835 31.0147 384.119 25.2783 265.741L25.2783 ' + y(-60.859) +
-          'C25.2772 ' + y(-412.6) + ' -6.99887 ' + y(-386.6) + ' 202.306 ' + y(-386.6) + 'L429.004 ' + y(-386.6) + 'C709.5 ' + y(-381.6) + ' 694.991 ' + y(-428.6) + ' 694.991 ' + y(-155.048) +
-          'L694.991 171.552C703.989 276.413 668.813 333.55 601.172 349.148C612.796 465.829 649.858 629.358 560.806 710.631C539.425 730.443 513.556 736.463 489.14 727.269C450.275 712.108 432.59 675.002 413.366 627.06C391.475 696.237 375.125 738.926 323.21 756.493Z';
-      }
-      function fit() {
-        var mobile = matchMedia('(max-width: 640px)').matches;
-        var U = DEFAULT_U;
-        if (!mobile) {
-          var p1 = sec.querySelector('.guide-text');
-          var w = svg.getBoundingClientRect().width;
-          if (p1 && w) {
-            var pr = p1.getBoundingClientRect(), sr = sec.getBoundingClientRect();
-            var want = sr.bottom - (pr.top + pr.height / 2);      // px from the line up to mid-paragraph
-            U = Math.max(MIN_U, want / (w / 760));
-          }
-        }
-        var E = Math.max(0, U - DEFAULT_U);
-        svg.setAttribute('viewBox', '-10 -104 760 ' + U.toFixed(1));
-        svg.style.height = mobile ? '' : 'calc(var(--blob-w) * ' + (U / 760).toFixed(4) + ')';
-        body.setAttribute('d', d(E));
-      }
-      fit();
-      addEventListener('resize', fit);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-      if ('ResizeObserver' in window) new ResizeObserver(fit).observe(sec);
     })();
   </script>
 </body>
