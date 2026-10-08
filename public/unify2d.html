@@ -532,7 +532,7 @@
       padding: 5.8% 4.9% 6.2%;
       margin-inline: clamp(0px, 8vw, 80px);   /* same inset as .home-copy / .stat-block */
       background: #292925;
-      border-radius: 2.67% / 6.5%;
+      border-radius: 1.6% / 3.9%;   /* was 2.67% / 6.5%, 40% less round (2026-10-08) */
       margin-top: clamp(60px, 9vw, 96px);
     }
     .home-panel { position: relative; width: 100%; }
@@ -960,7 +960,7 @@
       display: block; background: var(--bg-surface); border-radius: 9999px;
       box-shadow: var(--shadow-raised-sm);
       padding: 16px 24px; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
-      color: #555; text-transform: uppercase; text-decoration: none;
+      color: #555; text-transform: none; text-decoration: none;
       text-align: center; cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: box-shadow 150ms ease, transform 150ms ease;
@@ -1901,7 +1901,7 @@
     .v1-scene { container-type: inline-size; width: 100%; }
     .v1-canvas {
       position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
-      border-radius: 2cqw;
+      border-radius: 1.2cqw;   /* was 2cqw, 40% less round (2026-10-08) */
       /* flat: no dot grid, no pressed shadow (Lucas). To.morrow's step-badge
          blue #7A92B0, 7% lighter; fixed, so dark mode doesn't change it. */
       background: #90A4BD;
@@ -2081,6 +2081,15 @@
     .ba-row .chart-track { display: block; }
     .ba-row.is-after .chart-fill { background: var(--accent-orange); }
     .ba-row.is-after .chart-val { color: var(--accent-ink); }
+    /* Colours of the Problem section's statbar (2026-10-08, Lucas): a flat track in the
+       app's dark #292925 instead of the pressed well, pink for "with it", and a mid grey
+       for week 1 that reads on the dark track and as the legend dot on the page alike.
+       Sizes untouched. */
+    .ba-chart .chart-track { background: #292925; box-shadow: none; }
+    .ba-chart .chart-fill { background: #8E8E93; inset: 0 auto 0 0; width: calc(100% * var(--v) / 100); }   /* flush: no dark ring round the fill */
+    .ba-chart .ba-legend i { background: #8E8E93; }
+    .ba-chart .ba-row.is-after .chart-fill,
+    .ba-chart .ba-legend i.is-after { background: var(--accent-orange); }
 
     /* The stage is exactly the circle's box; the labels and their leader
        lines hang outside it (overflow visible), so the PIE ITSELF is what's
@@ -2848,7 +2857,7 @@
          frame that is taller than wide */
       .home-previews {
         display: block; position: relative; container-type: inline-size;
-        padding: 0; aspect-ratio: 1 / 1.4; border-radius: 5% / 3.6%;
+        padding: 0; aspect-ratio: 1 / 1.4; border-radius: 3% / 2.16%;
       }
       .home-panel { position: absolute; width: 41%; }
       .home-panel:nth-child(1) { left: 4cqw;    top: 3cqw;  z-index: 3; }
@@ -3015,7 +3024,7 @@
         <span class="step-badge">1</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n-html="p-problem">My friends and I study different subjects. We share a campus but rarely a course, so every week we swapped screenshots of our timetables to find a time to meet. In a week-long diary study, arranging a 30-minute coffee took 20 minutes of texting on average, and a third of the attempts never happened.</p>
+      <p class="guide-text" data-i18n-html="p-problem">My friends and I study different subjects. We share a campus but rarely a course, so every week we swapped screenshots of our timetables to find a time to meet. When a few of us kept track for a week, arranging a half-hour coffee took around 20 minutes of texting, and about a third of the plans never happened.</p>
       <!-- The evidence: an empty iMessage group chat whose messages lift off the
            screen one by one (script at the end of the page). Reconstructed from the
            real chats, names changed. -->
@@ -3052,23 +3061,23 @@
       <div class="stat-block">
         <!-- The finding, stated: a headline carrying the number, one paragraph
              under it, then the bar it comes from. -->
-        <p class="stat-kicker" data-i18n-html="kick-survey">Survey · 30 students · before Unify</p>
-        <h3 class="stat-head" data-i18n-html="head-85">85 % of students never meet a friend from another course between classes</h3>
+        <p class="stat-kicker" data-i18n-html="kick-survey">A quick survey · 30 students at our uni</p>
+        <h3 class="stat-head" data-i18n-html="head-85">26 of the 30 students we asked never meet a friend from another course between classes</h3>
   
-        <div class="statbar" role="img" data-i18n-aria="a-bar" aria-label="Of everyone asked, 30 % still text or swap screenshots and 70 % have stopped trying. Half of the texting group never met, which with the ones who never tried makes 85 % of everyone.">
+        <div class="statbar" role="img" data-i18n-aria="a-bar" aria-label="Of the 30 students asked, 9 still text or swap screenshots and 21 have given up. 5 of the 9 who text never met, so 26 of 30 never met up at all.">
           <div class="statbar-track">
-            <span class="statbar-seg is-main" style="--w: 30"><b>30 %</b><span class="seg-words" data-i18n-html="seg-text">still text</span></span>
-            <span class="statbar-seg" style="--w: 70"><b>70 %</b><span class="seg-words" data-i18n-html="seg-quit">have stopped trying</span></span>
+            <span class="statbar-seg is-main" style="--w: 30"><b>9</b><span class="seg-words" data-i18n-html="seg-text">still text</span></span>
+            <span class="statbar-seg" style="--w: 70"><b>21</b><span class="seg-words" data-i18n-html="seg-quit">have given up</span></span>
           </div>
-          <div class="statbar-brace" style="--from: 15; --to: 100">
+          <div class="statbar-brace" style="--from: 13; --to: 100">
             <span class="statbar-brace-line"></span>
-            <p class="statbar-brace-text" data-i18n-html="brace-85"><b>85 % never met anyone</b></p>
+            <p class="statbar-brace-text" data-i18n-html="brace-85"><b>26 of 30 never met up</b></p>
           </div>
         </div>
 
         <!-- The other side of the bar, in their own words. -->
-        <h3 class="stat-head is-section" style="margin-top: clamp(28.8px, 4.32vw, 50.4px);" data-i18n-html="head-why">Why the 70 % stopped trying</h3>
-        <p class="guide-text" data-i18n-html="p-int1">I went back to nine students who had stopped arranging anything between classes. Not one said they didn't want to meet. It simply costs more than it is worth: "I'd meet them if I knew when, but working it out takes longer than the break." <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
+        <h3 class="stat-head is-section" style="margin-top: clamp(28.8px, 4.32vw, 50.4px);" data-i18n-html="head-why">Why the 21 gave up</h3>
+        <p class="guide-text" data-i18n-html="p-int1">I went back to nine of them. Not one said they didn't want to meet. It simply costs more than it is worth: "I'd meet them if I knew when, but working it out takes longer than the break." <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.</p>
         <p class="guide-text" data-i18n-html="p-int2">The second thing was the size of the window: "By the time everyone has answered, I'm already in the next lecture." <b>For forty minutes it isn't worth the back and forth</b>, and as one of them put it, "we say next week, and next week never comes."</p>
       </div>
     </section>
@@ -3091,8 +3100,8 @@
            — no kicker, no card, no size hierarchy (unchanged from the 09-26 pass). -->
       <p class="guide-text" data-i18n-html="p-con0">Before I designed anything, the research set three constraints:</p>
       <p class="guide-text" data-i18n-html="p-con1"><b>It had to answer inside the break, not after it.</b> The window was the constraint, not willingness.</p>
-      <p class="guide-text" data-i18n-html="p-con2"><b>It had to work across faculties.</b> 65 % of students have a close friend outside their own course, which is why a shared timetable never existed. Survey, n=30.</p>
-      <p class="guide-text" data-i18n-html="p-con3"><b>It had to cost nothing to check.</b> The 70 % who stopped trying still wanted to meet; checking cost more than the break was worth.</p>
+      <p class="guide-text" data-i18n-html="p-con2"><b>It had to work across faculties.</b> 20 of the 30 have a close friend outside their own course, so a shared course timetable doesn't help them.</p>
+      <p class="guide-text" data-i18n-html="p-con3"><b>It had to cost nothing to check.</b> The 21 who gave up still wanted to meet; checking cost more than the break was worth.</p>
     </section>
 
     <!-- 3 · The idea: shared free time -->
@@ -3294,24 +3303,6 @@
         </div>
       </section>
 
-      <div class="feature-row reverse">
-        <div class="feature-media">
-          <div class="phone-shot">
-            <div class="phone-shot-screen">
-              <video class="phone-shot-video" autoplay loop muted playsinline data-vid="settings">
-                <source src="/videos/unify/settings_screen.mov" type="video/quicktime" />
-                <source src="/videos/unify/settings_screen.mov" type="video/mp4" />
-              </video>
-            </div>
-            <img class="phone-shot-frame" src="/images/unify/iphone-17-frame.png" alt="" />
-          </div>
-        </div>
-        <div class="feature-copy">
-          <h3 class="feature-title" data-i18n-html="ft-prof">Profile &amp; Friends</h3>
-          <p class="guide-text" data-i18n-html="fp-prof">The menu is where you set yourself up. Customise your profile and connect your courses in one step; everything <b>syncs automatically</b> from your matriculation number. Your <b>friends list</b> lives here too, so you can add or remove people whenever you like.</p>
-        </div>
-      </div>
-
       <!-- Home previews (2026-10-05, Lucas): the three features above were
            built as full screens first; the home screen that summarises them
            came after, so it closes the walkthrough instead of opening it (Settings
@@ -3358,7 +3349,7 @@
            intro AND implicitly a third time as a separate "12 participants"
            moderated test further down — three different framings of what is
            one study. Everything below this paragraph now belongs to it. -->
-      <p class="guide-text" data-i18n-html="p-res1">Five friend groups, twenty students in all, used the coded prototype for three weeks. Everything below comes from what the app recorded in that time and from interviews I ran with them at the end.</p>
+      <p class="guide-text" data-i18n-html="p-res1">Five friend groups, twenty students in all and mostly people we knew, used the coded prototype for three weeks. It was a small test, so the numbers below show a direction rather than prove anything. They come from what the app logged and from short interviews at the end.</p>
       <p class="guide-text" data-i18n-html="p-res2">One part could not be tested: the social plan, the activities you add to your timetable. It only makes sense with many more users than a pilot of twenty and would need testing at a much larger scale, so it remained a concept.</p>
 
       <div class="res-block">
@@ -3380,7 +3371,7 @@
           <span class="pie-label" style="top: 57.6%;" data-i18n-html="pie-rm">Room map <b>5 %</b></span>
           <span class="pie-label" style="top: 87.9%;" data-i18n-html="pie-free">Who's free now <b>70 %</b></span>
         </div>
-        <p class="guide-text res-note" data-i18n-html="p-pie">Once the home screen was in, seven in ten of the pilot's minutes went to "who's free now". The full timetable, the friends map and the room map split the remaining 30 %. Meetups per person per week rose from 1.4 before the app to 3.1 with it.</p>
+        <p class="guide-text res-note" data-i18n-html="p-pie">Once the home screen was in, roughly seven in ten minutes in the app went to "who's free now". The full timetable, the friends map and the room map split the rest. Asked at the end, people said they met up about three times a week between classes, up from once or twice before.</p>
       </div>
 
       <!-- Before / after the home screen (2026-10-05, Lucas): the evidence for
@@ -3393,20 +3384,20 @@
            the top of the file. -->
       <div class="res-block">
         <h3 class="cs-sub" data-i18n-html="sub-ba">Before and after the home screen</h3>
-        <div class="ba-chart" role="img" data-i18n-aria="a-ba" aria-label="Opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify 4 to 6, map 1 to 2.">
+        <div class="ba-chart" role="img" data-i18n-aria="a-ba" aria-label="Average opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify about 4 to 6, map about 1 to 2.">
           <div class="ba-legend"><span data-i18n-html="ba-l1"><i></i>Week 1, no home screen</span><span data-i18n-html="ba-l2"><i class="is-after"></i>Weeks 2 and 3, with it</span></div>
           <div class="ba-group">
             <span class="chart-key" data-i18n-html="ba-k1">Opened Unify</span>
-            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 40;"></span></span><span class="chart-val" data-i18n-html="ba-v4">4 / week</span></div>
-            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 60;"></span></span><span class="chart-val" data-i18n-html="ba-v6">6 / week</span></div>
+            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 40;"></span></span><span class="chart-val" data-i18n-html="ba-v4">~4 / week</span></div>
+            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 60;"></span></span><span class="chart-val" data-i18n-html="ba-v6">~6 / week</span></div>
           </div>
           <div class="ba-group">
             <span class="chart-key" data-i18n-html="ba-k2">Opened the map</span>
-            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 10;"></span></span><span class="chart-val" data-i18n-html="ba-v1">1 / week</span></div>
-            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 20;"></span></span><span class="chart-val" data-i18n-html="ba-v2">2 / week</span></div>
+            <div class="ba-row"><span class="chart-track"><span class="chart-fill" style="--v: 10;"></span></span><span class="chart-val" data-i18n-html="ba-v1">~1 / week</span></div>
+            <div class="ba-row is-after"><span class="chart-track"><span class="chart-fill" style="--v: 20;"></span></span><span class="chart-val" data-i18n-html="ba-v2">~2 / week</span></div>
           </div>
         </div>
-        <p class="guide-text res-note" data-i18n-html="p-ba">In week one the prototype opened straight onto the timetable. The home screen arrived for weeks two and three, and people then opened Unify half as often again. The map, barely touched in week one, was opened twice as often, mostly straight from its card.</p>
+        <p class="guide-text res-note" data-i18n-html="p-ba">In week one the prototype opened straight onto the timetable. The home screen arrived for weeks two and three, and people opened Unify more often after that. The map, barely touched in week one, roughly doubled, mostly opened straight from its card. With twenty people and a novelty effect in week one, that is a hint, not a finding.</p>
       </div>
 
 
@@ -3420,19 +3411,19 @@
            paragraph at the top of this section already did. -->
       <div class="fact-bar" style="margin-top: clamp(60px, 9vw, 84px);">
         <div class="fact">
-          <span class="fact-num">20 min</span>
-          <span class="fact-label" data-i18n-html="f1">spent texting to arrange one meetup between classes</span>
-          <span class="fact-src" data-i18n-html="f1s">Before Unify · diary study</span>
+          <span class="fact-num">~20 min</span>
+          <span class="fact-label" data-i18n-html="f1">of texting to arrange one coffee between classes</span>
+          <span class="fact-src" data-i18n-html="f1s">Before Unify · our own week of notes</span>
         </div>
         <div class="fact">
-          <span class="fact-num">5 min</span>
-          <span class="fact-label" data-i18n-html="f2">to arrange one meetup with Unify, 75 % less than before</span>
-          <span class="fact-src">During the pilot</span>
+          <span class="fact-num">~5 min</span>
+          <span class="fact-label" data-i18n-html="f2">to arrange one with Unify, by their own estimate</span>
+          <span class="fact-src" data-i18n-html="f2s">Pilot · exit interviews</span>
         </div>
         <div class="fact">
-          <span class="fact-num" data-i18n-html="f3n">2.2×</span>
-          <span class="fact-label" data-i18n-html="f3">more meetups per person per week, 1.4 to 3.1</span>
-          <span class="fact-src">During the pilot</span>
+          <span class="fact-num" data-i18n-html="f3n">~2×</span>
+          <span class="fact-label" data-i18n-html="f3">as many meetups between classes, about 1.5 to 3 a week</span>
+          <span class="fact-src" data-i18n-html="f3s">Pilot · self-reported</span>
         </div>
       </div>
     </section>
@@ -3448,9 +3439,9 @@
            first and the home screen last (the order they were built in), so
            this paragraph no longer claims the page walks the app in usage
            order; it ties the usage finding to the home screen instead. -->
-      <p class="guide-text" data-i18n-html="p-l1">The feature everyone argued about was not the one that got used. Seven in ten of the pilot's minutes went to a single block on the home screen, while the indoor map, the hardest part to build, barely registered. The summary of all three features turned out to be where people actually spent their time.</p>
+      <p class="guide-text" data-i18n-html="p-l1">Most of the time in the app went to a single block on the home screen, while the indoor map, the hardest part to build, barely registered. The summary of all three features turned out to be where people actually spent their time.</p>
       <p class="guide-text" data-i18n-html="p-l2">A visual language is not decoration. My v1 was clear, structured and cold, and the feedback round said so politely: it looked like something the university had issued. The same screens in the character design read as the group's own, and the structure underneath stayed largely the same.</p>
-      <p class="guide-text" data-i18n-html="p-l3">Next I would build widgets, so the free-now block never needs the app opened, and look at what happens when a group grows past six people. The shared lane in the timetable starts to crowd at around eight.</p>
+      <p class="guide-text" data-i18n-html="p-l3">Next I would build widgets, so the free-now block never needs the app opened, and test it with more than twenty people, ideally outside our own circle of friends.</p>
       <!-- The hero's blob, reused (Lucas, 2026-10-05): upside down, half the
            hero's size, its head sunk into the line above the next-project panel
            so it pokes up out of it. It is the LONG body the phone hero uses
@@ -3663,21 +3654,21 @@
         "val-timeline": "February to June 2026",
         "val-role": "Concept<br>UX<br>Design<br>Prototype",
         "h-problem": "The problem",
-        "p-problem": "My friends and I study different subjects. We share a campus but rarely a course, so every week we swapped screenshots of our timetables to find a time to meet. In a week-long diary study, arranging a 30-minute coffee took 20 minutes of texting on average, and a third of the attempts never happened.",
+        "p-problem": "My friends and I study different subjects. We share a campus but rarely a course, so every week we swapped screenshots of our timetables to find a time to meet. When a few of us kept track for a week, arranging a half-hour coffee took around 20 minutes of texting, and about a third of the plans never happened.",
         "imsg-day": "<b>Today</b> 09:12",
-        "kick-survey": "Survey · 30 students · before Unify",
-        "head-85": "85 % of students never meet a friend from another course between classes",
+        "kick-survey": "A quick survey · 30 students at our uni",
+        "head-85": "26 of the 30 students we asked never meet a friend from another course between classes",
         "seg-text": "still text",
-        "seg-quit": "have stopped trying",
-        "brace-85": "<b>85 % never met anyone</b>",
-        "head-why": "Why the 70 % stopped trying",
-        "p-int1": "I went back to nine students who had stopped arranging anything between classes. Not one said they didn't want to meet. It simply costs more than it is worth: \"I'd meet them if I knew when, but working it out takes longer than the break.\" <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.",
+        "seg-quit": "have given up",
+        "brace-85": "<b>26 of 30 never met up</b>",
+        "head-why": "Why the 21 gave up",
+        "p-int1": "I went back to nine of them. Not one said they didn't want to meet. It simply costs more than it is worth: \"I'd meet them if I knew when, but working it out takes longer than the break.\" <b>Finding out whether your friends are free is the work</b>, and the break is over by the time you have.",
         "p-int2": "The second thing was the size of the window: \"By the time everyone has answered, I'm already in the next lecture.\" <b>For forty minutes it isn't worth the back and forth</b>, and as one of them put it, \"we say next week, and next week never comes.\"",
         "h-constraints": "The constraints",
         "p-con0": "Before I designed anything, the research set three constraints:",
         "p-con1": "<b>It had to answer inside the break, not after it.</b> The window was the constraint, not willingness.",
-        "p-con2": "<b>It had to work across faculties.</b> 65 % of students have a close friend outside their own course, which is why a shared timetable never existed. Survey, n=30.",
-        "p-con3": "<b>It had to cost nothing to check.</b> The 70 % who stopped trying still wanted to meet; checking cost more than the break was worth.",
+        "p-con2": "<b>It had to work across faculties.</b> 20 of the 30 have a close friend outside their own course, so a shared course timetable doesn't help them.",
+        "p-con3": "<b>It had to cost nothing to check.</b> The 21 who gave up still wanted to meet; checking cost more than the break was worth.",
         "h-idea": "The idea",
         "sub-free": "Who's free now",
         "p-idea1": "I wanted two ways into the same overlap instead of one screen doing both jobs. Connect now is the glance: who is free right now and until when, before you have typed anything. Tap open <b>Timetable</b> and it opens into the full week, with everyone's timetable side by side, for the questions a glance can't answer.",
@@ -3704,45 +3695,47 @@
         "ft-prev": "A preview pulls you in",
         "fp-prev": "The summaries also pull people into the screens behind them. A YouTube video that plays a few seconds of itself in the feed gets clicked more than a still thumbnail, and the cards work the same way. Who's free, what's on and who's nearby all sit on the first screen, so each card invites you to open the full feature behind it.",
         "h-results": "Testing and results",
-        "p-res1": "Five friend groups, twenty students in all, used the coded prototype for three weeks. Everything below comes from what the app recorded in that time and from interviews I ran with them at the end.",
+        "p-res1": "Five friend groups, twenty students in all and mostly people we knew, used the coded prototype for three weeks. It was a small test, so the numbers below show a direction rather than prove anything. They come from what the app logged and from short interviews at the end.",
         "p-res2": "One part could not be tested: the social plan, the activities you add to your timetable. It only makes sense with many more users than a pilot of twenty and would need testing at a much larger scale, so it remained a concept.",
         "sub-time": "Where the time went",
         "pie-tt": "Timetable <b>20 %</b>",
         "pie-fr": "Friends map <b>5 %</b>",
         "pie-rm": "Room map <b>5 %</b>",
         "pie-free": "Who's free now <b>70 %</b>",
-        "p-pie": "Once the home screen was in, seven in ten of the pilot's minutes went to \"who's free now\". The full timetable, the friends map and the room map split the remaining 30 %. Meetups per person per week rose from 1.4 before the app to 3.1 with it.",
+        "p-pie": "Once the home screen was in, roughly seven in ten minutes in the app went to \"who's free now\". The full timetable, the friends map and the room map split the rest. Asked at the end, people said they met up about three times a week between classes, up from once or twice before.",
         "sub-ba": "Before and after the home screen",
         "ba-l1": "<i></i>Week 1, no home screen",
         "ba-l2": "<i class=\"is-after\"></i>Weeks 2 and 3, with it",
         "ba-k1": "Opened Unify",
         "ba-k2": "Opened the map",
-        "ba-v4": "4 / week",
-        "ba-v6": "6 / week",
-        "ba-v1": "1 / week",
-        "ba-v2": "2 / week",
-        "p-ba": "In week one the prototype opened straight onto the timetable. The home screen arrived for weeks two and three, and people then opened Unify half as often again. The map, barely touched in week one, was opened twice as often, mostly straight from its card.",
-        "f1": "spent texting to arrange one meetup between classes",
-        "f1s": "Before Unify · diary study",
-        "f2": "to arrange one meetup with Unify, 75 % less than before",
-        "f3": "more meetups per person per week, 1.4 to 3.1",
-        "f3n": "2.2×",
+        "ba-v4": "~4 / week",
+        "ba-v6": "~6 / week",
+        "ba-v1": "~1 / week",
+        "ba-v2": "~2 / week",
+        "p-ba": "In week one the prototype opened straight onto the timetable. The home screen arrived for weeks two and three, and people opened Unify more often after that. The map, barely touched in week one, roughly doubled, mostly opened straight from its card. With twenty people and a novelty effect in week one, that is a hint, not a finding.",
+        "f1": "of texting to arrange one coffee between classes",
+        "f1s": "Before Unify · our own week of notes",
+        "f2": "to arrange one with Unify, by their own estimate",
+        "f3": "as many meetups between classes, about 1.5 to 3 a week",
+        "f3n": "~2×",
         "h-learned": "What we learned",
-        "p-l1": "The feature everyone argued about was not the one that got used. Seven in ten of the pilot's minutes went to a single block on the home screen, while the indoor map, the hardest part to build, barely registered. The summary of all three features turned out to be where people actually spent their time.",
+        "p-l1": "Most of the time in the app went to a single block on the home screen, while the indoor map, the hardest part to build, barely registered. The summary of all three features turned out to be where people actually spent their time.",
         "p-l2": "A visual language is not decoration. My v1 was clear, structured and cold, and the feedback round said so politely: it looked like something the university had issued. The same screens in the character design read as the group's own, and the structure underneath stayed largely the same.",
-        "p-l3": "Next I would build widgets, so the free-now block never needs the app opened, and look at what happens when a group grows past six people. The shared lane in the timetable starts to crowd at around eight.",
+        "p-l3": "Next I would build widgets, so the free-now block never needs the app opened, and test it with more than twenty people, ideally outside our own circle of friends.",
         "a-chat": "Group chat: friends post screenshots of their timetables and fail to find a shared slot by hand. The one who replies late misses lunch.",
-        "a-bar": "Of everyone asked, 30 % still text or swap screenshots and 70 % have stopped trying. Half of the texting group never met, which with the ones who never tried makes 85 % of everyone.",
+        "a-bar": "Of the 30 students asked, 9 still text or swap screenshots and 21 have given up. 5 of the 9 who text never met, so 26 of 30 never met up at all.",
         "a-v1idea": "The v1 design: the Connect now card, showing who is free from 11:30 till 12:00, with its open Timetable button ringed, and an arrow to the day's timetable, where the Break from 11:30 to 12:00 lists the same friends, followed by the evening's Book Club.",
         "a-v1col": "A collage of the v1 design's parts: the Hello Lucas header, the Timetable and Socialplan switch with a course row, the activities card, the friends list, the menu bar, two event cards, the floor switcher and the map.",
         "a-home": "The three cards on the Unify home screen, opened: connect now (who's free and until when), socials (what's on today), map (friends nearby).",
         "a-pie": "Share of pilot time per feature: who's free now 70%, timetable 20%, friends map 5%, room map 5%.",
-        "a-ba": "Opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify 4 to 6, map 1 to 2.",
+        "a-ba": "Average opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify about 4 to 6, map about 1 to 2.",
         "val-team": "Lucas Maher<br>Sophie Meyer<br>Moritz Ackermann",
         "val-skills": "Figma<br>UX research<br>Vibe coding",
         "label-skills": "Skills",
         "label-role": "Role",
         "label-timeline": "Timeline",
+        "f2s": "Pilot · exit interviews",
+        "f3s": "Pilot · self-reported",
       },
       de: {
         'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
@@ -3788,21 +3781,21 @@
         "val-timeline": "Februar bis Juni 2026",
         "val-role": "Konzept<br>UX<br>Design<br>Prototyp",
         "h-problem": "Das Problem",
-        "p-problem": "Meine Freunde und ich studieren unterschiedliche Fächer. Wir teilen uns einen Campus, aber selten einen Kurs. Also tauschten wir jede Woche Screenshots unserer Stundenpläne, um einen Termin zu finden. In einer Tagebuchstudie über eine Woche dauerte es im Schnitt 20 Minuten Schreiberei, einen Kaffee von 30 Minuten zu verabreden, und ein Drittel der Versuche scheiterte ganz.",
+        "p-problem": "Meine Freunde und ich studieren unterschiedliche Fächer. Wir teilen uns einen Campus, aber selten einen Kurs. Also tauschten wir jede Woche Screenshots unserer Stundenpläne, um einen Termin zu finden. Als ein paar von uns eine Woche lang mitgeschrieben haben, dauerte es rund 20 Minuten Schreiberei, einen Kaffee von einer halben Stunde zu verabreden, und etwa ein Drittel der Pläne kam nie zustande.",
         "imsg-day": "<b>Heute</b> 09:12",
-        "kick-survey": "Umfrage · 30 Studierende · vor Unify",
-        "head-85": "85 % der Studierenden treffen zwischen den Vorlesungen nie einen Freund aus einem anderen Studiengang",
+        "kick-survey": "Eine kleine Umfrage · 30 Studierende an unserer Uni",
+        "head-85": "26 der 30 Befragten treffen zwischen den Vorlesungen nie einen Freund aus einem anderen Studiengang",
         "seg-text": "schreiben noch",
         "seg-quit": "haben aufgegeben",
-        "brace-85": "<b>85 % haben sich nie getroffen</b>",
-        "head-why": "Warum die 70 % aufgegeben haben",
-        "p-int1": "Ich habe mit neun Studierenden gesprochen, die zwischen den Vorlesungen nichts mehr verabreden. Keiner sagte, dass er sich nicht treffen will. Es kostet nur mehr, als es bringt: „Ich würde sie treffen, wenn ich wüsste, wann. Aber das herauszufinden dauert länger als die Pause.“ <b>Herauszufinden, ob deine Freunde frei sind, ist die eigentliche Arbeit</b>, und die Pause ist vorbei, bis du damit fertig bist.",
+        "brace-85": "<b>26 von 30 haben sich nie getroffen</b>",
+        "head-why": "Warum die 21 aufgegeben haben",
+        "p-int1": "Mit neun von ihnen habe ich danach gesprochen. Keiner sagte, dass er sich nicht treffen will. Es kostet nur mehr, als es bringt: „Ich würde sie treffen, wenn ich wüsste, wann. Aber das herauszufinden dauert länger als die Pause.“ <b>Herauszufinden, ob deine Freunde frei sind, ist die eigentliche Arbeit</b>, und die Pause ist vorbei, bis du damit fertig bist.",
         "p-int2": "Das Zweite war das Zeitfenster: „Bis alle geantwortet haben, sitze ich schon in der nächsten Vorlesung.“ <b>Für vierzig Minuten lohnt sich das Hin und Her nicht</b>, und wie einer sagte: „Wir sagen nächste Woche, und nächste Woche kommt nie.“",
         "h-constraints": "Die Rahmenbedingungen",
         "p-con0": "Bevor ich irgendetwas gestaltet habe, hat die Recherche drei Rahmenbedingungen gesetzt:",
         "p-con1": "<b>Die App musste innerhalb der Pause antworten, nicht danach.</b> Das Zeitfenster war die Grenze, nicht die Bereitschaft.",
-        "p-con2": "<b>Sie musste über Fakultäten hinweg funktionieren.</b> 65 % der Studierenden haben einen engen Freund außerhalb ihres Studiengangs, deshalb gab es nie einen gemeinsamen Stundenplan. Umfrage, n=30.",
-        "p-con3": "<b>Das Nachschauen durfte nichts kosten.</b> Die 70 %, die aufgegeben haben, wollten sich weiterhin treffen; das Nachschauen kostete mehr, als die Pause wert war.",
+        "p-con2": "<b>Sie musste über Fakultäten hinweg funktionieren.</b> 20 der 30 haben einen engen Freund außerhalb ihres Studiengangs, ein gemeinsamer Kursplan hilft ihnen also nicht.",
+        "p-con3": "<b>Das Nachschauen durfte nichts kosten.</b> Die 21, die aufgegeben haben, wollten sich weiterhin treffen; das Nachschauen kostete mehr, als die Pause wert war.",
         "h-idea": "Die Idee",
         "sub-free": "Wer gerade frei ist",
         "p-idea1": "Ich wollte zwei Wege zur selben Überschneidung, statt eines Bildschirms, der beides erledigt. „Connect now“ ist der Blick: wer jetzt frei ist und bis wann, bevor du etwas getippt hast. Mit „open <b>Timetable</b>“ öffnet sich die ganze Woche, alle Stundenpläne nebeneinander, für die Fragen, die ein Blick nicht beantwortet.",
@@ -3829,45 +3822,47 @@
         "ft-prev": "Eine Vorschau zieht dich rein",
         "fp-prev": "Die Zusammenfassungen ziehen die Leute auch in die Bildschirme dahinter. Ein YouTube-Video, das im Feed ein paar Sekunden von sich selbst abspielt, wird öfter geklickt als ein stehendes Vorschaubild, und die Kacheln funktionieren genauso. Wer frei ist, was los ist und wer in der Nähe ist, steht alles auf dem ersten Bildschirm, jede Kachel lädt also dazu ein, die ganze Funktion dahinter zu öffnen.",
         "h-results": "Tests und Ergebnisse",
-        "p-res1": "Fünf Freundesgruppen, zusammen zwanzig Studierende, haben den programmierten Prototyp drei Wochen lang genutzt. Alles Folgende stammt aus dem, was die App in dieser Zeit aufgezeichnet hat, und aus Interviews, die ich am Ende mit ihnen geführt habe.",
+        "p-res1": "Fünf Freundesgruppen, zusammen zwanzig Studierende und überwiegend Leute, die wir kannten, haben den programmierten Prototyp drei Wochen lang genutzt. Es war ein kleiner Test, die Zahlen unten zeigen also eher eine Richtung, als dass sie etwas beweisen. Sie stammen aus dem, was die App aufgezeichnet hat, und aus kurzen Interviews am Ende.",
         "p-res2": "Ein Teil ließ sich nicht testen: der Social Plan, also die Aktivitäten, die du in deinen Stundenplan übernimmst. Er ergibt nur mit viel mehr Nutzern als in einem Pilot von zwanzig Sinn und müsste in viel größerem Maßstab getestet werden, deshalb blieb er ein Konzept.",
         "sub-time": "Wohin die Zeit ging",
         "pie-tt": "Stundenplan <b>20 %</b>",
         "pie-fr": "Freundeskarte <b>5 %</b>",
         "pie-rm": "Raumkarte <b>5 %</b>",
         "pie-free": "Wer jetzt frei ist <b>70 %</b>",
-        "p-pie": "Sobald der Startbildschirm da war, ging sieben von zehn Pilotminuten an „Wer jetzt frei ist“. Stundenplan, Freundeskarte und Raumkarte teilten sich die übrigen 30 %. Die Treffen pro Person und Woche stiegen von 1,4 vor der App auf 3,1 mit ihr.",
+        "p-pie": "Sobald der Startbildschirm da war, gingen ungefähr sieben von zehn Minuten in der App an „Wer jetzt frei ist“. Stundenplan, Freundeskarte und Raumkarte teilten sich den Rest. Am Ende gefragt, sagten die Leute, sie hätten sich etwa dreimal pro Woche zwischen den Vorlesungen getroffen, vorher ein- bis zweimal.",
         "sub-ba": "Vor und nach dem Startbildschirm",
         "ba-l1": "<i></i>Woche 1, ohne Startbildschirm",
         "ba-l2": "<i class=\"is-after\"></i>Woche 2 und 3, damit",
         "ba-k1": "Unify geöffnet",
         "ba-k2": "Karte geöffnet",
-        "ba-v4": "4 / Woche",
-        "ba-v6": "6 / Woche",
-        "ba-v1": "1 / Woche",
-        "ba-v2": "2 / Woche",
-        "p-ba": "In Woche eins öffnete der Prototyp direkt den Stundenplan. Der Startbildschirm kam in Woche zwei und drei dazu, und danach öffneten die Leute Unify anderthalb Mal so oft. Die Karte, in Woche eins kaum angefasst, wurde doppelt so oft geöffnet, meist direkt über ihre Kachel.",
-        "f1": "Schreiberei, um ein Treffen zwischen den Vorlesungen zu verabreden",
-        "f1s": "Vor Unify · Tagebuchstudie",
-        "f2": "um mit Unify ein Treffen zu verabreden, 75 % weniger als zuvor",
-        "f3": "mehr Treffen pro Person und Woche, 1,4 auf 3,1",
-        "f3n": "2,2×",
+        "ba-v4": "~4 / Woche",
+        "ba-v6": "~6 / Woche",
+        "ba-v1": "~1 / Woche",
+        "ba-v2": "~2 / Woche",
+        "p-ba": "In Woche eins öffnete der Prototyp direkt den Stundenplan. Der Startbildschirm kam in Woche zwei und drei dazu, und danach öffneten die Leute Unify öfter. Die Karte, in Woche eins kaum angefasst, wurde etwa doppelt so oft geöffnet, meist direkt über ihre Kachel. Bei zwanzig Leuten und einem Neuheitseffekt in Woche eins ist das ein Hinweis, kein Befund.",
+        "f1": "Schreiberei, um einen Kaffee zwischen den Vorlesungen zu verabreden",
+        "f1s": "Vor Unify · eine Woche eigene Notizen",
+        "f2": "um mit Unify einen zu verabreden, nach eigener Schätzung",
+        "f3": "so viele Treffen zwischen den Vorlesungen, etwa 1,5 auf 3 pro Woche",
+        "f3n": "~2×",
         "h-learned": "Was wir gelernt haben",
-        "p-l1": "Das Feature, über das alle gestritten haben, war nicht das, das genutzt wurde. Sieben von zehn Pilotminuten gingen an einen einzigen Block auf dem Startbildschirm, während die Indoor-Karte, der aufwendigste Teil, kaum auftauchte. Die Zusammenfassung aller drei Funktionen war am Ende der Ort, an dem die Leute ihre Zeit tatsächlich verbrachten.",
+        "p-l1": "Die meiste Zeit in der App ging an einen einzigen Block auf dem Startbildschirm, während die Indoor-Karte, der aufwendigste Teil, kaum auftauchte. Die Zusammenfassung aller drei Funktionen war am Ende der Ort, an dem die Leute ihre Zeit tatsächlich verbrachten.",
         "p-l2": "Eine visuelle Sprache ist keine Dekoration. Meine v1 war klar, strukturiert und kalt, und die Feedbackrunde hat das höflich ausgedrückt: Sie sah aus, als hätte die Uni sie herausgegeben. Dieselben Screens im Charakter-Design wirkten wie die der Gruppe selbst, und die Struktur darunter blieb im Großen und Ganzen gleich.",
-        "p-l3": "Als Nächstes würde ich Widgets bauen, damit der Block „Wer ist frei“ die App gar nicht mehr braucht, und mir ansehen, was passiert, wenn eine Gruppe über sechs Leute wächst. Die gemeinsame Spur im Stundenplan wird ab etwa acht eng.",
+        "p-l3": "Als Nächstes würde ich Widgets bauen, damit der Block „Wer ist frei“ die App gar nicht mehr braucht, und das Ganze mit mehr als zwanzig Leuten testen, am besten außerhalb unseres eigenen Freundeskreises.",
         "a-chat": "Gruppenchat: Freunde posten Screenshots ihrer Stundenpläne und finden von Hand keinen gemeinsamen Termin. Wer zu spät antwortet, verpasst das Mittagessen.",
-        "a-bar": "Von allen Befragten schreiben 30 % noch oder tauschen Screenshots, 70 % haben aufgegeben. Die Hälfte der Schreibenden hat sich nie getroffen, zusammen mit denen, die es nie versucht haben, sind das 85 % aller.",
+        "a-bar": "Von 30 Befragten schreiben 9 noch oder tauschen Screenshots, 21 haben aufgegeben. 5 der 9, die schreiben, haben sich nie getroffen, also haben sich 26 von 30 gar nicht getroffen.",
         "a-v1idea": "Das v1-Design: Die Connect-now-Karte zeigt, wer von 11:30 bis 12:00 frei ist, der Button „open Timetable“ ist eingekreist, und ein Pfeil führt zum Stundenplan des Tages, in dem die Pause von 11:30 bis 12:00 dieselben Freunde zeigt, danach der Book Club am Abend.",
         "a-v1col": "Eine Collage aus Teilen des v1-Designs: der Kopf „Hello Lucas“, der Schalter zwischen Timetable und Socialplan mit einer Kurszeile, die Aktivitätenkarte, die Freundesliste, die Menüleiste, zwei Event-Karten, der Etagenwechsler und die Karte.",
         "a-home": "Die drei Kacheln auf dem Unify-Startbildschirm, geöffnet: connect now (wer frei ist und bis wann), socials (was heute los ist), map (Freunde in der Nähe).",
         "a-pie": "Anteil der Pilotzeit pro Funktion: wer jetzt frei ist 70 %, Stundenplan 20 %, Freundeskarte 5 %, Raumkarte 5 %.",
-        "a-ba": "Öffnungen pro Person und Woche, Woche 1 ohne Startbildschirm gegenüber Woche 2 und 3 damit: Unify 4 auf 6, Karte 1 auf 2.",
+        "a-ba": "Durchschnittliche Öffnungen pro Person und Woche, Woche 1 ohne Startbildschirm gegenüber Woche 2 und 3 damit: Unify etwa 4 auf 6, Karte etwa 1 auf 2.",
         "val-team": "Lucas Maher<br>Sophie Meyer<br>Moritz Ackermann",
         "val-skills": "Figma<br>UX-Research<br>Vibe-Coding",
         "label-skills": "Skills",
         "label-role": "Rolle",
         "label-timeline": "Zeitraum",
+        "f2s": "Pilot · Abschlussinterviews",
+        "f3s": "Pilot · Selbstauskunft",
       }
     };
     function applyLang(lang) {

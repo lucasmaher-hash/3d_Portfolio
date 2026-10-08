@@ -1458,3 +1458,15 @@ export const Promo16: React.FC<{variant: Variant; transition?: Transition}> = ({
   );
 };
 
+/* Tall cut for the website hero (2026-10-08): the same film with EXT px of canvas
+   above the frame, exactly like PromoTall in Promo.tsx. */
+export const EXT = 240; // video px; 1920 x 1320
+export const Promo16Tall: React.FC<{variant: Variant; transition?: Transition}> = (props) => (
+  <ExtTop.Provider value={EXT}>
+    <AbsoluteFill style={{background: LIGHT.canvas}}>
+      <div style={{position: 'absolute', left: 0, top: EXT, width: W, height: H}}>
+        <Promo16 {...props} />
+      </div>
+    </AbsoluteFill>
+  </ExtTop.Provider>
+);

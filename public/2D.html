@@ -868,7 +868,7 @@
       font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
       font-size: 22px;
       color: #555;
-      text-transform: uppercase;
+      text-transform: none;
       text-decoration: none;
       text-align: center;
       cursor: pointer;
@@ -1428,9 +1428,9 @@
           <!-- The promo loop: the landscape cut above 640px, the vertical (4:5) one
                on a phone. Landscape FIRST, so a browser that ignores `media`
                (pre-2023 Chrome) falls back to it everywhere. -->
-          <video autoplay muted loop playsinline width="1920" height="1080" poster="/images/to.morrow/promo-poster.webp"
+          <video autoplay muted loop playsinline width="1920" height="1080" poster="/images/to.morrow/promo-poster.webp?v=20261008"
                  aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Demnächst verschoben, dann wird eine Aufgabe live geschaltet">
-            <source src="/videos/to.morrow/tomorrow-promo.mp4" media="(min-width: 641px)" type="video/mp4" />
+            <source src="/videos/to.morrow/tomorrow-promo.mp4?v=20261008" media="(min-width: 641px)" type="video/mp4" />
             <source src="/videos/to.morrow/tomorrow-promo-mobile.mp4" type="video/mp4" />
           </video>
         </div>

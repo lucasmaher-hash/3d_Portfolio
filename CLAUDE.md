@@ -1270,7 +1270,7 @@ all playing, no overflow, no console errors.
 to 4 in `ui.tsx`, and all four site files (landscape, landscape tall, vertical, vertical tall) and
 both posters were re-rendered with it; pass `"blue": 1` for the original slate.
 
-**Alternate — `TomorrowPromo16` (`motion/src/Promo16.tsx`), review only, NOT on the site.** A
+**`TomorrowPromo16` (`motion/src/Promo16.tsx`) IS THE SITE'S DESKTOP VERSION since 2026-10-08** (Lucas): `TomorrowPromo16` → `tomorrow-promo.mp4` (landing tile) and the new `TomorrowPromo16Tall` (`Promo16Tall`, same `EXT` = 240) → `tomorrow-promo-hero.mp4` (page hero), posters re-made, URLs at `?v=20261008`. The F files that were there are backed up in `motion/out/site-before-16/`. **Phones still play the old vertical F cut** (no vertical Promo16 exists). Originally: A
 copy of the landscape F (blue ×4) with modern phones and a longer ending (33.3 s):
 - **Frame**: no iPhone 16 mockup exists in the project, so it uses the only Dynamic-Island one,
   `public/images/unify/iphone-17-frame.png` (copied to `motion/public/iphone17-frame.png`) —
@@ -3960,3 +3960,36 @@ inset. No `clip-path` remains on this page, but the same trap applies anywhere o
 - **A `display: none` iframe performs no layout, so it cannot self-measure.** Any postMessage/ResizeObserver auto-height scheme reports nothing until the frame is visible, which is why the 3D overlays flashed at their previous size on open. First-paint heights have to be set in CSS (`src/style.css`, under `@media (pointer: coarse)`); measuring after reveal is always one frame too late.
 - **`inset()` shorthand is collapsed in `getComputedStyle().clipPath`** when opposing sides are equal, so a naive whitespace parser reads a corner radius as an inset and reports a wildly wrong crop. Split on `round` and discard the radii first. (Cost one bogus measurement pass on the Unify caption widths.)
 - **A real CSS border beats an absolutely-positioned pseudo-element for "draw a line spanning this box."** Twice this session (see item 20 in "Recent Changes"), a divider built as `::after { position: absolute; top: 0; bottom: <value>; }` failed to reliably reach the container's true edge — first because a negative `bottom` value depended on how an ancestor's `overflow: hidden`/`clip` trimmed it (inconsistent, Safari especially), then because `bottom: 0` only matched the *pseudo-element's own* containing block, not the visual edge the user actually wanted. The fix that actually held up: a real `border-left`/`border-top` etc. on an already-correctly-sized flexbox/grid item — borders automatically span the box's full rendered dimension with zero positioning math and zero overflow-dependence. **Prefer a real border over an absolutely-positioned divider whenever the layout (flex/grid stretch) already gives the element the right size.**
+
+## Phone refinements + promo collapse spring (2026-10-08, Lucas)
+
+**Promo film, ALL cuts.** `ChatScene.tsx`: the phone's screen now collapses into the three timetable
+blocks IN PARALLEL with the messages being pulled in (`MORPH0_V` = `SUCK.SUCK0 + 2`; the white
+"clear" and the frame dissolve are relative to it) instead of after they are gone, and the shape
+lands on `springOut` (damped spring, ζ 0.5, first peak at 60% of the span) — it overshoots once and
+recoils. End frame is still `MORPH1`, so every later timing is unchanged. The block radius is
+clamped ≥ 0 because the overshoot extrapolates the lerp. All five cuts re-rendered and re-encoded
+(`unify-promo-hero|tile|mobile|mobile-hero.mp4`); `?v=20261008a` on every URL. Posters unchanged
+(frame 0 does not move). Review copy `~/Desktop/unify-promo.mp4`. zsh note: `set -- $c` does not
+word-split, so a render loop written that way silently renders nothing — name each command.
+
+**`unify2d.html`, all inside one ≤640px block last in `<style>`** (plus `.v1-zoom`, inert on desktop):
+- Idea scene: `.v1-zoom` wrapper inside `.v1-canvas`; on phones the canvas is 8:5 and the wrapper
+  `translate(-10cqw, -3.4cqw) scale(1.25)` — the frames get 25% bigger, the side padding goes.
+  `.v1-handoff` keeps `height: 56.25cqw`, or its 100x56.25 viewBox letterboxes into the taller canvas
+  and the ring drifts off the button.
+- `.stat-block` / `.home-copy` `padding-inline: 0`; `.res-block:has(.ba-chart)` left-aligned.
+- `.home-previews`: block, `container-type: inline-size`, 1/1.4, panels absolute at 41% wide, lefts
+  4/29.5/55cqw, tops 3/44.5/87cqw (≈2cqw overlap — more covers the lower card's heading), z-index 3/2/1
+  so the upper card sits over the one below.
+- `.pie-stage` 168px, `align-self: flex-start` so the labels (at 120% of the stage) stay on screen.
+- Monster: `--blob-w: calc(50vw - 20px)`, `left: 50vw` (the middle line between prev/next), viewBox height
+  `MOBILE_U` = 682 (the 364 units under the eyes halved). The last paragraph is `display: flow-root`
+  with a right float `::before` whose `shape-outside: inset(var(--wrap-top) 0 0 0)` — a float's
+  MARGIN box also pushes text, so `margin-top` does not work, `shape-outside: inset()` does. The blob
+  script's `fit()` sets `--wrap-top` to the fewest full-width lines that still let the rest fit beside it.
+
+**`2D.html`:** `.project-tile { box-shadow: none }` and the Virtual Cooking phone override too — no raised
+plate around project media, desktop or phone. **Favicon** (`images/site/favicon.svg|-32|-180`, `/favicon.ico`):
+logo 69% of the badge (was 43%), `#90A4BD` background (the Unify canvas blue; the site accent is
+`#809BBC`, so this may want matching).

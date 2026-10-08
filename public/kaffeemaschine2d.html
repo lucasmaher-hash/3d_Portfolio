@@ -769,7 +769,7 @@
       display: block; background: var(--bg-surface); border-radius: 9999px;
       box-shadow: var(--shadow-raised-sm);
       padding: 16px 24px; font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 22px;
-      color: #555; text-transform: uppercase; text-decoration: none;
+      color: #555; text-transform: none; text-decoration: none;
       text-align: center; cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: box-shadow 150ms ease, transform 150ms ease;
@@ -1069,7 +1069,49 @@
       .page-wrapper > :is(.section, .guide-section, .process-section, .hero-top) { padding-inline: var(--page-pad); }
       .page-wrapper > .scrolly .scrolly-sticky { padding-inline: var(--page-pad); }
     }
-  </style>
+  
+    /* ── Meta panel on desktop (2026-10-08, Lucas) ──
+       The phone's design — one pressed card, hairlines between its parts, flat
+       label/value pairs — carried up to desktop, but side by side: the four tiles
+       are columns of ONE panel with vertical dividers instead of rows with
+       horizontal ones. Same tokens as the ≤640 block above; values run inline
+       there too (the .meta-sep commas from the script near the end). */
+    @media (min-width: 641px) {
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0;
+        background: var(--bg-surface);
+        border-radius: 24px;
+        box-shadow: var(--shadow-pressed);
+        padding: 22px 0;
+      }
+      .meta-tile {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        height: auto;
+        min-height: 0;
+        padding: 4px clamp(18px, 2.4vw, 32px);
+        background: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .meta-tile + .meta-tile { border-left: 1px solid rgba(111, 111, 111, 0.18); }
+      .meta-label { font-size: 18px; line-height: 1.25; }
+      .meta-inset {
+        flex: none;
+        padding: 0;
+        background: none;
+        border-radius: 0;
+        box-shadow: none;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      .meta-inset br { display: none; }
+      .meta-sep { display: inline; }
+    }
+</style>
   <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
   <!-- <script src="/theme/theme.js" defer></script>  dark mode detached 2026-10-06 -->

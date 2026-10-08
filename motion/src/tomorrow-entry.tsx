@@ -6,7 +6,7 @@ import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {DURATION_F, EXT, FPS, Promo, PromoTall} from './Promo';
 import {DURATION_F as DURATION_FV, EXT_V, PromoV, PromoVTall} from './PromoV';
-import {DURATION_F as DURATION_F16, Promo16} from './Promo16';
+import {DURATION_F as DURATION_F16, EXT as EXT16, Promo16, Promo16Tall} from './Promo16';
 import './sk.css';
 
 const F = {variant: 'A' as const, transition: 'golive3' as const};
@@ -18,6 +18,7 @@ const TomorrowRoot: React.FC = () => (
     <Composition id="TomorrowPromoV" component={PromoV} durationInFrames={DURATION_FV} fps={FPS} width={1080} height={1350} defaultProps={F} />
     <Composition id="TomorrowPromoVTall" component={PromoVTall} durationInFrames={DURATION_FV} fps={FPS} width={1080} height={1350 + EXT_V} defaultProps={F} />
     <Composition id="TomorrowPromo16" component={Promo16} durationInFrames={DURATION_F16} fps={FPS} width={1920} height={1080} defaultProps={F} />
+    <Composition id="TomorrowPromo16Tall" component={Promo16Tall} durationInFrames={DURATION_F16} fps={FPS} width={1920} height={1080 + EXT16} defaultProps={F} />
   </>
 );
 
