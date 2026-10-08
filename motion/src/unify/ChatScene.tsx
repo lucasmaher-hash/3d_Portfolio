@@ -204,6 +204,21 @@ export type Block = {x: number; y: number; w: number; h: number; r: number; colo
 export const MORPH0 = SUCK.SUCK0 + 18;
 export const MORPH1 = SUCK.PUFF + 18;
 const CLEAR = 8;
+/* The VERTICAL cut (Lucas, 2026-10-08): the phone's screen collapses into the
+   sections in PARALLEL with the messages being pulled in, instead of after they
+   are gone, and it lands on a damped spring — it overshoots the final shape once
+   and recoils instead of just easing in. Same end frame (MORPH1) as the
+   landscape cut, so every later timing is shared. */
+export const MORPH0_V = SUCK.SUCK0 + 2;
+/* damped spring from rest, 0 -> 1 over [0,1], first peak at ~60% of the span */
+const SPRING_Z = 0.5;
+const SPRING_W = Math.PI / (0.6 * Math.sqrt(1 - SPRING_Z * SPRING_Z)); // peak at u = 0.6
+const springOut = (u: number) => {
+  if (u <= 0) return 0;
+  if (u >= 1) return 1;
+  const wd = SPRING_W * Math.sqrt(1 - SPRING_Z * SPRING_Z);
+  return 1 - Math.exp(-SPRING_Z * SPRING_W * u) * (Math.cos(wd * u) + ((SPRING_Z * SPRING_W) / wd) * Math.sin(wd * u));
+};
 
 export const ChatScene: React.FC<{
   f: number;
@@ -214,6 +229,7 @@ export const ChatScene: React.FC<{
   maxW?: number;
 }> = ({f, blocks, until, vertical, maxW = Infinity}) => {
   const sucking = f >= SUCK.INHALE;
+  const M0 = vertical ? MORPH0_V : MORPH0;
   const els: React.ReactNode[] = [];
 
   /* the opener's size: 3x, or as much as fits (the page's rule: min(3, width * .92 / bubble)) */
@@ -287,13 +303,13 @@ export const ChatScene: React.FC<{
      screen splits into the timetable's sections while the frame dissolves */
   const gulp = 1 + 0.03 * Math.sin(Math.PI * clamp01((f - SUCK.SUCK0 - 2) / 10));
   const scr = phoneScreen(CHAT_C[0], CHAT_C[1]);
-  const clear = ease(f, MORPH0 - CLEAR, MORPH0, Easing.inOut(Easing.quad));
-  const frameO = 1 - ease(f, MORPH0, MORPH0 + 12, Easing.in(Easing.quad));
-  const frameS = 1 + 0.06 * ease(f, MORPH0, MORPH0 + 12, Easing.out(Easing.quad));
+  const clear = ease(f, M0 - CLEAR, M0, Easing.inOut(Easing.quad));
+  const frameO = 1 - ease(f, M0, M0 + 12, Easing.in(Easing.quad));
+  const frameS = 1 + 0.06 * ease(f, M0, M0 + 12, Easing.out(Easing.quad));
   const phoneBox: CSS = {position: 'absolute', left: CHAT_C[0] - PHONE_W / 2, top: CHAT_C[1] - PHONE_H / 2, width: PHONE_W, height: PHONE_H};
-  // shape: a smooth ease, no overshoot; colour: white to the sections' own by 60% of the move
-  const mt = ease(f, MORPH0, MORPH1, Easing.bezier(0.65, 0, 0.35, 1));
-  const ct = ease(f, MORPH0, MORPH0 + (MORPH1 - MORPH0) * 0.6, Easing.inOut(Easing.quad));
+  // shape: a smooth ease, no overshoot (vertical: a spring that recoils once); colour: white to the sections' own by 60% of the move
+  const mt = vertical ? springOut((f - M0) / (MORPH1 - M0)) : ease(f, MORPH0, MORPH1, Easing.bezier(0.65, 0, 0.35, 1));
+  const ct = ease(f, M0, M0 + (MORPH1 - M0) * 0.6, Easing.inOut(Easing.quad));
   const total = blocks.reduce((a, b) => a + b.h, 0);
   let acc = 0;
   const parts = blocks.map((b, i) => {
@@ -302,8 +318,8 @@ export const ChatScene: React.FC<{
     const h0 = (scr.h * b.h) / total;
     const y0 = scr.y + (scr.h * acc) / total;
     acc += b.h;
-    const rt = lerp(i === 0 ? scr.r : 0, b.r, mt);
-    const rb = lerp(i === blocks.length - 1 ? scr.r : 0, b.r, mt);
+    const rt = Math.max(0, lerp(i === 0 ? scr.r : 0, b.r, mt));
+    const rb = Math.max(0, lerp(i === blocks.length - 1 ? scr.r : 0, b.r, mt));
     return (
       <div
         key={`part${i}`}
@@ -317,15 +333,15 @@ export const ChatScene: React.FC<{
 
   return (
     <>
-      {f < MORPH0 ? (
+      {f < M0 ? (
         <div style={{position: 'absolute', inset: 0, transform: `scale(${gulp})`, transformOrigin: `${CHAT_C[0]}px ${CHAT_C[1]}px`}}>
           <Phone cx={CHAT_C[0]} cy={CHAT_C[1]} black={1 - ease(f, 0, 10, Easing.out(Easing.quad))} noFrame />
           {clear > 0 ? <div style={{position: 'absolute', left: scr.x, top: scr.y, width: scr.w, height: scr.h, borderRadius: scr.r, background: '#fff', opacity: clear}} /> : null}
         </div>
       ) : null}
-      {f >= MORPH0 && f <= until ? parts : null}
+      {f >= M0 && f <= until ? parts : null}
       {frameO > 0 ? (
-        <div style={{...phoneBox, transform: `scale(${(f < MORPH0 ? gulp : 1) * frameS})`, opacity: frameO}}>
+        <div style={{...phoneBox, transform: `scale(${(f < M0 ? gulp : 1) * frameS})`, opacity: frameO}}>
           <Img src={staticFile(PHONE_FRAME_SRC)} style={{position: 'absolute', inset: 0, width: '100%', height: '100%'}} />
         </div>
       ) : null}

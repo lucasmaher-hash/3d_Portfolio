@@ -351,7 +351,7 @@
       aspect-ratio: 680 / 560;
       background: var(--bg-surface);
       border-radius: 16px;
-      box-shadow: var(--shadow-raised);
+      box-shadow: none;   /* no raised plate round the project media, desktop or phone (Lucas, 2026-10-08) */
     }
 
     /* UNUSED since 2026-10-05: the Unify tile plays the promo film now (.unify-video-tile).
@@ -506,8 +506,14 @@
       white-space: nowrap;
     }
 
+    /* The site's new accent blue (2026-10-08, Lucas): the to.morrow step-badge blue #7A92B0,
+       as OKLCH so brightness (L) and colour (C) can be dialled apart. Defaults are #7A92B0
+       exactly; the TEMPORARY tuner at the end of <body> overrides these three. Hover goes
+       darker by 0.2 of L. */
+    :root { --blue-L: 0.652; --blue-C: 0.053; --blue-H: 254.2; }
     .btn-view-work {
-      background: var(--accent-orange);
+      background: #7A92B0;
+      background: oklch(var(--blue-L) var(--blue-C) var(--blue-H));
       border-radius: 999px;
       padding: clamp(10px, 1.3vw, 17px) clamp(24px, 3.5vw, 48px);
       border: none;
@@ -519,13 +525,15 @@
       letter-spacing: 1px;
       text-decoration: none;
       display: inline-block;
-      transition: box-shadow 300ms ease-out, transform 300ms ease-out;
+      transition: box-shadow 300ms ease-out, transform 300ms ease-out, background-color 300ms ease-out;
       white-space: nowrap;
     }
 
     .btn-view-work:hover {
+      background: #3F5670;
+      background: oklch(calc(var(--blue-L) - 0.2) var(--blue-C) var(--blue-H));
       transform: translateY(-2px) scale(1.03);   /* standard site hover-lift magnitude */
-      transition: transform 150ms ease;
+      transition: transform 150ms ease, background-color 150ms ease;
     }
 
     /* Endpoint of the fluid shrink above: padding is already 0 by here via
@@ -1134,7 +1142,7 @@
          outline empty space). Below 640px it shows the kitchen PHOTO instead, a
          full rectangle like every other tile, so it gets the same raised shadow
          they have. !important only because the value it beats is inline. */
-      a[href="/virtual_cooking2d.html"] > .project-tile { box-shadow: var(--shadow-raised) !important; }
+      a[href="/virtual_cooking2d.html"] > .project-tile { box-shadow: none !important; }   /* was the raised shadow; gone with every tile's (Lucas, 2026-10-08) */
     }
   
     /* Former pixel-font labels that are buttons or carry weight: one step
@@ -1403,7 +1411,7 @@
           <video autoplay muted loop playsinline width="1620" height="1080" poster="/images/unify/promo-poster-tile.webp?v=20261005i"
                  aria-label="Animation: a group chat drowning in timetable screenshots collapses into Unify's shared timetable, then the connect now card, character customisation, and the campus map with friends and course rooms">
             <source src="/videos/unify/unify-promo-tile.mp4?v=20261005i" media="(min-width: 641px)" type="video/mp4" />
-            <source src="/videos/unify/unify-promo-mobile.mp4?v=20261005i" type="video/mp4" />
+            <source src="/videos/unify/unify-promo-mobile.mp4?v=20261008a" type="video/mp4" />
           </video>
           <!-- a phone gets the vertical cut's own first frame as its poster: the tile
                cut's, cover-cropped to 4:5, would cut the opening bubble off -->
@@ -1414,47 +1422,7 @@
 
     <!-- Project 02 -->
     <div class="project-section reverse" style="align-items: stretch;">
-      <a href="/virtual_cooking2d.html" style="display:block;">
-        <div class="project-tile tile-crop-sides" style="box-shadow: none; overflow: hidden; cursor: pointer;">
-          <!-- Same phone-only swap as the hero on virtual_cooking2d.html: ≤640px gets
-               the kitchen photo, everything wider falls through to the original render.
-               <picture> is layout-transparent, so the img's inline 100%/100% still
-               resolves against the tile. -->
-          <picture>
-            <source media="(max-width: 640px)" srcset="/images/vr-cookbook/vr_hero_mobile.jpg" />
-            <img src="/images/vr-cookbook/side_v1_final_V1.webp" alt="Virtual Cooking" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
-          </picture>
-        </div>
-      </a>
-      <div class="project-content">
-        <div class="project-title-block">
-          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-02">Project 02</p>
-          <h2 class="project-title">Virtual Cooking</h2>
-        </div>
-        <div class="project-tags">
-          <div class="tag">2026</div>
-          <div class="tag">3D</div>
-          <div class="tag">Blender</div>
-          <div class="tag">Three.js</div>
-        </div>
-        <a href="/virtual_cooking2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
-      </div>
-    </div>
-
-    <!-- Project 03 -->
-    <div class="project-section" style="align-items: stretch;">
-      <div class="project-content">
-        <div class="project-title-block">
-          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-03">Project 03</p>
-          <h2 class="project-title">to.morrow</h2>
-        </div>
-        <div class="project-tags">
-          <div class="tag">2026</div>
-          <div class="tag">iOS</div>
-          <div class="tag">SwiftUI</div>
-          <div class="tag">Design System</div>
-        </div>
-        <a href="/to-shove2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
+      <a href="/to-shove2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
       </div>
       <a href="/to-shove2d.html" style="display:block;">
         <div class="project-tile morrow-video-tile" style="cursor: pointer;">
@@ -1466,6 +1434,47 @@
             <source src="/videos/to.morrow/tomorrow-promo.mp4" media="(min-width: 641px)" type="video/mp4" />
             <source src="/videos/to.morrow/tomorrow-promo-mobile.mp4" type="video/mp4" />
           </video>
+        </div>
+      </a>
+      <div class="project-content">
+        <div class="project-title-block">
+          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-02">Project 02</p>
+          <h2 class="project-title">to.morrow</h2>
+        </div>
+        <div class="project-tags">
+          <div class="tag">2026</div>
+          <div class="tag">iOS</div>
+          <div class="tag">SwiftUI</div>
+          <div class="tag">Design System</div>
+        </div>
+  
+    </div>
+
+    <!-- Project 03 -->
+    <div class="project-section" style="align-items: stretch;">
+      <div class="project-content">
+        <div class="project-title-block">
+          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-03">Project 03</p>
+          <h2 class="project-title">Virtual Cooking</h2>
+        </div>
+        <div class="project-tags">
+          <div class="tag">2026</div>
+          <div class="tag">3D</div>
+          <div class="tag">Blender</div>
+          <div class="tag">Three.js</div>
+        </div>
+        <a href="/virtual_cooking2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
+      </div>
+      <a href="/virtual_cooking2d.html" style="display:block;">
+        <div class="project-tile tile-crop-sides" style="box-shadow: none; overflow: hidden; cursor: pointer;">
+          <!-- Same phone-only swap as the hero on virtual_cooking2d.html: ≤640px gets
+               the kitchen photo, everything wider falls through to the original render.
+               <picture> is layout-transparent, so the img's inline 100%/100% still
+               resolves against the tile. -->
+          <picture>
+            <source media="(max-width: 640px)" srcset="/images/vr-cookbook/vr_hero_mobile.jpg" />
+            <img src="/images/vr-cookbook/side_v1_final_V1.webp" alt="Virtual Cooking" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+          </picture>
         </div>
       </a>
     </div>
@@ -1968,6 +1977,32 @@
       }
       sync();
       new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    })();
+  </script>
+
+  <!-- TEMPORARY (2026-10-08): accent-blue dial. Remove once Lucas has settled the values, then
+       bake them into --blue-L / --blue-C above. Grep "TEMPORARY blue tuner". -->
+  <div id="blue-tuner" style="position:fixed;left:16px;bottom:16px;z-index:100000;background:#fff;color:#1a1a1a;border:1px solid #bbb;border-radius:12px;padding:12px 14px;font:13px/1.4 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.18);width:250px;">
+    <b>Blue dial</b> <span id="bt-swatch" style="display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-left:6px;"></span>
+    <label style="display:block;margin-top:8px;">Brightness <span id="bt-lv"></span><input id="bt-l" type="range" min="0.30" max="0.90" step="0.005" style="width:100%"></label>
+    <label style="display:block;margin-top:6px;">Colour <span id="bt-cv"></span><input id="bt-c" type="range" min="0" max="0.20" step="0.002" style="width:100%"></label>
+    <div id="bt-out" style="margin-top:8px;font-family:monospace;font-size:12px;"></div>
+  </div>
+  <script>
+    // TEMPORARY blue tuner
+    (function () {
+      var root = document.documentElement, l = document.getElementById('bt-l'), c = document.getElementById('bt-c');
+      var st = {}; try { st = JSON.parse(localStorage.getItem('blueTuner') || '{}'); } catch (e) {}
+      l.value = st.l || 0.652; c.value = st.c || 0.053;
+      function apply() {
+        root.style.setProperty('--blue-L', l.value); root.style.setProperty('--blue-C', c.value);
+        document.getElementById('bt-lv').textContent = l.value; document.getElementById('bt-cv').textContent = c.value;
+        var o = 'oklch(' + l.value + ' ' + c.value + ' 254.2)';
+        document.getElementById('bt-swatch').style.background = o;
+        document.getElementById('bt-out').textContent = '--blue-L: ' + l.value + '; --blue-C: ' + c.value;
+        try { localStorage.setItem('blueTuner', JSON.stringify({ l: l.value, c: c.value })); } catch (e) {}
+      }
+      l.addEventListener('input', apply); c.addEventListener('input', apply); apply();
     })();
   </script>
 </body>

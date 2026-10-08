@@ -1790,7 +1790,7 @@ const CONTENT = {
   // handler below, and both plaques are in POP_ENABLED so they press first.
   // WallIcon_Mail (the contact plaque) is removed from the scene at load
   // since 2026-10-06 — Contact was merged into About (see removeContactPlaque).
-  'WallIcon_Logo':       { title: 'About',   action: () => openAbout() },
+  // WallIcon_Logo (the About plaque) is removed too since 2026-10-08 — the nav's About is enough.
 }
 
 const ray = new THREE.Raycaster()
@@ -1955,10 +1955,7 @@ const ROOM_TITLES = [
   { text: 'interfaces', pos: [-0.36,     3.30,  TITLE_R], rotY:  Math.PI },     // BlueRoom door (+z): egg + VR panel
   { text: 'packaging',  pos: [ 0.36,     3.30, -TITLE_R], rotY:  0 },           // NewRoom door (−z): vaccine bottle
   { text: 'mac-lamp',   pos: [-TITLE_R,  3.30, -0.36   ], rotY:  Math.PI / 2 }, // YellowRoom door (−x)
-  // Plaque captions. Angles match WallIcon_Mail / WallIcon_Logo exactly; y is
-  // just under each plaque's lower edge (plaques span y 1.89–2.61 after the
-  // +0.30 raise on 2026-08-28).
-  wallLabel('about',   138.225, 1.60),
+  // (The "about" plaque caption went with its plaque, 2026-10-08.)
 ]
 
 // The contact plaque (WallIcon_Mail, the envelope between the mac-lamp and
@@ -1969,9 +1966,12 @@ const ROOM_TITLES = [
 // ROOM_TITLES too.
 function removeContactPlaque(model) {
   const hits = []
-  model.traverse(o => { if (o.name === 'WallIcon_Mail' || (o.parent && o.parent.name === 'WallIcon_Mail')) hits.push(o) })
-  const root = hits.find(o => o.name === 'WallIcon_Mail')
-  if (root && root.parent) root.parent.remove(root)
+  // 2026-10-08 (Lucas): the About plaque (WallIcon_Logo, black LM + its caption) goes too —
+  // the nav's About is enough. Both wall plaques are removed the same way.
+  const NAMES = ['WallIcon_Mail', 'WallIcon_Logo']
+  model.traverse(o => { if (NAMES.includes(o.name) || (o.parent && NAMES.includes(o.parent.name))) hits.push(o) })
+  const root = hits.find(o => NAMES.includes(o.name))
+  for (const r of hits.filter(o => NAMES.includes(o.name))) if (r.parent) r.parent.remove(r)
   for (let i = clickables.length - 1; i >= 0; i--) if (hits.includes(clickables[i])) clickables.splice(i, 1)
   for (let i = collidables.length - 1; i >= 0; i--) if (hits.includes(collidables[i])) collidables.splice(i, 1)
   console.log('Contact-Plakette entfernt:', !!root)
@@ -2312,10 +2312,6 @@ const POP_DURATION = 0.28   // seconds; navigation fires when the pulse ends
 const POP_ENABLED = new Set([
   'Pivot_UNify', 'Pivot_MacLamp', 'egg-rig', 'Pivot_VRPanel',
   'bottle_body_Podest', 'bottle_body',
-  // Wall plaques — centre-anchored: they are flat against the wall, so growing
-  // about the middle keeps them centred in their panel. The extra depth goes
-  // INTO the wall, which is already where their back face sits.
-  'WallIcon_Logo',
 ])
 // Objects that sit ON a surface (podium, table): the pop scales about the
 // bbox's BOTTOM centre instead of its middle, so they grow upward and their
