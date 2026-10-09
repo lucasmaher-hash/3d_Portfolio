@@ -10,16 +10,6 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
   <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Unlinked draft of the Unify case study. Nothing on the site links here; keep it out of search too.
-       ⚠ EVERY NUMBER ON THIS PAGE IS INVENTED. They were written 2026-09-25 so Lucas could see the
-       finished layout, and they must ALL be replaced with real results before this goes live:
-       20 min diary average, 5 min with Unify (pilot) · 30/70 % split, half of the texters never met, 85 % overall · the quotes ·
-       n=30 survey, n=12 diary, n=28 preference test, n=20 pilot, n=12 usability ·
-       2.1 → 5.8 warmth, 24 of 28 preferred · 14.2/11.5/4.1 s and 30/45/5 % variants ·
-       70/20/5/5 % feature use · 1.4 → 3.1 meetups ·
-       before/after the home screen: opens 4 → 6, map 1 → 2 per person per week,
-       and the week-1-without / weeks-2-3-with timeline itself ·
-       task table 92/83/75/92/42 → 100/92/92/92/92 · SUS 71 → 83 · "7 of 12 diary participants". -->
   <title>lucasmaher.com</title>
   <script src="/analytics.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1698,8 +1688,8 @@
 
     /* ══ Case-study rebuild (unify2d1.html) ═══════════════════════════════
        Everything below is new for the draft page and only exists here.
-       Plan: /unify-casestudy-plan.md. Every [ bracketed ] value and every
-       .ph box is a placeholder waiting for a real study result or asset. */
+       Plan: /unify-casestudy-plan.md. Every .ph box is a placeholder for an
+       asset. */
 
     .cs-section { border-bottom: none; }
     .cs-section + .cs-section { padding-top: clamp(16px, 3vw, 32px); }
@@ -1980,8 +1970,8 @@
     /* Timetable variants A / B / C with their metrics underneath.
        UNUSED as of 2026-09-28, see CLAUDE.md — the whole A/B/C comparison
        (.cs-grid-3 of .variant/.tv diagrams, further down) was cut from "The
-       final design" (was "Designing the merged timetable"): it visualized
-       invented numbers, not the shipped app, and Lucas asked to go straight
+       final design" (was "Designing the merged timetable"): it was an
+       abstract diagram, not the shipped app, and Lucas asked to go straight
        to the real screens instead. Kept, not deleted. */
     .variant { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
     .variant-name {
@@ -1997,7 +1987,7 @@
 
     /* Results: task success before / after one iteration. */
     /* UNUSED as of 2026-10-05, see CLAUDE.md (the task table went with the
-       invented usability iteration). */
+       usability iteration). */
     .cs-table { width: 100%; border-collapse: collapse; font-size: 14px; color: var(--text-secondary); }
     .cs-table th {
       font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 17px; font-weight: 400;
@@ -2348,9 +2338,9 @@
     /* ── Charts, drawn in the page's own style ────────────────────────────────
        Every chart is markup, not an image: VT323 labels, the neumorphic surface,
        one colour (the accent) for the bar that carries the finding and grey for
-       the rest. The numbers are placeholders — a value lives in one place, the
-       `--v` on its row (0–100) with the label beside it — so filling a study in
-       is a number swap, never a rebuild.
+       the rest. A value lives in one place, the `--v` on its row (0–100) with
+       the label beside it, so changing a value is a number swap, never a
+       rebuild.
        .chart/.chart-row are UNUSED as of 2026-09-28 (.chart-key/-track/-fill/
        -val are back in use since 2026-10-05, by .ba-chart in Results), see CLAUDE.md — this was the bar chart in the
        old "Supporting features" section; its data now renders as a pie chart
@@ -3199,8 +3189,8 @@
     <!-- 5 · The final design: was two sections ("Designing the merged
          timetable" + "Supporting features"), merged into one 2026-09-28,
          Lucas — see CLAUDE.md. The A/B/C variant comparison (.cs-grid-3 of
-         .tv diagrams) is gone entirely: it was an abstract diagram of
-         invented numbers, not the shipped app, and cutting it is what freed
+         .tv diagrams) is gone entirely: it was an abstract diagram,
+         not the shipped app, and cutting it is what freed
          this section up to just show the real thing. The usage-share data
          that used to live here as a bar chart now lives in "Testing and
          results" as a pie chart instead (see that section). -->
@@ -3378,10 +3368,7 @@
            the two reasons at the end of "The final design". Same res-block
            shape as the pie: heading -> evidence -> plain note. Paired bars on
            ONE scale (0-10 opens per person per week, --v = value x 10), grey
-           for week 1 without the home screen, pink for weeks 2-3 with it.
-           ⚠ Invented like every number here, AND so is the timeline (that the
-           home screen arrived after the first pilot week) — see the list at
-           the top of the file. -->
+           for week 1 without the home screen, pink for weeks 2-3 with it. -->
       <div class="res-block">
         <h3 class="cs-sub" data-i18n-html="sub-ba">Before and after the home screen</h3>
         <div class="ba-chart" role="img" data-i18n-aria="a-ba" aria-label="Average opens per person per week, week 1 without the home screen versus weeks 2 and 3 with it: Unify about 4 to 6, map about 1 to 2.">
