@@ -350,13 +350,6 @@ html.only .card__open { position: relative; }
 }
 .panel__face-pill--pink{ background:var(--pink); }
 .panel__face-pill--cream{ background:var(--cream); }
-.panel__face-eyes{
-  position:absolute;
-  left:19px; top:27px;
-  width:90.397px; height:71.653px;
-  display:flex; align-items:center; justify-content:center;
-}
-.panel__face-eyes img{ display:block; width:79.324px; height:52.543px; transform:rotate(15.34deg); }
 .panel__face-btn{
   position:absolute;
   left:8px; top:8px;          /* centred in the 80×80 lip */
@@ -377,33 +370,19 @@ html.only .card__open { position: relative; }
   color:var(--dark);
   white-space:nowrap;
 }
-.card__eyes{
-  position:absolute;
-  display:block;
-  width:67.561px;
-  height:49.939px;
-}
-.card__eyes img{ display:block; width:100%; height:100%; }
 
 /* first-on-top z-order (matches Figma itemReverseZIndex) */
 .card--connect{ height:72px; z-index:3; }
 .card--connect .card__bubble{ width:377px; height:118px; }
 .card--connect .card__label{ left:15px; top:11px; }
-.card--connect .card__eyes{ left:317px; top:33px; }
-
-.card--small{ height:64px; z-index:2; }
-.card--small .card__bubble{ width:294px; height:63.805px; }
-.card--small .card__label{ left:13.293px; top:9.748px; }
 
 .card--socials{ height:72px; z-index:2; }
 .card--socials .card__bubble{ width:377px; height:118px; }
 .card--socials .card__label{ left:15px; top:11px; }
-.card--socials .card__eyes{ left:318px; top:33px; }
 
 .card--map{ height:99px; z-index:1; }
 .card--map .card__bubble{ width:377px; height:118px; }
 .card--map .card__label{ left:15px; top:11px; }
-.card--map .card__eyes{ left:317px; top:27px; }
 
 /* expanded (open) heights — match the Figma Open variant heights */
 .card--connect.is-open{ height:347px; }
