@@ -123,14 +123,6 @@
     /* ── Header ── */
     .project-header { display: flex; flex-direction: column; gap: 16px; }
 
-    .breadcrumb {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-
     .title-row { display: flex; align-items: baseline; gap: 12px; }
 
     .project-title {
@@ -141,11 +133,6 @@
       letter-spacing: -0.04em;
     }
 
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0; }
-    }
-
     /* Sits ON the text baseline like a full stop. An empty flex item has no baseline
        of its own, so one is synthesised from its bottom edge — with margin-bottom 0
        that edge IS the dot's bottom, so it lands on the baseline at ANY heading size.
@@ -154,14 +141,6 @@
        descent, which scales with font-size — so one fixed value could only ever be
        right at one size. Measured: 7.8px BELOW the baseline on the 96px desktop
        heading, 4.2px ABOVE it on the 35px mobile one. */
-    .accent-dot {
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: var(--accent-orange);
-      margin-bottom: 0;
-      flex-shrink: 0;
-      animation: blink 1.5s step-end infinite;
-    }
 
     .dot-divider {
       width: 100%; height: 4px;
@@ -245,110 +224,7 @@
       flex-shrink: 0;
     }
 
-    .step-badge--sm {
-      width: 26px; height: 26px;
-      font-size: 16px;
-      border-radius: 50%;
-    }
-
-    /* ── Overview rows ── */
-    .overview-row {
-      display: grid;
-      grid-template-columns: 58fr 42fr;
-      gap: clamp(16px, 2vw, 24px);
-      align-items: stretch;
-    }
-
-    .overview-row.reverse {
-      grid-template-columns: 42fr 58fr;
-    }
-
-    .overview-img {
-      width: 100%;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: var(--shadow-pressed);
-    }
-
-    .overview-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .overview {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .text-inset {
-      background: var(--bg-surface);
-      border-radius: 16px;
-      padding: 20px 20px 20px 24px;
-      box-shadow: var(--shadow-pressed);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .step-heading-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .step-title {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 28px;
-      color: var(--text-primary);
-      text-transform: uppercase;
-      line-height: 1.2;
-    }
-
-    .text-inset p {
-      font-size: 13px;
-      line-height: 1.55;
-      color: var(--text-secondary);
-    }
-
-
-    /* ── Step tile (raised card) ── */
-    .step-tile {
-      background: var(--bg-surface);
-      border-radius: 24px;
-      box-shadow: var(--shadow-raised);
-      padding: 16px;
-      display: flex;
-      gap: 16px;
-    }
-
-    .step-tile.vertical { flex-direction: column; }
-
-    .step-img {
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: var(--shadow-pressed);
-      flex-shrink: 0;
-    }
-
-    .step-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
     /* ── Process row layouts ── */
-    .process-row {
-      display: grid;
-      gap: clamp(16px, 2vw, 24px);
-      align-items: stretch;
-    }
-
-    .process-row.cols-65-35 { grid-template-columns: 65fr 35fr; }
-    .process-row.cols-50-50 { grid-template-columns: 1fr 1fr; }
 
     .stack {
       display: flex;
@@ -356,31 +232,10 @@
       gap: clamp(16px, 2vw, 24px);
     }
 
-    /* Process step 1: horizontal image+text inside tile */
-    .step-tile.horizontal {
-      flex-direction: row;
-      align-items: stretch;
-    }
-
-    .step-tile.horizontal .step-img {
-      width: 55%;
-      aspect-ratio: unset;
-    }
-
-    .step-tile.compact { flex-direction: column; padding: 20px; gap: 14px; }
-    .step-tile.compact .step-img { aspect-ratio: 4/3; }
-
     /* ── Mobile layout ─────────────────────────────────────── */
     /* ── Mid layout ────────────────────────────────────────── */
     @media (max-width: 860px) {
       .meta-grid { grid-template-columns: 1fr 1fr; }
-      .overview-row,
-      .overview-row.reverse { grid-template-columns: 1fr; }
-      .process-row,
-      .process-row.cols-65-35,
-      .process-row.cols-50-50 { grid-template-columns: 1fr; }
-      .step-tile.horizontal { flex-direction: column; }
-      .step-tile.horizontal .step-img { width: 100%; aspect-ratio: 4/3; }
     }
 
     /* Endpoint of the fluid shrink above: padding is already 0 by here via
@@ -409,13 +264,6 @@
       .meta-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
       .meta-tile { padding: 8px; gap: 8px; height: 155px; min-height: 0; }
       .meta-inset { padding: 8px 10px; }
-      .overview-row,
-      .overview-row.reverse { grid-template-columns: 1fr; }
-      .process-row,
-      .process-row.cols-65-35,
-      .process-row.cols-50-50 { grid-template-columns: 1fr; }
-      .step-tile.horizontal { flex-direction: column; }
-      .step-tile.horizontal .step-img { width: 100%; aspect-ratio: 4/3; }
     }
 
     /* ── Project nav ──────────────────────────────────────── */
@@ -547,32 +395,6 @@
       box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
     }
 
-    /* 2D/3D toggle ONLY: a flat orange fill, and explicitly NO inset — the neumorphic
-       shading and white highlight are cancelled here so the orange reads as a solid pill.
-       The language toggle shares .mobile-view-toggle / .mobile-mode-btn and keeps both the
-       surface fill and the inset from the rule above.
-       Matched on [data-mode] rather than child position or the .mobile-lang-toggle class,
-       so the orange cannot wander onto the wrong control if the panel is reordered — the
-       language segments carry [data-lang] instead. Specificity (0,3,0) beats the shared
-       rule, so source order does not matter.
-       --accent-orange is undefined on index.html (the 3D page declares no such custom
-       property), hence the literal fallback. */
-    .mobile-mode-btn[data-mode].is-active {
-      background: var(--accent-orange, #809BBC);
-      /* Black, overriding the base rule's #555. That grey is tuned for an UNSELECTED
-         segment on the grey surface; over #809BBC it measures 2.4:1 and the label reads
-         as disabled rather than selected. Black on this orange is 6.8:1. Scoped to
-         [data-mode], so the language segments keep #555 on their grey well. */
-      color: #000;
-      /* Same well as the language toggle above — same offsets, same blur, same
-         alphas — recoloured so it reads on orange instead of on the grey
-         surface. The grey/white pair was built to sit on #DCDCE3; over #809BBC
-         a white highlight desaturates to a pale wash and the cool grey shadow
-         reads as dirt. So the two hues are re-derived from the orange itself:
-         top-left gets a darker orange, bottom-right a lighter one, keeping the
-         site's light-from-top-left convention. */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(78, 104, 138, 0.6), inset -3.25px -3.25px 6.5px rgba(190, 208, 228, 1);
-    }
     .mobile-mode-btn:active:not(.is-active) {
       /* Scale is the tap feedback both toggles share. */
       transform: scale(0.96);
@@ -825,7 +647,6 @@
       display: block;
     }
 
-
     /* Sized to sit clearly BELOW .section-title (clamp(28px, 4vw, 44px)) — these are
        sub-items inside a section that already carries its own big heading, so this
        intentionally does not use Unify's larger clamp(22px, 3vw, 34px). */
@@ -836,7 +657,6 @@
       letter-spacing: -0.02em;
       color: var(--text-primary);
     }
-
 
     /* Process stills — constrained + staggered, caption above image */
     .process-shot {
@@ -970,15 +790,8 @@
     /* ── Reduced motion (apple-design §14): drop non-essential movement,
        keep layout + opacity cues. No effect unless the OS pref is set. */
     @media (prefers-reduced-motion: reduce) {
-      .accent-dot { animation: none !important; opacity: 1; }
-      .machine-overlay-btn,
-      .hero-blob,
-      .character-row,
-      .spin-scrolly .spin { animation: none !important; }
       .project-nav-item:hover .project-nav-item-inner,
       .meta-tile:hover,
-      .project-tile:hover,
-      .machine-frame-wrap:hover,
       .tag:hover { transform: none !important; }
     }
 
@@ -1005,8 +818,6 @@
       .lamp-scrolly-panel { font-size: 16px; }
       /* short but real content, kept below body size */
       .meta-inset { font-size: 15px; }
-      /* VT323 UI labels */
-      .breadcrumb { font-size: 16px; }
 
       /* Project nav — mobile only. The project TITLE under the label is hidden, so
          the footer reads just "NEXT >>" / "<< PREVIOUS" and the number. It is dropped
@@ -1334,13 +1145,11 @@
        the body, darker skim keywords. Sticky/scrolly sections keep their own
        geometry — padding on .guide-section only adds air around the spacer. */
     @media (max-width: 640px) {
-      .guide-section { padding: 52px 20px; }
       .section { padding: 32px 20px; }
       /* This page has no .guide-section — content sections are plain .section.
          The ones carrying a real heading get the full 52px tier; header/meta
          blocks keep 32px. Graceful without :has() support: they stay at 32px. */
       .section:has(.section-title) { padding: 52px 20px; }
-      .guide-section .dot-divider,
       .section .dot-divider { margin-bottom: 12px; }
       b.kw { color: #4a4a52; }
       /* The At-a-Glance lead reads as the project's one-paragraph pitch — full
@@ -1394,13 +1203,10 @@
        heavier than body text so they still read as UI (Lucas, 2026-10-06). */
     .meta-label,
     .step-badge,
-    .step-title,
     .project-nav-label,
     .project-nav-number,
     .mobile-nav-btn,
-    .mobile-mode-btn,
-    .pill__seg,
-    .machine-overlay-btn { font-weight: 500; }
+    .mobile-mode-btn { font-weight: 500; }
   
     /* ── Inset content column from 1280px up (2026-10-06, Lucas) ───────────
        The format from the Unify case-study draft (unify2d1.html): every
@@ -1416,7 +1222,6 @@
     html[data-screen="macbook"] { --page-pad: 112px; }
     @media (min-width: 1280px) {
       .page-wrapper > :is(.section, .guide-section, .process-section, .hero-top) { padding-inline: var(--page-pad); }
-      .page-wrapper > .scrolly .scrolly-sticky { padding-inline: var(--page-pad); }
     }
   
     /* ── Meta panel on desktop (2026-10-08, Lucas) ──
@@ -1707,21 +1512,10 @@
           menu.classList.contains('open') ? closeMenu() : openMenu();
       });
       menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
-      menu.querySelectorAll('[data-mode]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (btn.dataset.mode === '3d') {
-            // _enter3d: deliberate switch to 3D — see the "/" guard in index.html
-            try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
-            window._nav('/', 'right');
-          }
-          else window.location.href = '/2D.html';
-        });
-      });
       menu.querySelectorAll('[data-page]').forEach(btn => {
         btn.addEventListener('click', e => {
           e.preventDefault(); closeMenu();
-          if      (btn.dataset.page === 'craft')   window.location.href = '/2D.html#craft-section';
-          else if (btn.dataset.page === 'about')   window.location.href = '/about2d.html';
+          if (btn.dataset.page === 'about') window.location.href = '/about2d.html';
         });
       });
 
@@ -1775,8 +1569,7 @@
     // ── i18n ─────────────────────────────────────────────────────
     const TRANSLATIONS = {
       en: {
-        'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;Mac-Lamp',
+        'menu-about': 'About',
         'label-timeline': 'Timeline', 'val-timeline': 'Jan 2026 —<br>Apr 2026',
         'label-team': 'Team', 'val-team': 'Lucas Maher',
         'label-role': 'Role', 'val-role': 'Designer & Maker',
@@ -1794,13 +1587,11 @@
         'process-cad': 'Every part was <b class="kw">modeled in Blender</b> to the exact dimensions of the MacBook.',
         'process-print-title': 'Printed to Glow',
         'process-print': 'For the 3D print I used a <b class="kw">translucent PLA filament</b> at 20% infill, to let as much light through as possible.',
-        'section-gallery': 'Gallery', 'gallery-meta': '3 Videos · 6 Photos',
-        'nav-prev': '<< PREVIOUS', 'nav-next': 'NEXT >>',
+                'nav-prev': '<< PREVIOUS', 'nav-next': 'NEXT >>',
         'nav-double-packaging': 'Double Packaging',
       },
       de: {
-        'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;Mac-Lamp',
+        'menu-about': 'Über mich',
         'label-timeline': 'Zeitraum', 'val-timeline': 'Jan. 2026 —<br>Apr. 2026',
         'label-team': 'Team', 'val-team': 'Lucas Maher',
         'label-role': 'Rolle', 'val-role': 'Designer & Hersteller',
@@ -1818,8 +1609,7 @@
         'process-cad': 'Jedes Teil wurde <b class="kw">in Blender</b> exakt nach den MacBook-Maßen modelliert.',
         'process-print-title': 'Gedruckt, um zu leuchten',
         'process-print': 'Ich habe <b class="kw">transluzentes PLA</b> mit 20 % Fülldichte verwendet, um möglichst viel Licht durchzulassen.',
-        'section-gallery': 'Galerie', 'gallery-meta': '3 Videos · 6 Fotos',
-        'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
+                'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
         'nav-double-packaging': 'Double Packaging',
       }
     };
