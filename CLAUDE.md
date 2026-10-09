@@ -122,6 +122,30 @@ file that say "orange" describe the old state. The 3D About plaque (`WallIcon_Lo
 to the contact one (`removeContactPlaque`). Project order is now 01 Unify, 02 to.morrow, 03 Virtual Cooking,
 04 Cybercoffee, 05 Mac-Lamp, 06 Double Packaging (page map and older notes still show the old order).
 
+## Cleanup pass (2026-10-09) — what is gone
+
+One commit per page on branch `cleanup-2026-10-09`, each verified in headless Chrome
+(computed styles of every element identical to `main` at 1920/1440/768/390). Older notes
+in this file that describe these things are history:
+- **Craft dropdown**: markup, CSS, script, and the `nav-expand`/`nav-collapse` messages are
+  gone; the nav iframe stays 140px, nothing resizes it any more. The nav's "is this a 2D
+  page" list is ONE constant now, `IS_2D_VIEW` in `top_row_permanent_V3.html`.
+- **Contact/Craft**: `contact3d.html`, `craft3d.html`, their 3D overlays and `main.js` wiring,
+  every menu's Contact/Craft branch and `menu-craft`/`menu-contact` keys.
+- **Burger menus have no 2D/3D buttons** (only the nav bar does): their `[data-mode]` CSS
+  and click handlers are gone from every page.
+- **`unify2d1.html` is deleted** (it held the pre-case-study Unify page). The Unify hero blob
+  (hidden at every width) is gone; the "What we learned" blob stays.
+- **Dead CSS** (≈430 rules site-wide, all `UNUSED as of …` blocks included), ~140 dead
+  translation entries, and ~11 MB of unreferenced media (old Unify `.mov`s, v1 stills,
+  to.morrow app icons/screens, problem timetables, character SVGs).
+- **Shared scripts**: scroll dots + dot-divider fix + bottom-border snap live in
+  `/js/page-chrome.js` (all 2D pages), the `?from=3d` Exit pill in `/js/exit-3d.js` (project
+  pages). Edit those files, not per-page copies.
+- Deliberately KEPT: the detached dark mode (`public/theme/`, commented blocks),
+  `VT323-Regular.ttf` (the "no pixel font" revert needs it), `images/unify/unify-blob.svg`,
+  font licence files.
+
 ## No blinking dots, no breadcrumbs (2026-10-06, Lucas)
 
 The blinking accent dot beside every project title (`<span class="accent-dot">`) and beside
