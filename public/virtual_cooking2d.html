@@ -130,14 +130,6 @@
     /* ── Header ── */
     .project-header { display: flex; flex-direction: column; gap: 16px; }
 
-    .breadcrumb {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-
     .title-row { display: flex; align-items: baseline; gap: 12px; }
 
     .project-title {
@@ -148,11 +140,6 @@
       letter-spacing: -0.04em;
     }
 
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0; }
-    }
-
     /* Sits ON the text baseline like a full stop. An empty flex item has no baseline
        of its own, so one is synthesised from its bottom edge — with margin-bottom 0
        that edge IS the dot's bottom, so it lands on the baseline at ANY heading size.
@@ -161,14 +148,6 @@
        descent, which scales with font-size — so one fixed value could only ever be
        right at one size. Measured: 7.8px BELOW the baseline on the 96px desktop
        heading, 4.2px ABOVE it on the 35px mobile one. */
-    .accent-dot {
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: var(--accent-orange);
-      margin-bottom: 0;
-      flex-shrink: 0;
-      animation: blink 1.5s step-end infinite;
-    }
 
     .dot-divider {
       width: 100%; height: 4px;
@@ -265,48 +244,6 @@
 
     .guide-text + .guide-text { margin-top: -8px; }
 
-    /* ── At a glance ── */
-    .glance-list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .glance-row {
-      display: grid;
-      grid-template-columns: 20px 120px 1fr;
-      gap: 14px;
-      align-items: baseline;
-    }
-
-    .glance-dot {
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      background: var(--accent-orange);
-      transform: translateY(-1px);
-    }
-
-    .glance-label {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 17px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--text-primary);
-    }
-
-    .glance-value {
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--text-secondary);
-    }
-
-    @media (max-width: 640px) {
-      .glance-row { grid-template-columns: 14px 1fr; }
-      .glance-label { grid-column: 2; }
-      .glance-value { grid-column: 2; }
-      .glance-dot { grid-row: 1; }
-    }
-
     /* ── Media block inside a guide section ── */
     .guide-media {
       width: 100%;
@@ -321,41 +258,6 @@
       width: 100%;
       height: auto;
       display: block;
-    }
-
-    /* Breakout image — same horizontal padding as every other section */
-    .breakout-media {
-      width: 100%;
-      overflow: hidden;
-      border-top: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
-      padding: clamp(32px, 5vw, 56px) clamp(40px, 8vw, 80px);
-    }
-
-    .breakout-media img {
-      width: 100%;
-      aspect-ratio: 16 / 10;
-      object-fit: cover;
-      object-position: center 30%;
-      display: block;
-      border-radius: 16px;
-      box-shadow: var(--shadow-pressed);
-    }
-
-    /* ── Reflection sections (no step badge, softer tone) ── */
-    .reflection-title {
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
-      font-size: clamp(22px, 3vw, 30px);
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-    }
-
-    .reflection-tag {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent-orange);
     }
 
     /* ── Mobile layout ─────────────────────────────────────── */
@@ -518,32 +420,6 @@
       box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
     }
 
-    /* 2D/3D toggle ONLY: a flat orange fill, and explicitly NO inset — the neumorphic
-       shading and white highlight are cancelled here so the orange reads as a solid pill.
-       The language toggle shares .mobile-view-toggle / .mobile-mode-btn and keeps both the
-       surface fill and the inset from the rule above.
-       Matched on [data-mode] rather than child position or the .mobile-lang-toggle class,
-       so the orange cannot wander onto the wrong control if the panel is reordered — the
-       language segments carry [data-lang] instead. Specificity (0,3,0) beats the shared
-       rule, so source order does not matter.
-       --accent-orange is undefined on index.html (the 3D page declares no such custom
-       property), hence the literal fallback. */
-    .mobile-mode-btn[data-mode].is-active {
-      background: var(--accent-orange, #809BBC);
-      /* Black, overriding the base rule's #555. That grey is tuned for an UNSELECTED
-         segment on the grey surface; over #809BBC it measures 2.4:1 and the label reads
-         as disabled rather than selected. Black on this orange is 6.8:1. Scoped to
-         [data-mode], so the language segments keep #555 on their grey well. */
-      color: #000;
-      /* Same well as the language toggle above — same offsets, same blur, same
-         alphas — recoloured so it reads on orange instead of on the grey
-         surface. The grey/white pair was built to sit on #DCDCE3; over #809BBC
-         a white highlight desaturates to a pale wash and the cool grey shadow
-         reads as dirt. So the two hues are re-derived from the orange itself:
-         top-left gets a darker orange, bottom-right a lighter one, keeping the
-         site's light-from-top-left convention. */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(78, 104, 138, 0.6), inset -3.25px -3.25px 6.5px rgba(190, 208, 228, 1);
-    }
     .mobile-mode-btn:active:not(.is-active) {
       /* Scale is the tap feedback both toggles share. */
       transform: scale(0.96);
@@ -674,7 +550,6 @@
       max-width: 440px;
     }
 
-
     /* Deliberately sized to match .result-subhead, NOT Unify's .feature-title
        (clamp(22px, 3vw, 34px)). These are sub-items inside a section that already has a
        .section-title at clamp(28px, 4vw, 44px), so they must stay clearly below it. */
@@ -695,7 +570,6 @@
 
     .process-shot.shift-right { width: 66%; margin-left: 27%; }
     .process-shot.shift-left  { width: 80%; }
-
 
     .result-subhead {
       font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
@@ -751,15 +625,8 @@
     /* ── Reduced motion (apple-design §14): drop non-essential movement,
        keep layout + opacity cues. No effect unless the OS pref is set. */
     @media (prefers-reduced-motion: reduce) {
-      .accent-dot { animation: none !important; opacity: 1; }
-      .machine-overlay-btn,
-      .hero-blob,
-      .character-row,
-      .spin-scrolly .spin { animation: none !important; }
       .project-nav-item:hover .project-nav-item-inner,
       .meta-tile:hover,
-      .project-tile:hover,
-      .machine-frame-wrap:hover,
       .tag:hover { transform: none !important; }
     }
 
@@ -786,8 +653,6 @@
       .stagger-copy { font-size: 16px; }
       /* short but real content, kept below body size */
       .meta-inset { font-size: 15px; }
-      /* VT323 UI labels */
-      .breadcrumb { font-size: 16px; }
 
       /* Project nav — mobile only. The project TITLE under the label is hidden, so
          the footer reads just "NEXT >>" / "<< PREVIOUS" and the number. It is dropped
@@ -1015,9 +880,7 @@
     .project-nav-label,
     .project-nav-number,
     .mobile-nav-btn,
-    .mobile-mode-btn,
-    .pill__seg,
-    .machine-overlay-btn { font-weight: 500; }
+    .mobile-mode-btn { font-weight: 500; }
   
     /* ── Inset content column from 1280px up (2026-10-06, Lucas) ───────────
        The format from the Unify case-study draft (unify2d1.html): every
@@ -1033,7 +896,6 @@
     html[data-screen="macbook"] { --page-pad: 112px; }
     @media (min-width: 1280px) {
       .page-wrapper > :is(.section, .guide-section, .process-section, .hero-top) { padding-inline: var(--page-pad); }
-      .page-wrapper > .scrolly .scrolly-sticky { padding-inline: var(--page-pad); }
     }
   
     /* ── Meta panel on desktop (2026-10-08, Lucas) ──
@@ -1348,21 +1210,10 @@
           menu.classList.contains('open') ? closeMenu() : openMenu();
       });
       menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
-      menu.querySelectorAll('[data-mode]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (btn.dataset.mode === '3d') {
-            // _enter3d: deliberate switch to 3D — see the "/" guard in index.html
-            try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
-            window._nav('/', 'right');
-          }
-          else window.location.href = '/2D.html';
-        });
-      });
       menu.querySelectorAll('[data-page]').forEach(btn => {
         btn.addEventListener('click', e => {
           e.preventDefault(); closeMenu();
-          if      (btn.dataset.page === 'craft')   window.location.href = '/2D.html#craft-section';
-          else if (btn.dataset.page === 'about')   window.location.href = '/about2d.html';
+          if (btn.dataset.page === 'about') window.location.href = '/about2d.html';
         });
       });
 
@@ -1416,8 +1267,7 @@
     // ── i18n ─────────────────────────────────────────────────────
     const TRANSLATIONS = {
       en: {
-        'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;Virtual Cooking',
+        'menu-about': 'About',
         'label-timeline': 'Timeline', 'val-timeline': 'May 2026 —<br>Jul 2026',
         'label-team': 'Team', 'val-team': 'Lucas Maher',
         'label-role': 'Role', 'val-role': 'Idea & Concept Designer',
@@ -1444,11 +1294,9 @@
         'result-timer-heading': 'Timer &amp; ingredients',
         'result-timer-text': 'The finished right-hand panel: ingredient quantities adjust to <b class="kw">however many people</b> you\'re cooking for, and the running timer opens into the full <b class="kw">gesture-controlled view</b> the moment you click it.',
         'nav-prev': '<< PREVIOUS', 'nav-next': 'NEXT >>',
-        'nav-unify': 'Unify',
       },
       de: {
-        'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;Virtual Cooking',
+        'menu-about': 'Über mich',
         'label-timeline': 'Zeitraum', 'val-timeline': 'Mai 2026 —<br>Jul. 2026',
         'label-team': 'Team', 'val-team': 'Lucas Maher',
         'label-role': 'Rolle', 'val-role': 'Konzept & Design',
@@ -1475,7 +1323,6 @@
         'result-timer-heading': 'Timer &amp; Zutaten',
         'result-timer-text': 'Das fertige rechte Panel: Die <b class="kw">Zutatenmengen passen sich der Personenzahl an</b>, und der laufende Timer öffnet mit einem Klick die vollständige, <b class="kw">gestengesteuerte Ansicht</b>.',
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
-        'nav-unify': 'Unify',
       }
     };
     function applyLang(lang) {
