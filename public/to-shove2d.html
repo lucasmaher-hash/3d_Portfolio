@@ -172,14 +172,6 @@
        descent, which scales with font-size — so one fixed value could only ever be
        right at one size. Measured: 7.8px BELOW the baseline on the 96px desktop
        heading, 4.2px ABOVE it on the 35px mobile one. */
-    .accent-dot {
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: var(--accent-orange);
-      margin-bottom: 0;
-      flex-shrink: 0;
-      animation: blink 1.5s step-end infinite;
-    }
 
     .dot-divider {
       width: 100%; height: 4px;
@@ -450,87 +442,6 @@
     /* Was -8px, which pulled consecutive paragraphs to 20px against
        unify2d's 28px. The section's own gap is the right value. */
     .guide-text + .guide-text { margin-top: 0; }
-
-    /* ── At a glance ── */
-    .glance-list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .glance-row {
-      display: grid;
-      grid-template-columns: 20px 120px 1fr;
-      gap: 14px;
-      align-items: baseline;
-    }
-
-    .glance-dot {
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      background: var(--accent-orange);
-      transform: translateY(-1px);
-    }
-
-    .glance-label {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 17px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--text-primary);
-    }
-
-    .glance-value {
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--text-secondary);
-    }
-
-    @media (max-width: 640px) {
-      .glance-row { grid-template-columns: 14px 1fr; }
-      .glance-label { grid-column: 2; }
-      .glance-value { grid-column: 2; }
-      .glance-dot { grid-row: 1; }
-    }
-
-    /* ── Media block inside a guide section ── */
-    .guide-media {
-      width: 100%;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: var(--shadow-pressed);
-      background: #111;
-    }
-
-    .guide-media img,
-    .guide-media video {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* A stand-in for a real screenshot/video that isn't shot yet. Pressed
-       (not raised) so it reads as an empty slot rather than a finished
-       tile — same shadow token .meta-inset already uses for "not final."
-       aspect-ratio is set per-use via style="--ph-ratio: …", default 4/3.
-       Drop a real <img>/<video> in and delete the two ph- classes; nothing
-       about the surrounding layout (.guide-media / .stagger-figure /
-       .process-shot) needs to change either way. */
-    .ph-media {
-      width: 100%;
-      aspect-ratio: var(--ph-ratio, 4 / 3);
-      border-radius: 16px;
-      box-shadow: var(--shadow-pressed);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 16px;
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 15px;
-      letter-spacing: 0.02em;
-      color: var(--text-tertiary);
-    }
 
     /* ── The Live button ────────────────────────────────────────────────
        Lifted from shove95-live-button.md / -demo.html, which Lucas built
@@ -985,7 +896,6 @@
     .ic-copy--retro  { --ic-copy-x: calc(var(--ic-copy-shift) * 0.5); }
     .ic-copy--modern { --ic-copy-x: calc(var(--ic-copy-shift) * -0.5); }
 
-
     /* The side's WIDTH is animated as well as its transform. A scale()
        does not change layout, so with a fixed-width box the two collapsed
        clusters sat ~250px apart with empty space between them and never
@@ -1033,7 +943,6 @@
       transition-duration: 900ms;
       transition-timing-function: cubic-bezier(.65, 0, .35, 1);
     }
-
 
     .ic-orbit {
       position: absolute; inset: 0;
@@ -1262,7 +1171,6 @@
       to   { transform: translateY(var(--sw-y, 6px)) rotate(var(--sw-a, 1deg)); }
     }
 
-
     /* ── SkeuKit, only the parts these icons need ───────────────────────
        Lifted from shove95-components.css rather than linked, so the page
        stays self-contained like every other page here. Light palette only;
@@ -1421,41 +1329,6 @@
          base .live rule: as a length the derived factors become px² and the
          whole layer silently disappears. */
       .live { --n: 71; }
-    }
-
-    /* Breakout image — same horizontal padding as every other section */
-    .breakout-media {
-      width: 100%;
-      overflow: hidden;
-      border-top: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
-      padding: clamp(32px, 5vw, 56px) clamp(40px, 8vw, 80px);
-    }
-
-    .breakout-media img {
-      width: 100%;
-      aspect-ratio: 16 / 10;
-      object-fit: cover;
-      object-position: center 30%;
-      display: block;
-      border-radius: 16px;
-      box-shadow: var(--shadow-pressed);
-    }
-
-    /* ── Reflection sections (no step badge, softer tone) ── */
-    .reflection-title {
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
-      font-size: clamp(22px, 3vw, 30px);
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-    }
-
-    .reflection-tag {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent-orange);
     }
 
     /* ── Mobile layout ─────────────────────────────────────── */
@@ -1707,33 +1580,6 @@
       box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
     }
 
-    /* 2D/3D toggle ONLY: a flat orange fill, and explicitly NO inset — the neumorphic
-       shading and white highlight are cancelled here so the orange reads as a solid pill.
-       The language toggle shares .mobile-view-toggle / .mobile-mode-btn and keeps both the
-       surface fill and the inset from the rule above.
-       Matched on [data-mode] rather than child position or the .mobile-lang-toggle class,
-       so the orange cannot wander onto the wrong control if the panel is reordered — the
-       language segments carry [data-lang] instead. Specificity (0,3,0) beats the shared
-       rule, so source order does not matter.
-       --accent-orange is undefined on index.html (the 3D page declares no such custom
-       property), hence the literal fallback. */
-    .mobile-mode-btn[data-mode].is-active {
-      background: var(--accent-orange, #FF5C00);
-      /* Black, overriding the base rule's #555. That grey is tuned for an UNSELECTED
-         segment on the grey surface; over #FF5C00 it measures 2.4:1 and the label reads
-         as disabled rather than selected. Black on this orange is 6.8:1. Scoped to
-         [data-mode], so the language segments keep #555 on their grey well. */
-      color: #000;
-      /* Same well as the language toggle above — same offsets, same blur, same
-         alphas — recoloured so it reads on orange instead of on the grey
-         surface. The grey/white pair was built to sit on #DCDCE3; over #FF5C00
-         a white highlight desaturates to a pale wash and the cool grey shadow
-         reads as dirt. So the two hues are re-derived from the orange itself:
-         top-left gets a darker orange, bottom-right a lighter one, keeping the
-         site's light-from-top-left convention. */
-      /* re-derived from this page's blue accent (#7A92B0), as the orange pair was from #FF5C00 */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(78, 98, 124, 0.6), inset -3.25px -3.25px 6.5px rgba(176, 194, 216, 1);
-    }
     .mobile-mode-btn:active:not(.is-active) {
       /* Scale is the tap feedback both toggles share. */
       transform: scale(0.96);
@@ -1838,7 +1684,6 @@
     }
 
     /* image left, text right — indented from the left edge */
-    .stagger-row.indent { margin-left: clamp(20px, 7vw, 110px); }
 
     .stagger-figure {
       flex: 0 0 auto;
@@ -1864,7 +1709,6 @@
       max-width: 440px;
     }
 
-
     /* Deliberately sized to match .result-subhead, NOT Unify's .feature-title
        (clamp(22px, 3vw, 34px)). These are sub-items inside a section that already has a
        .section-title at clamp(28px, 4vw, 44px), so they must stay clearly below it. */
@@ -1877,59 +1721,24 @@
     }
 
     /* Process screenshots — constrained + staggered, caption above image */
-    .process-shot {
-      display: flex;
-      flex-direction: column;
-      gap: clamp(14px, 1.6vw, 20px);
-    }
-
-    .process-shot.shift-right { width: 66%; margin-left: 27%; }
-    .process-shot.shift-left  { width: 80%; }
-
-
-    .result-subhead {
-      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
-      font-size: clamp(20px, 2.6vw, 26px);
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-    }
-
-    .result-image-pair {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(20px, 3vw, 40px);
-    }
-
-    .result-image-pair img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 16px;
-      box-shadow: var(--shadow-pressed);
-    }
 
     @media (max-width: 860px) {
       /* .dna-row is deliberately NOT in this list any more: it is a centred
          column at every width now, and this rule would flip it back to a row. */
       .stagger-row,
-      .stagger-row.right,
-      .stagger-row.indent {
+      .stagger-row.right {
         margin-left: 0; max-width: none; flex-direction: row;
       }
       .stagger-figure { width: clamp(160px, 34vw, 240px); }
       .stagger-row .stagger-figure.phone,
       .stagger-row.right .stagger-figure.phone { margin-left: 0; margin-right: 0; }
-      .process-shot.shift-right,
-      .process-shot.shift-left { width: 100%; margin-left: 0; }
     }
 
     @media (max-width: 640px) {
       .stagger-row,
       .stagger-row.right,
-      .stagger-row.indent,
       .dna-row { flex-direction: column; align-items: flex-start; gap: 18px; }
       .stagger-figure { width: clamp(180px, 60vw, 280px); }
-      .result-image-pair { grid-template-columns: 1fr; }
     }
 
     /* Wide-aspect external monitors (wider than the 16:10 MacBook screen):
@@ -1943,7 +1752,6 @@
          well overshot Unify by ~110px. */
       .stagger-row .stagger-figure.phone,
       .stagger-row.right .stagger-figure.phone { margin-left: 0; margin-right: 0; }
-      .stagger-row.indent { margin-left: clamp(40px, 5vw, 110px); }
       .stagger-figure { width: clamp(320px, 25vw, 460px); }
       .stagger-body { max-width: 520px; }
       .stagger-copy { font-size: 16px; }
@@ -1951,21 +1759,14 @@
     /* ── Reduced motion (apple-design §14): drop non-essential movement,
        keep layout + opacity cues. No effect unless the OS pref is set. */
     @media (prefers-reduced-motion: reduce) {
-      .accent-dot { animation: none !important; opacity: 1; }
       /* No pinned scroll animation: drop the spacer and show the row spread. */
       .fan-scrolly, .ic-scrolly { height: auto !important; }
       .fan-sticky, .ic-sticky { position: static !important; height: auto !important; }
       .color-card { animation: none !important; }
       .appstore-badge { animation: none !important; transform: none !important; }
       .appstore-link:hover, .appstore-link:active { transform: none; }
-      .machine-overlay-btn,
-      .hero-blob,
-      .character-row,
-      .spin-scrolly .spin { animation: none !important; }
       .project-nav-item:hover .project-nav-item-inner,
       .meta-tile:hover,
-      .project-tile:hover,
-      .machine-frame-wrap:hover,
       .tag:hover { transform: none !important; }
     }
 
@@ -2107,10 +1908,7 @@
     @media (max-width: 640px) {
       .stagger-figure { width: 100%; }
       .stagger-row,
-      .stagger-row.right,
-      .stagger-row.indent { gap: 20px; }
-      .process-shot,
-      .guide-media { width: 100%; margin-left: 0; margin-right: 0; }
+      .stagger-row.right { gap: 20px; }
     }
   
     /* Keyword emphasis for skimming (Hanwha-style). Inert by default — the <b>
@@ -2147,11 +1945,6 @@
          paragraphs together with -8px; on a phone that reads as one slab. */
       .guide-text + .guide-text { margin-top: 0; }
 
-      /* Endergebnis: the two demo units separate more than their internals
-         (52px → 76px). Only subheads FOLLOWING content — the first subhead
-         after the divider keeps its existing 84px. */
-      .guide-text + .result-subhead { margin-top: 24px; }
-
       /* Skim keywords: darker grey ink, weight unchanged (only wght 400 is
          loaded here; synthetic bold renders muddy on this face). */
       b.kw { color: #4a4a52; }
@@ -2173,7 +1966,6 @@
       .stagger-figure { width: 65%; }
       .stagger-row .stagger-figure        { align-self: flex-start; }
       .stagger-row.right .stagger-figure  { align-self: flex-end; }
-      .stagger-row.indent .stagger-figure { align-self: center; }
 
       /* Phones follow unify2d's phone treatment rather than the silver-panel
          stagger above, and they are matched to it NUMERICALLY, not by eye.
@@ -2364,7 +2156,6 @@
 
     /* Full width of that block, so the copy's edges are the demos' edges. */
     .dna-copy { max-width: none; }
-
 
     /* A heading belongs to the text under it, so it sits close to it — the
        section's own 28px gap would read as two separate blocks. */
@@ -2755,9 +2546,7 @@
     .project-nav-label,
     .project-nav-number,
     .mobile-nav-btn,
-    .mobile-mode-btn,
-    .pill__seg,
-    .machine-overlay-btn { font-weight: 500; }
+    .mobile-mode-btn { font-weight: 500; }
   
     /* ── Inset content column from 1280px up (2026-10-06, Lucas) ───────────
        The format from the Unify case-study draft (unify2d1.html): every
@@ -2773,7 +2562,6 @@
     html[data-screen="macbook"] { --page-pad: 112px; }
     @media (min-width: 1280px) {
       .page-wrapper > :is(.section, .guide-section, .process-section, .hero-top) { padding-inline: var(--page-pad); }
-      .page-wrapper > .scrolly .scrolly-sticky { padding-inline: var(--page-pad); }
     }
   
     /* ── Meta panel on desktop (2026-10-08, Lucas) ──
@@ -2875,20 +2663,8 @@
          why that matters to the nav bar's shadow. The hero video is
          .hero-promo, not .hero, for exactly that reason. -->
     <div class="section header-section" style="border-bottom: none;">
-      <!-- No breadcrumb here (dropped 2026-09-07), unlike the other project
-           pages: with the hero directly above it, the trail sat between the
-           hero and the title and held the two apart. -->
       <div class="project-header">
-        <!-- .title-row exactly as the other pages have it. It used to carry a
-             .morrow-shove class that glided the word across the column; that
-             went with the shoving icon (2026-10-04). No .accent-dot here —
-             the other pages' blinking orange dot is deliberately dropped
-             on this page. -->
         <div class="title-row">
-          <!-- The two o's are the Live mark itself — a stroked ring with a
-               core at 42% of the diameter, the same construction as
-               .live__mark further down. aria-label carries the real word, so
-               the heading still reads as "to.morrow" to a screen reader. -->
           <h1 class="project-title">to.morrow</h1>
         </div>
         <div class="dot-divider"></div>
@@ -3393,21 +3169,10 @@
           menu.classList.contains('open') ? closeMenu() : openMenu();
       });
       menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
-      menu.querySelectorAll('[data-mode]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (btn.dataset.mode === '3d') {
-            // _enter3d: deliberate switch to 3D — see the "/" guard in index.html
-            try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
-            window._nav('/', 'right');
-          }
-          else window.location.href = '/2D.html';
-        });
-      });
       menu.querySelectorAll('[data-page]').forEach(btn => {
         btn.addEventListener('click', e => {
           e.preventDefault(); closeMenu();
-          if      (btn.dataset.page === 'craft')   window.location.href = '/2D.html#craft-section';
-          else if (btn.dataset.page === 'about')   window.location.href = '/about2d.html';
+          if (btn.dataset.page === 'about') window.location.href = '/about2d.html';
         });
       });
 
@@ -3461,11 +3226,9 @@
     // ── i18n ─────────────────────────────────────────────────────
     const TRANSLATIONS = {
       en: {
-        'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
+        'menu-about': 'About',
         'section-glance': 'At a Glance',
-        'placeholder': '[ Placeholder ]',
         'nav-prev': '<< PREVIOUS', 'nav-next': 'NEXT >>',
-        'nav-cybercoffee': 'Cybercoffee',
         'section-problem': "The problem",
         'section-app': 'The App',
         'section-design': 'Design process',
@@ -3515,7 +3278,7 @@
       },
 
       de: {
-        'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
+        'menu-about': 'Über mich',
         'section-glance': 'Auf einen Blick',
         'glance-lead': "Aufgaben anlegen ist in jeder App leicht. Sie zu verschieben kostet Arbeit, deshalb bleibt meistens liegen, was auf der Liste steht. to.morrow macht das Verschieben zu einer einzigen Wischgeste und hält die eine Sache, die du nicht vergessen darfst, auf deinem Sperr- und Homescreen.",
         'label-timeline': 'Zeitraum', 'label-role': 'Rolle', 'label-team': 'Team', 'label-platform': 'Plattform',
@@ -3559,9 +3322,7 @@
         'conclusion-2': "Zweitens hilft es, <b class=\"kw\">sich Regeln zu geben</b>. Sobald jede der drei Formen genau eine Bedeutung hatte, war jede neue Ansicht eine Anwendung dieser Entscheidung statt einer neuen Designfrage.",
         'conclusion-3': "Drittens hieß es, bei etwas so <b class=\"kw\">Alltäglichem wie einer To-do-Liste</b> genau hinzuschauen, was andere Apps für selbstverständlich halten, etwa für jedes Verschieben eine Datumsauswahl zu öffnen.",
         'color-text': "Die meisten To-do-Apps sind grau. Ich wollte, dass man sich die Farben selbst aussuchen kann: vier <b class=\"kw\">blasse Pastelltöne</b>, jeder in Hell und Dunkel. Sie bleiben zurückhaltend, damit die Farbe einen Akzent setzt, ohne beim Lesen zu stören.",
-        'placeholder': '[ Platzhalter ]',
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
-        'nav-cybercoffee': 'Cybercoffee',
         'pivot-3': "Also habe ich es gestrichen. An seine Stelle kam <b class=\"kw\">SkeuKit</b>, ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Retro-Idee blieb, nur die Oberfläche ging.",
         'conclusion-4': "Als Nächstes kommen <b class=\"kw\">Widgets</b>, damit die Heute-Liste auf dem Homescreen liegt und du Aufgaben abhaken und verschieben kannst, ohne die App zu öffnen. Danach eine <b class=\"kw\">Desktop-Version</b> mit Tastatur und Platz für eine Wochenansicht. Beides ist für Version zwei geplant.",
 
