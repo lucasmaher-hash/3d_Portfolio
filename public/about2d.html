@@ -13,7 +13,7 @@
   <script src="/analytics.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
   <link href="/fonts/roboto-flex-ui.css" rel="stylesheet" />
   <style>
     @font-face {
@@ -93,8 +93,7 @@
       max-width: 1440px;
       overflow: hidden;
       /* Fill the frame vertically and centre the header + accordion in the
-         middle of it, matching contact2d.html's layout now that there's no
-         photo pushing the page taller than the viewport. */
+         middle of it. */
       min-height: calc(100vh - 24px);
       display: flex;
       flex-direction: column;
@@ -349,32 +348,6 @@
       box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
     }
 
-    /* 2D/3D toggle ONLY: a flat orange fill, and explicitly NO inset — the neumorphic
-       shading and white highlight are cancelled here so the orange reads as a solid pill.
-       The language toggle shares .mobile-view-toggle / .mobile-mode-btn and keeps both the
-       surface fill and the inset from the rule above.
-       Matched on [data-mode] rather than child position or the .mobile-lang-toggle class,
-       so the orange cannot wander onto the wrong control if the panel is reordered — the
-       language segments carry [data-lang] instead. Specificity (0,3,0) beats the shared
-       rule, so source order does not matter.
-       --accent-orange is undefined on index.html (the 3D page declares no such custom
-       property), hence the literal fallback. */
-    .mobile-mode-btn[data-mode].is-active {
-      background: var(--accent-orange, #809BBC);
-      /* Black, overriding the base rule's #555. That grey is tuned for an UNSELECTED
-         segment on the grey surface; over #809BBC it measures 2.4:1 and the label reads
-         as disabled rather than selected. Black on this orange is 6.8:1. Scoped to
-         [data-mode], so the language segments keep #555 on their grey well. */
-      color: #000;
-      /* Same well as the language toggle above — same offsets, same blur, same
-         alphas — recoloured so it reads on orange instead of on the grey
-         surface. The grey/white pair was built to sit on #DCDCE3; over #809BBC
-         a white highlight desaturates to a pale wash and the cool grey shadow
-         reads as dirt. So the two hues are re-derived from the orange itself:
-         top-left gets a darker orange, bottom-right a lighter one, keeping the
-         site's light-from-top-left convention. */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(78, 104, 138, 0.6), inset -3.25px -3.25px 6.5px rgba(190, 208, 228, 1);
-    }
     .mobile-mode-btn:active:not(.is-active) {
       /* Scale is the tap feedback both toggles share. */
       transform: scale(0.96);
@@ -450,20 +423,6 @@
       #scroll-track:hover .scroll-dot,
       #scroll-track.is-dragging .scroll-dot { transform: scale(1.3); }
     }
-    /* ── Reduced motion (apple-design §14): drop non-essential movement,
-       keep layout + opacity cues. No effect unless the OS pref is set. */
-    @media (prefers-reduced-motion: reduce) {
-      .accent-dot { animation: none !important; opacity: 1; }
-      .machine-overlay-btn,
-      .hero-blob,
-      .character-row,
-      .spin-scrolly .spin { animation: none !important; }
-      .project-nav-item:hover,
-      .meta-tile:hover,
-      .project-tile:hover,
-      .machine-frame-wrap:hover,
-      .tag:hover { transform: none !important; }
-    }
 
     /* Wide-aspect monitors only (not the ~1.6 MacBook ratio): pull the card
        in a bit more for extra breathing room. Nav keeps its own width.
@@ -523,9 +482,7 @@
        heavier than body text so they still read as UI (Lucas, 2026-10-06). */
     .mobile-nav-btn,
     .mobile-mode-btn,
-    .item-label,
-    .pill__seg,
-    .machine-overlay-btn { font-weight: 500; }
+    .item-label { font-weight: 500; }
   
     /* Contact links under Design Philosophy (2026-10-06): plain body text —
        same face, size and weight as the page's running text — spread evenly
@@ -568,9 +525,7 @@
         <button class="mobile-mode-btn" data-theme-choice="dark" aria-label="Dunkel"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="0" width="5" height="1"/><rect x="2" y="1" width="4" height="1"/><rect x="1" y="2" width="4" height="1"/><rect x="1" y="3" width="3" height="1"/><rect x="0" y="4" width="4" height="1"/><rect x="0" y="5" width="4" height="1"/><rect x="0" y="6" width="4" height="1"/><rect x="0" y="7" width="4" height="1"/><rect x="0" y="8" width="5" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="1" y="9" width="6" height="1"/><rect x="10" y="9" width="2" height="1"/><rect x="1" y="10" width="11" height="1"/><rect x="2" y="11" width="9" height="1"/><rect x="4" y="12" width="5" height="1"/></svg></button>
       </div> -->
       <a class="mobile-nav-btn is-active" data-page="about" data-i18n="menu-about">About</a>
-      <!-- Language toggle. Deliberately the SAME component as the 2D/3D toggle
-           above — same two classes, no styling of its own — so the pair can
-           never drift apart. The nav bar's own de/en text is hidden below
+      <!-- Language toggle. The nav bar's own de/en text is hidden below
            640px; this replaces it. -->
       <div class="mobile-view-toggle mobile-lang-toggle">
         <button class="mobile-mode-btn" data-lang="de">Deutsch</button>
@@ -645,8 +600,8 @@
 
           <!-- Contact merged into About (2026-10-06, Lucas): the contact page's
                three links as plain text, spread evenly under Design Philosophy.
-               The email href is set by the script below (split address, as on
-               contact2d.html, so the raw HTML never holds an "@"). -->
+               The email href is set by the script below (split address, so the
+               raw HTML never holds an "@"). -->
           <div class="anim anim-5">
             <div class="about-links">
               <a href="#" id="email-link" data-i18n="label-email">Email</a>
@@ -751,21 +706,10 @@
           menu.classList.contains('open') ? closeMenu() : openMenu();
       });
       menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
-      menu.querySelectorAll('[data-mode]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (btn.dataset.mode === '3d') {
-            // _enter3d: deliberate switch to 3D — see the "/" guard in index.html
-            try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
-            window._nav('/', 'right');
-          }
-          else window.location.href = '/2D.html';
-        });
-      });
       menu.querySelectorAll('[data-page]').forEach(btn => {
         btn.addEventListener('click', e => {
           e.preventDefault(); closeMenu();
-          if      (btn.dataset.page === 'craft')   window.location.href = '/2D.html#craft-section';
-          else if (btn.dataset.page === 'about')   window.location.href = '/about2d.html';
+          if (btn.dataset.page === 'about') window.location.href = '/about2d.html';
         });
       });
 
@@ -819,7 +763,7 @@
     // ── i18n ─────────────────────────────────────────────────────
     const TRANSLATIONS = {
       en: {
-        'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
+        'menu-about': 'About',
         'label-background': 'Background',
         'bg-text': '<p>Hi, I\'m Lucas Maher, a 21 yo designer based in Munich.</p><p style="margin-top:12px;">I\'ve always created with my hands. Long before I discovered design, I was drawing, sculpting clay, cutting glass, welding metal, sewing fabric, and painting in oil and acrylic — constantly switching materials, constantly asking: what can this become?</p><p style="margin-top:12px;">That restlessness led me to Industrial Design, where three-dimensional thinking meets real-world problems. Now, studying at Hochschule München, I\'m channeling that same energy into the digital space — where 2D and 3D collide, and where screens are becoming the new material to shape.</p>',
         'label-things-i-love': 'Things I Love',
@@ -829,7 +773,7 @@
         'philosophy-text': '<p>Design that only looks good has already failed. I came to this field from fine art and craft — and that background taught me one thing above all: beauty without purpose is decoration, not design.</p><p style="margin-top:12px;">I work at the intersection of bold aesthetics and real problem-solving. I\'m not afraid to experiment, to try what hasn\'t been done, or to borrow from unexpected places. The best ideas often live at the edges — between physical and digital, between 2D and 3D, between what exists and what could.</p>',
       },
       de: {
-        'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
+        'menu-about': 'Über mich',
         'label-background': 'Hintergrund',
         'bg-text': '<p>Hallo, ich bin Lucas Maher, ein 21-jähriger Designer aus München.</p><p style="margin-top:12px;">Ich habe immer mit den Händen gearbeitet. Lange bevor ich zum Design kam: zeichnen, Ton formen, Glas schneiden, Metall schweißen, Stoff nähen, malen — immer neue Materialien, immer dieselbe Frage: Was wird daraus?</p><p style="margin-top:12px;">Diese Rastlosigkeit führte mich zum Industriedesign, wo räumliches Denken auf reale Probleme trifft. Heute, an der Hochschule München, steckt dieselbe Energie im digitalen Raum — wo 2D und 3D kollidieren und Bildschirme das neue Material sind.</p>',
         'label-things-i-love': 'Interessen',
@@ -1010,7 +954,7 @@
 
   <script>
     /* Email href assembled at runtime so the raw HTML never contains the
-       address (same as contact2d.html). */
+       address. */
     (function () {
       var user = 'lucas.maher.design', domain = 'gmail.com';
       var link = document.getElementById('email-link');
