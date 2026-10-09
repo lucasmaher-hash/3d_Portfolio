@@ -131,14 +131,6 @@
       gap: 16px;
     }
 
-    .breadcrumb {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-
     .title-row {
       display: flex;
       align-items: baseline;
@@ -153,11 +145,6 @@
       letter-spacing: -0.04em;
     }
 
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0; }
-    }
-
     /* Sits ON the text baseline like a full stop. An empty flex item has no baseline
        of its own, so one is synthesised from its bottom edge — with margin-bottom 0
        that edge IS the dot's bottom, so it lands on the baseline at ANY heading size.
@@ -166,15 +153,6 @@
        descent, which scales with font-size — so one fixed value could only ever be
        right at one size. Measured: 7.8px BELOW the baseline on the 96px desktop
        heading, 4.2px ABOVE it on the 35px mobile one. */
-    .accent-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--accent-orange);
-      margin-bottom: 0;
-      flex-shrink: 0;
-      animation: blink 1.5s step-end infinite;
-    }
 
     .dot-divider {
       width: 100%;
@@ -201,7 +179,6 @@
       gap: 12px;
       min-height: 180px;
     }
-
 
     .meta-label {
       font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
@@ -279,7 +256,6 @@
       letter-spacing: -0.01em;
       color: var(--text-secondary);
     }
-
 
     /* Heading above each step's caption (Modeling, Topology, ...).
        OCR-A-BT, matching the .feature-title / .result-subhead convention every other
@@ -559,32 +535,6 @@
       box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
     }
 
-    /* 2D/3D toggle ONLY: a flat orange fill, and explicitly NO inset — the neumorphic
-       shading and white highlight are cancelled here so the orange reads as a solid pill.
-       The language toggle shares .mobile-view-toggle / .mobile-mode-btn and keeps both the
-       surface fill and the inset from the rule above.
-       Matched on [data-mode] rather than child position or the .mobile-lang-toggle class,
-       so the orange cannot wander onto the wrong control if the panel is reordered — the
-       language segments carry [data-lang] instead. Specificity (0,3,0) beats the shared
-       rule, so source order does not matter.
-       --accent-orange is undefined on index.html (the 3D page declares no such custom
-       property), hence the literal fallback. */
-    .mobile-mode-btn[data-mode].is-active {
-      background: var(--accent-orange, #809BBC);
-      /* Black, overriding the base rule's #555. That grey is tuned for an UNSELECTED
-         segment on the grey surface; over #809BBC it measures 2.4:1 and the label reads
-         as disabled rather than selected. Black on this orange is 6.8:1. Scoped to
-         [data-mode], so the language segments keep #555 on their grey well. */
-      color: #000;
-      /* Same well as the language toggle above — same offsets, same blur, same
-         alphas — recoloured so it reads on orange instead of on the grey
-         surface. The grey/white pair was built to sit on #DCDCE3; over #809BBC
-         a white highlight desaturates to a pale wash and the cool grey shadow
-         reads as dirt. So the two hues are re-derived from the orange itself:
-         top-left gets a darker orange, bottom-right a lighter one, keeping the
-         site's light-from-top-left convention. */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(78, 104, 138, 0.6), inset -3.25px -3.25px 6.5px rgba(190, 208, 228, 1);
-    }
     .mobile-mode-btn:active:not(.is-active) {
       /* Scale is the tap feedback both toggles share. */
       transform: scale(0.96);
@@ -659,15 +609,8 @@
     /* ── Reduced motion (apple-design §14): drop non-essential movement,
        keep layout + opacity cues. No effect unless the OS pref is set. */
     @media (prefers-reduced-motion: reduce) {
-      .accent-dot { animation: none !important; opacity: 1; }
-      .machine-overlay-btn,
-      .hero-blob,
-      .character-row,
-      .spin-scrolly .spin { animation: none !important; }
       .project-nav-item:hover .project-nav-item-inner,
       .meta-tile:hover,
-      .project-tile:hover,
-      .machine-frame-wrap:hover,
       .tag:hover { transform: none !important; }
     }
 
@@ -700,8 +643,6 @@
       .stagger-copy { font-size: 16px; }
       /* short but real content, kept below body size */
       .meta-inset { font-size: 15px; }
-      /* VT323 UI labels */
-      .breadcrumb { font-size: 16px; }
 
       /* Project nav — mobile only. The project TITLE under the label is hidden, so
          the footer reads just "<< PREVIOUS" and the number. It is dropped rather than
@@ -1018,9 +959,7 @@
     .project-nav-label,
     .project-nav-number,
     .mobile-nav-btn,
-    .mobile-mode-btn,
-    .pill__seg,
-    .machine-overlay-btn { font-weight: 500; }
+    .mobile-mode-btn { font-weight: 500; }
   
     /* ── Inset content column from 1280px up (2026-10-06, Lucas) ───────────
        The format from the Unify case-study draft (unify2d1.html): every
@@ -1036,7 +975,6 @@
     html[data-screen="macbook"] { --page-pad: 112px; }
     @media (min-width: 1280px) {
       .page-wrapper > :is(.section, .guide-section, .process-section, .hero-top) { padding-inline: var(--page-pad); }
-      .page-wrapper > .scrolly .scrolly-sticky { padding-inline: var(--page-pad); }
     }
   
     /* ── Meta panel on desktop (2026-10-08, Lucas) ──
@@ -1324,21 +1262,10 @@
           menu.classList.contains('open') ? closeMenu() : openMenu();
       });
       menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
-      menu.querySelectorAll('[data-mode]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (btn.dataset.mode === '3d') {
-            // _enter3d: deliberate switch to 3D — see the "/" guard in index.html
-            try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
-            window._nav('/', 'right');
-          }
-          else window.location.href = '/2D.html';
-        });
-      });
       menu.querySelectorAll('[data-page]').forEach(btn => {
         btn.addEventListener('click', e => {
           e.preventDefault(); closeMenu();
-          if      (btn.dataset.page === 'craft')   window.location.href = '/2D.html#craft-section';
-          else if (btn.dataset.page === 'about')   window.location.href = '/about2d.html';
+          if (btn.dataset.page === 'about') window.location.href = '/about2d.html';
         });
       });
 
@@ -1392,8 +1319,7 @@
     // ── i18n ─────────────────────────────────────────────────────
     const TRANSLATIONS = {
       en: {
-        'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projects&nbsp;&nbsp;/&nbsp;&nbsp;Double Packaging',
+        'menu-about': 'About',
         'label-timeline': 'Timeline', 'val-timeline': 'Spring 2026<br/>4 weeks',
         'label-team': 'Team', 'val-team': 'Lucas Maher',
         'label-role': 'Role', 'val-role': '3D Designer',
@@ -1408,11 +1334,10 @@
         'step4-heading': 'Shading', 'step4-text': 'Bag mixes <b class="kw">Transparent BSDF</b> for clarity, Translucent BSDF for the milky scatter on the bunched areas, and Glossy with IOR-driven Fresnel for the <b class="kw">wet plastic highlights</b>.',
         'step5-heading': 'Rendering', 'step5-text': 'Cycles output configured at 1920×1400 with a <b class="kw">single key light at 6500K</b>, denoised in the compositor before any of the final angles were picked.',
         'section-final-render': 'Final Render',
-        'nav-prev': '<< PREVIOUS', 'nav-next': 'NEXT >>',
+        'nav-prev': '<< PREVIOUS',
       },
       de: {
-        'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt',
-        'breadcrumb': 'Portfolio&nbsp;&nbsp;/&nbsp;&nbsp;Projekte&nbsp;&nbsp;/&nbsp;&nbsp;Double Packaging',
+        'menu-about': 'Über mich',
         'label-timeline': 'Zeitraum', 'val-timeline': 'Frühling 2026<br/>4 Wochen',
         'label-team': 'Team', 'val-team': 'Lucas Maher',
         'label-role': 'Rolle', 'val-role': '3D-Designer',
@@ -1427,7 +1352,7 @@
         'step4-heading': 'Shading', 'step4-text': 'Der Beutel kombiniert <b class="kw">Transparent BSDF</b> für Klarheit, Translucent BSDF für die Streuung an geknautschten Stellen und Glossy mit IOR-Fresnel für <b class="kw">nasse Glanzlichter</b>.',
         'step5-heading': 'Rendering', 'step5-text': 'Cycles-Ausgabe konfiguriert auf 1920×1400 mit einem <b class="kw">einzelnen Key-Licht bei 6500K</b>, im Compositor entrauscht, bevor die finalen Winkel ausgewählt wurden.',
         'section-final-render': 'Finales Rendering',
-        'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
+        'nav-prev': '<< ZURÜCK',
       }
     };
     function applyLang(lang) {
