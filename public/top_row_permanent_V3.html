@@ -143,10 +143,9 @@
        passes over a hero image. Clipping unconditionally keeps every child's
        shading inside the rim.
        The island's OWN raised shadow (.is-2d-mode) is unaffected — overflow
-       clips descendants, never the element's own box-shadow. The Craft
-       dropdown is a fixed-position sibling of <header>, not a child, so it
-       is not clipped either. .is-3d-view is still set by the JS below (it is
-       now a no-op for overflow, kept as the view marker). */
+       clips descendants, never the element's own box-shadow. .is-3d-view is
+       still set by the JS below (now a no-op for overflow, kept as the view
+       marker). */
 
     .nav-island>.nav-left {
       justify-self: start;
@@ -328,57 +327,6 @@
       opacity: 1;
     }
 
-    /* ── Craft dropdown ──────────────────────────────────────── */
-    .craft-dropdown {
-      position: fixed;
-      background: rgba(220, 220, 227, 0.35);
-      backdrop-filter: blur(24px) saturate(1.4);
-      -webkit-backdrop-filter: blur(24px) saturate(1.4);
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.55);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.6),
-        inset 0 -1px 0 rgba(174, 174, 192, 0.15);
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 160px;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(-6px);
-      transition: opacity 200ms ease, transform 200ms ease;
-      transition-delay: 0s;
-      z-index: 2000;
-    }
-
-    .craft-dropdown.visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-      transition-delay: 0.4s;
-    }
-
-    .craft-dropdown-item {
-      padding: 7px 14px;
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 16px;
-      color: #111114;
-      text-transform: uppercase;
-      text-decoration: none;
-      border-radius: 999px;
-      letter-spacing: 0.04em;
-      transition: color 120ms ease, background 120ms ease, opacity 120ms ease;
-      white-space: nowrap;
-      display: block;
-    }
-
-    .craft-dropdown-item:hover {
-      color: #809BBC;
-      background: rgba(255, 255, 255, 0.45);
-      opacity: 1;
-    }
-
     /* ── Hamburger button ────────────────────────────────────── */
     .hamburger {
       display: none;
@@ -452,9 +400,7 @@
            sat on a background the exact same colour as itself, but obvious now
            that the bar passes over images, as a white glow bleeding off the
            left end. Same fix the 3D view already uses (.nav-island.is-3d-view),
-           applied here for every mobile view.
-           Safe: the Craft dropdown is position: fixed off the viewport, and it
-           is display: none at this width anyway, as is .nav-pill. */
+           applied here for every mobile view. */
         overflow: hidden;
       }
     }
@@ -490,8 +436,8 @@
        Same component desktop uses — same .pill track, same inset-well active
        segment — only the metrics shrink. The bar's mobile grid grows a centre
        column for it (1fr auto 1fr keeps it dead-centred between logo and
-       hamburger regardless of their widths). .nav-pill (Craft/About/Contact)
-       stays hidden; those live in the mobile menu. */
+       hamburger regardless of their widths). .nav-pill (About) stays hidden;
+       it lives in the mobile menu. */
     @media (max-width: 640px) {
       .nav-island { grid-template-columns: 1fr auto 1fr; }
       /* Sized to land at the logo/hamburger's 44px: 5px track padding x2 +
@@ -521,9 +467,7 @@
     /* Former pixel-font labels that are buttons or carry weight: one step
        heavier than body text so they still read as UI (Lucas, 2026-10-06). */
     .pill__seg,
-    .craft-dropdown-item,
-    .help-btn,
-    #help-fab { font-weight: 500; }
+    .help-btn { font-weight: 500; }
   </style>
   <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
   <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". The nav's theme listener:
@@ -558,15 +502,6 @@
 </head>
 
 <body>
-
-  <div id="craft-dropdown" class="craft-dropdown">
-    <span class="craft-dropdown-item" onclick="window.top.location.href='/unify2d.html'">Unify</span>
-    <span class="craft-dropdown-item" onclick="window.top.location.href='/virtual_cooking2d.html'">Virtual Cooking</span>
-    <span class="craft-dropdown-item" onclick="window.top.location.href='/to-shove2d.html'">to.morrow</span>
-    <span class="craft-dropdown-item" onclick="window.top.location.href='/kaffeemaschine2d.html'">Cybercoffee</span>
-    <span class="craft-dropdown-item" onclick="window.top.location.href='/mac-lamp2d.html'">Mac-Lamp</span>
-    <span class="craft-dropdown-item" onclick="window.top.location.href='/vaccine2d.html'">Double Packaging</span>
-  </div>
 
   <header class="top-row" role="banner">
     <div class="nav-island">
@@ -610,11 +545,15 @@
   </header>
 
   <script>
+    // Which kind of page is hosting this nav: every 2D page is listed here, the
+    // 3D scene (index.html, at "/") is not. The one place to add a new 2D page.
+    const PARENT_PATH = window.top.location.pathname;
+    const IS_2D_VIEW = ['2D', 'about2d', 'vaccine2d', 'mac-lamp2d', 'kaffeemaschine2d',
+      'virtual_cooking2d', 'to-shove2d', 'unify2d'].some(p => PARENT_PATH.includes(p));
+
     document.getElementById('logo-btn').addEventListener('click', e => {
       e.preventDefault();
-      const parentPath = window.top.location.pathname;
-      const is2DView = parentPath.includes('2D') || parentPath.includes('about2d') || parentPath.includes('contact2d') || parentPath.includes('vaccine2d') || parentPath.includes('mac-lamp2d') || parentPath.includes('kaffeemaschine2d') || parentPath.includes('virtual_cooking2d') || parentPath.includes('to-shove2d') || parentPath.includes('unify2d');
-      if (is2DView) {
+      if (IS_2D_VIEW) {
         if (window.top.location.pathname === '/2D.html') {
           window.top.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
@@ -626,17 +565,8 @@
     });
 
     (function () {
-      const parentPath = window.top.location.pathname;
-      const is2D = parentPath.includes('2D');
-      const isAbout2D = parentPath.includes('about2d');
-      const isContact2D = parentPath.includes('contact2d');
-      const isVaccine2D = parentPath.includes('vaccine2d');
-      const isMacLamp2D = parentPath.includes('mac-lamp2d');
-      const isKaffeemaschine2D = parentPath.includes('kaffeemaschine2d');
-      const isVirtualCooking2D = parentPath.includes('virtual_cooking2d');
-      const isToShove2D = parentPath.includes('to-shove2d');
-      const isUnify2D = parentPath.includes('unify2d');
-      const is2DView = is2D || isAbout2D || isContact2D || isVaccine2D || isMacLamp2D || isKaffeemaschine2D || isVirtualCooking2D || isToShove2D || isUnify2D;
+      const is2DView = IS_2D_VIEW;
+      const isAbout2D = PARENT_PATH.includes('about2d');
       const navIsland = document.querySelector('.nav-island');
 
       // 3D view: clip hover shadow bleed to the island's own rounded edge
@@ -738,8 +668,8 @@
             // 'complete'. 'interactive' means the document is fully PARSED, which is all
             // that is needed to know whether a `.hero` exists — it is static markup on
             // every page. 'complete' additionally waits for every image, video and iframe
-            // to finish downloading, and the four hero-less pages (2D.html, about2d,
-            // contact2d, unify2d) are exactly the ones carrying the heavy media: the
+            // to finish downloading, and the hero-less pages (2D.html, about2d,
+            // unify2d) are exactly the ones carrying the heavy media: the
             // homepage alone pulls ~16 MB across 3 videos + 2 large images. That made the
             // nav sit un-shaded for several seconds on the real domain, then fade in (the
             // fade being the 260ms box-shadow transition finally running), while localhost
@@ -786,8 +716,6 @@
       pageTabs.forEach(seg => {
         let isActive = false;
         if (seg.dataset.page === 'about' && isAbout2D) isActive = true;
-        if (seg.dataset.page === 'contact' && isContact2D) isActive = true;
-        if (seg.dataset.page === 'craft' && is2D) isActive = true;
         seg.classList.toggle('is-active', isActive);
         seg.setAttribute('aria-selected', isActive ? 'true' : 'false');
       });
@@ -821,18 +749,6 @@
               } else {
                 window.top.openAboutOverlay();
               }
-            } else if (seg.dataset.page === 'contact') {
-              if (is2DView) {
-                window.top.location.href = '/contact2d.html';
-              } else {
-                window.top.openContactOverlay();
-              }
-            } else if (seg.dataset.page === 'craft') {
-              if (is2DView) {
-                window.top.location.href = '/2D.html#craft-section';
-              } else {
-                window.top.openCraftOverlay();
-              }
             }
           });
         });
@@ -847,12 +763,7 @@
     // ── Help button → open controls overlay (3D only) ────────────
     (function () {
       const helpBtn = document.getElementById('help-btn');
-      const parentPath = window.top.location.pathname;
-      const is2DView = parentPath.includes('2D') || parentPath.includes('about2d') ||
-                       parentPath.includes('contact2d') || parentPath.includes('vaccine2d') ||
-                       parentPath.includes('mac-lamp2d') ||
-                       parentPath.includes('kaffeemaschine2d') || parentPath.includes('virtual_cooking2d') || parentPath.includes('to-shove2d') || parentPath.includes('unify2d');
-      if (is2DView) helpBtn.style.setProperty('display', 'none', 'important');
+      if (IS_2D_VIEW) helpBtn.style.setProperty('display', 'none', 'important');
       helpBtn.addEventListener('click', () => {
         window.parent.postMessage({ type: 'openControls' }, '*');
       });
@@ -861,15 +772,12 @@
     // ── Language toggle ───────────────────────────────────────────
     (function() {
       const NAV_LANG = {
-        en: { craft: 'Craft', about: 'About', contact: 'Contact' },
-        de: { craft: 'Projekte', about: 'Über mich', contact: 'Kontakt' }
+        en: { about: 'About' },
+        de: { about: 'Über mich' }
       };
-      const q = s => document.querySelector(s);
       function applyNavLang(l) {
         const t = NAV_LANG[l] || NAV_LANG.en;
-        if (q('[data-page="craft"]'))        q('[data-page="craft"]').textContent = t.craft;
-        if (q('[data-page="about"]'))        q('[data-page="about"]').textContent = t.about;
-        if (q('[data-page="contact"]'))      q('[data-page="contact"]').textContent = t.contact;
+        document.querySelector('[data-page="about"]').textContent = t.about;
         document.querySelectorAll('.lang-btn').forEach(btn => {
           btn.classList.toggle('active', btn.dataset.lang === l);
         });
@@ -900,45 +808,6 @@
       setTimeout(() => {
         try { window.parent.postMessage({ type: 'lang-change', lang: localStorage.getItem('lang') || 'de' }, '*'); } catch(e) {}
       }, 100);
-    })();
-
-    // ── Craft dropdown (2D mode only) ────────────────────────────
-    (function () {
-      const parentPath = window.top.location.pathname;
-      const is2DView = parentPath.includes('2D') || parentPath.includes('about2d') || parentPath.includes('contact2d') || parentPath.includes('vaccine2d') || parentPath.includes('mac-lamp2d') || parentPath.includes('kaffeemaschine2d') || parentPath.includes('virtual_cooking2d') || parentPath.includes('to-shove2d') || parentPath.includes('unify2d');
-      if (!is2DView) return;
-
-      const craftSeg = document.querySelector('[data-page="craft"]');
-      const dropdown = document.getElementById('craft-dropdown');
-      const header = document.querySelector('.top-row');
-      if (!craftSeg || !dropdown || !header) return;
-
-      function position() {
-        const cRect = craftSeg.getBoundingClientRect();
-        dropdown.style.top = (cRect.bottom + 12) + 'px';
-        dropdown.style.left = cRect.left + 'px';
-      }
-
-      let hideTimer;
-
-      function show() {
-        clearTimeout(hideTimer);
-        position();
-        dropdown.classList.add('visible');
-        try { window.parent.postMessage({ type: 'nav-expand' }, '*'); } catch(e) {}
-      }
-
-      function hide() {
-        hideTimer = setTimeout(() => {
-          dropdown.classList.remove('visible');
-          try { window.parent.postMessage({ type: 'nav-collapse' }, '*'); } catch(e) {}
-        }, 120);
-      }
-
-      craftSeg.addEventListener('mouseenter', show);
-      craftSeg.addEventListener('mouseleave', hide);
-      dropdown.addEventListener('mouseenter', () => clearTimeout(hideTimer));
-      dropdown.addEventListener('mouseleave', hide);
     })();
   </script>
 
