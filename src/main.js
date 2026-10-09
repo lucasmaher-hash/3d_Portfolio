@@ -1692,7 +1692,7 @@ if (joystickBase) {
 const keys = {}
 // The four arrows are the browser's own scroll keys, so they need preventDefault or
 // holding one both walks the camera AND scrolls the document. WASD never needed this.
-// Safe for the overlays: About/Contact/Craft are iframes, and a keydown inside an
+// Safe for the overlays: About and Controls are iframes, and a keydown inside an
 // iframe does not bubble to the parent window, so this listener never sees — and so
 // never blocks — arrow-key scrolling of their content.
 const ARROWS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
@@ -1782,15 +1782,8 @@ const CONTENT = {
   'egg-rig':             { title: 'Cybercoffee',      url: '/kaffeemaschine2d.html' }, // Pivot_Kaffeemaschine's mesh parent
   'Pivot_UNify':         { title: 'Unify',            url: '/unify2d.html' },
   'Pivot_VRPanel':       { title: 'Virtual Cooking',  url: '/virtual_cooking2d.html' },
-  // Wall plaques between the mac-lamp and packaging doors. These open the
-  // SAME in-scene overlays the nav's Kontakt/Über-mich buttons open, rather
-  // than navigating away — the 3D scene has its own contact/about pages
-  // (contact3d.html / about3d.html) and leaving the room for them would be a
-  // one-way trip. `action` instead of `url`; both are handled in the click
-  // handler below, and both plaques are in POP_ENABLED so they press first.
-  // WallIcon_Mail (the contact plaque) is removed from the scene at load
-  // since 2026-10-06 — Contact was merged into About (see removeContactPlaque).
-  // WallIcon_Logo (the About plaque) is removed too since 2026-10-08 — the nav's About is enough.
+  // The two wall plaques between the mac-lamp and packaging doors (WallIcon_Mail,
+  // WallIcon_Logo) are taken out of the scene at load — see removeContactPlaque.
 }
 
 const ray = new THREE.Raycaster()
@@ -2652,58 +2645,6 @@ window.addEventListener('message', e => {
   }
 })
 
-// ── Craft Overlay ────────────────────────────────────────────────
-const craftOverlay = document.getElementById('craft-overlay')
-
-function openCraft() {
-  if (window.track) window.track('nav_open', { panel: 'craft' })
-  ensureOverlayFrameLoaded('craft-frame')
-  craftOverlay.classList.add('open')
-  isOverlayOpen = true
-}
-
-function closeCraft() {
-  craftOverlay.classList.remove('open')
-  isOverlayOpen = false
-  const topBar = document.getElementById('top-bar')
-  if (topBar && topBar.contentDocument) {
-    topBar.contentDocument.querySelectorAll('.nav-pill .pill__seg').forEach(s => {
-      s.classList.remove('is-active')
-      s.setAttribute('aria-selected', 'false')
-    })
-  }
-}
-
-window.openCraftOverlay = openCraft
-
-craftOverlay.addEventListener('click', e => { if (e.target === craftOverlay) closeCraft() })
-
-// ── Contact Overlay ───────────────────────────────────────────────
-const contactOverlay = document.getElementById('contact-overlay')
-
-function openContact() {
-  if (window.track) window.track('nav_open', { panel: 'contact' })
-  ensureOverlayFrameLoaded('contact-frame')
-  contactOverlay.classList.add('open')
-  isOverlayOpen = true
-}
-
-function closeContact() {
-  contactOverlay.classList.remove('open')
-  isOverlayOpen = false
-  const topBar = document.getElementById('top-bar')
-  if (topBar && topBar.contentDocument) {
-    topBar.contentDocument.querySelectorAll('.nav-pill .pill__seg').forEach(s => {
-      s.classList.remove('is-active')
-      s.setAttribute('aria-selected', 'false')
-    })
-  }
-}
-
-window.openContactOverlay = openContact
-
-contactOverlay.addEventListener('click', e => { if (e.target === contactOverlay) closeContact() })
-
 // ── About Overlay ────────────────────────────────────────────────
 const aboutOverlay = document.getElementById('about-overlay')
 
@@ -2790,12 +2731,6 @@ window.addEventListener('keydown', e => {
   if (aboutOverlay.classList.contains('open')) {
     closeAbout()
   }
-  if (contactOverlay.classList.contains('open')) {
-    closeContact()
-  }
-  if (craftOverlay.classList.contains('open')) {
-    closeCraft()
-  }
   if (controlsOverlay.classList.contains('open')) {
     closeControls()
   }
@@ -2848,15 +2783,6 @@ renderer.domElement.addEventListener('click', e => {
       } else {
         navigate()
       }
-    } else if (data.action) {
-      // In-scene overlay (the wall plaques). Same press-then-act flow as a
-      // navigation, but nothing is left behind, so no return state is saved
-      // and popNavigating is NOT latched — it never resets without a page
-      // load, and that would kill every later plaque click.
-      if (window.track) window.track('nav_open', { panel: data.title, via: '3d-click' })
-      const pop = resolvePopTargets(obj)
-      if (pop && pop.targets.length) startPop(pop.targets, data.action, pop.bottom)
-      else data.action()
     } else {
       openOverlay(name)
     }
@@ -2884,8 +2810,6 @@ kaffeemaschineOverlay.addEventListener('click', e => { if (e.target === kaffeema
 // ── Mobile overlay close buttons ─────────────────────────────────
 ;[
   ['about-close-btn',          closeAbout],
-  ['contact-close-btn',        closeContact],
-  ['craft-close-btn',          closeCraft],
   ['controls-close-btn',       closeControls],
   ['kaffeemaschine-close-btn', closeKaffeemaschine],
 ].forEach(([id, fn]) => {
@@ -2897,8 +2821,6 @@ const mobileMenu = document.getElementById('mobile-menu')
 const openMobileMenu = () => mobileMenu?.classList.add('open')
 ;[
   ['about-back-btn',          closeAbout],
-  ['contact-back-btn',        closeContact],
-  ['craft-back-btn',          closeCraft],
   ['controls-back-btn',       closeControls],
   ['kaffeemaschine-back-btn', closeKaffeemaschine],
 ].forEach(([id, closeFn]) => {

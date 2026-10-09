@@ -101,8 +101,6 @@ canvas {
   background: transparent;
 }
 
-
-
 #floating-button {
   position: fixed;
   bottom: 0;
@@ -117,18 +115,6 @@ canvas {
 
 @media (pointer: coarse) {
   #floating-button { display: none; }
-}
-
-#hud {
-  position: fixed;
-  bottom: 16px;
-  left: 16px;
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.45);
-  pointer-events: none;
-  z-index: 5;
-  line-height: 1.6;
 }
 
 /* ── About overlay ───────────────────────────────────────────────── */
@@ -155,64 +141,6 @@ canvas {
 }
 
 #about-frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* ── Contact overlay ─────────────────────────────────────────────── */
-#contact-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 15;
-  align-items: center;
-  justify-content: center;
-}
-
-#contact-overlay.open {
-  display: flex;
-}
-
-#contact-wrapper {
-  width: 66.66vw;
-  height: 66.66vh;
-  border-radius: 16px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
-  overflow: hidden;
-}
-
-#contact-frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* ── Craft overlay ───────────────────────────────────────────────── */
-#craft-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 15;
-  align-items: center;
-  justify-content: center;
-}
-
-#craft-overlay.open {
-  display: flex;
-}
-
-#craft-wrapper {
-  width: 66.66vw;
-  height: 66.66vh;
-  border-radius: 16px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
-  overflow: hidden;
-}
-
-#craft-frame {
   width: 100%;
   height: 100%;
   border: none;
@@ -344,8 +272,6 @@ canvas {
   }
 
   #about-wrapper,
-  #contact-wrapper,
-  #craft-wrapper,
   #controls-wrapper {
     position: relative;
     width: 85vw;
@@ -369,13 +295,9 @@ canvas {
      here costs a barely-perceptible adjustment, never a broken layout.
      min(..., 85vh) preserves the old ceiling on short screens. */
   #about-wrapper    { height: min(339px, 85vh); }
-  #contact-wrapper  { height: min(315px, 85vh); }
-  #craft-wrapper    { height: min(340px, 85vh); }
   #controls-wrapper { height: min(631px, 85vh); }
 
   #about-frame,
-  #contact-frame,
-  #craft-frame,
   #controls-frame {
     width: 100%;
     height: 100%;

@@ -139,32 +139,6 @@
       box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
     }
 
-    /* 2D/3D toggle ONLY: a flat orange fill, and explicitly NO inset — the neumorphic
-       shading and white highlight are cancelled here so the orange reads as a solid pill.
-       The language toggle shares .mobile-view-toggle / .mobile-mode-btn and keeps both the
-       surface fill and the inset from the rule above.
-       Matched on [data-mode] rather than child position or the .mobile-lang-toggle class,
-       so the orange cannot wander onto the wrong control if the panel is reordered — the
-       language segments carry [data-lang] instead. Specificity (0,3,0) beats the shared
-       rule, so source order does not matter.
-       --accent-orange is undefined on index.html (the 3D page declares no such custom
-       property), hence the literal fallback. */
-    .mobile-mode-btn[data-mode].is-active {
-      background: var(--accent-orange, #809BBC);
-      /* Black, overriding the base rule's #555. That grey is tuned for an UNSELECTED
-         segment on the grey surface; over #809BBC it measures 2.4:1 and the label reads
-         as disabled rather than selected. Black on this orange is 6.8:1. Scoped to
-         [data-mode], so the language segments keep #555 on their grey well. */
-      color: #000;
-      /* Same well as the language toggle above — same offsets, same blur, same
-         alphas — recoloured so it reads on orange instead of on the grey
-         surface. The grey/white pair was built to sit on #DCDCE3; over #809BBC
-         a white highlight desaturates to a pale wash and the cool grey shadow
-         reads as dirt. So the two hues are re-derived from the orange itself:
-         top-left gets a darker orange, bottom-right a lighter one, keeping the
-         site's light-from-top-left convention. */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(78, 104, 138, 0.6), inset -3.25px -3.25px 6.5px rgba(190, 208, 228, 1);
-    }
     .mobile-mode-btn:active:not(.is-active) {
       /* Scale is the tap feedback both toggles share. */
       transform: scale(0.96);
@@ -526,25 +500,16 @@
 
         menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
 
-        menu.querySelectorAll('[data-mode]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            if (btn.dataset.mode === '2d') window._nav('/2D.html', 'left');
-            else closeMenu();
-          });
-        });
-
         menu.querySelectorAll('[data-page]').forEach(btn => {
           btn.addEventListener('click', () => {
             closeMenu();
-            if      (btn.dataset.page === 'craft'   && window.openCraftOverlay)   window.openCraftOverlay();
-            else if (btn.dataset.page === 'about'   && window.openAboutOverlay)   window.openAboutOverlay();
-            else if (btn.dataset.page === 'contact' && window.openContactOverlay) window.openContactOverlay();
+            if (btn.dataset.page === 'about' && window.openAboutOverlay) window.openAboutOverlay();
           });
         });
 
         // Lets an overlay iframe hand an external-scheme URL (mailto:) to the
         // TOP-LEVEL document so this page performs the navigation itself.
-        // Why it exists: contact3d.html lives in #contact-frame, and mobile Safari
+        // Why it exists: about3d.html lives in #about-frame, and mobile Safari
         // drops a mailto: navigation that originates inside a nested frame — even
         // with target="_top" on the link — so the tap did nothing at all. Desktop
         // hands it off either way, which is why it only failed on a phone.
@@ -561,8 +526,8 @@
         // the preference and hands the change to the nav iframe, which is already
         // the site's single owner of language and broadcasts 'lang-change' back
         // to the menu-i18n handler below. One path, so nothing desyncs. Writing
-        // localStorage also fires a `storage` event inside the about/contact/
-        // craft/controls overlay iframes, which is how they already re-translate.
+        // localStorage also fires a `storage` event inside the about/controls
+        // overlay iframes, which is how they already re-translate.
         const langBtns = menu.querySelectorAll('[data-lang]');
         function markLang(l) {
           langBtns.forEach(b => b.classList.toggle('is-active', b.dataset.lang === l));
@@ -588,8 +553,8 @@
       // ── i18n for the mobile menu (EN + DE) ──────────────────────
       (function () {
         var T = {
-          de: { 'menu-craft': 'Projekte', 'menu-about': 'Über mich', 'menu-contact': 'Kontakt' },
-          en: { 'menu-craft': 'Craft', 'menu-about': 'About', 'menu-contact': 'Contact' }
+          de: { 'menu-about': 'Über mich' },
+          en: { 'menu-about': 'About' }
         };
         function apply(lang) {
           var t = T[lang] || T.en;
@@ -631,9 +596,9 @@
     </script>
     <iframe id="floating-button" src="/Questionmark_Button3d.html" allowtransparency="true"></iframe>
 
-    <!-- About / Contact / Craft / Controls have no .overlay-topbar: the ← / ✕ bar
+    <!-- About / Controls have no .overlay-topbar: the ← / ✕ bar
          was mobile-only chrome (it renders only under `pointer: coarse`) and it
-         sat semi-transparent over the panel. These four dismiss by tapping the
+         sat semi-transparent over the panel. These two dismiss by tapping the
          backdrop instead — see the `if (e.target === overlay) close…()` handlers
          in src/main.js. Kaffeemaschine below deliberately keeps its bar, since
          its iframe is an interactive app that fills the frame edge to edge and
@@ -644,16 +609,6 @@
     <div id="about-overlay">
       <div id="about-wrapper">
         <iframe id="about-frame" data-src="/about3d.html" loading="lazy"></iframe>
-      </div>
-    </div>
-    <div id="contact-overlay">
-      <div id="contact-wrapper">
-        <iframe id="contact-frame" data-src="/contact3d.html" loading="lazy"></iframe>
-      </div>
-    </div>
-    <div id="craft-overlay">
-      <div id="craft-wrapper">
-        <iframe id="craft-frame" data-src="/craft3d.html" loading="lazy"></iframe>
       </div>
     </div>
     <div id="controls-overlay">
