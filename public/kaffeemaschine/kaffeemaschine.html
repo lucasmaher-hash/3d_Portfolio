@@ -409,28 +409,6 @@
     .grid-cell:active { background: rgba(255,113,113,0.07); }
     .grid-cell.empty { }
     .grid-cell.no-border { border: none; box-shadow: none; }
-    /* persistent "selected" highlight (favorites panel slot picking) */
-    .grid-cell.selected { background: transparent; isolation: isolate; }
-    .grid-cell.selected::before {
-      content: '';
-      position: absolute;
-      inset: 4px;
-      border-radius: 12%;
-      background: #ff7171;
-      z-index: -1;
-    }
-    .grid-cell.fav-cell.selected::before {
-      clip-path: polygon(50% -1.94%, 68.02% 31.98%, 101.94% 50%, 68.02% 68.02%, 50% 101.94%, 31.98% 68.02%, -1.94% 50%, 31.98% 31.98%);
-      border-radius: 0;
-    }
-
-    .grid-cell.selected .cell-name,
-    .grid-cell.selected .cell-label { color: #000; }
-    .grid-cell.selected .seg-border rect { stroke: #000; }
-    .grid-cell.selected .star-svg,
-    .grid-cell.selected .bev-dot,
-    .grid-cell.selected .cell-arrow-svg { fill: #000; filter: none; }
-    .grid-cell.selected .set-tri-svg { stroke: #000; filter: none; }
 
     /* ── Button press flash: dark → light mode (Figma 253:330) ──
        On click the cell fills with the light-red surface and all
@@ -499,19 +477,6 @@
       white-space: nowrap;
     }
 
-    .cell-star {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-    }
-    .cell-star .star-svg {
-      width: clamp(17px, 5vw, 30px);
-      height: auto;
-      display: block;
-      filter: drop-shadow(0 0 1.6px rgba(255,113,113,0.6));
-    }
-
     .cell-dots {
       display: flex;
       gap: clamp(2px, 0.7vw, 4px);
@@ -549,12 +514,6 @@
     }
 
     /* ── CONFIRM SELECTION screen ───────────────────────── */
-    .cfm {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
     .cfm-title {
       font-family: 'Digital-7 Mono', 'Digital-7', monospace;
       font-style: oblique 10deg;
@@ -685,43 +644,6 @@
       flex-shrink: 0;
       padding: 1% 0;
     }
-    .set-time-spacer { flex: 1; min-height: 0; }
-    .set-time-btns {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(5px, 2.4vw, 13px);
-      height: clamp(44px, 13vw, 72px);
-      flex-shrink: 0;
-      margin-bottom: 1%;
-    }
-
-    /* ── SET TIMER running ──────────────────────────────── */
-    .set-run {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-      padding-top: 9%;
-    }
-    .set-run-box {
-      width: 80%;
-      height: clamp(46px, 14vw, 84px);
-      margin: 0 auto;
-      flex-shrink: 0;
-      padding-left: 17px;
-      padding-right: 17px;
-    }
-    .set-run-num {
-      font-family: 'Digital-7 Mono', 'Digital-7', monospace;
-      font-style: oblique 10deg;
-      font-size: clamp(28px, 10vw, 56px);
-      color: #ff7171;
-      letter-spacing: 0.08em;
-      white-space: nowrap;
-    }
-    .set-run-row { display: flex; align-items: baseline; }
-    .set-run-l   { transform: translateX(6px); }
-    .set-run-r   { transform: translateX(-6px); }
 
     /* ── MESSAGE screen (drink-ready, favorite-saved) ───── */
     .msg-body {
