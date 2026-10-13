@@ -301,6 +301,10 @@ export const TimetableScene: React.FC<{f: number}> = ({f}) => {
   const blockT = () => 1;
   const expandT = (course: string) => (course === 'CAD Modeling' ? growC(f) : course === 'break' ? growB(f) : course === 'Book Club' ? growM(f) : 0);
   const emilOpen = ease(f, T.TAP_EMIL + 1, T.TAP_EMIL + 12, Easing.inOut(Easing.quad));
+  /* once the camera has settled on Emil's green room number, it bounces twice: this is the one the caption means */
+  const hopT = f - (T.ROOM_IN[1] + 2);
+  /* sin² eases in and out of every pop and lands on exactly 0 at frame 24 (no snap at the end); the second pop is half the first */
+  const emilPop = hopT > 0 && hopT < 24 ? 0.16 * Math.sin((Math.PI * hopT) / 12) ** 2 * (hopT < 12 ? 1 : 0.5) : 0;
 
   // cursor: the Tuesday disc, the Wednesday disc, then Emil's chevron
   const dDisc = ttScreen(f, 114.5, DAYS_PAD + 25.9); // Tuesday
@@ -332,7 +336,7 @@ export const TimetableScene: React.FC<{f: number}> = ({f}) => {
             <SearchBar />
             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, width: '100%'}}>
               {FRIENDS.map((fr, i) => (
-                <FriendRow key={fr.name} f={fr} open={i === 0 ? emilOpen : 0} />
+                <FriendRow key={fr.name} f={fr} open={i === 0 ? emilOpen : 0} pop={i === 0 ? emilPop : 0} />
               ))}
             </div>
           </div>

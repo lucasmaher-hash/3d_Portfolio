@@ -304,8 +304,9 @@ const FriendCourseItem: React.FC<{c: FriendCourse}> = ({c}) => (
   </span>
 );
 
-/* `open` 0→1 is the row's own expand (grid 0fr→1fr, .35s ease). */
-export const FriendRow: React.FC<{f: Friend; open?: number}> = ({f, open = 0}) => {
+/* `open` 0→1 is the row's own expand (grid 0fr→1fr, .35s ease).
+   `pop` (>= 0) grows the room number from its centre, for the promo's bounce on it. */
+export const FriendRow: React.FC<{f: Friend; open?: number; pop?: number}> = ({f, open = 0, pop = 0}) => {
   const isOpen = open > 0;
   const bl = isOpen ? 47 : f.bubbleLeft ?? 47;
   const social = f.socials.length > 0;
@@ -321,7 +322,7 @@ export const FriendRow: React.FC<{f: Friend; open?: number}> = ({f, open = 0}) =
       >
         <span style={{display: 'flex', alignItems: 'center', gap: 8, width: '100%', boxSizing: 'border-box', padding: isOpen ? '0 18px 0 36px' : 0}}>
           <span style={{fontFamily: NUNITO, fontWeight: 800, fontSize: 27.6, color: DARK, flex: 1, textAlign: 'left'}}>{f.name}</span>
-          <span style={{fontFamily: NUNITO, fontWeight: 800, fontSize: 24, color: f.online ? '#37C35F' : 'rgba(41,41,37,0.47)'}}>{f.room}</span>
+          <span style={{display: 'inline-block', fontFamily: NUNITO, fontWeight: 800, fontSize: 24, color: f.online ? '#37C35F' : 'rgba(41,41,37,0.47)', transform: pop ? `scale(${1 + pop})` : undefined, transformOrigin: '50% 50%'}}>{f.room}</span>
           <span style={{width: 35, height: 35, flex: 'none', borderRadius: 999, border: `3px solid ${DARK}`, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `rotate(${180 * (1 - open)}deg)`}}>
             <Img src={u('icon_chevron_up.svg')} style={{width: 19, height: 19, display: 'block'}} />
           </span>
