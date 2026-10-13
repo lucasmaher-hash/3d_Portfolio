@@ -3983,6 +3983,15 @@ clamped ≥ 0 because the overshoot extrapolates the lerp. All five cuts re-rend
 (frame 0 does not move). Review copy `~/Desktop/unify-promo.mp4`. zsh note: `set -- $c` does not
 word-split, so a render loop written that way silently renders nothing — name each command.
 
+**Promo film, ALL cuts, 2026-10-13 (Lucas): 120% speed and a pop on Emil's room number.** Once the
+camera has settled on Emil's green "0.012" (`T.ROOM_IN[1] + 2`), the number pops from its centre
+twice (`emilPop` in UnifyPromo.tsx → `FriendRow pop`, scale `1 + 0.16·sin²(πt/12)`, the second pop
+half the first, exactly 0 again at t = 24 so it never snaps; bigger than ~1.16 it runs into the
+chevron). The Remotion timeline is unchanged at 30 fps; the speed-up is done in the encode:
+`-vf setpts=PTS/1.2 -r 36` (all 1613 frames kept, 44.8 s). Re-encoding a 1.2x file at 30 fps drops
+every sixth frame and judders. All four web files re-encoded that way (crf 22), `?v=20261013a` on
+the four `.mp4` URLs. Posters unchanged (frame 0 does not move).
+
 **`unify2d.html`, all inside one ≤640px block last in `<style>`** (plus `.v1-zoom`, inert on desktop):
 - Idea scene: `.v1-zoom` wrapper inside `.v1-canvas`; on phones the canvas is 8:5 and the wrapper
   `translate(-10cqw, -3.4cqw) scale(1.25)` — the frames get 25% bigger, the side padding goes.
