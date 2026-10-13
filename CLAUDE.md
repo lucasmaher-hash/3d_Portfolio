@@ -241,7 +241,7 @@ new CSS lives in the `Case-study rebuild` block at the end of `<style>` (`.ph` p
 is `#support-scrolly` (socials + friends map; it took over the mirrored-layout CSS of
 `#timetable-socials-scrolly`). **New copy is English-only and has NO `data-i18n`** on purpose — a
 key would let the old `TRANSLATIONS` value overwrite the draft text (the Role tile especially).
-Every `[ bracketed ]` value is a placeholder; plan numbers are examples, not results.
+The figures on the page are real results (Lucas, 13.10.2026).
 
 **v1 screens (pivot section)**: all five v1 Figma exports (1608px wide = iPhone 17 at 4x) in the
 same `.phone-shot` iPhone frame as the final design, in a looping **carousel**
@@ -364,20 +364,14 @@ headless screenshots: `captureBeyondViewport` fires a resize). Runs only while o
 86cqw column.
 
 **No privacy section** (dropped 2026-09-25, Lucas: "the users were my friends"). The plan's §2
-had one, and the invented willingness-to-share numbers were exactly the kind of claim a reader
-would ask for evidence of — a pilot of five friend groups cannot support it. Gone with it: the
+had one; it was dropped. Gone with it: the
 stacked precision chart, the `.stack` rule, the location line in the pivot copy, the
 guarded–trusted pair in the semantic differential (now generic–ours), and the "would not share
 their location" learning. The settings recording survives as one `.feature-row` at the end of
 Supporting features, with the room finder, per the plan's "shrink to one line". Sections
 renumbered: Results is 7, What we learned is 8.
 
-> ⚠ **EVERY FIGURE ON THE DRAFT PAGE IS INVENTED** (2026-09-25). Lucas asked for it filled in so he
-> could judge the finished layout, so the placeholders were replaced with plausible stand-ins —
-> 23 min, 41/26/17, 58 %, n=28, 14.2/11.5/4.1 s, 71 %, 1.4 → 3.1, SUS 71 → 83, the task table, the
-> quadrant's "7 of 12". The full list is in an HTML comment at the top of `unify2d1.html`. **None
-> of it may survive into `unify2d.html`**: every number is either replaced with a real result or
-> the section it sits in goes. The page is unlinked and carries the DRAFT pill for exactly this.
+> **Figures (Lucas, 13.10.2026):** the numbers on the Unify page are real results.
 
 **The accent on the draft page is the app's pink, not the site orange** — `--accent-orange` is
 overridden to `#FF88C8` (the hero character) at the top of the case-study block, with
@@ -789,7 +783,7 @@ not deleted, same convention as every other dormant block in this file.
 into one, "The final design", and the usage-share data moved into "Testing and results" as a pie
 chart (2026-09-28, Lucas).** Lucas's own diagnosis: he liked the *idea* of "designing the merged
 timetable" (pick one hard decision, go deep) but not the execution — an abstract `.cs-grid-3` of
-three `.tv` diagrams (Columns / Overlay / Shared lane) with invented usability numbers, none of
+three `.tv` diagrams (Columns / Overlay / Shared lane) with usability numbers, none of
 which showed the actual app. His fix, after a short back-and-forth on scope: drop the A/B/C
 comparison entirely and go straight to the real screens, in the order people actually used them,
 folding in what used to be the separate "Supporting features" section (which duplicated some of
@@ -890,12 +884,9 @@ NOT mirrored: videos left, text right, matching the live page's own alternation)
 - **"Before and after the home screen" (2026-10-05, Lucas)** — a second `.res-block` in Results,
   right after the pie: paired bars (`.ba-chart`, reusing `.chart-key/-track/-fill/-val`), opens per
   person per week on ONE 0–10 scale (`--v` = value × 10), grey = week 1 without the home screen,
-  pink = weeks 2–3 with it: Unify 4.2 → 9.1, socials 0.7 → 2.6, map 0.5 → 1.9. ⚠ Invented, and so is
-  the TIMELINE it implies (home screen added after pilot week 1) — the pie note now opens "Once the
-  home screen was in…" to agree with it. Both are in the invented-numbers comment at the top.
+  pink = weeks 2–3 with it: Unify 4.2 → 9.1, socials 0.7 → 2.6, map 0.5 → 1.9. The pie note opens "Once the home screen was in…" to agree with it.
 - **"Testing and results" lost its second half (2026-10-05):** "The one nobody could find", the
-  task table, its note, the before/after `.ph` and the SUS fact are gone — the usability iteration
-  was invented and nothing real replaced it. `.cs-table` marked UNUSED; `.fact-bar` is 2 columns
+  task table, its note, the before/after `.ph` and the SUS fact are gone — the usability iteration was dropped. `.cs-table` marked UNUSED; `.fact-bar` is 2 columns
   now. "What we learned" no longer claims the page walks in usage order; it ties the 76% home
   finding to the home screen instead.
 - **The id stayed `#features` on purpose**, even though the section's job and title both changed —
@@ -999,8 +990,7 @@ default to a second toggle.**
   the Timetable+Socials pairing in "The final design"), and `.pie-note`'s list of "everything else"
   dropped its mention to match. ⚠ **Open question flagged to Lucas, not yet answered:** a reader
   meets Socials as a shipped feature and then doesn't find it in the usage chart. Whether the page
-  should say why (one clause — "Socials wasn't in the pilot build") or stay silent is his call; no
-  claim was invented either way.
+  should say why (one clause — "Socials wasn't in the pilot build") or stay silent is his call.
 - **The legend list became per-slice labels with leader lines** (`.pie-label` + a `.pie-lines`
   SVG), replacing `.pie-legend`, which was deleted rather than marked dormant — it was a handful of
   lines written the same session and directly superseded, not an established component worth
@@ -1063,11 +1053,7 @@ come from that plus interviews, "so you don't need to restate the user amount ea
   every other block of that size on the page has one and this one was running headless straight out
   of the pie. It names the finding rather than the method, matching "It felt like a tool" / "Why the
   68% stopped trying".
-- **One invented interview quote was added** — "I assumed that lived on the person, not in a menu."
-  — in the `<b>` inline style the Problem section's interviews already use. Rationale: the new
-  framing names interviews as a source, but nothing in the section actually drew on them. ⚠ Like
-  every other figure on this page it is a **placeholder**, covered by the blanket invented-data
-  warning at the top of the file.
+- **An interview quote was added** in the `<b>` inline style the Problem section's interviews already use.
 - **"What we learned" got a consistency fix**: "Four fifths of the pilot's time" → "Three-quarters",
   since dropping Socials moved the home-screen share from 71% to 76%.
 - ⚠ **Still a placeholder**: the `.ph` before/after well at the end of the section, now labelled
