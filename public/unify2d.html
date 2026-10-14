@@ -203,6 +203,33 @@
       .unify-film { padding-top: 0; }
       .unify-film video { aspect-ratio: 1920 / 1276; }
     }
+    /* Sound toggle (2026-10-15, Lucas): the landscape cut has a voice-over and music.
+       It still autoplays muted; this pill turns the sound on and starts the film
+       from the top. Only where the landscape cut plays — phones keep the silent
+       vertical cut, so the pill is hidden there. */
+    .unify-film { position: relative; }
+    .film-sound {
+      display: none;
+      position: absolute; right: clamp(12px, 1.6vw, 24px); bottom: clamp(12px, 1.6vw, 24px);
+      z-index: 2;
+      align-items: center; gap: 8px;
+      height: 40px; padding: 0 16px 0 13px;
+      border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 999px;
+      background: rgba(41, 41, 37, 0.62);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+      color: #fff; cursor: pointer;
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
+      font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
+      transition: background 0.2s ease;
+    }
+    .film-sound:hover { background: rgba(41, 41, 37, 0.8); }
+    .film-sound:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .film-sound svg { width: 18px; height: 18px; flex: none; }
+    .film-sound .icon-on, .film-sound[aria-pressed="true"] .icon-off { display: none; }
+    .film-sound[aria-pressed="true"] .icon-on { display: block; }
+    @media (min-width: 641px) {
+      .film-sound { display: inline-flex; }
+    }
 
     /* ── The hero's blob, reused at the page's end (2026-10-05, Lucas) ──
        Upside down, HALF the hero's size, bottom-right of "What we learned",
@@ -2922,8 +2949,10 @@
       <a href="#results">Results</a>
     </nav>
 
-    <!-- Hero film (desktop): the Unify promo loop's tall cut — silent, seamless,
-         ~54s. The poster is the loop's own first frame (the phone, screen off). -->
+    <!-- Hero film: the Unify promo's tall cut. Above 640px the voiced version
+         (UnifyVoiceTall: voice-over, sound effects and music, ~52s), autoplaying muted
+         with a sound toggle; phones keep the silent vertical loop. The poster is the
+         film's own first frame (the phone, screen off). -->
     <div class="unify-film">
       <video autoplay loop muted playsinline preload="auto" width="1920" height="1320"
              poster="/images/unify/promo-poster-hero.webp?v=20261005i"
@@ -2931,12 +2960,37 @@
         <!-- the landscape tall cut above 640px, the VERTICAL tall cut (1080x1530) on a
              phone — picked once, at load. Landscape FIRST, so a browser that ignores
              `media` falls back to it everywhere. -->
-        <source src="/videos/unify/unify-promo-hero.mp4?v=20261013a" media="(min-width: 641px)" type="video/mp4" />
+        <source src="/videos/unify/unify-promo-hero-voice.mp4?v=20261015a" media="(min-width: 641px)" type="video/mp4" />
         <source src="/videos/unify/unify-promo-mobile-hero.mp4?v=20261013a" type="video/mp4" />
       </video>
       <!-- a phone gets the vertical cut's own first frame as its poster: the landscape
            one, cover-cropped to 1080:1530, would cut the opening bubble off -->
       <script>(function (v) { if (matchMedia('(max-width: 640px)').matches) v.poster = '/images/unify/promo-poster-mobile-hero.webp?v=20261005i'; })(document.currentScript.previousElementSibling);</script>
+      <button type="button" class="film-sound" aria-pressed="false" aria-label="Turn sound on">
+        <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m22 9-6 6M16 9l6 6"/></svg>
+        <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.8 5.2a9.5 9.5 0 0 1 0 13.6"/></svg>
+        <span class="film-sound-label">Sound on</span>
+      </button>
+      <!-- Sound on: unmute and start from the top, so the voice-over is heard from its
+           first line. Sound off: mute. Scrolling the film out of view mutes it again. -->
+      <script>
+        (function (btn) {
+          var film = btn.parentElement, v = film.querySelector('video'), label = btn.querySelector('.film-sound-label');
+          function set(on) {
+            v.muted = !on;
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            btn.setAttribute('aria-label', on ? 'Turn sound off' : 'Turn sound on');
+            label.textContent = on ? 'Sound off' : 'Sound on';
+          }
+          btn.addEventListener('click', function () {
+            if (v.muted) { v.currentTime = 0; set(true); v.play().catch(function () { set(false); }); }
+            else set(false);
+          });
+          if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
+            if (!es[0].isIntersecting && !v.muted) set(false);
+          }, { threshold: 0.15 }).observe(film);
+        })(document.currentScript.previousElementSibling);
+      </script>
     </div>
 
     <!-- Hero: extended blob runs off the top-right; header sits bottom-left.
