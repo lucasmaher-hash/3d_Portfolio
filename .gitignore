@@ -28,3 +28,7 @@ dist-ssr
 design-sources/
 *.mkv
 wash-tuner/settings.json
+
+# API keys (ElevenLabs etc.)
+.env
+*.env

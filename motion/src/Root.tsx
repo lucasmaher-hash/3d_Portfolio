@@ -5,6 +5,7 @@ import {DURATION_E, DURATION_F, EXT, FPS, LabPhone, Promo, PromoTall} from './Pr
 import {DURATION_F as DURATION_FV, EXT_V, PromoV, PromoVTall} from './PromoV';
 import {TILE as UNIFY_TILE, UNIFY_DURATION, UNIFY_EXT, UnifyPromo, UnifyPromoTall, UnifyPromoTile} from './unify/UnifyPromo';
 import {UnifyLab} from './unify/Lab';
+import {UnifyVoice, UnifyVoiceTall, VOICE_DURATION} from './unify/UnifyVoice';
 import {UNIFY_EXT_V, UnifyPromoV, UnifyPromoVTall, VH as UNIFY_VH, VW as UNIFY_VW} from './unify/UnifyPromoV';
 import {DURATION_F as DURATION_F16, Promo16} from './Promo16';
 import './sk.css';
@@ -43,6 +44,8 @@ export const RemotionRoot: React.FC = () => (
   <>
     {/* ── Unify promo ── */}
     <Composition id="UnifyPromo" component={UnifyPromo} durationInFrames={UNIFY_DURATION} fps={30} width={1920} height={1080} />
+    <Composition id="UnifyVoice" component={UnifyVoice} durationInFrames={VOICE_DURATION} fps={30} width={1920} height={1080} defaultProps={{music: 'unify/music/poptrack03.mp3'}} />
+    <Composition id="UnifyVoiceTall" component={UnifyVoiceTall} durationInFrames={VOICE_DURATION} fps={30} width={1920} height={1080 + UNIFY_EXT} defaultProps={{music: 'unify/music/poptrack03.mp3'}} />
     {/* ...and its TALL cut, the draft page's hero: UNIFY_EXT px of canvas above the frame */}
     <Composition id="UnifyPromoTall" component={UnifyPromoTall} durationInFrames={UNIFY_DURATION} fps={30} width={1920} height={1080 + UNIFY_EXT} />
     <Composition id="UnifyPromoTile" component={UnifyPromoTile} durationInFrames={UNIFY_DURATION} fps={30} width={UNIFY_TILE.w} height={UNIFY_TILE.h} />

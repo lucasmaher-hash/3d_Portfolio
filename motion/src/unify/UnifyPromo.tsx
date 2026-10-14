@@ -120,7 +120,14 @@ export const UNIFY_DURATION = T.END;
    in — play at the END of the file, from where they loop straight into its
    start. The film's timeline (T) is unchanged; only where the file begins. */
 export const FILM_START = OPEN + 14;
-export const useFilmFrame = () => (useCurrentFrame() + FILM_START) % UNIFY_DURATION;
+/* Optional time remap for re-timed cuts (UnifyVoice): output frame -> film frame. Without a
+   provider every cut runs the film 1:1, starting on the chat. */
+export const FilmRemap = React.createContext<((f: number) => number) | null>(null);
+export const useFilmFrame = () => {
+  const remap = React.useContext(FilmRemap);
+  const cf = useCurrentFrame();
+  return remap ? remap(cf) : (cf + FILM_START) % UNIFY_DURATION;
+};
 
 /* ── Layout ─────────────────────────────────────────────────────────────── */
 export const LEFT3 = W / 3; // the connect card and the character sit on the left third line

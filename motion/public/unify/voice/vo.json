@@ -1,0 +1,100 @@
+[
+ {
+  "i": 1,
+  "anchor": 30,
+  "text": "Every week, the same messages: \u201cWhen are you guys on break?\u201d",
+  "dur": 4.24,
+  "file": "unify/voice/vo01.mp3"
+ },
+ {
+  "i": 2,
+  "anchor": 100,
+  "text": "\u201cWanna grab lunch?\u201d Screenshots fly back and forth.",
+  "dur": 3.92,
+  "file": "unify/voice/vo02.mp3"
+ },
+ {
+  "i": 3,
+  "anchor": 255,
+  "text": "[sighs] And most of the time, it all leads to nothing.",
+  "dur": 4.0,
+  "file": "unify/voice/vo03.mp3"
+ },
+ {
+  "i": 4,
+  "anchor": 362,
+  "text": "Unify puts your timetable, and everyone's, all in one place.",
+  "dur": 4.88,
+  "file": "unify/voice/vo04.mp3"
+ },
+ {
+  "i": 5,
+  "anchor": 582,
+  "text": "See who's in your course,",
+  "dur": 1.68,
+  "file": "unify/voice/vo05.mp3"
+ },
+ {
+  "i": 6,
+  "anchor": 661,
+  "text": "who's on a break,",
+  "dur": 1.12,
+  "file": "unify/voice/vo06.mp3"
+ },
+ {
+  "i": 7,
+  "anchor": 740,
+  "text": "and add university activities to your timetable.",
+  "dur": 3.28,
+  "file": "unify/voice/vo07.mp3"
+ },
+ {
+  "i": 8,
+  "anchor": 830,
+  "text": "Green means they're at university.",
+  "dur": 2.48,
+  "file": "unify/voice/vo08.mp3"
+ },
+ {
+  "i": 9,
+  "anchor": 941,
+  "text": "Check your friends' timetables,",
+  "dur": 1.84,
+  "file": "unify/voice/vo09.mp3"
+ },
+ {
+  "i": 10,
+  "anchor": 1032,
+  "text": "or see everyone at a glance.",
+  "dur": 2.16,
+  "file": "unify/voice/vo10.mp3"
+ },
+ {
+  "i": 11,
+  "anchor": 1226,
+  "text": "Customize your character,",
+  "dur": 1.52,
+  "file": "unify/voice/vo11.mp3"
+ },
+ {
+  "i": 12,
+  "anchor": 1335,
+  "text": "then find your friends on campus,",
+  "dur": 2.08,
+  "file": "unify/voice/vo12.mp3"
+ },
+ {
+  "i": 13,
+  "anchor": 1435,
+  "text": "and your courses.",
+  "dur": 1.52,
+  "file": "unify/voice/vo13.mp3"
+ },
+ {
+  "i": 14,
+  "anchor": 1511,
+  "text": "All in one place.",
+  "dur": 1.6,
+  "file": "unify/voice/vo14.mp3"
+ }
+]
