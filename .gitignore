@@ -32,3 +32,6 @@ wash-tuner/settings.json
 # API keys (ElevenLabs etc.)
 .env
 *.env
+
+# Built from public/current🟢.glb by `npm run build` (scripts/optimize-glb.mjs)
+public/scene-optimized.glb
