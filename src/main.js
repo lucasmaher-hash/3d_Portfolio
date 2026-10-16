@@ -56,6 +56,7 @@ const PERF = {
   bvh: true,            // collision + click rays through a BVH instead of every triangle
   towerGlass: true,     // centre tower panels without transmission → no second scene render
   glassHalfRes: true,   // the bottles' glass samples a half-resolution copy of the scene
+  adaptiveRes: true,    // cap at one 4K frame of pixels; lower the pixel ratio while frames are slow
 }
 const _perfQuery = new URLSearchParams(location.search)
 const _perfOff = (_perfQuery.get('perfoff') || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -83,7 +84,72 @@ try {
   throw err
 }
 renderer.setSize(window.innerWidth, window.innerHeight)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+// ── Adaptive resolution (PERF.adaptiveRes) ───────────────────────
+// The GPU cost here scales with pixels: measured 2026-10-16 on an M4, the same view took
+// 8 ms at pixel ratio 1 and 26 ms at 2. Two parts:
+//   1. A static cap: never render more than one 4K frame's worth of pixels. Every MacBook
+//      screen stays at full 2x (the biggest, 16", is ~7.7 M); a 5K / large external display
+//      (14.7 M at 2x) comes down to ~1.5x.
+//   2. A slow governor: if the median frame of a 1.5 s window is slower than ~42 fps, the
+//      ratio steps down 15% (never below 1, i.e. CSS-pixel sharpness). It climbs back only
+//      after 6 s of smooth frames, and not as high as a ratio that already proved too slow
+//      (`ceiling`, lifted again after 20 s without a slow window), so it cannot see-saw.
+//      Off: exactly the old fixed ratio, min(devicePixelRatio, 2).
+const RES_BASE        = Math.min(window.devicePixelRatio, 2)
+const RES_MAX_PIXELS  = 3840 * 2160
+const RES_MIN         = Math.min(1, RES_BASE)
+const RES_SLOW_MS     = 24      // median frame above this → step down
+const RES_SMOOTH_MS   = 17.5    // median frame below this (60 Hz with headroom) → may step up
+const RES_STEP        = 0.85
+const RES_WINDOW_MS   = 1500
+const RES_UP_WINDOWS  = 4       // consecutive smooth windows before stepping up
+const res = { ratio: 1, ceiling: Infinity, samples: [], windowT0: 0, smooth: 0, calm: 0, liveAfter: Infinity }
+function resCap() {
+  const px = window.innerWidth * window.innerHeight
+  return Math.max(RES_MIN, Math.min(RES_BASE, Math.sqrt(RES_MAX_PIXELS / px)))
+}
+function resApply(r) {
+  res.ratio = r
+  renderer.setPixelRatio(r)
+  renderer.setSize(window.innerWidth, window.innerHeight)
+}
+// Called once per drawn frame (never under an overlay). Starts sampling 1.5 s after the
+// scene is revealed, so shader warm-up and the first shadow draw do not count.
+function resGovern(rawDelta) {
+  const now = performance.now()
+  if (now < res.liveAfter) { res.windowT0 = now; return }
+  const ms = rawDelta * 1000
+  if (ms < 250) res.samples.push(ms)            // a longer gap is a stall (tab switch), not load
+  if (now - res.windowT0 < RES_WINDOW_MS) return
+  const s = res.samples.sort((a, b) => a - b)
+  const median = s.length ? s[s.length >> 1] : 0
+  res.samples = []
+  res.windowT0 = now
+  if (s.length < 10) return
+  if (median > RES_SLOW_MS && res.ratio > RES_MIN + 1e-3) {
+    res.ceiling = res.ratio
+    res.smooth = 0
+    res.calm = 0
+    resApply(Math.max(RES_MIN, res.ratio * RES_STEP))
+    console.log(`Auflösung runter: ${res.ratio.toFixed(2)}x (Median ${median.toFixed(1)} ms)`)
+  } else if (median < RES_SMOOTH_MS) {
+    // 20 s without a slow window: whatever made the old ratio slow (another app, a hitch)
+    // may be gone, so the ceiling lifts and the ratio may probe upward again.
+    if (++res.calm * RES_WINDOW_MS >= 20000) res.ceiling = Infinity
+    const top = Math.min(resCap(), res.ceiling * 0.95)
+    if (res.ratio < top - 1e-3 && ++res.smooth >= RES_UP_WINDOWS) {
+      res.smooth = 0
+      resApply(Math.min(top, res.ratio / RES_STEP))
+      console.log(`Auflösung hoch: ${res.ratio.toFixed(2)}x`)
+    }
+  } else {
+    res.smooth = 0
+    res.calm = 0
+  }
+}
+resApply(PERF.adaptiveRes ? resCap() : RES_BASE)
+
 renderer.shadowMap.enabled = !isMobile
 // PERF.staticShadows: nothing that casts a shadow moves (the lights are fixed, the arrows
 // cast none), so re-rendering the three spot shadow maps every frame was pure cost. With
@@ -2352,6 +2418,7 @@ loader.load(
       revealed = true
       for (const o of hiddenForCompile) o.visible = true
       renderer.shadowMap.needsUpdate = true   // the one draw static shadow maps get (PERF.staticShadows)
+      res.liveAfter = performance.now() + 1500  // the resolution governor starts after warm-up
       // Lets the welcome screen close (index.html holds it until now).
       if (window._sceneReady) window._sceneReady()
       console.log(`Szene sichtbar — Shader kompiliert nach ${Math.round(performance.now() - glbT0)}ms`)
@@ -2773,6 +2840,7 @@ function animate() {
   const perfR0 = PERF_HUD ? performance.now() : 0
   renderer.render(scene, camera)
   if (PERF_HUD) perfFrame(rawDelta, perfCollisionMs, performance.now() - perfR0)
+  if (PERF.adaptiveRes) resGovern(rawDelta)
 }
 
 animate()
@@ -2807,7 +2875,14 @@ if (PERF_HUD) {
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  if (PERF.adaptiveRes) {
+    // New window, new cap; a ratio that was too slow at the old size may be fine now.
+    res.ceiling = Infinity
+    res.smooth = 0
+    resApply(Math.min(resCap(), res.ratio))
+  } else {
+    renderer.setSize(window.innerWidth, window.innerHeight)
+  }
   overlayFrameDone = false   // a resize clears the canvas; redraw it once even under an overlay
 })
 
