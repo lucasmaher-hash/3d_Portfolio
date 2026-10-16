@@ -1,6 +1,8 @@
 import './style.css'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+// PERF.lightGlb: the production GLB is meshopt-compressed (scripts/optimize-glb.mjs).
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js'
 // Room-title lettering: TTFLoader triangulates the site's text face (Roboto,
 // /public/Roboto-Regular.ttf, SIL OFL — was the VT323 pixel font until
 // 2026-10-06) at runtime — no typeface.json to generate/commit.
@@ -57,6 +59,9 @@ const PERF = {
   towerGlass: true,     // centre tower panels without transmission → no second scene render
   glassHalfRes: true,   // the bottles' glass samples a half-resolution copy of the scene
   adaptiveRes: true,    // cap at one 4K frame of pixels; lower the pixel ratio while frames are slow
+  // Production loads public/scene-optimized.glb (built by `npm run build`, 4.4 -> 2.8 MB over the
+  // wire). The dev server always loads current🟢.glb, so a fresh Blender export shows up at once.
+  lightGlb: !import.meta.env.DEV,
 }
 const _perfQuery = new URLSearchParams(location.search)
 const _perfOff = (_perfQuery.get('perfoff') || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -2167,9 +2172,21 @@ function addRoomTitles(model) {
 
 // ── Load model ───────────────────────────────────────────────────
 const loader = new GLTFLoader()
+loader.setMeshoptDecoder(MeshoptDecoder)
+const GLB_ORIGINAL  = '/current🟢.glb'
+const GLB_OPTIMIZED = '/scene-optimized.glb'
+// A missing or broken optimized file (the optimizer never fails the build, it just does not
+// write one) falls back to the original GLB instead of leaving the 3D page empty.
+function loadScene(url, onLoad, onProgress, onError) {
+  loader.load(url, onLoad, onProgress, err => {
+    if (url === GLB_ORIGINAL) return onError(err)
+    console.warn(`GLB ${url} nicht ladbar, lade ${GLB_ORIGINAL}:`, err)
+    loadScene(GLB_ORIGINAL, onLoad, onProgress, onError)
+  })
+}
 const glbT0 = performance.now()
-loader.load(
-  '/current🟢.glb',
+loadScene(
+  PERF.lightGlb ? GLB_OPTIMIZED : GLB_ORIGINAL,
   (gltf) => {
     const model  = gltf.scene
     const box    = new THREE.Box3().setFromObject(model)
