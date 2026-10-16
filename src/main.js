@@ -104,7 +104,7 @@ const RES_SMOOTH_MS   = 17.5    // median frame below this (60 Hz with headroom)
 const RES_STEP        = 0.85
 const RES_WINDOW_MS   = 1500
 const RES_UP_WINDOWS  = 4       // consecutive smooth windows before stepping up
-const res = { ratio: 1, ceiling: Infinity, samples: [], windowT0: 0, smooth: 0, calm: 0, liveAfter: Infinity }
+const res = { ratio: 1, ceiling: Infinity, samples: [], windowT0: 0, smooth: 0, calm: 0, liveAfter: Infinity, pending: 0 }
 function resCap() {
   const px = window.innerWidth * window.innerHeight
   return Math.max(RES_MIN, Math.min(RES_BASE, Math.sqrt(RES_MAX_PIXELS / px)))
@@ -116,6 +116,9 @@ function resApply(r) {
 }
 // Called once per drawn frame (never under an overlay). Starts sampling 1.5 s after the
 // scene is revealed, so shader warm-up and the first shadow draw do not count.
+// It only DECIDES; animate() applies `pending` before its next render. Resizing the canvas
+// clears it, and doing that after this frame's render handed the compositor an empty canvas:
+// a one-frame black flash on every step (caught by the 2026-10-16 screenshots).
 function resGovern(rawDelta) {
   const now = performance.now()
   if (now < res.liveAfter) { res.windowT0 = now; return }
@@ -131,8 +134,8 @@ function resGovern(rawDelta) {
     res.ceiling = res.ratio
     res.smooth = 0
     res.calm = 0
-    resApply(Math.max(RES_MIN, res.ratio * RES_STEP))
-    console.log(`Auflösung runter: ${res.ratio.toFixed(2)}x (Median ${median.toFixed(1)} ms)`)
+    res.pending = Math.max(RES_MIN, res.ratio * RES_STEP)
+    console.log(`Auflösung runter: ${res.pending.toFixed(2)}x (Median ${median.toFixed(1)} ms)`)
   } else if (median < RES_SMOOTH_MS) {
     // 20 s without a slow window: whatever made the old ratio slow (another app, a hitch)
     // may be gone, so the ceiling lifts and the ratio may probe upward again.
@@ -140,8 +143,8 @@ function resGovern(rawDelta) {
     const top = Math.min(resCap(), res.ceiling * 0.95)
     if (res.ratio < top - 1e-3 && ++res.smooth >= RES_UP_WINDOWS) {
       res.smooth = 0
-      resApply(Math.min(top, res.ratio / RES_STEP))
-      console.log(`Auflösung hoch: ${res.ratio.toFixed(2)}x`)
+      res.pending = Math.min(top, res.ratio / RES_STEP)
+      console.log(`Auflösung hoch: ${res.pending.toFixed(2)}x`)
     }
   } else {
     res.smooth = 0
@@ -2837,6 +2840,7 @@ function animate() {
     }
   }
 
+  if (res.pending) { resApply(res.pending); res.pending = 0 }   // before the render, see resGovern
   const perfR0 = PERF_HUD ? performance.now() : 0
   renderer.render(scene, camera)
   if (PERF_HUD) perfFrame(rawDelta, perfCollisionMs, performance.now() - perfR0)
@@ -2879,6 +2883,7 @@ window.addEventListener('resize', () => {
     // New window, new cap; a ratio that was too slow at the old size may be fine now.
     res.ceiling = Infinity
     res.smooth = 0
+    res.pending = 0
     resApply(Math.min(resCap(), res.ratio))
   } else {
     renderer.setSize(window.innerWidth, window.innerHeight)
