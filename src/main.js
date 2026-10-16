@@ -49,6 +49,7 @@ const DEBUG_SCENE_LOGS = false
 const PERF = {
   hideRow: true,        // drop the object row parked BEHIND the building (~1/3 of all triangles)
   staticShadows: true,  // draw the spot shadow maps once; redraw only while something pops
+  overlayPause: true,   // stop redrawing the (frozen) scene while an overlay covers it
 }
 const _perfQuery = new URLSearchParams(location.search)
 const _perfOff = (_perfQuery.get('perfoff') || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -2331,6 +2332,7 @@ loader.load(
 
 // ── Render loop ──────────────────────────────────────────────────
 let isOverlayOpen = false
+let overlayFrameDone = false   // PERF.overlayPause: the one frame drawn under an open overlay
 let lastCollisionLog = 0
 const forward = new THREE.Vector3()
 const right   = new THREE.Vector3()
@@ -2529,7 +2531,18 @@ function animate() {
   forward.normalize()
   right.crossVectors(forward, UP).normalize()
 
-  if (isOverlayOpen) { renderer.render(scene, camera); return }
+  // PERF.overlayPause: under an open overlay the scene is frozen anyway (no input reaches
+  // it, and the arrows below never advance), so after one frame there is nothing new to
+  // draw, and the GPU belongs to the overlay (the Kaffeemaschine is a whole app). A running
+  // pop still draws, and a resize clears the canvas, so both re-arm that one frame.
+  if (isOverlayOpen) {
+    if (!PERF.overlayPause || !overlayFrameDone || popAnims.length) {
+      renderer.render(scene, camera)
+      overlayFrameDone = true
+    }
+    return
+  }
+  overlayFrameDone = false
 
   // ── Mobile steering composition (see the steering-model comment block) ──
   // Joystick beyond the deadzone → retarget the heading; heading eases toward
@@ -2742,6 +2755,7 @@ window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
+  overlayFrameDone = false   // a resize clears the canvas; redraw it once even under an overlay
 })
 
 // ── Controls Overlay ────────────────────────────────────────────
