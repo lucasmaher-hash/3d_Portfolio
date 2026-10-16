@@ -55,6 +55,7 @@ const PERF = {
   overlayPause: true,   // stop redrawing the (frozen) scene while an overlay covers it
   bvh: true,            // collision + click rays through a BVH instead of every triangle
   towerGlass: true,     // centre tower panels without transmission → no second scene render
+  glassHalfRes: true,   // the bottles' glass samples a half-resolution copy of the scene
 }
 const _perfQuery = new URLSearchParams(location.search)
 const _perfOff = (_perfQuery.get('perfoff') || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -101,6 +102,10 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping
 // 1/d² falloff) there is far less light to tame, so the exposure comes back up.
 // This is the single best knob for overall "too bright / too dark" — adjust it first.
 renderer.toneMappingExposure = 0.55
+// PERF.glassHalfRes: the bottles are now the only transmissive objects. Their glass samples
+// a copy of the scene behind them; at half resolution that copy costs a quarter of the
+// pixels, and through clear glass on a small bottle the difference is hard to find.
+if (PERF.glassHalfRes) renderer.transmissionResolutionScale = 0.5
 document.body.appendChild(renderer.domElement)
 
 // One-time setup for RectAreaLight. Must run before the first frame that contains one.
