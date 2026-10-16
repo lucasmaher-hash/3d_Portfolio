@@ -54,6 +54,7 @@ const PERF = {
   staticShadows: true,  // draw the spot shadow maps once; redraw only while something pops
   overlayPause: true,   // stop redrawing the (frozen) scene while an overlay covers it
   bvh: true,            // collision + click rays through a BVH instead of every triangle
+  towerGlass: true,     // centre tower panels without transmission → no second scene render
 }
 const _perfQuery = new URLSearchParams(location.search)
 const _perfOff = (_perfQuery.get('perfoff') || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -541,6 +542,13 @@ const MATERIAL_FIXUPS = {
     roughness: 0.24,
     emissive: 0x6f7275,
   },
+
+  // PERF.towerGlass: the centre tower's panels were authored with transmission 0.78. Any
+  // transmissive material inside the view cone makes three.js render every opaque object a
+  // second time, into a full-size 4x-MSAA target with mipmaps, every frame, and the tower
+  // stands in the room you spawn in. At roughness 1 that second render only ever reached
+  // the panel as its most-blurred mip, under an emissive of 2.0, so it barely showed.
+  ...(PERF.towerGlass ? { 'Tower_Upper_Panel': { transmission: 0 } } : {}),
 }
 
 // Worth knowing if the centre tower ever flickers dark while moving again: its panels sit
