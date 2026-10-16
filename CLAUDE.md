@@ -3168,6 +3168,68 @@ JSON.stringify) is now behind `DEBUG_SCENE_LOGS = false` (top of `src/main.js`) 
 verifying CONTENT keys or collision filtering after a GLB re-export; the one-line summaries always
 log.
 
+## 3D Mode: Performance pass (2026-10-16) — every change has its own off switch
+
+Lucas: "the 3D scene is laggy and buggy". Measured first, on an M4 in headless Chrome with the
+real GPU at 1440×900 @2x (2880×1800): 19–29 ms per frame in MainRoom/NewRoom views, and one
+collision probe (3 rays) inside PinkRoom cost 7.8–10.4 ms of JavaScript. Eight steps, one
+commit each on branch `perf-3d`, each behind a key in the `PERF` object at the top of
+`src/main.js`:
+
+| Key | What | Measured |
+|---|---|---|
+| `hideRow` | `removeHiddenRow()`: drops the 7 staging groups standing BEHIND the building (glTF z −34…−55, building ends at −27; 108k triangles, a third of the GLB, incl. a glass bottle). Their 2 arrows (`inRow: true`) are skipped. | 0 changed pixels in 8 views |
+| `staticShadows` | `shadowMap.autoUpdate = false`; redrawn at the reveal, on every pop frame, on bfcache restore and on GL context restore | PinkRoom view 6.4 → 2.2 ms |
+| `overlayPause` | the frozen scene under an open overlay is drawn once, not every frame | 0 renders/s while open |
+| `bvh` | three-mesh-bvh trees (`indirect: true`, index buffers untouched) on every collidable/clickable mesh | probe 10.4 → 0.021 ms; 6000/6000 probes identical |
+| `towerGlass` | `Tower_Upper_Panel` loses its transmission (fixup) — it forced a second full render of the scene whenever the tower was in the view cone | spawn 26.5 → 9.5 ms; max pixel diff 1/255 |
+| `glassHalfRes` | `transmissionResolutionScale = 0.5` for the bottles | NewRoom 22.4 → 13.6 ms; label edges seen THROUGH the glass a little softer |
+| `adaptiveRes` | pixel ratio capped at one 4K frame of pixels; governor steps down 15% when the 1.5 s median frame > 24 ms, back up after calm | 2560×1440@2 → 1.5x; MacBooks unchanged |
+| `lightGlb` | production loads `public/scene-optimized.glb` (meshopt, lossless) | 4.4 → 2.8 MB gzipped download |
+
+All on vs all off (min of 3 interleaved runs, @2x): spawn 26.5 → 10.9 ms, tower 29.4 → 11.2,
+bottle 23.9 → 10.4, NewRoom 23.5 → 12.1, PinkRoom 5.8 → 1.7. YellowRoom and BlueRoom stay at
+~10 ms: what is left there is per-pixel lighting (5 point + 3 spot + 1 RectAreaLight + fills on
+every pixel, sheen on the velvet), i.e. the light budget, which is Lucas's call.
+
+**Switching things off:** `?perfoff=<key>[,<key>]` or `?perfoff=all` (= exactly the pre-pass
+scene; verified pixel-identical). `?perf` shows a live readout (fps, frame ms, collision ms,
+draw calls, pixel ratio) and exposes `window.__perf` (`setView(x, z, yaw, pitch)`, `probe()`,
+`pick()`). The 2D redirect guard still applies: enter 3D through the toggle, then add the query
+and reload in the same tab. Or revert the step's commit.
+
+Traps:
+- **`HIDDEN_ROW` must stay a runtime removal.** The model is centred on its bounding box, and
+  that box includes the row; deleting it in Blender moves the centre and every hard-coded
+  coordinate (spawn, `PINK_COLUMN`, `BLUEROOM_Z_LIMIT`). It runs before the collidable
+  traversal and after the centre is taken. New staging objects behind the building: add their
+  top-level names.
+- **Static shadows:** anything new that MOVES and casts a shadow needs
+  `renderer.shadowMap.needsUpdate = true` on each frame it moves, or its shadow freezes.
+- **Transmission anywhere = a second render of the scene** while it is in the view cone (walls
+  do not stop frustum culling). Fake glass with opacity/emissive unless it is the point.
+- **BVH:** a mesh added to `collidables`/`clickables` after load gets no tree and silently falls
+  back to three's per-triangle raycast (correct, just slow) — call `geometry.computeBoundsTree({ indirect: true })`.
+- **The governor only decides; `animate()` applies `res.pending` BEFORE the render.** Resizing
+  after the render handed the compositor a cleared canvas — a one-frame black flash per step
+  (caught in automated screenshots of the production build, fixed in its own commit). A phone
+  in Low Power Mode (rAF capped at 30 fps) will settle at 1x.
+- **`scene-optimized.glb` is generated, gitignored, and never used by the dev server.**
+  `prebuild` runs `scripts/optimize-glb.mjs` (CI runs `npm run build`, so the deploy always
+  builds it from the committed `current🟢.glb`; it skips work when the source hash in
+  `asset.extras.sourceSha256` matches). It drops `COLOR_1` (three only reads `COLOR_0`) and
+  UVs on untextured primitives (only the vaccine label has a texture; the gradient code makes
+  its own UVs), applies `EXT_meshopt_compression` without quantisation, reads the result back
+  and compares every array — on any difference it writes nothing and the site loads the
+  original (`loadScene()` also falls back on a failed load). Known, accepted: the index codec
+  rotates a triangle's start vertex (same triangle, same winding → single edge pixels differ),
+  and gltf-transform drops the label nodes' 0.008 mm translations. Test it with
+  `npm run build && npm run preview`.
+
+Not done, need Lucas: a capsule collider against the BVH with a floor ray (would let the
+podium rectangles, `PINK_COLUMN`, `BLUEROOM_Z_LIMIT` and the low sofa ray go, and make eye
+height follow each room's floor), and the light budget for YellowRoom/BlueRoom.
+
 ## 3D Mode: Project arrows (floating chrome "clickable" markers)
 
 `PROJECT_ARROWS` + `addProjectArrows(model)` in `src/main.js` (right after `addFixtureLights`). A
