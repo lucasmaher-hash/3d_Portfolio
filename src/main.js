@@ -47,6 +47,7 @@ const DEBUG_SCENE_LOGS = false
 // and exposes window.__perf for measuring. The 2D redirect guard in index.html still applies,
 // so enter 3D once through the toggle, then add the query to the address bar and reload.
 const PERF = {
+  hideRow: true,        // drop the object row parked BEHIND the building (~1/3 of all triangles)
 }
 const _perfQuery = new URLSearchParams(location.search)
 const _perfOff = (_perfQuery.get('perfoff') || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -1280,10 +1281,12 @@ const MACLAMP_TABLE_MESHES = [
   'Back_Grey_Panel_Table', 'Trackpad_Back_Grey_Table', 'Trackpad_Front_Grey_Table',
 ]
 const PROJECT_ARROWS = [
-  { title: 'Mac-Lamp',         url: '/mac-lamp2d.html',        match: byKey('Pivot_MacLamp') },
+  // `inRow`: the anchor lives in the row behind the building (see HIDDEN_ROW), so with
+  // PERF.hideRow the arrow is skipped instead of warning that its anchor is gone.
+  { title: 'Mac-Lamp',         url: '/mac-lamp2d.html',        match: byKey('Pivot_MacLamp'), inRow: true },
   { title: 'Mac-Lamp',         url: '/mac-lamp2d.html',        match: c => MACLAMP_TABLE_MESHES.includes(c.name) },
   { title: 'Double Packaging', url: '/vaccine2d.html',         match: byKey('bottle_body_Podest') },
-  { title: 'Double Packaging', url: '/vaccine2d.html',         match: byKey('bottle_body') },
+  { title: 'Double Packaging', url: '/vaccine2d.html',         match: byKey('bottle_body'), inRow: true },
   { title: 'Cybercoffee',      url: '/kaffeemaschine2d.html',  match: byKey('egg-rig') },
   // Unify deliberately has NO arrow (removed 2026-08-28 per Lucas) — the blob
   // itself is the landmark. The object stays clickable via CONTENT.
@@ -1341,6 +1344,7 @@ function addProjectArrows(model) {
   const geo = makeArrowGeometry()
   const placed = []
   PROJECT_ARROWS.forEach((spec, i) => {
+    if (spec.inRow && PERF.hideRow) return
     const box = new THREE.Box3()
     let found = 0
     model.traverse(c => {
@@ -1973,6 +1977,34 @@ const ROOM_TITLES = [
 // code rather than in the .blend, so no GLB re-export; it is gone from the
 // render, the raycast and CONTENT alike. Its "contact" caption went from
 // ROOM_TITLES too.
+// ── The row behind the building (PERF.hideRow) ──────────────────────────
+// Seven top-level groups stand in a line BEHIND the building, Blender's "portfolio row" of
+// staging copies (glTF z −34…−55; the building itself ends at −27). Measured 2026-10-16:
+// 108k triangles, a third of the whole GLB, and Pivot_Bottle carries the glass material, so
+// whenever it fell inside the view cone (walls do not stop frustum culling) it also
+// triggered the transmission pass, i.e. a second render of the scene. Nobody can walk there
+// and the walls hide it.
+//
+// Removed at RUNTIME, after the recentre, never in Blender: the model is centred on its
+// bounding box, and that box includes this row. Deleting it from the .blend would move the
+// centre and shift every hard-coded coordinate in this file (spawn, PINK_COLUMN,
+// BLUEROOM_Z_LIMIT, …). Must run BEFORE the collidable/clickable traversal, so none of it
+// ends up in those lists.
+const HIDDEN_ROW = [
+  'Pivot_LM_Logo', 'Pivot_UNify_staging', 'Pivot_Kaffeemaschine', 'Pivot_MacLamp',
+  'Pivot_VRPanel_staging', 'Pivot_Bottle', 'Pivot_Monster2',
+]
+function removeHiddenRow(model) {
+  const gone = []
+  for (const name of HIDDEN_ROW) {
+    const o = model.children.find(c => c.name === name)
+    if (o) { model.remove(o); gone.push(name) }
+  }
+  const missing = HIDDEN_ROW.filter(n => !gone.includes(n))
+  console.log(`Reihe hinter dem Gebäude entfernt: ${gone.length}/${HIDDEN_ROW.length}` +
+              (missing.length ? ` — nicht gefunden: ${missing.join(', ')}` : ''))
+}
+
 function removeContactPlaque(model) {
   const hits = []
   // 2026-10-08 (Lucas): the About plaque (WallIcon_Logo, black LM + its caption) goes too —
@@ -2047,6 +2079,9 @@ loader.load(
     // very end of this callback. Raycasts ignore visibility (verified against
     // three r184), so every bbox/collision/spawn probe below is unaffected.
     model.visible = false
+
+    // `center` and `size` above already include the row, so removing it now changes neither.
+    if (PERF.hideRow) removeHiddenRow(model)
 
     // Relative Schwellenwerte basierend auf der tatsächlichen Modellgröße
     const thinThresh = size.y * 0.04                        // 4 % der Gebäudehöhe
@@ -2450,6 +2485,7 @@ function perfFrame(rawDelta, collisionMs, renderMs) {
   const pr = renderer.getPixelRatio()
   if (!perfHudEl) {
     perfHudEl = document.createElement('div')
+    perfHudEl.id = 'perf-hud'
     perfHudEl.style.cssText = 'position:fixed;left:8px;top:104px;z-index:10002;pointer-events:none;' +
       'font:11px/1.35 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.62);' +
       'padding:6px 8px;border-radius:6px;white-space:pre'
