@@ -38,6 +38,22 @@ const isMobile = navigator.maxTouchPoints > 0
 // filtering after a GLB re-export; the one-line summaries (Clickables
 // gefunden, Fixture-Lichter, Project-Arrows, Kamerastart) always log.
 const DEBUG_SCENE_LOGS = false
+
+// ── Performance switches (2026-10-16) ────────────────────────────
+// Every change from the 2026-10-16 performance pass sits behind ONE flag here, so any of
+// them can be switched off on its own if it breaks something: set it to false, or, without
+// editing anything, add ?perfoff=<key>[,<key>…] to the URL. ?perfoff=all is the scene as it
+// was before the pass. ?perf shows a live readout (fps, frame ms, collision ms, draw calls)
+// and exposes window.__perf for measuring. The 2D redirect guard in index.html still applies,
+// so enter 3D once through the toggle, then add the query to the address bar and reload.
+const PERF = {
+}
+const _perfQuery = new URLSearchParams(location.search)
+const _perfOff = (_perfQuery.get('perfoff') || '').split(',').map(s => s.trim()).filter(Boolean)
+for (const k of Object.keys(PERF)) if (_perfOff.includes(k) || _perfOff.includes('all')) PERF[k] = false
+const PERF_HUD = _perfQuery.has('perf')
+if (_perfOff.length) console.log('PERF:', JSON.stringify(PERF))
+
 // The try/catch exists ONLY to report the failure — it rethrows, so behaviour is
 // unchanged. A device with no working WebGL gets a blank page and leaves, which
 // is indistinguishable from a bounce in the pageview numbers; this is the one
@@ -2414,6 +2430,40 @@ function updatePops(delta) {
   }
 }
 
+// ── ?perf readout ────────────────────────────────────────────────
+// Declared ABOVE animate() on purpose: animate() first runs during module evaluation, so
+// any const/let it touches must already exist (the POP state above learned that the hard
+// way). Everything here is inert unless the URL carries ?perf.
+const perfStats = { frames: 0, sumMs: 0, worstMs: 0, collisionMs: 0, renderMs: 0, t0: performance.now() }
+let perfHudEl = null
+function perfFrame(rawDelta, collisionMs, renderMs) {
+  const ms = rawDelta * 1000
+  perfStats.frames++
+  perfStats.sumMs += ms
+  if (ms > perfStats.worstMs) perfStats.worstMs = ms
+  perfStats.collisionMs += collisionMs
+  perfStats.renderMs += renderMs
+  const now = performance.now()
+  if (now - perfStats.t0 < 500) return
+  const n = perfStats.frames || 1
+  const info = renderer.info.render
+  const pr = renderer.getPixelRatio()
+  if (!perfHudEl) {
+    perfHudEl = document.createElement('div')
+    perfHudEl.style.cssText = 'position:fixed;left:8px;top:104px;z-index:10002;pointer-events:none;' +
+      'font:11px/1.35 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.62);' +
+      'padding:6px 8px;border-radius:6px;white-space:pre'
+    document.body.appendChild(perfHudEl)
+  }
+  perfHudEl.textContent =
+    `${(n * 1000 / (now - perfStats.t0)).toFixed(0)} fps   frame ${(perfStats.sumMs / n).toFixed(1)} ms (worst ${perfStats.worstMs.toFixed(0)})\n` +
+    `collision ${(perfStats.collisionMs / n).toFixed(2)} ms   render-cpu ${(perfStats.renderMs / n).toFixed(1)} ms\n` +
+    `${info.calls} calls   ${(info.triangles / 1000).toFixed(0)}k tris   ` +
+    `${renderer.domElement.width}x${renderer.domElement.height} @${pr.toFixed(2)}\n` +
+    Object.entries(PERF).filter(([, v]) => !v).map(([k]) => 'off: ' + k).join('  ')
+  Object.assign(perfStats, { frames: 0, sumMs: 0, worstMs: 0, collisionMs: 0, renderMs: 0, t0: now })
+}
+
 function animate() {
   requestAnimationFrame(animate)
 
@@ -2423,7 +2473,8 @@ function animate() {
   // 0.4-unit collision probe, i.e. straight through walls) and snaps every
   // exponential ease to its target. 0.1s caps the damage: stalls simply
   // don't advance the simulation, normal frames (16–33ms) are untouched.
-  const delta = Math.min(clock.getDelta(), 0.1)
+  const rawDelta = clock.getDelta()
+  const delta = Math.min(rawDelta, 0.1)
   updatePops(delta)   // click-pop pulses run regardless of overlay state
   camera.getWorldDirection(forward)
   forward.y = 0
@@ -2507,6 +2558,7 @@ function animate() {
     move.z -= Math.cos(headingYaw)
   }
 
+  const perfT0 = PERF_HUD ? performance.now() : 0
   if (move.lengthSq() > 0) {
     move.normalize()
     const probe = probeMove(camera.position, move)
@@ -2546,6 +2598,7 @@ function animate() {
       }
     }
   }
+  const perfCollisionMs = PERF_HUD ? performance.now() - perfT0 : 0
 
   // ── Podiums: push back out along the shallowest axis ─────────────
   // Runs after the move + slide so it corrects the final position instead of fighting the
@@ -2611,10 +2664,31 @@ function animate() {
     }
   }
 
+  const perfR0 = PERF_HUD ? performance.now() : 0
   renderer.render(scene, camera)
+  if (PERF_HUD) perfFrame(rawDelta, perfCollisionMs, performance.now() - perfR0)
 }
 
 animate()
+
+// Measuring hooks, only with ?perf. setView parks the camera exactly (the steering model
+// is re-seated so the next frame does not ease it back); probe runs the real collision
+// probe and returns a plain copy, so two builds can be compared ray for ray.
+if (PERF_HUD) {
+  window.__perf = {
+    PERF, renderer, scene, camera,
+    setView(x, z, yawV, pitchV = 0) {
+      camera.position.set(x, camera.position.y, z)
+      yaw = yawV; pitch = pitchV
+      applyRotation(); syncSteeringToView()
+    },
+    probe(ox, oy, oz, dx, dz) {
+      const r = probeMove(new THREE.Vector3(ox, oy, oz), new THREE.Vector3(dx, 0, dz).normalize())
+      return { blocked: r.blocked, name: r.name, normal: r.normal ? [r.normal.x, r.normal.y, r.normal.z] : null }
+    },
+    collidableCount: () => collidables.length,
+  }
+}
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
