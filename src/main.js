@@ -48,6 +48,7 @@ const DEBUG_SCENE_LOGS = false
 // so enter 3D once through the toggle, then add the query to the address bar and reload.
 const PERF = {
   hideRow: true,        // drop the object row parked BEHIND the building (~1/3 of all triangles)
+  staticShadows: true,  // draw the spot shadow maps once; redraw only while something pops
 }
 const _perfQuery = new URLSearchParams(location.search)
 const _perfOff = (_perfQuery.get('perfoff') || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -69,6 +70,12 @@ try {
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.shadowMap.enabled = !isMobile
+// PERF.staticShadows: nothing that casts a shadow moves (the lights are fixed, the arrows
+// cast none), so re-rendering the three spot shadow maps every frame was pure cost. With
+// autoUpdate off they are drawn when needsUpdate is set: once at the reveal, on every frame
+// of a click-pop (the popped object may be a caster), and after a lost GL context returns.
+renderer.shadowMap.autoUpdate = !PERF.staticShadows
+renderer.domElement.addEventListener('webglcontextrestored', () => { renderer.shadowMap.needsUpdate = true })
 renderer.outputColorSpace = THREE.SRGBColorSpace
 // Tone mapping — without this, bright values (e.g. the emissive ceiling tiles,
 // meant to read as glowing light sources) hard-clip to flat white instead of
@@ -2298,6 +2305,7 @@ loader.load(
       if (revealed) return
       revealed = true
       for (const o of hiddenForCompile) o.visible = true
+      renderer.shadowMap.needsUpdate = true   // the one draw static shadow maps get (PERF.staticShadows)
       // Lets the welcome screen close (index.html holds it until now).
       if (window._sceneReady) window._sceneReady()
       console.log(`Szene sichtbar — Shader kompiliert nach ${Math.round(performance.now() - glbT0)}ms`)
@@ -2392,6 +2400,8 @@ window.addEventListener('pageshow', e => {
     }
   }
   popAnims.length = 0
+  // The meshes just jumped back to rest; static shadow maps still hold the mid-pop shape.
+  renderer.shadowMap.needsUpdate = true
   // _3dReturnState is deliberately NOT cleared here, and that is load-bearing.
   // A restore is not the end of the story on iOS: Safari will happily hand the
   // page back from the bfcache and then still tear it down and reload it a
@@ -2444,6 +2454,8 @@ function startPop(targets, done, anchorBottom) {
 }
 
 function updatePops(delta) {
+  // Static shadow maps follow the pulse, including the frame that restores the rest scale.
+  if (popAnims.length) renderer.shadowMap.needsUpdate = true
   for (let i = popAnims.length - 1; i >= 0; i--) {
     const a = popAnims[i]
     a.t += delta
