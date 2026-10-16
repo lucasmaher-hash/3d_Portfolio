@@ -14,6 +14,9 @@ import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUnifo
 // Used ONLY as the project arrows' private envMap — NOT as scene.environment
 // (that is deliberately uniform; see uniformEnvironment below).
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
+// PERF.bvh: a bounding-volume tree per collidable mesh, so a ray tests the ~20 triangles
+// near it instead of every triangle of every mesh whose bounding sphere contains the player.
+import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh'
 
 // Scene
 const scene = new THREE.Scene()
@@ -50,12 +53,21 @@ const PERF = {
   hideRow: true,        // drop the object row parked BEHIND the building (~1/3 of all triangles)
   staticShadows: true,  // draw the spot shadow maps once; redraw only while something pops
   overlayPause: true,   // stop redrawing the (frozen) scene while an overlay covers it
+  bvh: true,            // collision + click rays through a BVH instead of every triangle
 }
 const _perfQuery = new URLSearchParams(location.search)
 const _perfOff = (_perfQuery.get('perfoff') || '').split(',').map(s => s.trim()).filter(Boolean)
 for (const k of Object.keys(PERF)) if (_perfOff.includes(k) || _perfOff.includes('all')) PERF[k] = false
 const PERF_HUD = _perfQuery.has('perf')
 if (_perfOff.length) console.log('PERF:', JSON.stringify(PERF))
+
+// PERF.bvh, part 1: Mesh.raycast becomes the BVH version. It falls back to three's own
+// raycast for any geometry without a tree, so only the meshes given one below change path.
+if (PERF.bvh) {
+  THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree
+  THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree
+  THREE.Mesh.prototype.raycast = acceleratedRaycast
+}
 
 // The try/catch exists ONLY to report the failure — it rethrows, so behaviour is
 // unchanged. A device with no working WebGL gets a blank page and leaves, which
@@ -2189,6 +2201,26 @@ loader.load(
     addRoomTitles(model)
     removeContactPlaque(model)
 
+    // PERF.bvh, part 2: a tree for every mesh a ray is ever cast at. Measured before
+    // (2026-10-16, M4): one collision probe = 3 rays cost 7.8 ms inside PinkRoom, because its
+    // 58k-triangle wall was tested triangle by triangle on every ray. `indirect: true` builds
+    // the tree beside the geometry instead of re-sorting its index buffer, so draw order
+    // (and with it every coplanar tie and glass blend) stays exactly as authored. Built
+    // before the spawn probe below, so that probe already goes through it.
+    if (PERF.bvh) {
+      const t0 = performance.now()
+      const geos = new Set()
+      for (const m of [...collidables, ...lowCollidables, ...clickables]) {
+        if (m.isMesh && m.geometry && !m.geometry.boundsTree) geos.add(m.geometry)
+      }
+      let tris = 0
+      for (const g of geos) {
+        g.computeBoundsTree({ indirect: true })
+        tris += (g.index ? g.index.count : g.attributes.position.count) / 3
+      }
+      console.log(`BVH: ${geos.size} Geometrien, ${Math.round(tris / 1000)}k Dreiecke, ${Math.round(performance.now() - t0)} ms`)
+    }
+
     const fixedClearance = size.y * 0.20
     const roofCutoff     = size.y * 0.35  // obere 35% = Dach, wird ausgeschlossen
 
@@ -2748,6 +2780,14 @@ if (PERF_HUD) {
       return { blocked: r.blocked, name: r.name, normal: r.normal ? [r.normal.x, r.normal.y, r.normal.z] : null }
     },
     collidableCount: () => collidables.length,
+    // What a click at normalised screen coords would hit: first collidable and first clickable.
+    pick(nx, ny) {
+      const rc = new THREE.Raycaster()
+      rc.setFromCamera(new THREE.Vector2(nx, ny), camera)
+      const a = rc.intersectObjects(collidables, false)[0]
+      const b = rc.intersectObjects(clickables, false)[0]
+      return [a ? a.object.name + '@' + a.distance.toFixed(4) : null, b ? b.object.name + '@' + b.distance.toFixed(4) : null]
+    },
   }
 }
 
