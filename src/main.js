@@ -2254,6 +2254,8 @@ loader.load(
       if (revealed) return
       revealed = true
       for (const o of hiddenForCompile) o.visible = true
+      // Lets the welcome screen close (index.html holds it until now).
+      if (window._sceneReady) window._sceneReady()
       console.log(`Szene sichtbar — Shader kompiliert nach ${Math.round(performance.now() - glbT0)}ms`)
     }
     try {
@@ -2270,6 +2272,8 @@ loader.load(
     console.error('GLB load error:', err)
     if (window.track) window.track('scene_load_failed', { mobile: isMobile })
     if (window._loader) window._loader.done()
+    // Never hold the welcome screen forever on a failed load.
+    if (window._sceneReady) window._sceneReady()
   }
 )
 
