@@ -252,6 +252,16 @@
       animation: hintPulse 1.6s ease-in-out infinite;
       user-select: none;
     }
+    /* While the 3D scene is still loading behind this screen (index.html adds
+       .scene-loading and removes it once the scene is on screen), the hint says
+       so instead of inviting a click: dismissing early used to uncover an empty
+       dark canvas for as long as the 12 MB model took on mobile data. A click
+       in that state is remembered and the screen closes the moment the scene
+       is ready. */
+    .hint-loading { display: none; }
+    .scene-loading .start-hint .desc-pointer,
+    .scene-loading .start-hint .desc-touch { display: none; }
+    .scene-loading .start-hint .hint-loading { display: inline; }
     @keyframes hintPulse {
       0%, 100% { opacity: 0.45; }
       50%      { opacity: 1; }
@@ -569,6 +579,7 @@
     <div class="start-hint">
       <span class="desc-pointer" data-i18n="start-hint">[ click anywhere to start ]</span>
       <span class="desc-touch" data-i18n="start-hint-touch">[ tap anywhere to start ]</span>
+      <span class="hint-loading">[ <span data-i18n="start-hint-loading">loading the scene</span><span class="hint-pct"></span> ]</span>
     </div>
   </div>
 
@@ -703,7 +714,8 @@
           'inspect-desc-touch': 'Objekt antippen, um das Projekt zu öffnen',
           'reset-title': 'RESET', 'reset-desc': 'Icon (oben links) tippen, um zur Mitte zurückzukehren',
           'start-hint': '[ klicke irgendwo, um zu starten ]',
-          'start-hint-touch': '[ tippe irgendwo, um zu starten ]'
+          'start-hint-touch': '[ tippe irgendwo, um zu starten ]',
+          'start-hint-loading': 'Szene lädt'
         },
         en: {
           'controls-title': 'WELCOME',
@@ -715,7 +727,8 @@
           'inspect-desc-touch': 'Tap an object to open its project',
           'reset-title': 'RESET', 'reset-desc': 'Tap icon (top left) to reset to center',
           'start-hint': '[ click anywhere to start ]',
-          'start-hint-touch': '[ tap anywhere to start ]'
+          'start-hint-touch': '[ tap anywhere to start ]',
+          'start-hint-loading': 'loading the scene'
         }
       };
       function apply(lang) {
@@ -741,7 +754,22 @@
       window.addEventListener('resize', fixDividers);
     })();
 
+    // Scene-loading state, driven by the parent (index.html). Standalone there
+    // is no scene to wait for, so the class is only set inside a frame.
+    (function () {
+      if (window.parent === window) return;
+      var root = document.documentElement;
+      var pct = document.querySelector('.hint-pct');
+      root.classList.add('scene-loading');
+      window.addEventListener('message', function (e) {
+        var d = e.data || {};
+        if (d.type === 'intro-scene-progress' && pct) pct.textContent = ' ' + Math.round(d.p * 100) + '%';
+        if (d.type === 'intro-scene-ready') root.classList.remove('scene-loading');
+      });
+    })();
+
     // Any click / key dismisses the intro — parent fades the iframe out
+    // (or, if the scene is not ready yet, closes it as soon as it is)
     function dismiss() {
       window.parent.postMessage({ type: 'intro-controls-dismiss' }, '*');
     }

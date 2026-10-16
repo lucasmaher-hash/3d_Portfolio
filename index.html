@@ -357,17 +357,45 @@
         // sequence is started via postMessage, and posting before the child
         // document's listener exists would silently drop the message (that
         // was a real bug in the original loader-driven version too).
+        // The intro must not close before the scene is on screen (2026-10-16):
+        // a click during WELCOME used to uncover an empty dark canvas for as
+        // long as the 12 MB model took on mobile data, which read as a black,
+        // broken page. src/main.js calls window._loader.progress() while the
+        // GLB downloads and window._sceneReady() once the scene is visible (or
+        // the load failed). A click before that is remembered and the intro
+        // closes the moment the scene is ready.
+        var ready = false, wantsOut = false, lastP = null, closed = false;
+        function post(msg) {
+          try { intro.contentWindow.postMessage(msg, '*'); } catch (e) {}
+        }
+        function close() {
+          if (closed) return;
+          closed = true;
+          intro.classList.remove('is-visible');
+          setTimeout(function () { intro.remove(); }, 750);
+        }
+        window._loader = {
+          progress: function (p) { lastP = p; post({ type: 'intro-scene-progress', p: p }); },
+          done: function () {}
+        };
+        window._sceneReady = function () {
+          if (ready) return;
+          ready = true;
+          post({ type: 'intro-scene-ready' });
+          if (wantsOut) close();
+        };
+
         intro.addEventListener('load', function () {
           intro.classList.add('is-visible');
-          try {
-            intro.contentWindow.postMessage({ type: 'intro-controls-show' }, '*');
-          } catch (e) {}
+          post({ type: 'intro-controls-show' });
+          // Messages sent before this point were dropped (no listener yet).
+          if (lastP !== null) post({ type: 'intro-scene-progress', p: lastP });
+          if (ready) post({ type: 'intro-scene-ready' });
         });
         intro.src = '/controls_fullscreen3d.html';
         window.addEventListener('message', function (e) {
           if (e.data && e.data.type === 'intro-controls-dismiss') {
-            intro.classList.remove('is-visible');
-            setTimeout(function () { intro.remove(); }, 750);
+            if (ready) close(); else wantsOut = true;
           }
         });
       })();
