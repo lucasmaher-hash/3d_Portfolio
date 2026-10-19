@@ -212,6 +212,20 @@ markup and its init script (it returns early with no `[data-page="craft"]` segme
 `craft` click branches, the `menu-craft`/`craft` translation keys, and `craft3d.html` (no longer
 opened from anywhere).
 
+## Home footer: logo · links · copyright (2026-10-19, Lucas)
+
+`2D.html`'s footer keeps the frame's thin lines but is now a three-column grid (`1fr auto 1fr`):
+**LM logo left** (neumorphic 44px circle with the same `logo-lm.png` mask, colours and hover lift as
+the nav logo; it is a `<button id="scroll-top-btn">`, so it took over the old "top" pill's
+scroll-to-top), **Instagram · LinkedIn · Email centred** (`.footer-links`, same face, colour and
+left-to-right underline as About's `.about-links`; the email `href` is assembled at runtime like on
+About, `footer-email` key EN/DE), **copyright right** (`white-space: nowrap`). Phones (≤640px): logo
+left + links right on one row, copyright centred underneath; that `@media` block sits right after
+the footer rules on purpose (same specificity, source order wins). The old `.footer-meta` wrapper
+and the phone-only `#scroll-top-btn { display: none }` are gone; `footer-top` translation keys are
+inert leftovers. At the 860px desktop floor the links sit ~32px left of centre because the
+one-line copyright column needs more room.
+
 ## Page map
 
 | File | What it is |

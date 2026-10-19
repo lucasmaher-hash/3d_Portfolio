@@ -571,7 +571,6 @@
          font-family and font-size, so there is nothing to fight. */
       .project-label { display: none; }
 
-      #scroll-top-btn { display: none !important; }
       .footer-section { padding: 24px 20px; }
     }
 
@@ -714,66 +713,83 @@
       box-shadow: var(--shadow-pressed);
     }
 
-    /* Footer */
     /* ── Footer ────────────────────────────────────────────────────────
-       The "top" button beside the copyright line, centred. Padding is roughly
-       half what it was — the band used to reserve ~200px for two small items,
-       which read as an unfinished gap rather than deliberate space. */
+       Three columns inside the frame's thin lines: LM logo left (neumorphic
+       circle like the nav logo; click scrolls to the top, it replaced the old
+       "top" button), the three links centred (same underline as the About page:
+       a 1px line grows left -> right on hover), copyright right (2026-10-19, Lucas). */
     .footer-section {
-      padding: clamp(24px, 3.5vw, 40px) clamp(24px, 8vw, 80px);
-      display: flex;
-      flex-direction: row;
-      gap: 20px;
+      padding: clamp(24px, 3.5vw, 40px) clamp(24px, 6vw, 64px);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: center;
+      gap: 24px;
     }
 
-    /* The logo carried translate(-30px,-18px) and the copyright a
-       translateY(-18px) built up over three nudges — both were compensating for
-       the old taller band. With the padding halved they would pull the pair off
-       centre, so the offsets are zeroed and flexbox does the centring. The hover
-       lift is restated because it used to repeat the base transform. */
-    .footer-section .footer-logo { transform: none; }
-    .footer-section .footer-logo:hover { transform: translateY(-2px) scale(1.03); }
-    .footer-section .copyright { transform: none; }
-
     .footer-logo {
+      justify-self: start;
       width: 44px;
       height: 44px;
+      border-radius: 50%;
       background: var(--bg-surface);
-      border-radius: 22px;
       box-shadow: var(--shadow-raised-sm);
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: 18px;
-      color: var(--text-primary);
       flex-shrink: 0;
-      position: relative;
-      transform: translate(-30px, -18px);
+      border: 0;
+      padding: 0;
       cursor: pointer;
       transition: transform 260ms cubic-bezier(.2,.7,.2,1), box-shadow 260ms cubic-bezier(.2,.7,.2,1);
     }
-
-    /* same neumorphic lift as the nav logo / other buttons */
+    .footer-logo .logo-mark {
+      width: 34.56px;
+      aspect-ratio: 400 / 265;
+      display: block;
+      pointer-events: none;
+      background-color: #809BBC;
+      -webkit-mask: url(/images/site/logo-lm.png) center / contain no-repeat;
+      mask: url(/images/site/logo-lm.png) center / contain no-repeat;
+      transition: background-color 260ms cubic-bezier(.2,.7,.2,1);
+    }
+    /* same neumorphic lift and colour shift as the nav logo */
     .footer-logo:hover {
-      transform: translate(-30px, -18px) translateY(-2px) scale(1.03);
+      transform: translateY(-2px) scale(1.03);
       box-shadow: 11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);
       transition: transform 150ms ease, box-shadow 150ms ease;
     }
+    .footer-logo:hover .logo-mark { background-color: #475F7E; transition-duration: 150ms; }
+    .footer-logo:focus-visible { outline: 2px solid #809BBC; outline-offset: 4px; }
 
-    .footer-meta {
+    .footer-links {
       display: flex;
-      flex-direction: column;
-      gap: 20px;
+      gap: clamp(20px, 3vw, 40px);
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
+      font-size: 15px; font-weight: 400; line-height: 1.7;
     }
+    .footer-links a {
+      color: var(--text-secondary); text-decoration: none;
+      background: linear-gradient(currentColor, currentColor) left bottom / 0% 1px no-repeat;
+      padding-bottom: 2px;
+      transition: color 150ms ease, background-size 320ms cubic-bezier(.4, 0, .2, 1);
+    }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--text-primary); background-size: 100% 1px; outline: none; }
+    @media (prefers-reduced-motion: reduce) { .footer-links a { transition: color 150ms ease; } }
 
     .copyright {
+      justify-self: end;
+      text-align: right;
       font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       font-size: 14px;
       color: var(--text-primary);
-      transform: translateY(-18px);   /* nudge up to sit level with the top button */
+      white-space: nowrap;
+    }
+    /* Phones: logo left and links right on one row, copyright centred below.
+       Must stay after the footer rules above (same specificity, source order wins). */
+    @media (max-width: 640px) {
+      .footer-section { grid-template-columns: auto 1fr; row-gap: 16px; }
+      .footer-links { justify-self: end; font-size: 16px; gap: 20px; }
+      .copyright { grid-column: 1 / -1; justify-self: center; text-align: center; }
     }
 
     html { scrollbar-width: none; }
@@ -1360,11 +1376,13 @@
 
     <!-- Footer -->
     <div class="footer-section">
-      <div class="footer-logo" id="scroll-top-btn" style="cursor: pointer;" data-i18n="footer-top">top</div>
-
-      <div class="footer-meta">
-        <p class="copyright" data-i18n="footer-copyright">© 2026 Lucas Maher. All Rights Reserved.</p>
-      </div>
+      <button type="button" class="footer-logo" id="scroll-top-btn" aria-label="Back to top"><span class="logo-mark" aria-hidden="true"></span></button>
+      <nav class="footer-links" aria-label="Contact">
+        <a href="https://www.instagram.com/lucas.maher.visuals" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.linkedin.com/in/lucas-maher-5b53163bb/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="#" id="footer-email-link" data-i18n="footer-email">Email</a>
+      </nav>
+      <p class="copyright" data-i18n="footer-copyright">© 2026 Lucas Maher. All Rights Reserved.</p>
     </div>
   </div>
 
@@ -1408,6 +1426,13 @@
       typeEl.textContent = '';
       typeTimer = setTimeout(tick, 400);
     }
+
+    /* Footer email: href assembled at runtime so the raw HTML never contains the address (as on About). */
+    (function () {
+      var user = 'lucas.maher.design', domain = 'gmail.com';
+      var link = document.getElementById('footer-email-link');
+      if (link) link.href = 'mailto:' + user + '@' + domain;
+    })();
 
     document.getElementById('scroll-top-btn').addEventListener('click', () => {
       const start = window.scrollY;
@@ -1569,6 +1594,7 @@
         'craft-title': 'Craft',
         'btn-view-work': 'View Work',
         'footer-copyright': '© 2026 Lucas Maher. All Rights Reserved.',
+        'footer-email': 'Email',
       },
       de: {
         'menu-about': 'Über mich',
@@ -1582,6 +1608,7 @@
         'craft-title': 'Projekte',
         'btn-view-work': 'Ansehen',
         'footer-copyright': '© 2026 Lucas Maher. Alle Rechte vorbehalten.',
+        'footer-email': 'E-Mail',
       }
     };
     function applyLang(lang) {
