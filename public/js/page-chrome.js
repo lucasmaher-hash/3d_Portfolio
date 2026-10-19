@@ -10,16 +10,52 @@
     return document.documentElement.scrollHeight - window.innerHeight;
   }
   function travel() { return track.offsetHeight - thumb.offsetHeight; }
+
+  /* Following the scroll (2026-10-19, Lucas: jumpy and low frame rate when
+     scrolling fast). It used to set `top` from a scroll handler, measuring the
+     page every frame: a layout per frame, and on a phone, where the page
+     scrolls on its own thread, a step behind the page that jumped when the
+     scroll was fast. Now the dots move by transform only, the two lengths are
+     measured once (again on resize or when the page grows), and where the
+     browser has scroll timelines (Chrome, Safari 26) the movement is a
+     scroll-driven animation the compositor runs in step with the scroll, with
+     no script per frame at all. Older browsers keep a rAF fallback. */
+  var travelPx = 0, maxPx = 0, anim = null;
+  var hasTimeline = typeof window.ScrollTimeline === 'function';
+  function place(progress) {
+    thumb.style.transform = 'translate(-50%, ' + (progress * travelPx) + 'px)';
+  }
   function update() {
-    var max = maxScroll();
-    var progress = max > 0 ? Math.max(0, Math.min(1, window.scrollY / max)) : 0;
-    thumb.style.top = (progress * travel()) + 'px';
+    var progress = maxPx > 0 ? Math.max(0, Math.min(1, window.scrollY / maxPx)) : 0;
+    place(progress);
     ticking = false;
   }
+  function measure() {
+    maxPx = maxScroll();
+    travelPx = travel();
+    if (hasTimeline) {
+      if (anim) anim.cancel();
+      try {
+        anim = thumb.animate(
+          [{ transform: 'translate(-50%, 0px)' }, { transform: 'translate(-50%, ' + travelPx + 'px)' }],
+          { fill: 'both', easing: 'linear',
+            timeline: new ScrollTimeline({ source: document.documentElement, axis: 'block' }) });
+        return;
+      } catch (e) { hasTimeline = false; anim = null; }
+    }
+    update();
+  }
   window.addEventListener('scroll', function () {
-    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    if (hasTimeline || ticking) return;
+    requestAnimationFrame(update); ticking = true;
   }, { passive: true });
-  update();
+  var mRaf;
+  function scheduleMeasure() { cancelAnimationFrame(mRaf); mRaf = requestAnimationFrame(measure); }
+  window.addEventListener('resize', scheduleMeasure);
+  window.addEventListener('load', scheduleMeasure);
+  // The page grows as images and videos arrive; that changes how far it scrolls.
+  if (window.ResizeObserver) new ResizeObserver(scheduleMeasure).observe(document.body);
+  measure();
 
   /* ── Draggable, macOS-style ───────────────────────────────────────
      Drag the dot column to scrub, or click the bare strip to jump there.
