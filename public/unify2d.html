@@ -1108,8 +1108,11 @@
        label-sized type and dropped: per Lucas it is the light pink everywhere.
        --accent-ink stays as the one switch if that is ever revisited. */
     :root {
-      --accent-orange: #FF88C8;
-      --accent-ink: #FF88C8;
+      /* 2026-10-19 (Lucas): the app pink washed out to the 2D blue's lightness
+         and chroma, oklch(0.68 0.058 348), like every page accent. The app's own
+         #FF88C8 stays wherever the APP is shown (swatch, pie, monster). */
+      --accent-orange: #B48A9F;
+      --accent-ink: #B48A9F;
     }
 
     /* ══ Case study ════════════════════════════════════════════════════════

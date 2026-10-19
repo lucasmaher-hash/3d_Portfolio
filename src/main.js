@@ -2472,12 +2472,14 @@ loadScene(
 // measured in the live scene (the floors' world bboxes, ~0.5 outside them); the
 // main room and the tunnels between rooms are the default. Re-measure after a
 // GLB change that moves a room.
-const ROOM_ACCENT_DEFAULT = '#6F8E7E'          // green grey, after the main room's carpet (#52A377)
+// All in one washed-out family: the 2D blue's oklch lightness/chroma (0.68 / 0.058),
+// only the hue per room (blue room and brown room a little darker).
+const ROOM_ACCENT_DEFAULT = '#79A48C'          // green grey, the hue of the main room's carpet (#52A377)
 const ROOM_ACCENTS = [
-  { room: 'PinkRoom',   color: '#FF88C8', x: [6.0, 29.5],    z: [5.4, 28.1]   },  // Unify, the app's pink
-  { room: 'YellowRoom', color: '#EA5A1E', x: [-29.0, -15.2], z: [6.5, 23.6]   },  // the Mac-Lamp table lamp, Mac-Lamp's orange
-  { room: 'BlueRoom',   color: '#617395', x: [-10.8, 0.6],   z: [27.1, 39.0]  },  // VR panel + Cybercoffee, the walls' blue grey
-  { room: 'NewRoom',    color: '#9C7A5C', x: [-11.7, 4.5],   z: [-11.3, 4.9]  },  // packaging, a brown off its sand floor
+  { room: 'PinkRoom',   color: '#B48A9F', x: [6.0, 29.5],    z: [5.4, 28.1]   },  // Unify, the app's pink
+  { room: 'YellowRoom', color: '#B78E7A', x: [-29.0, -15.2], z: [6.5, 23.6]   },  // the Mac-Lamp table lamp, Mac-Lamp's orange
+  { room: 'BlueRoom',   color: '#728BAC', x: [-10.8, 0.6],   z: [27.1, 39.0]  },  // VR panel + Cybercoffee, the walls' blue grey
+  { room: 'NewRoom',    color: '#987A5B', x: [-11.7, 4.5],   z: [-11.3, 4.9]  },  // packaging, a brown off its sand floor
 ]
 const ROOM_ACCENT_EASE = 3                   // 1/s: ~1 s from one room's colour to the next
 
