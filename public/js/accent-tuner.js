@@ -19,7 +19,7 @@
   var pageHover = parseFloat(getComputedStyle(root).getPropertyValue('--accent-hover-mix')) || 30;
   var PRESETS = [
     ['2D / Packaging', '#809BBC'], ['to.morrow', '#9693BB'], ['Virtual Cooking', '#9693BB'],
-    ['Unify', '#B48A9F'], ['Cybercoffee', '#CF7275'], ['Mac-Lamp', '#E6905B'], ['3D lamp room', '#B78E7A'],
+    ['Unify', '#B48A9F'], ['Cybercoffee', '#CF7275'], ['Mac-Lamp', '#E28C6A'], ['3D lamp room', '#B78E7A'],
     ['3D main', '#79A48C'], ['3D blue', '#728BAC'], ['3D brown', '#987A5B'], ['App pink', '#FF88C8'],
   ];
 
