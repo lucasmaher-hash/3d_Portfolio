@@ -38,9 +38,10 @@
       /* The bar's own outer shading is the only part that falls on page content (hero images),
          so its light is weaker (white 0.7 instead of 1; 0.45 was too faint): over a dark image a full-white
          highlight washed out to a bright halo. The buttons' own highlights stay full. */
-      --shadow-island:
-        5px 5px 12px rgba(40, 40, 90, 0.166),
-        -5px -5px 12px rgba(255, 255, 255, 0.7);
+      --shadow-island: 5px 5px 12px rgba(40, 40, 90, 0.166);
+      /* The bar's light lives on its own layer (.nav-light) so it can be cut out wherever a
+         picture of the page sits under it — see the script at the end. */
+      --island-light: -5px -5px 12px rgba(255, 255, 255, 0.7);
       /* Logo, 2D/3D toggle, About pill, hamburger: outer shading as tight as the pressed
          segment inside the toggle, a touch wider (4px offset / 8px blur instead of 5px / 12px), Lucas
          2026-10-19. Hover lifts by the same ratio as before (about x2). */
@@ -147,6 +148,25 @@
     /* Over a full-bleed hero the nav bar stays (its light background),
        only the outer raised shadow/highlight drops; it returns once the
        nav leaves the image (or on pages with no full-bleed hero). */
+    /* Light layer: a full-frame layer just under the bar (z 999 < .top-row 1000) holding an
+       island-shaped box whose only paint is the white highlight. A per-frame clip-path (evenodd
+       path, pure geometry: no image to decode, so no flicker) punches holes wherever a picture of the page (img, video, canvas, background image) lies under
+       the light, so the light falls on the plain page background only (Lucas, 2026-10-19). */
+    .nav-light {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 260ms var(--ease);
+    }
+    .nav-light.on { opacity: 1; }
+    .nav-light-shape {
+      position: absolute;
+      border-radius: 9999px;
+      box-shadow: var(--island-light);
+    }
+
     .nav-island.is-2d-mode {
       box-shadow: var(--shadow-island);
     }
@@ -480,7 +500,8 @@
       :root {
         --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(40, 40, 90, 0.166), -3.25px -3.25px 7.8px rgba(255,255,255,1);
         --shadow-soft: 2.6px 2.6px 5.2px rgba(40, 40, 90, 0.166), -2.6px -2.6px 5.2px rgba(255,255,255,1);
-        --shadow-island: 3.25px 3.25px 7.8px rgba(40, 40, 90, 0.166), -3.25px -3.25px 7.8px rgba(255,255,255,0.7);
+        --shadow-island: 3.25px 3.25px 7.8px rgba(40, 40, 90, 0.166);
+        --island-light: -3.25px -3.25px 7.8px rgba(255,255,255,0.7);
         --shadow-raised: 5.2px 5.2px 11.7px rgba(40, 40, 90, 0.166), -5.2px -5.2px 11.7px rgba(255,255,255,1);
         --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(40, 40, 90, 0.153), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
       }
@@ -525,6 +546,7 @@
 
 <body>
 
+  <div class="nav-light" aria-hidden="true"><div class="nav-light-shape"></div></div>
   <header class="top-row" role="banner">
     <div class="nav-island">
 
@@ -833,6 +855,100 @@
     })();
   </script>
 
+  <script>
+    /* Bar light only on the plain page background (2026-10-19, Lucas).
+       The light follows the bar (same on/off as its shadow via .is-2d-mode) and is clipped: every
+       picture of the parent page that touches the light band gets a hole in the mask, shaped
+       like its visible frame (nearest of element/parent/grandparent with a corner radius). */
+    (function () {
+      var light = document.querySelector('.nav-light');
+      var shape = light && light.querySelector('.nav-light-shape');
+      var island = document.querySelector('.nav-island');
+      if (!light || !shape || !island) return;
+      var topWin;
+      try { topWin = window.top; void topWin.document.body; } catch (e) { return; }
+
+      function syncOn() {
+        var on = island.classList.contains('is-2d-mode');
+        light.classList.toggle('on', on);
+        if (on) request();   // catch up: update() idles while the light is off
+      }
+      new MutationObserver(syncOn).observe(island, { attributes: true, attributeFilter: ['class'] });
+      syncOn();
+
+      var frames = [];
+      function collect() {
+        var doc = topWin.document, seen = [], out = [];
+        function add(el) {
+          var f = el, r = 0;
+          for (var i = 0; i < 3 && f && f !== doc.body; i++, f = f.parentElement) {
+            r = parseFloat(topWin.getComputedStyle(f).borderTopLeftRadius) || 0;
+            if (r > 0) break;
+          }
+          if (!(r > 0) || !f || f === doc.body) { f = el; r = 0; }
+          if (seen.indexOf(f) < 0) { seen.push(f); out.push({ el: f, r: r }); }
+        }
+        doc.querySelectorAll('img, video, canvas').forEach(add);
+        doc.querySelectorAll('body *').forEach(function (el) {
+          if (el.tagName === 'IFRAME') return;
+          if (topWin.getComputedStyle(el).backgroundImage.indexOf('url(') === 0) add(el);
+        });
+        frames = out;
+      }
+
+      function rr(x, y, w, h, r) {
+        r = Math.max(0, Math.min(r, w / 2, h / 2));
+        return 'M' + (x + r) + ' ' + y + 'H' + (x + w - r) +
+          'A' + r + ' ' + r + ' 0 0 1 ' + (x + w) + ' ' + (y + r) + 'V' + (y + h - r) +
+          'A' + r + ' ' + r + ' 0 0 1 ' + (x + w - r) + ' ' + (y + h) + 'H' + (x + r) +
+          'A' + r + ' ' + r + ' 0 0 1 ' + x + ' ' + (y + h - r) + 'V' + (y + r) +
+          'A' + r + ' ' + r + ' 0 0 1 ' + (x + r) + ' ' + y + 'Z';
+      }
+
+      var lastClip = null, lastY = topWin.scrollY;
+      function update() {
+        // Idle while the light is off (over a hero, in 3D): nothing to cut.
+        var dy = topWin.scrollY - lastY; lastY = topWin.scrollY;
+        if (!light.classList.contains('on')) return;
+        // Lag guard: where scrolling runs on its own thread (Safari) the scroll event can land a
+        // frame after the page moved, so each hole is stretched by the last scroll step in the
+        // direction of travel (max 40px). Fast scrolling hides the light a touch early at picture
+        // edges instead of flashing it over them.
+        var lag = Math.min(40, Math.abs(dy));
+        var ir = island.getBoundingClientRect();
+        shape.style.left = ir.left + 'px'; shape.style.top = ir.top + 'px';
+        shape.style.width = ir.width + 'px'; shape.style.height = ir.height + 'px';
+        var fe = window.frameElement, fr = fe ? fe.getBoundingClientRect() : { left: 0, top: 0 };
+        var W = window.innerWidth, H = window.innerHeight, pad = 30, holes = '';
+        for (var i = 0; i < frames.length; i++) {
+          var b = frames[i].el.getBoundingClientRect();
+          if (!b.width || !b.height) continue;
+          var x = b.left - fr.left, y = b.top - fr.top;
+          if (x > ir.right + pad || x + b.width < ir.left - pad || y > ir.bottom + pad + lag || y + b.height < ir.top - pad - lag) continue;
+          var yy = dy > 0 ? y - lag : y, hh = b.height + lag;
+          holes += rr(x, yy, b.width, hh, frames[i].r);
+        }
+        // clip-path, not mask-image: a new data-URL mask every frame had to be decoded first and
+        // the light flickered in the gap; a path is applied synchronously.
+        var clip = holes ? 'path(evenodd, "M0 0H' + W + 'V' + H + 'H0Z' + holes + '")' : 'none';
+        if (clip !== lastClip) { light.style.clipPath = clip; light.style.webkitClipPath = clip; lastClip = clip; }
+      }
+
+      var ticking = false;
+      function request() { if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; update(); }); } }
+      function recollect() { collect(); request(); }
+      // Scroll updates synchronously (before the frame is painted); deferring to rAF left the
+      // holes one frame behind the page and the light flashed over picture edges.
+      topWin.addEventListener('scroll', update, { passive: true });
+      topWin.addEventListener('resize', recollect, { passive: true });
+      window.addEventListener('resize', request, { passive: true });
+      topWin.addEventListener('load', recollect);
+      if (topWin.document.readyState === 'loading') topWin.document.addEventListener('DOMContentLoaded', recollect);
+      recollect();
+      setTimeout(recollect, 500);
+      setTimeout(recollect, 2000);   // late content (lazy media, scripted sections)
+    })();
+  </script>
 </body>
 
 </html>
