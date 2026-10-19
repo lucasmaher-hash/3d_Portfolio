@@ -2498,6 +2498,17 @@ function sendRoomAccent() {
   if (hex === roomAccent.sent) return
   roomAccent.sent = hex
   document.documentElement.style.setProperty('--accent-orange', hex)
+  // The nav's logo is set directly (same origin), not only by message: a phone
+  // holding an older cached copy of the nav, which only read the colour once at
+  // load, still follows the rooms this way.
+  try {
+    const nav = document.getElementById('top-bar')
+    const root = nav && nav.contentDocument && nav.contentDocument.documentElement
+    if (root) {
+      root.style.setProperty('--logo-color', hex)
+      root.style.setProperty('--logo-hover', `color-mix(in oklch, ${hex}, black 30%)`)
+    }
+  } catch (e) {}
   for (const f of document.querySelectorAll('iframe')) {
     try { f.contentWindow && f.contentWindow.postMessage({ type: 'accent', color: hex }, '*') } catch (e) {}
   }
