@@ -18,8 +18,8 @@
   var original = getComputedStyle(root).getPropertyValue('--accent-orange').trim() || '#809BBC';
   var pageHover = parseFloat(getComputedStyle(root).getPropertyValue('--accent-hover-mix')) || 30;
   var PRESETS = [
-    ['2D / Packaging', '#809BBC'], ['to.morrow', '#7A92B0'], ['Virtual Cooking', '#9693BB'],
-    ['Unify', '#B48A9F'], ['Cybercoffee', '#AD7E7F'], ['Mac-Lamp', '#E6905B'], ['3D lamp room', '#B78E7A'],
+    ['2D / Packaging', '#809BBC'], ['to.morrow', '#9693BB'], ['Virtual Cooking', '#9693BB'],
+    ['Unify', '#B48A9F'], ['Cybercoffee', '#CF7275'], ['Mac-Lamp', '#E6905B'], ['3D lamp room', '#B78E7A'],
     ['3D main', '#79A48C'], ['3D blue', '#728BAC'], ['3D brown', '#987A5B'], ['App pink', '#FF88C8'],
   ];
 
@@ -91,7 +91,11 @@
       var nr = nav && nav.contentDocument && nav.contentDocument.documentElement;
       if (nr) { nr.style.setProperty('--logo-color', c); nr.style.setProperty('--logo-hover', hov); }
     } catch (e) {}
-    saved[PAGE] = { color: c, base: hex(state.base), grey: state.grey, hover: state.hover };
+    // Listed only once something was changed here: a page merely visited keeps
+    // its own colour and stays out of "Copy all pages".
+    if (c !== original.toUpperCase() || state.grey || state.hover !== pageHover) {
+      saved[PAGE] = { color: c, base: hex(state.base), grey: state.grey, hover: state.hover };
+    } else delete saved[PAGE];
     try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch (e) {}
     render();
   }
