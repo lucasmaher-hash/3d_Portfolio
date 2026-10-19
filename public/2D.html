@@ -886,7 +886,8 @@
     /* ── Site entrance loader (moved here from index.html 2026-08-14) ──
        The orange liquid ball is the WEBSITE's intro animation: it plays on the
        first load of this landing page per tab (sessionStorage.siteLoaderSeen,
-       set by the script right after <body>), a pure 3s timed fill + 1.2s fade.
+       set by the script right after <body>), a pure 1.8s timed fill + 1.2s fade
+       (the fill was 3s until 2026-10-19 — Lucas: 40% faster; no % counter since).
        The 3D page no longer has any loader — its first entry per tab shows
        only the welcome/controls screen. */
     #load-overlay {
@@ -919,18 +920,6 @@
       width: 100%;
       height: 100%;
       display: block;
-    }
-    #load-count {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-      font-size: clamp(34px, 6vw, 56px);
-      color: var(--text-primary);
-      z-index: 2;
-      user-select: none;
     }
 
     /* Mobile: neumorphic shadow spread/radius reduced 35% (offsets & blur ×0.65),
@@ -978,7 +967,6 @@
   <div id="load-overlay">
     <div id="load-circle">
       <canvas id="load-liquid"></canvas>
-      <div id="load-count">0%</div>
     </div>
   </div>
   <script>
@@ -1014,7 +1002,6 @@
       try { sessionStorage.setItem('siteLoaderSeen', '1'); } catch (e) {}
 
       var canvas = document.getElementById('load-liquid');
-      var count  = document.getElementById('load-count');
       var ctx    = canvas.getContext('2d');
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1117,7 +1104,7 @@
         ctx.fillStyle = front.fill; layerPath(front); ctx.fill();
       }
 
-      var MIN_DURATION = 3000;  // the fill always takes this long — there is no
+      var MIN_DURATION = 1800;  // the fill always takes this long — there is no
                                 // byte-progress to track here, unlike the old
                                 // GLB-driven loader this animation came from
       var shown = 0, t0 = performance.now(), last = t0, raf = 0;
@@ -1146,7 +1133,6 @@
         // Reduced motion still fills — it just does not move: the layers are
         // never stepped, so both surfaces stay flat.
         draw(reduce ? 0 : dt, shown);
-        count.textContent = Math.round(shown * 100) + '%';
 
         if (shown >= 1) { finish(); return; }
         raf = requestAnimationFrame(frame);
