@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". This pre-paint script no longer runs, so nothing sets
+       data-theme: no stored choice, no evening clock.
+  <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script> -->
+  <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucas Maher — Farbexperiment</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="/color-preview/palette.css" />
+  <script src="/color-preview/palette.js"></script>
+  <script src="/analytics.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="/fonts/roboto-flex-ui.css" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'OCR-A-BT';
+      src: url('/OCR-A-BT-DE.ttf?v=20261019b') format('truetype');
+    }
+
+    :root {
+      --bg-surface: #DCDCE3;
+      --text-primary: #1A1A1A;
+      --text-secondary: #8E8E93;
+      --text-tertiary: #c7c7cc;
+      --accent-orange: #809BBC;
+      --border-color: #6f6f6f;
+
+      --shadow-raised-sm: 5px 5px 12px rgba(174,174,192,0.65), -5px -5px 12px rgba(255,255,255,1);
+      --shadow-raised: 8px 8px 18px rgba(174,174,192,0.65), -8px -8px 18px rgba(255,255,255,1);
+      --shadow-pressed: inset 5px 5px 10px rgba(174,174,192,0.6), inset -5px -5px 10px rgba(255,255,255,1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      /* clip (not hidden): prevents horizontal scroll without becoming a
+         scroll container, which would break position:sticky descendants. */
+      overflow-x: clip;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-family: 'Roboto', system-ui, sans-serif; font-size-adjust: none;
+      line-height: 1.6;
+      /* Fluid outer padding: full clamp() ceiling (55px) at/above 1440px,
+         shrinks linearly to exactly 0 by 860px — matches the vertical
+         border-removal breakpoint below, so the disappearance is continuous
+         instead of jumping straight from ~25px to 0. */
+      padding: 0 clamp(0px, calc(9.483vw - 81.552px), 55px);
+    }
+
+    /* Desktop-only shrink cap: once the padded/bordered layout has fully
+       collapsed (below 860px), stop reflowing further — narrowing the real
+       browser window just clips the extra width (no horizontal scrollbar);
+       vertical scroll is unaffected. pointer:fine + hover:hover targets
+       mouse/trackpad devices specifically, so actual touchscreens (phones,
+       tablets) are excluded and keep reflowing normally down to their real
+       widths via the existing @media (max-width: 640px) rules below. */
+    @media (hover: hover) and (pointer: fine) {
+      html, body { min-width: 860px; }
+    }
+
+    #top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 140px;
+      border: none;
+      z-index: 9999;
+      pointer-events: auto;
+      background: transparent;
+      overflow: visible;
+      transition: transform 300ms ease;
+    }
+
+    #top-bar.hide {
+      transform: translateY(-220px);
+    }
+
+    .page-wrapper {
+      padding-top: 90px;
+      padding-bottom: 12px;
+      border: 1px solid var(--border-color);
+      margin: 12px auto;
+      /* Cap the content card on wide monitors; page bg fills the sides.
+         Only bites above ~1550px — 13"/14" MacBooks stay edge-to-edge. */
+      max-width: 1440px;
+      overflow: visible;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      border-bottom: 1px solid var(--border-color);
+      padding: clamp(30px, 6vw, 60px) clamp(40px, 8vw, 80px);
+      /* +90px over the base so the centred blob+title gain ~45px of breathing
+         room above and below (blob `top` is nudged +45 to match). */
+      min-height: calc(clamp(400px, 45vw, 580px) + 90px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .hero-blob {
+      position: absolute;
+      width: clamp(590px, 76.5vw, 900px);
+      height: clamp(590px, 76.5vw, 900px);
+      /* +45 to stay centred with the title as the section grew +90px */
+      top: calc(clamp(20px, 5vw, 50px) + 45px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-210px);
+      border: none;
+      overflow: visible;
+      background: transparent;
+    }
+
+    .hero-subtitle {
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: clamp(19px, 2.2vw, 31px);
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .typewriter-cursor {
+      display: inline-block;
+      animation: blink 1s step-end infinite;
+      margin-left: 1px;
+    }
+
+    .hero-title-block {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-title {
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
+      font-size: clamp(32px, 8vw, 83px);
+      line-height: 1;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    .tagline-block {
+      position: absolute;
+      bottom: clamp(24px, 5vw, 80px);
+      right: clamp(24px, 5vw, 80px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
+      font-size: clamp(13px, 1.2vw, 15px);
+      pointer-events: none;
+    }
+
+    .tagline-block p:first-child {
+      color: var(--text-primary);
+    }
+
+    /* No underline at rest; on hover a 1px line grows left -> right, same as About's
+       .about-links (background-size 0 -> 100% over 320ms). Lucas, 2026-10-19. */
+    .tagline-block p:last-child {
+      color: var(--text-secondary);
+      text-decoration: none;
+      background: linear-gradient(currentColor, currentColor) left bottom / 0% 1px no-repeat;
+      padding-bottom: 2px;
+      pointer-events: auto;
+      cursor: pointer;
+      display: inline-block;
+      transition: color 150ms ease, transform 150ms ease, background-size 320ms cubic-bezier(.4, 0, .2, 1);
+      transform-origin: left center;
+    }
+
+    .tagline-block p:last-child:hover {
+      color: var(--text-primary);
+      transform: scale(1.1);
+      background-size: 100% 1px;
+    }
+    @media (prefers-reduced-motion: reduce) { .tagline-block p:last-child { transition: color 150ms ease; } }
+
+    /* The to.morrow tile is the promo loop (2026-10-04) — the 16:9 cut of the
+       to-shove2d.html hero (that page uses a taller cut) — flat, with the
+       rounded corners of the other tiles but not their raised plate; it
+       replaced the app icon that sat straight on the page. The film is 16:9 and
+       the tiles here are 680/560, which would cut ~16% off each side and clip
+       the outer wells and the Live caption. So this tile is 3:2 instead, and
+       cover crops just ~8% off each side — nothing the loop shows is in that
+       margin (wells at 14–86% of the width, captions from 15%). Below 640px
+       it is 16/10 like every tile there, ~5% a side (restated in the last
+       640px block). */
+    .project-tile.morrow-video-tile {
+      position: relative;
+      aspect-ratio: 3 / 2;
+      overflow: hidden;
+      /* Flat, not raised (Lucas): the film sits in the page like a picture. */
+      box-shadow: none;
+    }
+    .morrow-video-tile video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #C7CCD4;
+    }
+
+    /* The Unify tile is its promo loop too (2026-10-05), flat like the to.morrow
+       one and at its 3:2 — but NOT a crop of the 16:9 film, whose captions run to
+       ~95% of the frame: its own TILE cut (UnifyPromoTile, 1620x1080), the film
+       re-framed at 0.9 so nothing is cut (see CLAUDE.md "Unify promo loop").
+       Below 640px it plays the VERTICAL cut (UnifyPromoV, 4:5) at exactly its
+       own shape, restated in the last 640px block as the to.morrow tile's is. */
+    .project-tile.unify-video-tile {
+      position: relative;
+      aspect-ratio: 3 / 2;
+      overflow: hidden;
+      box-shadow: none;
+    }
+    .unify-video-tile video {
+      position: absolute;
+      /* 1px past every edge, clipped by the tile's overflow: the tile's box is
+         fractional (3:2 of a fractional width) and Safari paints the video's
+         frame a hair short of it, so the element's dark background showed as a
+         hairline along the top and right over the film's pink and cream scenes
+         (the file itself is clean to every edge). Same overscan as the project
+         hero images; width/height must be explicit, `inset` alone does not size
+         a replaced element. */
+      top: -1px;
+      left: -1px;
+      width: calc(100% + 2px);
+      height: calc(100% + 2px);
+      object-fit: cover;
+      display: block;
+      background: #292925;   /* the film's own ground, before the poster paints */
+    }
+
+    /* ── Mobile only: hero fills the screen, blob + title centred ──────── */
+    @media (max-width: 640px) {
+      /* Grow the section so its bottom border lands at the fold instead of
+         partway up the screen. 91px = .page-wrapper's 90px padding-top + its
+         1px border-top — those sit above the hero, so a plain 100svh would
+         overshoot the fold by exactly that much.
+         svh, not vh: on iOS Safari 100vh is the chrome-HIDDEN height, which
+         would push the border below the fold. svh is the chrome-visible height
+         and is stable — dvh would also fit but resizes mid-scroll as Safari's
+         bars collapse, reflowing the hero while you scroll. */
+      .hero-section {
+        min-height: calc(100svh - 91px);
+      }
+
+      /* Centre the blob. The base rule deliberately parks it high (top 65px +
+         translateY(-210px)) so it sat behind an off-centre title in the short
+         section; at full height that reads as floating near the top. The blob
+         shape is centred inside its own iframe (`place-items: center`), so
+         centring the iframe centres the visible shape.
+         The subtitle and title need no override — they're flex children of a
+         `justify-content: center` column, so they re-centre themselves. */
+      .hero-blob {
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+    }
+
+    /* Craft Section */
+    .craft-header {
+      border-bottom: 1px solid var(--border-color);
+      padding: clamp(24px, 5vw, 64px) clamp(24px, 5vw, 80px);
+      min-height: clamp(80px, 12vw, 162px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .craft-title {
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: clamp(28px, 3.5vw, 48px);
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+
+    /* Project Sections */
+    .project-section {
+      border-bottom: 1px solid var(--border-color);
+      padding: clamp(24px, 5vw, 64px) clamp(24px, 5vw, 80px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(24px, 5vw, 80px);
+      align-items: start;
+      /* Relax the bottom edge by 1px so the 1px border-bottom divider is
+         never clipped away at fractional device-pixel heights; top/left/right
+         stay clipped to contain the neumorphic tile shadows. */
+      clip-path: inset(0 0 -1px 0);
+    }
+
+    .project-section.reverse {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .project-section.reverse .project-tile {
+      grid-column: 1;
+    }
+
+    .project-section.reverse .project-content {
+      grid-column: 2;
+    }
+
+    .project-tile {
+      width: 100%;
+      min-width: 0;
+      aspect-ratio: 680 / 560;
+      background: var(--bg-surface);
+      border-radius: 16px;
+      box-shadow: none;   /* no raised plate round the project media, desktop or phone (Lucas, 2026-10-08) */
+    }
+
+    .project-content {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(12px, 2.5vw, 40px);
+    }
+
+    .project-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .project-label {
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
+      font-size: 40px;
+      line-height: 1;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .project-title {
+      font-family: 'OCR-A-BT', monospace; font-size-adjust: none;
+      font-size: clamp(22px, 3.8vw, 64px);
+      line-height: 1;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      max-width: min(403px, 100%);
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(6px, 1vw, 12px);
+    }
+
+    .tag {
+      background: var(--bg-surface);
+      border-radius: 999px;
+      /* --shadow-pressed's offset/blur (5px/10px) reduced 35% — a scoped
+         override, not a change to the shared variable, so other pressed-inset
+         elements (meta-inset, text-inset, etc.) keep the standard depth. */
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
+      padding: clamp(3px, 0.5vw, 5px) clamp(8px, 1.2vw, 12px);
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: clamp(12px, 1.4vw, 16px);
+      color: var(--text-primary);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* The site's accent is blue now (2026-10-08, Lucas): #809BBC = oklch(0.68 0.058 254.2),
+       dialled from the to.morrow step-badge blue. The token keeps its old name,
+       --accent-orange. Hover goes 0.2 darker in L: #475F7E. */
+        .btn-view-work {
+      background: var(--accent-orange);
+      border-radius: 999px;
+      padding: clamp(10px, 1.3vw, 17px) clamp(24px, 3.5vw, 48px);
+      border: none;
+      cursor: pointer;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: clamp(15px, 1.6vw, 19px);
+      color: #f0f0f2;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      transition: box-shadow 300ms ease-out, transform 300ms ease-out, background-color 300ms ease-out;
+      white-space: nowrap;
+      /* Own compositing layer from the start: the text used to be re-rasterised the
+         moment the hover transform began, which showed as a small downward jitter. */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .btn-view-work:hover {
+      background: var(--preview-hover);
+      transform: translate3d(0, -2px, 0) scale(1.03);   /* standard site hover-lift magnitude */
+      transition: transform 150ms ease, background-color 150ms ease;
+    }
+
+    /* Endpoint of the fluid shrink above: padding is already 0 by here via
+       the clamp(), but the page-wrapper's own border/margin need an explicit
+       cut — a 1px border can't fade gradually, so it's removed outright at
+       the exact width the padding hits zero, which reads as continuous. */
+    @media (max-width: 860px) {
+      html, body { padding: 0; }
+      .page-wrapper {
+        /* 3px BOTTOM margin, and it is load-bearing — not spacing.
+           With a flat `margin: 0` this element's border-bottom is the final
+           painted row of the entire document, with nothing below it. Page
+           heights are fractional, so the last sub-pixel of that 1px border
+           falls outside the scrollable area and the line renders clipped —
+           visibly thinner than the matching border-top, or missing. Chrome
+           happens to snap it to a clean device-pixel band so it never shows
+           there; WebKit is under no obligation to, and on iOS Safari it reads
+           as cut off. (There is also a JS pixel-snapper near the end of this
+           file that grew padding-bottom to chase the same problem; it was not
+           enough on a real device, because the border was still the last row.)
+           Three real pixels underneath means no rounding can push any part of
+           the border out. Invisible: the page background and the card interior
+           are both --bg-surface, so the spacer just reads as the page edge.
+           Left/right stay flush so the card is still edge-to-edge. */
+        margin: 0 0 3px;
+        border-left: none;
+        border-right: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      /* Shrink the nav bar iframe to just its content height so it only blocks
+         the tiny strip where the nav island lives, not the top third of the blob */
+      #top-bar {
+        height: 140px;
+      }
+      #top-bar.hide {
+        transform: translateY(-90px);
+      }
+    }
+
+    @media (max-width: 1100px) {
+      /* Give the tile column ~30% more share than the content column */
+      .project-section { grid-template-columns: 7fr 13fr; }
+      .project-section.reverse { grid-template-columns: 13fr 7fr; }
+
+      /* Scale down project info text */
+      .project-title { font-size: clamp(19px, 3.2vw, 52px); }
+      .project-label { font-size: clamp(14px, 1.6vw, 18px) !important; }
+      .tag { font-size: clamp(11px, 1.3vw, 15px); padding: clamp(3px, 0.45vw, 5px) clamp(7px, 1vw, 11px); }
+      .btn-view-work { font-size: clamp(14px, 1.5vw, 18px); padding: clamp(9px, 1.1vw, 15px) clamp(20px, 3vw, 40px); }
+    }
+
+    @media (max-width: 640px) {
+      /* Stack project sections: title → tags → image → button */
+      .project-section,
+      .project-section.reverse {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        /* 60px top/bottom (24px originally, then 44px): with the section stacked
+           as image > title > pills, this padding is what separates the image
+           from the divider above it and the pills from the divider below, so it
+           sets the breathing room between projects. Horizontal stays 20px. */
+        padding: 60px 20px;
+        align-items: stretch;
+      }
+
+      /* Dissolve content wrapper so children join the flex flow */
+      .project-content {
+        display: contents;
+      }
+
+      /* Uniform stacking for every project: media, then title, then the four tags.
+         The MEDIA is what stays pinned at 0 and the other two move around it — that is
+         load-bearing. Two DOM shapes exist here: three projects wrap the tile in an <a>
+         (so the <a> is the flex item, at default order 0, and an order on .project-tile
+         never applies) while Mac-Lamp and Double Packaging have .project-tile as the
+         direct child. Since the wrapping <a> can't be reached through .project-tile,
+         order 0 is the only value the media reliably holds in BOTH shapes — for the
+         wrapped ones it is the <a>'s default, for the direct ones it is set explicitly
+         below. So image-first is expressed by pushing the title to 1, never by giving
+         the media a negative order, which would move only the two direct-child tiles
+         and leave the other three unchanged. */
+      .project-title-block { order: 1; }
+      .project-tags        { order: 2; gap: 5px; }
+      .project-tile        { order: 0; width: 100%; aspect-ratio: 16/10; }
+
+      /* No "View Work" button on mobile — every tile is already wrapped in an <a> to the
+         same project page, so the button was a second affordance for the same tap target.
+         Hiding it (rather than deleting the markup) keeps desktop untouched. The
+         font-size rule for .btn-view-work in the last @media block below is now inert. */
+      .btn-view-work { display: none; }
+
+      /* Cybercoffee: tile ratio set to the video's OWN intrinsic ratio, so the video
+         fills the tile edge to edge with no letterboxing and no crop — it previously
+         used a squarer tile (16/21) its near-square video could not fill, leaving
+         dead space left/right. Ratio is the file's measured pixel dimensions (mdls),
+         not the intrinsic ratio CSS could infer — a tile can't read its child's
+         ratio. If the video is re-exported at a different size, update this number. */
+      .project-tile.tile-tall-media { aspect-ratio: 1064 / 1104; }  /* Cybercoffee */
+
+      /* Cybercoffee's video has #D7D7DE (215,215,222) baked in behind the machine
+         while the page is #DCDCE3 (220,220,227) — a uniform +5 per channel. Once the
+         video fills the tile edge to edge (ratio match above) that 5-level step meets
+         the page directly and reads as a visible flat patch. brightness() is
+         multiplicative and lands it exactly: 215 x 1.023 = 219.9 -> 220 and
+         222 x 1.023 = 227.1 -> 227. The same 2.3% lift on the artwork is
+         imperceptible (near-black outlines go 26 -> 27).
+
+         ENGINE SPLIT — do not "correct" this from a Chrome measurement:
+           · iOS Safari renders the video's RAW baked value, so the seam is real
+             there and this filter removes it. Confirmed on device.
+           · Chromium colour-manages the video's BT.709 profile and already
+             composites the background to #DCDCE3 on its own, so measuring the
+             composited pixel in Chrome shows NO seam, and this filter measures
+             +5 light there (#E1E1E7).
+         Reading the raw frame via canvas drawImage() gives #D7D7DE in Chrome too —
+         i.e. the decode and the composite disagree, which is what makes Chrome the
+         wrong place to calibrate this. The device is the source of truth. */
+      .tile-tall-media video { filter: brightness(1.023); }
+
+      /* Virtual Cooking, Mac-Lamp, Double Packaging: a TALLER tile, so object-fit: cover
+         crops the LEFT AND RIGHT only. This replaces an earlier transform: scale(), which
+         was wrong — a scale zooms uniformly and therefore crops all four sides while
+         leaving the aspect ratio unchanged. Here the box shape itself changes.
+
+         Mechanics: with cover, whichever axis is relatively short gets filled and the other
+         overflows. Once the box is TALLER than the media's own ratio, cover fills the box
+         height exactly (vertical crop drops to ZERO) and overflows horizontally, which is
+         the side crop. Amount per side = (1 - R_box / r_media) / 2.
+
+         21/20 (1.05) is one SHARED ratio so all three tiles stay the same height (333px at
+         a 350px-wide tile), which the uniform-layout requirement needs. The three media have
+         different intrinsic ratios, so the crop lands slightly differently on each — no
+         single box ratio can give exactly 12% on all three:
+           Virtual Cooking  4000x2791 (r 1.433) -> 13.4% per side
+           Mac-Lamp         3941x2956 (r 1.333) -> 10.6% per side
+           Double Packaging 1920x1400 (r 1.371) -> 11.7% per side
+         Average ~11.9%. For exactly 12% each they would need 12/11, 1.013 and 1.042
+         respectively — i.e. three different tile heights. */
+      .project-tile.tile-crop-sides { aspect-ratio: 21/20; }
+
+      /* Kill any inline vertical transform on these three. Double Packaging's video carries
+         transform: translateY(-15px) inline, which framed the old 16/10 box where cover
+         overflowed vertically and there was spare image to shift into. Now that cover fits
+         the height exactly, shifting up would expose the inner <a>'s black background as a
+         15px strip along the bottom. !important is required to beat the inline style. */
+      .tile-crop-sides img,
+      .tile-crop-sides video { transform: none !important; }
+
+      .tag { flex: 1; text-align: center; font-size: 14px; padding: 6px 4px; }
+      .project-title { font-size: 29px; }
+
+      /* No "Project 01" kicker on mobile — the numbering is redundant next to the
+         title once the section is a single stacked column. Hidden rather than
+         deleted from the markup so desktop keeps it, and so the data-i18n keys
+         (label-project-01..05) stay wired for both languages.
+         display is safe to set here: the element's inline style only pins
+         font-family and font-size, so there is nothing to fight. */
+      .project-label { display: none; }
+
+    }
+
+    /* Mobile menu overlay */
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      /* Must sit ABOVE #top-bar, which is z-index 9999 on this page (most other 2D pages
+         use 10). At 200 the nav iframe painted over this backdrop, so opening the mobile
+         menu darkened the whole page EXCEPT the nav pill, which stayed bright.
+         Raising this rather than lowering #top-bar keeps desktop untouched: this element
+         is opacity:0/pointer-events:none unless .open, and it is never .open at desktop
+         widths (the hamburger only exists on mobile), so its stacking is inert there. */
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 250ms ease;
+    }
+
+    .mobile-menu.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-menu-panel {
+      width: 64%;
+      background: var(--bg-surface);
+      border-radius: 28px;
+      /* No outer shadow/highlight — a neumorphic glow would read as a halo
+         against the darkened backdrop. Depth lives on the buttons inside. */
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transform: translateY(10px);
+      transition: transform 250ms ease;
+    }
+
+    .mobile-menu.open .mobile-menu-panel {
+      transform: translateY(0);
+    }
+
+    .mobile-view-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      background: var(--bg-surface);
+      border-radius: 9999px;
+      box-shadow: var(--shadow-raised-sm);
+      padding: 5px;
+    }
+
+    /* No extra margin on any one control: every item in the burger menu is
+       separated by the panel's own uniform 24px gap (2026-09-15). The theme
+       toggle moved to the TOP of the panel, which silently handed it a
+       `:first-child { margin-bottom: 22px }` rule written for the 2D/3D toggle
+       that used to lead — so it alone sat further from its neighbour than
+       anything else. Removed rather than re-targeted: the menu reads better
+       evenly spaced, and a rule keyed on position breaks again the next time
+       the order changes. */
+
+    .mobile-mode-btn {
+      border: none;
+      background: transparent;
+      border-radius: 9999px;
+      padding: 11px 0;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
+         line-height, so a segment's text box is identical to a nav button's. The
+         segment keeps 11px vertical padding, which is exactly what makes the TRACK
+         come out level with a nav button: the track adds its own 5px padding top and
+         bottom, so 5+11 and 11+5 sum to the nav button's 16px — the two pills end up
+         the same height without hardcoding one. line-height is stated explicitly
+         because these are <button>s, which do not reliably inherit it. */
+      font-size: 22px;
+      line-height: 1.6;
+      color: #555;
+      cursor: pointer;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: box-shadow 150ms ease, color 150ms ease, transform 150ms ease;
+    }
+
+    .mobile-mode-btn.is-active {
+      /* Shared by BOTH toggles: the selected segment is a recessed well. The inset is
+         --shadow-pressed's 5px offset / 10px blur reduced 35%, matching the desktop nav's
+         .pill__seg.is-active in top_row_permanent_V3.html. Scoped to the segments INSIDE
+         the toggle — .mobile-view-toggle's own raised track shadow is untouched, mirroring
+         the desktop .pill track.
+         background must be a real colour, NOT transparent: an inset shadow paints over the
+         element's own background, so without one the segment would read as a hole punched
+         through to the track rather than a well.
+         Deliberately sets NO color — selecting a segment must not darken its text, so both
+         toggles keep the base #555 and the inset alone marks the language selection. */
+      background: var(--bg-surface);
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
+    }
+
+    .mobile-mode-btn:active:not(.is-active) {
+      /* Scale is the tap feedback both toggles share. */
+      transform: scale(0.96);
+    }
+
+    /* Press inset for the LANGUAGE toggle only. A tap should preview the state it lands
+       in: a language segment lands in an inset well, but a 2D/3D segment now lands in a
+       flat orange pill, so flashing an inset there would animate to something that no
+       longer exists in that control. Same reduced spread as the settled state. */
+    .mobile-mode-btn[data-lang]:active:not(.is-active) {
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
+    }
+
+    .mobile-nav-btn {
+      display: block;
+      background: var(--bg-surface);
+      border-radius: 9999px;
+      box-shadow: var(--shadow-raised-sm);
+      padding: 16px 24px;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: 22px;
+      color: #555;
+      text-transform: none;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .mobile-nav-btn.is-active {
+      box-shadow: var(--shadow-pressed);
+      color: #000;
+    }
+
+    .mobile-nav-btn:active {
+      transform: scale(0.98);
+      box-shadow: var(--shadow-pressed);
+    }
+
+    /* ── Footer ────────────────────────────────────────────────────────
+       Three columns inside the frame's thin lines: LM logo left (neumorphic
+       circle like the nav logo; click scrolls to the top, it replaced the old
+       "top" button), the three links centred (same underline as the About page:
+       a 1px line grows left -> right on hover), copyright right (2026-10-19, Lucas). */
+    .footer-section {
+      /* 35% lower than the first version (Lucas, 2026-10-19): vertical padding = 0.65 x old
+         band height minus the 44px logo, halved — 40px -> ~18px at desktop widths. */
+      padding: clamp(8px, calc(2.275vw - 7.7px), 18px) clamp(24px, 6vw, 64px);
+      /* Cancel the .page-wrapper's 12px bottom padding so the band sits centred between the
+         divider above and the frame line below (was 18px above, 31px below). */
+      margin-bottom: -12px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .footer-logo {
+      justify-self: start;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-raised-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 260ms cubic-bezier(.2,.7,.2,1), box-shadow 260ms cubic-bezier(.2,.7,.2,1);
+    }
+    .footer-logo .logo-mark {
+      width: 34.56px;
+      aspect-ratio: 400 / 265;
+      display: block;
+      pointer-events: none;
+      background-color: var(--accent-orange);
+      -webkit-mask: url(/images/site/logo-lm.png) center / contain no-repeat;
+      mask: url(/images/site/logo-lm.png) center / contain no-repeat;
+      transition: background-color 260ms cubic-bezier(.2,.7,.2,1);
+    }
+    /* same neumorphic lift and colour shift as the nav logo */
+    .footer-logo:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+    .footer-logo:hover .logo-mark { background-color: var(--preview-hover); transition-duration: 150ms; }
+    .footer-logo:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 4px; }
+
+    .footer-links {
+      display: flex;
+      gap: clamp(20px, 3vw, 40px);
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
+      font-size: 15px; font-weight: 400; line-height: 1.7;
+    }
+    .footer-links a {
+      color: var(--text-secondary); text-decoration: none;
+      background: linear-gradient(currentColor, currentColor) left bottom / 0% 1px no-repeat;
+      padding-bottom: 2px;
+      transition: color 150ms ease, background-size 320ms cubic-bezier(.4, 0, .2, 1);
+    }
+    .footer-links a:hover, .footer-links a:focus-visible { color: var(--text-primary); background-size: 100% 1px; outline: none; }
+    @media (prefers-reduced-motion: reduce) { .footer-links a { transition: color 150ms ease; } }
+
+    .copyright {
+      justify-self: end;
+      text-align: right;
+      font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
+      font-size: 14px;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .copyright-short { display: none; }
+    /* Phones: no links (Lucas, 2026-10-19) — logo left, copyright right on one row, short form
+       "© 2026 LM" so it fits beside the logo; may still wrap on very narrow screens.
+       Must stay after the footer rules above (same specificity, source order wins). */
+    @media (max-width: 640px) {
+      .footer-section { grid-template-columns: auto 1fr; padding: 10px 20px; }   /* 8px + 20% (Lucas) */
+      .footer-links { display: none; }
+      .copyright { white-space: normal; }
+      .copyright-full { display: none; }
+      .copyright-short { display: inline; }
+    }
+
+    html { scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    #scroll-track {
+      position: fixed; right: 16px; top: 24px; bottom: 24px;
+      width: 6px; z-index: 999; pointer-events: none;
+      transform: translateZ(0); will-change: transform;
+    }
+    /* Mobile only: sit the scroll dots closer to the screen edge. Same
+       specificity as the rule above, so this wins purely on source order —
+       keep it immediately after. Desktop keeps right: 16px. */
+    @media (max-width: 640px) {
+      #scroll-track { right: 6px; }
+    }
+    #scroll-thumb {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .scroll-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent-orange, #809BBC); display: block; flex-shrink: 0;
+    }
+    /* Desktop: the dot column doubles as a real scrollbar — drag the dots, or
+       click the strip to jump there (macOS behaviour). The grab area is
+       widened to 20px while the dots stay optically put: the extra width is
+       added on the left and `right` shrinks by the same amount, so the centre
+       line (19px from the edge) is unchanged.
+       Touch keeps the base `pointer-events: none` — a live 20px strip down the
+       screen edge would swallow swipe-scrolling on a phone. */
+    @media (hover: hover) and (pointer: fine) {
+      #scroll-track {
+        width: 20px;
+        right: 9px;            /* 16 + 6/2 = 19 centre; 19 − 20/2 = 9 */
+        pointer-events: auto;
+        cursor: pointer;
+      }
+      #scroll-thumb { cursor: grab; }
+      #scroll-track.is-dragging,
+      #scroll-track.is-dragging #scroll-thumb { cursor: grabbing; }
+      /* Affordance: dots swell while the strip is hovered or dragged. Transform
+         only — no layout shift, so the thumb's measured height never changes
+         (the scroll maths reads offsetHeight). */
+      .scroll-dot { transition: transform 160ms cubic-bezier(.2,.7,.2,1); }
+      #scroll-track:hover .scroll-dot,
+      #scroll-track.is-dragging .scroll-dot { transform: scale(1.3); }
+    }
+    /* ── Reduced motion (apple-design §14): drop non-essential movement,
+       keep layout + opacity cues. No effect unless the OS pref is set. */
+    @media (prefers-reduced-motion: reduce) {
+      .hero-blob { animation: none !important; }
+      .project-tile:hover,
+      .tag:hover { transform: none !important; }
+    }
+
+    /* Wide-aspect monitors only (not the ~1.6 MacBook ratio): pull the card
+       in a bit more for extra breathing room. Nav keeps its own width.
+       17/10 not 1.7 — Safari ignores the decimal aspect form. */
+    @media (min-aspect-ratio: 17/10) {
+      .page-wrapper { max-width: 1390px; }
+    }
+
+    /* ── Mobile only: readable type scale ──────────────────────────────────
+       At 390px these sat under the platform minimum (iOS body default is 17px;
+       Material's body-large is 16sp). 16px for VT323 UI labels — VT323 has a
+       small x-height and 1px strokes, so it reads ~2-3px smaller than a
+       proportional face at the same declared size. 15px for the hero tagline:
+       real content rather than a label, so above the 14px secondary floor.
+       .copyright stays 14px — genuinely incidental.
+       MUST stay last in the stylesheet: .tag and .btn-view-work already set
+       font-size in the earlier max-width blocks and these overrides have equal
+       specificity, so they win on source order alone. */
+    @media (max-width: 640px) {
+      /* VT323 UI labels */
+      .tag,
+      .btn-view-work { font-size: 16px; }
+      /* hero tagline block (the About link; "Von Material zu Pixel." removed 2026-10-06) */
+      .tagline-block { font-size: 15px; }
+    }
+    /* ── Site entrance loader (moved here from index.html 2026-08-14) ──
+       The orange liquid ball is the WEBSITE's intro animation: it plays on the
+       first load of this landing page per tab (sessionStorage.siteLoaderSeen,
+       set by the script right after <body>), a pure 1.8s timed fill + 1.2s fade
+       (the fill was 3s until 2026-10-19 — Lucas: 40% faster; no % counter since).
+       The 3D page no longer has any loader — its first entry per tab shows
+       only the welcome/controls screen. */
+    #load-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10001; /* above the nav iframe (9999) AND .mobile-menu (10000) */
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1200ms ease;
+    }
+    #load-overlay.is-done { opacity: 0; pointer-events: none; }
+    #load-circle {
+      position: relative;
+      width: min(27.6vw, 27.6vh, 192px);
+      height: min(27.6vw, 27.6vh, 192px);
+      border-radius: 50%;
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-pressed);
+      overflow: hidden;
+    }
+    /* The liquid is a <canvas> (2026-09-11) — the surface is drawn by the
+       script in <body>, not by CSS. The circle's own overflow: hidden and
+       border-radius clip it, so the renderer never has to think about the
+       round shape. */
+    #load-liquid {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Mobile: neumorphic shadow spread/radius reduced 35% (offsets & blur ×0.65),
+       matching the nav's 2D/3D toggle segment. Redefining only the tokens keeps
+       desktop untouched; every var(--shadow-*) user inherits this automatically. */
+    @media (max-width: 640px) {
+      :root {
+        --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(174,174,192,0.65), -3.25px -3.25px 7.8px rgba(255,255,255,1);
+        --shadow-raised: 5.2px 5.2px 11.7px rgba(174,174,192,0.65), -5.2px -5.2px 11.7px rgba(255,255,255,1);
+        --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
+      }
+
+      /* On a phone the to.morrow tile plays the VERTICAL cut (4:5, re-laid for a
+         phone; picked by the <source media> in the markup) at exactly its own
+         shape, so nothing is cropped. Restated at the tile's own specificity —
+         the base .morrow-video-tile rule is (0,2,0) and would otherwise keep 3:2. */
+      .project-tile.morrow-video-tile { aspect-ratio: 4 / 5; }
+      /* ...and the Unify tile likewise: the vertical cut (UnifyPromoV), 4:5. */
+      .project-tile.unify-video-tile { aspect-ratio: 4 / 5; }
+
+      /* Virtual Cooking's tile carries an inline `box-shadow: none` (the desktop
+         render is a cut-out on a transparent ground, where a raised edge would
+         outline empty space). Below 640px it shows the kitchen PHOTO instead, a
+         full rectangle like every other tile, so it gets the same raised shadow
+         they have. !important only because the value it beats is inline. */
+      a[href="/virtual_cooking2d.html"] > .project-tile { box-shadow: none !important; }   /* was the raised shadow; gone with every tile's (Lucas, 2026-10-08) */
+    }
+  
+    /* Former pixel-font labels that are buttons or carry weight: one step
+       heavier than body text so they still read as UI (Lucas, 2026-10-06). */
+    .btn-view-work,
+    .craft-title,
+    .mobile-nav-btn,
+    .mobile-mode-btn,
+    .footer-logo { font-weight: 500; }
+  </style>
+  <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
+  <link rel="stylesheet" href="/theme/mobile-menu.css" />
+  <!-- <script src="/theme/theme.js" defer></script>  dark mode detached 2026-10-06 -->
+  <style>
+    /* Desktop type scale (Lucas, 2026-10-19): headings, project titles and the
+       At-a-Glance lead about 20% smaller from 861px up. Each rule restates the
+       page's own size above × 0.8, so phones and tablets are untouched. Keep this
+       the last <style> on the page and add a line here for any new heading size. */
+    @media (min-width: 861px) {
+      .hero-title { font-size: calc(clamp(32px, 8vw, 83px) * 0.8); }
+      .craft-title { font-size: calc(clamp(28px, 3.5vw, 48px) * 0.8); }
+      .project-title { font-size: calc(clamp(22px, 3.8vw, 64px) * 0.8); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Site entrance loader — the orange liquid ball, once per tab (see the
+       matching CSS block near the end of <style>). First element in <body>
+       so it covers the page from the very first paint. -->
+  <div id="load-overlay">
+    <div id="load-circle">
+      <canvas id="load-liquid"></canvas>
+    </div>
+  </div>
+  <script>
+    /* ── The loader's liquid ───────────────────────────────────────────────
+       TWO sine surfaces travelling in OPPOSITE directions at different
+       amplitudes and speeds, one drawn over the other. Neither is liquid by
+       itself; what reads as liquid is the two crossing, because the place
+       where they meet never repeats — each layer's own amplitude is also
+       breathing (`amplitude = max * sin(angle)`), so the crests grow and
+       flatten as they travel rather than marching past at a fixed height.
+
+       The model and the layer fields are taken from js-fluid-meter by Angel
+       Arcoraci (MIT) —
+       https://github.com/aarcoraci/javascript-fluid-meter — which is written
+       for exactly this shape: a percentage as liquid in a circle.
+
+       What is NOT taken from it: it draws its own circle, its own ring border,
+       its own background disc and its own percentage text, and it hard-codes
+       everything in pixels around a 300px meter. None of that suits this ball,
+       which already has the neumorphic pressed shell and the VT323 counter as
+       real DOM above it — so this draws the fluid alone, into the circle that
+       is already there, and every pixel constant is derived from the ball's
+       measured size instead. Its rising bubbles were built and then dropped:
+       the surface is the whole effect here. */
+    (function () {
+      var overlay = document.getElementById('load-overlay');
+      var seen = false;
+      // Private mode / disabled storage must not break the page — skip the loader.
+      try { seen = sessionStorage.getItem('siteLoaderSeen') === '1'; } catch (e) { seen = true; }
+      if (seen) { overlay.remove(); return; }
+      // Set immediately, not on finish, so a reload part-way through still
+      // counts as seen — same philosophy as the 3D intro gate.
+      try { sessionStorage.setItem('siteLoaderSeen', '1'); } catch (e) {}
+
+      var canvas = document.getElementById('load-liquid');
+      var ctx    = canvas.getContext('2d');
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var ORANGE = getComputedStyle(document.documentElement).getPropertyValue('--accent-orange').trim();
+      // The back layer is the SAME orange at part opacity, not a second
+      // colour: two hues in a 192px ball reads as a graphic, and the point of
+      // the layer is to be glimpsed through the front one where the two
+      // surfaces cross.
+      var ORANGE_BACK = ORANGE;
+
+      // Every one of these is a fraction of the ball, not a pixel count. The
+      // library's own numbers (maxAmplitude 12, frequency 30, speed ±150) are
+      // authored against a 300px meter; this circle is min(27.6vw, 27.6vh,
+      // 192px) and smaller still on a phone, so they are resolved in resize().
+      var front = { fill: ORANGE,      angle: 0, x: 0, angularSpeed: 100, maxAmp: 0, freq: 0, speed: 0, top: 0, ampScale: 0 };
+      var back  = { fill: ORANGE_BACK, angle: 0, x: 0, angularSpeed:  73, maxAmp: 0, freq: 0, speed: 0, top: 0, ampScale: 0 };
+      //                                             ^ deliberately NOT 100:
+      // equal angular speeds make both layers reach their flat moment together
+      // and the whole surface goes still for an instant, once a cycle.
+
+      var W = 0, H = 0, dpr = 1;
+
+      // The canvas backing store is sized in DEVICE pixels and the context is
+      // scaled once, so the surface is crisp on a retina screen and every
+      // number below stays in CSS pixels.
+      //
+      // THIS CANNOT BE MEASURED SYNCHRONOUSLY HERE, and that cost a debugging
+      // pass. This script is inline at the top of <body> so the loader covers
+      // the first paint — but the page also pulls Google Fonts stylesheets,
+      // and a pending render-blocking stylesheet means Chrome has no layout to
+      // give: getBoundingClientRect() returns ZEROS rather than forcing a wait.
+      // The canvas then came out 0 wide and every draw threw. The old div-based
+      // loader never hit this because it only ever set style.height in percent
+      // and measured nothing.
+      // So: try now, watch with a ResizeObserver, and re-try inside the frame
+      // loop until a real size arrives (the first rAF is already past layout).
+      function resize() {
+        var r = canvas.getBoundingClientRect();
+        if (!r.width || !r.height) return false;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = r.width; H = r.height;
+        canvas.width  = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        front.maxAmp = H * 0.055; front.freq = H * 0.155; front.speed = -H * 0.62;
+        back.maxAmp  = H * 0.042; back.freq  = H * 0.190; back.speed  =  H * 0.78;
+        //                                                              ^ the
+        // signs are opposite on purpose — that is the whole mechanism.
+        return true;
+      }
+      resize();
+      if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
+      else window.addEventListener('resize', resize);
+
+      // y of a layer's surface at x. `amplitude` is itself a sine of the
+      // layer's angle, so the wave breathes between full and flat instead of
+      // running at one height.
+      function surfaceY(layer, x) {
+        var amp = layer.maxAmp * layer.ampScale * Math.sin(layer.angle * Math.PI / 180);
+        return layer.top + amp * Math.sin((x + layer.x) / layer.freq);
+      }
+
+      // The surface runs one px PAST the right edge. W is fractional on a
+      // phone (27.6vw = 107.6px at 390), and stepping x by whole px stopped at
+      // 107, so the closing edge ran diagonally from (107, surface) to
+      // (107.6, floor) and left a sliver of bare ball down the right side.
+      // Drawing past the canvas costs nothing — it is clipped.
+      function layerPath(layer) {
+        var xEnd = Math.ceil(W) + 1;
+        ctx.beginPath();
+        ctx.moveTo(-1, surfaceY(layer, -1));
+        for (var x = 0; x <= xEnd; x++) ctx.lineTo(x, surfaceY(layer, x));
+        ctx.lineTo(xEnd, H + 1);
+        ctx.lineTo(-1, H + 1);
+        ctx.closePath();
+      }
+
+      function step(layer, dt, level) {
+        layer.angle += layer.angularSpeed * dt;
+        if (layer.angle > 360) layer.angle -= 360;
+        layer.x += layer.speed * dt;
+        layer.top = H - level * H;
+        // The wave grows IN over the first few percent. At full amplitude a
+        // trough on a nearly-empty ball dips below the floor, and the fill
+        // polygon then has nothing to enclose there — a notch of bare ball at
+        // the very bottom. A shallow puddle not carrying a big wave is also
+        // simply what liquid does.
+        layer.ampScale = Math.min(1, level * 11);
+      }
+
+      function draw(dt, level) {
+        if (!W) return;
+        ctx.clearRect(0, 0, W, H);
+
+        step(back, dt, level);
+        step(front, dt, level);
+
+        ctx.fillStyle = back.fill;  layerPath(back);  ctx.fill();
+        ctx.fillStyle = front.fill; layerPath(front); ctx.fill();
+      }
+
+      var MIN_DURATION = 1800;  // the fill always takes this long — there is no
+                                // byte-progress to track here, unlike the old
+                                // GLB-driven loader this animation came from
+      var shown = 0, t0 = performance.now(), last = t0, raf = 0;
+
+      function finish() {
+        overlay.classList.add('is-done');
+        // Stop drawing with the fade, not after it: nothing is visible through
+        // a transparent overlay and the page now wants the frames.
+        cancelAnimationFrame(raf);
+        setTimeout(function () { overlay.remove(); }, 1300);
+      }
+
+      function frame(now) {
+        // See resize(): the first frames can land before the blocking
+        // stylesheets have given the circle a size. Keep asking, draw nothing
+        // until it has one, and do not let that dead time count as fill.
+        if (!W && !resize()) { t0 = now; last = now; raf = requestAnimationFrame(frame); return; }
+
+        var dt = Math.min((now - last) / 1000, 0.05);  // a backgrounded tab must
+        last = now;                                    // not jump the wave a
+                                                       // whole screen sideways
+        var target = Math.min(1, (now - t0) / MIN_DURATION);
+        shown += (target - shown) * (target >= 1 ? 0.14 : 0.06);
+        if (target - shown < 0.001) shown = target;
+
+        // Reduced motion still fills — it just does not move: the layers are
+        // never stepped, so both surfaces stay flat.
+        draw(reduce ? 0 : dt, shown);
+
+        if (shown >= 1) { finish(); return; }
+        raf = requestAnimationFrame(frame);
+      }
+      raf = requestAnimationFrame(frame);
+    })();
+  </script>
+
+  <iframe id="top-bar" src="/top_row_permanent_V3.html" allowtransparency="true" scrolling="no"></iframe>
+
+  <!-- Mobile menu overlay (lives here so it covers the full viewport) -->
+  <div id="mobile-menu" class="mobile-menu">
+    <div class="mobile-menu-panel">
+      <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". The burger menu's light/dark toggle — restore by
+     un-commenting it and re-linking the two /theme files in <head>.
+     Light/dark toggle, first in the panel above Craft, built from the
+           same two classes, so the pair always match. Mobile-only, like the menu.
+           The labels are 13x13 pixel-art glyphs (sun / moon), not text, so they carry
+           no data-i18n — /theme/theme.js sets the aria-label in the current language.
+      <div class="mobile-view-toggle mobile-theme-toggle">
+        <button class="mobile-mode-btn" data-theme-choice="light" aria-label="Hell"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="5" y="3" width="3" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="0" y="6" width="2" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="11" y="6" width="2" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="3" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="1" y="11" width="1" height="1"/><rect x="6" y="11" width="1" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/></svg></button>
+        <button class="mobile-mode-btn" data-theme-choice="dark" aria-label="Dunkel"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="0" width="5" height="1"/><rect x="2" y="1" width="4" height="1"/><rect x="1" y="2" width="4" height="1"/><rect x="1" y="3" width="3" height="1"/><rect x="0" y="4" width="4" height="1"/><rect x="0" y="5" width="4" height="1"/><rect x="0" y="6" width="4" height="1"/><rect x="0" y="7" width="4" height="1"/><rect x="0" y="8" width="5" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="1" y="9" width="6" height="1"/><rect x="10" y="9" width="2" height="1"/><rect x="1" y="10" width="11" height="1"/><rect x="2" y="11" width="9" height="1"/><rect x="4" y="12" width="5" height="1"/></svg></button>
+      </div> -->
+      <!-- No `is-active` here: on about2d it is a correct "you are here" marker,
+           but this is the landing page, not the About page. -->
+      <a class="mobile-nav-btn" data-page="about" data-i18n="menu-about" href="/about2d.html">About</a>
+      <!-- Language toggle. The nav bar's own de/en text is hidden below
+           640px; this replaces it. -->
+      <div class="mobile-view-toggle mobile-lang-toggle">
+        <button class="mobile-mode-btn" data-lang="de">Deutsch</button>
+        <button class="mobile-mode-btn" data-lang="en">English</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrapper">
+    <!-- Hero -->
+    <div class="hero-section">
+      <iframe class="hero-blob" src="/blob_morph_bouncy.html" allowtransparency="true" scrolling="no" aria-hidden="true"></iframe>
+      <p class="hero-subtitle"><span id="typewriter"></span><span class="typewriter-cursor">|</span></p>
+      <div class="hero-title-block">
+        <h1 class="hero-title">Lucas Maher</h1>
+      </div>
+      <div class="tagline-block">
+        <p data-i18n="tagline2" onclick="window.location.href='/about2d.html'">More about me →</p>
+      </div>
+    </div>
+
+    <!-- Craft Header -->
+    <div class="craft-header" id="craft-section">
+      <p class="craft-title" data-i18n="craft-title">Craft</p>
+    </div>
+
+    <!-- Project 01 -->
+    <div class="project-section" style="align-items: stretch;">
+      <div class="project-content">
+        <div class="project-title-block">
+          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-01">Project 01</p>
+          <h2 class="project-title">Unify</h2>
+        </div>
+        <div class="project-tags">
+          <div class="tag">2026</div>
+          <div class="tag">UI/UX</div>
+          <div class="tag">Mobile</div>
+          <div class="tag">Campus</div>
+        </div>
+        <a href="/unify2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
+      </div>
+      <a href="/unify2d.html" style="display:block;">
+        <div class="project-tile unify-video-tile" style="cursor: pointer;">
+          <!-- The Unify promo loop (2026-10-05): its own 3:2 tile cut above 640px
+               (the film re-framed for this shape, not a crop), the vertical (4:5)
+               cut on a phone. Tile cut FIRST, so a browser that ignores `media`
+               falls back to it everywhere. -->
+          <video autoplay muted loop playsinline width="1620" height="1080" poster="/images/unify/promo-poster-tile.webp?v=20261005i"
+                 aria-label="Animation: a group chat drowning in timetable screenshots collapses into Unify's shared timetable, then the connect now card, character customisation, and the campus map with friends and course rooms">
+            <source src="/videos/unify/unify-promo-tile.mp4?v=20261013a" media="(min-width: 641px)" type="video/mp4" />
+            <source src="/videos/unify/unify-promo-mobile.mp4?v=20261013a" type="video/mp4" />
+          </video>
+          <!-- a phone gets the vertical cut's own first frame as its poster: the tile
+               cut's, cover-cropped to 4:5, would cut the opening bubble off -->
+          <script>(function (v) { if (matchMedia('(max-width: 640px)').matches) v.poster = '/images/unify/promo-poster-mobile.webp?v=20261005i'; })(document.currentScript.previousElementSibling);</script>
+        </div>
+      </a>
+    </div>
+
+    <!-- Project 02 -->
+    <div class="project-section reverse" style="align-items: stretch;">
+      <a href="/to-shove2d.html" style="display:block;">
+        <div class="project-tile morrow-video-tile" style="cursor: pointer;">
+          <!-- The promo loop: the landscape cut above 640px, the vertical (4:5) one
+               on a phone. Landscape FIRST, so a browser that ignores `media`
+               (pre-2023 Chrome) falls back to it everywhere. -->
+          <video autoplay muted loop playsinline width="1920" height="1080" poster="/images/to.morrow/promo-poster.webp?v=20261008"
+                 aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Demnächst verschoben, dann wird eine Aufgabe live geschaltet">
+            <source src="/videos/to.morrow/tomorrow-promo.mp4?v=20261008" media="(min-width: 641px)" type="video/mp4" />
+            <source src="/videos/to.morrow/tomorrow-promo-mobile.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </a>
+      <div class="project-content">
+        <div class="project-title-block">
+          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-02">Project 02</p>
+          <h2 class="project-title">to.morrow</h2>
+        </div>
+        <div class="project-tags">
+          <div class="tag">2026</div>
+          <div class="tag">iOS</div>
+          <div class="tag">SwiftUI</div>
+          <div class="tag">Design System</div>
+        </div>
+        <a href="/to-shove2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
+      </div>
+    </div>
+
+    <!-- Project 03 -->
+    <div class="project-section" style="align-items: stretch;">
+      <div class="project-content">
+        <div class="project-title-block">
+          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-03">Project 03</p>
+          <h2 class="project-title">Virtual Cooking</h2>
+        </div>
+        <div class="project-tags">
+          <div class="tag">2026</div>
+          <div class="tag">VR</div>
+          <div class="tag">Blender</div>
+          <div class="tag">Three.js</div>
+        </div>
+        <a href="/virtual_cooking2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
+      </div>
+      <a href="/virtual_cooking2d.html" style="display:block;">
+        <div class="project-tile tile-crop-sides" style="box-shadow: none; overflow: hidden; cursor: pointer;">
+          <!-- Same phone-only swap as the hero on virtual_cooking2d.html: ≤640px gets
+               the kitchen photo, everything wider falls through to the original render.
+               <picture> is layout-transparent, so the img's inline 100%/100% still
+               resolves against the tile. -->
+          <picture>
+            <source media="(max-width: 640px)" srcset="/images/vr-cookbook/vr_hero_mobile.jpg" />
+            <img src="/images/vr-cookbook/side_v1_final_V1.webp" alt="Virtual Cooking" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+          </picture>
+        </div>
+      </a>
+    </div>
+
+    <!-- Project 04 -->
+    <div class="project-section reverse" style="align-items: stretch;">
+      <a href="/kaffeemaschine2d.html" style="display:block;">
+        <!-- Dark mode swaps to a second screen recording of the machine's own
+             UI, captured on a dark ground (no colour grading needed — the
+             recording's own background is already ~#1A1A1E against the
+             page's #1C1C22). Two full videos rather than a filter:
+             brightness/invert tricks on the light clip would also hit the
+             physical machine body, which must stay the same light plastic in
+             both themes. cc-vid-light is the default; dark-mobile.css swaps
+             which one is `display` below 640px, matching every other
+             mobile-only dark-mode toggle on the site.
+             The dark source is a keyed composite, not a crop (a crop tried
+             first cut real content off the frame and was reverted). The
+             recording had the page's OWN orange scroll-dots bleed into the
+             bottom-right corner — the site's `#809BBC` UI leaking into the
+             capture, not part of the machine at all. Cropping the edge to
+             remove them shaved a slice off the actual footage; instead the
+             machine's own UI is left untouched and only pixels matching that
+             specific orange are keyed out (ffmpeg colorkey on 0xFF5C00,
+             tight similarity so it doesn't touch the machine's own pinkish-
+             red glow, which sits far enough away in colour), plus a small
+             solid-fill rectangle over that exact screen position to erase
+             the antialiased fringe the key alone couldn't fully clean up —
+             both filled with the recording's own sampled background colour,
+             so nothing shows a seam. Full frame width preserved. -->
+          <div class="project-tile tile-tall-media" style="box-shadow: none; overflow: hidden; cursor: pointer; border-radius: 24px;">
+          <video class="cc-vid-light" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: contain; display: block;">
+            <source src="/videos/kaffeemaschine/coffeemachine_interface_video.mov" type="video/mp4">
+          </video>
+          <video class="cc-vid-dark" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: contain; display: none;">
+            <source src="/videos/kaffeemaschine/coffeemachine_interface_video_dark.mov" type="video/mp4">
+          </video>
+        </div>
+      </a>
+      <div class="project-content">
+        <div class="project-title-block">
+          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-04">Project 04</p>
+          <h2 class="project-title">Cybercoffee</h2>
+        </div>
+        <div class="project-tags">
+          <div class="tag">2026</div>
+          <div class="tag">UI/UX</div>
+          <div class="tag">Figma</div>
+          <div class="tag">Prototyping</div>
+        </div>
+        <a href="/kaffeemaschine2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
+      </div>
+    </div>
+
+    <!-- Project 05 -->
+    <div class="project-section" style="align-items: stretch;">
+      <div class="project-content">
+        <div class="project-title-block">
+          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-05">Project 05</p>
+          <h2 class="project-title">Mac-Lamp</h2>
+        </div>
+        <div class="project-tags">
+          <div class="tag">2026</div>
+          <div class="tag" data-i18n="tag-industrial">Industrial</div>
+          <div class="tag" data-i18n="tag-fabrication">Fabrication</div>
+          <div class="tag">Studio</div>
+        </div>
+        <a href="/mac-lamp2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
+      </div>
+      <div class="project-tile tile-crop-sides" style="position: relative;">
+        <a href="/mac-lamp2d.html" style="position: absolute; inset: 0; overflow: hidden; border-radius: 16px; text-decoration: none; display: block;">
+          <img src="/images/mac-lamp/IMG_3729_SnapseedCopy.jpeg" alt="Mac-Lamp" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+        </a>
+      </div>
+    </div>
+
+    <!-- Project 06 -->
+    <div class="project-section reverse" style="align-items: stretch;">
+      <div class="project-tile tile-crop-sides" style="position: relative;">
+        <a href="/vaccine2d.html" style="position: absolute; inset: 0; overflow: hidden; border-radius: 16px; background: #000; text-decoration: none;">
+          <video autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover; display: block; transform: translateY(-15px);">
+            <source src="/videos/vaccine/vaccine_render_V1.mov" type="video/quicktime" />
+            <source src="/videos/vaccine/vaccine_render_V1.mov" type="video/mp4" />
+          </video>
+        </a>
+      </div>
+      <div class="project-content">
+        <div class="project-title-block">
+          <p class="project-label" style="font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4; font-size: 20px;" data-i18n="label-project-06">Project 06</p>
+          <h2 class="project-title">Double Packaging</h2>
+        </div>
+        <div class="project-tags">
+          <div class="tag">2025</div>
+          <div class="tag">Blender</div>
+          <div class="tag" data-i18n="tag-lighting">Lighting</div>
+          <div class="tag" data-i18n="tag-texturing">Texturing</div>
+        </div>
+        <a href="/vaccine2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-section">
+      <button type="button" class="footer-logo" id="scroll-top-btn" aria-label="Back to top"><span class="logo-mark" aria-hidden="true"></span></button>
+      <nav class="footer-links" aria-label="Contact">
+        <a href="https://www.instagram.com/lucas.maher.visuals" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.linkedin.com/in/lucas-maher-5b53163bb/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="#" id="footer-email-link" data-i18n="footer-email">Email</a>
+      </nav>
+      <p class="copyright"><span class="copyright-full" data-i18n="footer-copyright">© 2026 Lucas Maher. All Rights Reserved.</span><span class="copyright-short" data-i18n="footer-copyright-short">© 2026 LM. All Rights Reserved.</span></p>
+    </div>
+  </div>
+
+  <script>
+    const TITLES_BY_LANG = {
+      en: ['Interface Designer...','Product Designer...','3D & UI Hybrid...','Motion & Interface Designer...','Interaction Designer...'],
+      de: ['Interface Designer...','Produktdesigner...','3D & UI Designer...','Motion & Interface Designer...','Interaction Designer...'],
+    };
+    let currentTitles = TITLES_BY_LANG[localStorage.getItem('lang') || 'de'];
+    const typeEl = document.getElementById('typewriter');
+    let titleIdx = 0, charIdx = 0, deleting = false, typeTimer = null;
+
+    function tick() {
+      const current = currentTitles[titleIdx];
+      if (!deleting) {
+        charIdx++;
+        typeEl.textContent = current.slice(0, charIdx);
+        if (charIdx === current.length) {
+          typeTimer = setTimeout(() => { deleting = true; tick(); }, 3000);
+          return;
+        }
+        typeTimer = setTimeout(tick, 80);
+      } else {
+        charIdx--;
+        typeEl.textContent = current.slice(0, charIdx);
+        if (charIdx === 0) {
+          deleting = false;
+          titleIdx = (titleIdx + 1) % currentTitles.length;
+          typeTimer = setTimeout(tick, 350);
+          return;
+        }
+        typeTimer = setTimeout(tick, 45);
+      }
+    }
+    typeTimer = setTimeout(tick, 600);
+
+    function restartTypewriter(lang) {
+      currentTitles = TITLES_BY_LANG[lang] || TITLES_BY_LANG.en;
+      if (typeTimer) clearTimeout(typeTimer);
+      titleIdx = 0; charIdx = 0; deleting = false;
+      typeEl.textContent = '';
+      typeTimer = setTimeout(tick, 400);
+    }
+
+    /* Footer email: href assembled at runtime so the raw HTML never contains the address (as on About). */
+    (function () {
+      var user = 'lucas.maher.design', domain = 'gmail.com';
+      var link = document.getElementById('footer-email-link');
+      if (link) link.href = 'mailto:' + user + '@' + domain;
+    })();
+
+    document.getElementById('scroll-top-btn').addEventListener('click', () => {
+      const start = window.scrollY;
+      const duration = 700;
+      const startTime = performance.now();
+      function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2; }
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        window.scrollTo(0, start * (1 - ease(progress)));
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+
+    // ── Page transitions ──────────────────────────────────────────
+    (function() {
+      var KF = '@keyframes _sR{from{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes _sL{from{transform:translateX(-100%)}to{transform:translateX(0)}}';
+      var s = document.createElement('style'); s.textContent = KF; document.head.appendChild(s);
+      var DUR = 380, EASE = 'cubic-bezier(0.4,0,0.2,1)';
+
+      function _getWrap() {
+        var w = document.getElementById('_sw');
+        if (!w) {
+          w = document.createElement('div'); w.id = '_sw';
+          Array.from(document.body.children).forEach(function(c) {
+            if (c.id !== 'top-bar' && c.id !== '_sw') w.appendChild(c);
+          });
+          document.body.appendChild(w);
+        }
+        return w;
+      }
+
+      var _rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var dir = sessionStorage.getItem('_sv');
+      if (dir) sessionStorage.removeItem('_sv');
+      if (dir && !_rm) {
+        var wrap = _getWrap();
+        wrap.style.transform = dir === 'right' ? 'translateX(100%)' : 'translateX(-100%)';
+        var done = false;
+        function reveal() {
+          if (done) return; done = true;
+          requestAnimationFrame(function() {
+            wrap.style.transform = '';
+            wrap.style.animation = (dir === 'right' ? '_sR' : '_sL') + ' ' + DUR + 'ms ' + EASE + ' both';
+            setTimeout(function() { wrap.style.animation = ''; }, DUR + 60);
+          });
+        }
+        if (document.fonts && document.fonts.ready) { document.fonts.ready.then(reveal); } else { requestAnimationFrame(function() { requestAnimationFrame(reveal); }); }
+        setTimeout(reveal, 300);
+      }
+
+      window._nav = function(url, into) {
+        sessionStorage.setItem('_sv', into);
+        var dim = document.createElement('div');
+        dim.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0);z-index:9999;transition:background 220ms ease;pointer-events:none;';
+        document.body.appendChild(dim);
+        requestAnimationFrame(function() { dim.style.background = 'rgba(0,0,0,0.28)'; });
+        setTimeout(function() { location.href = url; }, 220);
+      };
+
+      window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'page-slide') window._nav(e.data.url, e.data.enterFrom);
+      });
+    })();
+
+    // Mobile menu — toggled via postMessage from the nav iframe
+    (function () {
+      const menu = document.getElementById('mobile-menu');
+
+      /* The mobile menu is an opaque neumorphic panel using the site's own
+         surface colour and shadow tokens, so it no longer adapts its shading
+         to the page behind it (that was needed only for the old glass look). */
+
+      function openMenu()  { menu.classList.add('open'); }
+      function closeMenu() { menu.classList.remove('open'); }
+
+      window.addEventListener('message', e => {
+        if (e.data.type === 'mobile-menu-toggle') {
+          menu.classList.contains('open') ? closeMenu() : openMenu();
+        }
+      });
+
+      // Close on backdrop tap
+      menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
+
+      // Nav buttons
+      menu.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          closeMenu();
+          if (btn.dataset.page === 'about') window.location.href = '/about2d.html';
+        });
+      });
+
+      // Language toggle. It does NOT translate this page directly — it writes
+      // the preference and hands the change to the nav iframe, which is already
+      // the site's single owner of language and broadcasts 'lang-change' back to
+      // the handler this page has always had. One path, so nothing desyncs.
+      const langBtns = menu.querySelectorAll('[data-lang]');
+      function markLang(l) {
+        langBtns.forEach(b => b.classList.toggle('is-active', b.dataset.lang === l));
+      }
+      // Seed the highlight synchronously; the nav also broadcasts the stored
+      // language ~100ms after it loads, which corrects a stale value (e.g. an
+      // old 'fr' preference, which the nav rewrites to 'en').
+      try { markLang(localStorage.getItem('lang') || 'de'); } catch (e) { markLang('de'); }
+      langBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const l = btn.dataset.lang;
+          try { localStorage.setItem('lang', l); } catch (e) {}
+          markLang(l);
+          const bar = document.getElementById('top-bar');
+          if (bar && bar.contentWindow) bar.contentWindow.postMessage({ type: 'lang-change', lang: l }, '*');
+        });
+      });
+      window.addEventListener('message', e => {
+        if (e.data && e.data.type === 'lang-change') markLang(e.data.lang);
+      });
+    })();
+
+    let lastScrollY = 0;
+    let lastToggleY = 0;
+    const topBar = document.getElementById('top-bar');
+    const hideThreshold = 250;
+    const showThreshold = 126;  // was 180: the nav comes back 30% sooner on scroll-up (Lucas, 2026-10-19)
+
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
+
+      // Always show nav bar at the top
+      if (currentScrollY === 0) {
+        topBar.classList.remove('hide');
+        lastToggleY = 0;
+      } else if (currentScrollY > lastScrollY && Math.abs(currentScrollY - lastToggleY) > hideThreshold) {
+        // Scrolling down - use higher threshold
+        topBar.classList.add('hide');
+        lastToggleY = currentScrollY;
+      } else if (currentScrollY < lastScrollY && Math.abs(currentScrollY - lastToggleY) > showThreshold) {
+        // Scrolling up - use lower threshold
+        topBar.classList.remove('hide');
+        lastToggleY = currentScrollY;
+      }
+
+      lastScrollY = currentScrollY;
+    });
+
+    // ── i18n ─────────────────────────────────────────────────────
+    const TRANSLATIONS = {
+      en: {
+        'menu-about': 'About',
+        'label-project-01': 'Project 01', 'label-project-02': 'Project 02',
+        'label-project-03': 'Project 03', 'label-project-04': 'Project 04',
+        'label-project-05': 'Project 05', 'label-project-06': 'Project 06',
+        'tag-industrial': 'Industrial', 'tag-fabrication': 'Fabrication',
+        'tag-lighting': 'Lighting', 'tag-texturing': 'Texturing',
+        'footer-top': 'top',
+        'tagline2': 'More about me →',
+        'craft-title': 'Craft',
+        'btn-view-work': 'View Work',
+        'footer-copyright': '© 2026 Lucas Maher. All Rights Reserved.',
+        'footer-email': 'Email',
+        'footer-copyright-short': '© 2026 LM. All Rights Reserved.',
+      },
+      de: {
+        'menu-about': 'Über mich',
+        'label-project-01': 'Projekt 01', 'label-project-02': 'Projekt 02',
+        'label-project-03': 'Projekt 03', 'label-project-04': 'Projekt 04',
+        'label-project-05': 'Projekt 05', 'label-project-06': 'Projekt 06',
+        'tag-industrial': 'Industrie', 'tag-fabrication': 'Fertigung',
+        'tag-lighting': 'Beleuchtung', 'tag-texturing': 'Texturierung',
+        'footer-top': 'hoch',
+        'tagline2': 'Mehr über mich →',
+        'craft-title': 'Projekte',
+        'btn-view-work': 'Ansehen',
+        'footer-copyright': '© 2026 Lucas Maher. Alle Rechte vorbehalten.',
+        'footer-email': 'E-Mail',
+        'footer-copyright-short': '© 2026 LM. Alle Rechte vorbehalten.',
+      }
+    };
+    function applyLang(lang) {
+      const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => { if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n]; });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => { if (t[el.dataset.i18nHtml] !== undefined) el.innerHTML = t[el.dataset.i18nHtml]; });
+      restartTypewriter(lang);
+    }
+    applyLang(localStorage.getItem('lang') || 'de');
+
+    window.addEventListener('message', function(e) {
+      if (!e.data || !e.data.type) return;
+      if (e.data.type === 'lang-change') applyLang(e.data.lang);
+    });
+  </script>
+  <div id="scroll-track">
+    <div id="scroll-thumb">
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+    </div>
+  </div>
+  <script src="/js/page-chrome.js"></script>
+
+  <script>
+    // Cybercoffee tile: the light/dark clip swap is CSS-only (dark-mobile.css
+    // toggles `display`), but `autoplay`/`loop` on both elements means the
+    // hidden one keeps decoding in the background — this pauses whichever one
+    // just went out of view and (re)plays whichever came into it. A
+    // MutationObserver on documentElement's data-theme is the one thing that
+    // fires on every trigger (the menu tap, a storage event from another tab,
+    // the pre-paint inline script) without depending on theme.js internals.
+    (function () {
+      var light = document.querySelector('.cc-vid-light');
+      var dark = document.querySelector('.cc-vid-dark');
+      if (!light || !dark) return;
+      function sync() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var show = isDark ? dark : light, hide = isDark ? light : dark;
+        hide.pause();
+        show.play().catch(function () {});
+      }
+      sync();
+      new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    })();
+  </script>
+
+</body>
+</html>

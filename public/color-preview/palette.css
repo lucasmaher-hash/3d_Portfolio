@@ -1,0 +1,33 @@
+/* Scoped to a.html; the normal homepage never loads this file. */
+html:root {
+  --bg-surface: var(--preview-bg, #CED7B3);
+  --accent-orange: var(--preview-accent, #413099);
+  --preview-hover: color-mix(in srgb, var(--accent-orange), black 25%);
+  --preview-dark: color-mix(in srgb, var(--bg-surface), black 22%);
+  --preview-light: color-mix(in srgb, var(--bg-surface), white 58%);
+  --shadow-raised-sm: 5px 5px 12px var(--preview-dark), -5px -5px 12px var(--preview-light);
+  --shadow-raised: 8px 8px 18px var(--preview-dark), -8px -8px 18px var(--preview-light);
+  --shadow-pressed: inset 5px 5px 10px var(--preview-dark), inset -5px -5px 10px var(--preview-light);
+}
+.palette {
+  position: fixed; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 10010; color: #1a1a1a; font: 14px/1.4 'Roboto', system-ui, sans-serif;
+}
+.palette summary { list-style: none; cursor: pointer; margin-left: auto; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-surface); box-shadow: var(--shadow-raised-sm); }
+.palette summary::-webkit-details-marker { display: none; }
+.palette summary svg { width: 28px; height: 28px; color: var(--accent-orange); transition: transform 150ms ease; }
+.palette[open] summary svg { transform: rotate(90deg); }
+.palette summary:focus-visible, .palette button:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 5px; }
+.palette-panel { position: absolute; bottom: 72px; right: 0; width: min(320px, calc(100vw - 40px)); max-height: calc(100dvh - 120px); overflow-y: auto; padding: 24px; border-radius: 24px; background: var(--bg-surface); box-shadow: var(--shadow-raised); }
+.palette h2 { font-size: 18px; margin: 0 0 20px; font-weight: 500; }
+.palette fieldset { border: 0; margin: 0 0 20px; padding: 0; min-width: 0; }
+.palette legend { display: flex; align-items: center; gap: 8px; width: 100%; margin-bottom: 12px; font-weight: 500; }
+.palette code { margin-left: auto; font-size: 11px; }
+.palette-swatch { width: 14px; height: 14px; border-radius: 50%; background: var(--swatch); border: 1px solid #0002; }
+.palette label { display: flex; justify-content: space-between; font-size: 12px; margin-top: 8px; }
+.palette input[type=range] { display: block; width: 100%; height: 24px; accent-color: var(--accent-orange); cursor: pointer; }
+.palette button { padding: 10px 16px; border: 0; border-radius: 20px; background: var(--bg-surface); color: inherit; box-shadow: var(--shadow-raised-sm); cursor: pointer; font: inherit; }
+.palette button:active { box-shadow: var(--shadow-pressed); }
+@media (max-width: 640px) {
+  html:root { --shadow-raised-sm: 3.25px 3.25px 7.8px var(--preview-dark), -3.25px -3.25px 7.8px var(--preview-light); --shadow-raised: 5.2px 5.2px 11.7px var(--preview-dark), -5.2px -5.2px 11.7px var(--preview-light); --shadow-pressed: inset 3.25px 3.25px 6.5px var(--preview-dark), inset -3.25px -3.25px 6.5px var(--preview-light); }
+}

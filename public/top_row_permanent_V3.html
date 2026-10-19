@@ -575,7 +575,8 @@
     // Which kind of page is hosting this nav: every 2D page is listed here, the
     // 3D scene (index.html, at "/") is not. The one place to add a new 2D page.
     const PARENT_PATH = window.top.location.pathname;
-    const IS_2D_VIEW = ['2D', 'about2d', 'vaccine2d', 'mac-lamp2d', 'kaffeemaschine2d',
+    const IS_COLOR_PREVIEW = PARENT_PATH === '/a.html';
+    const IS_2D_VIEW = IS_COLOR_PREVIEW || ['2D', 'about2d', 'vaccine2d', 'mac-lamp2d', 'kaffeemaschine2d',
       'virtual_cooking2d', 'to-shove2d', 'unify2d'].some(p => PARENT_PATH.includes(p));
 
     // The logo takes the host page's accent (--accent-orange), so it is purple on
@@ -617,7 +618,7 @@
     document.getElementById('logo-btn').addEventListener('click', e => {
       e.preventDefault();
       if (IS_2D_VIEW) {
-        if (window.top.location.pathname === '/2D.html') {
+        if (window.top.location.pathname === '/2D.html' || IS_COLOR_PREVIEW) {
           window.top.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           window.top.location.href = '/2D.html';
