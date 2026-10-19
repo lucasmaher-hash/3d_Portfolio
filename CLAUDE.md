@@ -226,6 +226,19 @@ and the phone-only `#scroll-top-btn { display: none }` are gone; `footer-top` tr
 inert leftovers. At the 860px desktop floor the links sit ~32px left of centre because the
 one-line copyright column needs more room.
 
+## Nav shading acts like real light and shadow (2026-10-19, Lucas)
+
+`top_row_permanent_V3.html`: every shadow colour is now a dark blue-grey at low alpha,
+`rgba(40,40,90, a)` with `a = old alpha x 46/180`, instead of the light grey `rgba(174,174,192,a)`.
+Alpha-blending a dark colour multiplies what is underneath, so over a dark hero image the shadow
+darkens instead of painting light grey on top; on `#DCDCE3` it is exactly as dark as before. White
+highlights already behave like light (white at alpha = screen). No `mix-blend-mode`: the nav is an
+iframe and blend modes do not reach the parent page. **The bar's own outer shading**
+(`.nav-island.is-2d-mode`, the only part that falls on page content) uses `--shadow-island`, whose
+highlight is white 0.7 (1 washed dark images out, 0.45 was too faint). **Logo, 2D/3D toggle, About
+pill, hamburger** use `--shadow-soft` (4px / 8px, phones 2.6px / 5.2px; was 5px / 12px) and
+`--shadow-soft-hover` (7px / 14px; was 11px / 24px) — close to the pressed segment inside the toggle.
+
 ## Page map
 
 | File | What it is |

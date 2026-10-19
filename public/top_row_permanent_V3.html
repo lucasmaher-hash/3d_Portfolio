@@ -27,17 +27,37 @@
       --text-secondary: #8E8E93;
       --accent-orange: #809BBC;
 
+      /* Shadows are a real shade (2026-10-19, Lucas): a dark blue-grey at low alpha instead of
+         the old light grey rgba(174,174,192,a). Alpha-blending a dark colour multiplies whatever
+         is under it, so over a dark hero image the shadow darkens instead of painting light grey
+         on top. Alpha = old x 46/180, which gives exactly the old darkness on #DCDCE3.
+         The white highlight already acts as light (white at alpha = screen). */
       --shadow-raised-sm:
-        5px 5px 12px rgba(174, 174, 192, 0.65),
+        5px 5px 12px rgba(40, 40, 90, 0.166),
+        -5px -5px 12px rgba(255, 255, 255, 1);
+      /* The bar's own outer shading is the only part that falls on page content (hero images),
+         so its light is weaker (white 0.7 instead of 1; 0.45 was too faint): over a dark image a full-white
+         highlight washed out to a bright halo. The buttons' own highlights stay full. */
+      --shadow-island:
+        5px 5px 12px rgba(40, 40, 90, 0.166),
+        -5px -5px 12px rgba(255, 255, 255, 0.7);
+      /* Logo, 2D/3D toggle, About pill, hamburger: outer shading as tight as the pressed
+         segment inside the toggle, a touch wider (4px offset / 8px blur instead of 5px / 12px), Lucas
+         2026-10-19. Hover lifts by the same ratio as before (about x2). */
+      --shadow-soft:
+        4px 4px 8px rgba(40, 40, 90, 0.166),
+        -4px -4px 8px rgba(255, 255, 255, 1);
+      --shadow-soft-hover:
+        7px 7px 14px rgba(40, 40, 90, 0.23),
         -5px -5px 12px rgba(255, 255, 255, 1);
       --shadow-raised:
-        8px 8px 18px rgba(174, 174, 192, 0.65),
+        8px 8px 18px rgba(40, 40, 90, 0.166),
         -8px -8px 18px rgba(255, 255, 255, 1);
       --shadow-pressed:
-        inset 5px 5px 10px rgba(174, 174, 192, 0.6),
+        inset 5px 5px 10px rgba(40, 40, 90, 0.153),
         inset -5px -5px 10px rgba(255, 255, 255, 1);
       --shadow-hover:
-        11px 11px 22px rgba(174, 174, 192, 0.8),
+        11px 11px 22px rgba(40, 40, 90, 0.204),
         -8px -8px 18px rgba(255, 255, 255, 1);
 
       --ease: cubic-bezier(.2, .7, .2, 1);
@@ -128,7 +148,7 @@
        only the outer raised shadow/highlight drops; it returns once the
        nav leaves the image (or on pages with no full-bleed hero). */
     .nav-island.is-2d-mode {
-      box-shadow: var(--shadow-raised-sm);
+      box-shadow: var(--shadow-island);
     }
 
     /* Why .nav-island is overflow: hidden (base rule above, EVERY view).
@@ -206,7 +226,7 @@
       height: 44px;
       border-radius: 50%;
       background: var(--bg-surface);
-      box-shadow: var(--shadow-raised-sm);
+      box-shadow: var(--shadow-soft);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -231,7 +251,7 @@
 
     .logo:hover {
       transform: translateY(-2px) scale(1.03);
-      box-shadow: 11px 11px 24px rgba(174, 174, 192, 0.9), -8px -8px 20px rgba(255, 255, 255, 1);
+      box-shadow: var(--shadow-soft-hover);
       transition: transform 150ms ease, box-shadow 150ms ease;
     }
 
@@ -239,7 +259,7 @@
     .pill {
       background: var(--bg-surface);
       border-radius: 9999px;
-      box-shadow: var(--shadow-raised-sm);
+      box-shadow: var(--shadow-soft);
       padding: 5px;
       display: inline-flex;
       gap: 4px;
@@ -247,7 +267,7 @@
     }
 
     .pill:hover {
-      box-shadow: 11px 11px 24px rgba(174, 174, 192, 0.9), -8px -8px 20px rgba(255, 255, 255, 1);
+      box-shadow: var(--shadow-soft-hover);
       transform: translateY(-2px) scale(1.03);
       transition: transform 150ms ease, box-shadow 150ms ease;
     }
@@ -289,7 +309,7 @@
       /* --shadow-pressed's offset/blur (5px/10px) reduced 35% — scoped to the
          active toggle segment only, not the shared variable, so the outer
          .view-toggle/.pill track's own raised shadow is untouched. */
-      box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(40, 40, 90, 0.153), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
       cursor: default;
     }
 
@@ -334,7 +354,7 @@
       height: 44px;
       border-radius: 50%;
       background: var(--bg-surface);
-      box-shadow: var(--shadow-raised-sm);
+      box-shadow: var(--shadow-soft);
       border: none;
       cursor: pointer;
       flex-direction: column;
@@ -356,7 +376,7 @@
 
     .hamburger:hover {
       transform: translateY(-2px) scale(1.03);
-      box-shadow: 11px 11px 24px rgba(174,174,192,0.9), -8px -8px 20px rgba(255,255,255,1);
+      box-shadow: var(--shadow-soft-hover);
       transition: transform 150ms ease, box-shadow 150ms ease;
     }
 
@@ -458,9 +478,11 @@
        desktop untouched; logo / pill / hamburger inherit automatically. */
     @media (max-width: 640px) {
       :root {
-        --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(174,174,192,0.65), -3.25px -3.25px 7.8px rgba(255,255,255,1);
-        --shadow-raised: 5.2px 5.2px 11.7px rgba(174,174,192,0.65), -5.2px -5.2px 11.7px rgba(255,255,255,1);
-        --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
+        --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(40, 40, 90, 0.166), -3.25px -3.25px 7.8px rgba(255,255,255,1);
+        --shadow-soft: 2.6px 2.6px 5.2px rgba(40, 40, 90, 0.166), -2.6px -2.6px 5.2px rgba(255,255,255,1);
+        --shadow-island: 3.25px 3.25px 7.8px rgba(40, 40, 90, 0.166), -3.25px -3.25px 7.8px rgba(255,255,255,0.7);
+        --shadow-raised: 5.2px 5.2px 11.7px rgba(40, 40, 90, 0.166), -5.2px -5.2px 11.7px rgba(255,255,255,1);
+        --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(40, 40, 90, 0.153), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
       }
     }
   
