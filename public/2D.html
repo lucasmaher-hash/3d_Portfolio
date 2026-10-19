@@ -789,12 +789,13 @@
       color: var(--text-primary);
       white-space: nowrap;
     }
-    /* Phones: logo left and links right on one row, copyright centred below.
+    /* Phones: no links (Lucas, 2026-10-19) — logo left, copyright right on one row; the
+       copyright may wrap there since it does not fit beside the logo at 375px.
        Must stay after the footer rules above (same specificity, source order wins). */
     @media (max-width: 640px) {
-      .footer-section { grid-template-columns: auto 1fr; row-gap: 6px; }
-      .footer-links { justify-self: end; font-size: 16px; gap: 20px; }
-      .copyright { grid-column: 1 / -1; justify-self: center; text-align: center; }
+      .footer-section { grid-template-columns: auto 1fr; }
+      .footer-links { display: none; }
+      .copyright { white-space: normal; }
     }
 
     html { scrollbar-width: none; }

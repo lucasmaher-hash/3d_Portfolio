@@ -219,11 +219,11 @@ opened from anywhere).
 the nav logo; it is a `<button id="scroll-top-btn">`, so it took over the old "top" pill's
 scroll-to-top), **Instagram · LinkedIn · Email centred** (`.footer-links`, same face, colour and
 left-to-right underline as About's `.about-links`; the email `href` is assembled at runtime like on
-About, `footer-email` key EN/DE), **copyright right** (`white-space: nowrap`). Phones (≤640px): logo
-left + links right on one row, copyright centred underneath; that `@media` block sits right after
+About, `footer-email` key EN/DE), **copyright right** (`white-space: nowrap`). Phones (≤640px): no links
+(Lucas, 2026-10-19) — logo left, copyright right on one row (it may wrap there); that `@media` block sits right after
 the footer rules on purpose (same specificity, source order wins). The old `.footer-meta` wrapper
 and the phone-only `#scroll-top-btn { display: none }` are gone; `footer-top` translation keys are
-inert leftovers. Band height cut 35% on 2026-10-19 (vertical padding `clamp(8px, 2.275vw - 7.7px, 18px)`, phones 8px with 6px row gap: 1440px 124 -> 80px, phones 130 -> 88px). At the 860px desktop floor the links sit ~32px left of centre because the
+inert leftovers. Band height cut 35% on 2026-10-19 (vertical padding `clamp(8px, 2.275vw - 7.7px, 18px)`, phones 8px: 1440px 124 -> 80px, phones 61px). The band cancels the `.page-wrapper` 12px bottom padding (`margin-bottom: -12px`) so its content is centred between the divider and the frame line. At the 860px desktop floor the links sit ~32px left of centre because the
 one-line copyright column needs more room.
 
 ## Nav shading acts like real light and shadow (2026-10-19, Lucas)
