@@ -1108,15 +1108,8 @@
        label-sized type and dropped: per Lucas it is the light pink everywhere.
        --accent-ink stays as the one switch if that is ever revisited. */
     :root {
-      /* 2026-10-19 (Lucas): the app pink washed out to the 2D blue's lightness
-         and chroma, oklch(0.68 0.058 348), like every page accent. The app's own
-         #FF88C8 stays wherever the APP is shown (swatch, pie, monster). */
-      --accent-orange: #B48A9F;
-      --accent-ink: #B48A9F;
-    }
-    /* …except the two diagrams (Lucas, 2026-10-19): the Problem bar and the
-       before/after bars keep the app's own pink. */
-    .statbar, .ba-chart {
+      /* The app's own bright pink again (Lucas, 2026-10-19), after a few hours of a
+         washed-out #B48A9F: the same pink as the charts. */
       --accent-orange: #FF88C8;
       --accent-ink: #FF88C8;
     }
