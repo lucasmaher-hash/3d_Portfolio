@@ -177,20 +177,26 @@
       color: var(--text-primary);
     }
 
+    /* No underline at rest; on hover a 1px line grows left -> right, same as About's
+       .about-links (background-size 0 -> 100% over 320ms). Lucas, 2026-10-19. */
     .tagline-block p:last-child {
       color: var(--text-secondary);
-      text-decoration: underline;
+      text-decoration: none;
+      background: linear-gradient(currentColor, currentColor) left bottom / 0% 1px no-repeat;
+      padding-bottom: 2px;
       pointer-events: auto;
       cursor: pointer;
       display: inline-block;
-      transition: color 150ms ease, transform 150ms ease;
+      transition: color 150ms ease, transform 150ms ease, background-size 320ms cubic-bezier(.4, 0, .2, 1);
       transform-origin: left center;
     }
 
     .tagline-block p:last-child:hover {
       color: var(--text-primary);
       transform: scale(1.1);
+      background-size: 100% 1px;
     }
+    @media (prefers-reduced-motion: reduce) { .tagline-block p:last-child { transition: color 150ms ease; } }
 
     /* The to.morrow tile is the promo loop (2026-10-04) — the 16:9 cut of the
        to-shove2d.html hero (that page uses a taller cut) — flat, with the
