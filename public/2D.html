@@ -722,6 +722,9 @@
       /* 35% lower than the first version (Lucas, 2026-10-19): vertical padding = 0.65 x old
          band height minus the 44px logo, halved — 40px -> ~18px at desktop widths. */
       padding: clamp(8px, calc(2.275vw - 7.7px), 18px) clamp(24px, 6vw, 64px);
+      /* Cancel the .page-wrapper's 12px bottom padding so the band sits centred between the
+         divider above and the frame line below (was 18px above, 31px below). */
+      margin-bottom: -12px;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
