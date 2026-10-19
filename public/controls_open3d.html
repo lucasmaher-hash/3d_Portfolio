@@ -241,9 +241,15 @@
        sizes, 56px desktop and 44px mobile, with no second declaration. */
     .lm-mark {
       width: 78.5%;
-      height: auto;
+      aspect-ratio: 400 / 265;
       display: block;
       pointer-events: none;
+      /* A mask, not an <img>, so the badge takes the accent: on the 3D page that
+         is the room colour, faded in by /js/room-accent.js, the same colour as
+         the nav logo it points at. */
+      background-color: var(--accent-orange, #809BBC);
+      -webkit-mask: url(/images/site/logo-lm.png) center / contain no-repeat;
+      mask: url(/images/site/logo-lm.png) center / contain no-repeat;
     }
 
     /* ── Mobile ────────────────────────────────────────────────────────────
@@ -592,7 +598,7 @@
           <div class="card-description" data-i18n="reset-desc">Tap icon (top left) to reset to center</div>
         </div>
         <div class="card-visual">
-          <div class="lm-button"><img src="/images/site/logo-lm.png" alt="" class="lm-mark" /></div>
+          <div class="lm-button"><span class="lm-mark" aria-hidden="true"></span></div>
         </div>
       </div>
     </div>
@@ -655,5 +661,6 @@
       report();
     })();
   </script>
+  <script src="/js/room-accent.js"></script>
 </body>
 </html>

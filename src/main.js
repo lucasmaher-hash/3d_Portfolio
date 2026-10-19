@@ -2440,6 +2440,8 @@ loadScene(
       renderer.shadowMap.needsUpdate = true   // the one draw static shadow maps get (PERF.staticShadows)
       res.liveAfter = performance.now() + 1500  // the resolution governor starts after warm-up
       // Lets the welcome screen close (index.html holds it until now).
+      roomAccent.ready = true
+      updateRoomAccent(0, true)
       if (window._sceneReady) window._sceneReady()
       console.log(`Szene sichtbar — Shader kompiliert nach ${Math.round(performance.now() - glbT0)}ms`)
     }
@@ -2461,6 +2463,65 @@ loadScene(
     if (window._sceneReady) window._sceneReady()
   }
 )
+
+// ── Room accent ──────────────────────────────────────────────────
+// The site's accent (--accent-orange on this page's root) follows the room you
+// stand in, fading softly as you walk through a doorway. The nav iframe colours
+// its logo from it, and the About and controls overlays (/js/room-accent.js)
+// their accent elements. Each room is its floor's rectangle in world XZ,
+// measured in the live scene (the floors' world bboxes, ~0.5 outside them); the
+// main room and the tunnels between rooms are the default. Re-measure after a
+// GLB change that moves a room.
+const ROOM_ACCENT_DEFAULT = '#6F8E7E'          // green grey, after the main room's carpet (#52A377)
+const ROOM_ACCENTS = [
+  { room: 'PinkRoom',   color: '#FF88C8', x: [6.0, 29.5],    z: [5.4, 28.1]   },  // Unify, the app's pink
+  { room: 'YellowRoom', color: '#EA5A1E', x: [-29.0, -15.2], z: [6.5, 23.6]   },  // the Mac-Lamp table lamp, Mac-Lamp's orange
+  { room: 'BlueRoom',   color: '#617395', x: [-10.8, 0.6],   z: [27.1, 39.0]  },  // VR panel + Cybercoffee, the walls' blue grey
+  { room: 'NewRoom',    color: '#9C7A5C', x: [-11.7, 4.5],   z: [-11.3, 4.9]  },  // packaging, a brown off its sand floor
+]
+const ROOM_ACCENT_EASE = 3                   // 1/s: ~1 s from one room's colour to the next
+
+const hexToRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16))
+const roomAccent = {
+  ready: false,                              // set at the reveal, once the camera stands at its spawn
+  rgb: hexToRgb(ROOM_ACCENT_DEFAULT),
+  sent: '',
+}
+function roomAccentTarget(p) {
+  for (const r of ROOM_ACCENTS) {
+    if (p.x >= r.x[0] && p.x <= r.x[1] && p.z >= r.z[0] && p.z <= r.z[1]) return r.color
+  }
+  return ROOM_ACCENT_DEFAULT
+}
+function sendRoomAccent() {
+  const hex = '#' + roomAccent.rgb.map(v => Math.round(v).toString(16).padStart(2, '0')).join('').toUpperCase()
+  if (hex === roomAccent.sent) return
+  roomAccent.sent = hex
+  document.documentElement.style.setProperty('--accent-orange', hex)
+  for (const f of document.querySelectorAll('iframe')) {
+    try { f.contentWindow && f.contentWindow.postMessage({ type: 'accent', color: hex }, '*') } catch (e) {}
+  }
+}
+// snap: jump straight to the target (the first frame after the reveal, so a
+// return from a project page does not fade in from the main room's colour).
+function updateRoomAccent(delta, snap = false) {
+  if (!roomAccent.ready) return
+  const target = hexToRgb(roomAccentTarget(camera.position))
+  const k = snap ? 1 : 1 - Math.exp(-ROOM_ACCENT_EASE * delta)
+  roomAccent.rgb = roomAccent.rgb.map((v, i) => {
+    const n = v + (target[i] - v) * k
+    return Math.abs(target[i] - n) < 0.5 ? target[i] : n
+  })
+  sendRoomAccent()
+}
+sendRoomAccent()
+// An iframe that loads later (the overlays are loaded on first open, the nav may
+// finish after this runs) gets the current colour; the nav also reads it itself.
+for (const f of document.querySelectorAll('iframe')) {
+  f.addEventListener('load', () => {
+    try { f.contentWindow.postMessage({ type: 'accent', color: roomAccent.sent }, '*') } catch (e) {}
+  })
+}
 
 // ── Render loop ──────────────────────────────────────────────────
 let isOverlayOpen = false
@@ -2658,6 +2719,7 @@ function animate() {
   const rawDelta = clock.getDelta()
   const delta = Math.min(rawDelta, 0.1)
   updatePops(delta)   // click-pop pulses run regardless of overlay state
+  updateRoomAccent(delta)
   camera.getWorldDirection(forward)
   forward.y = 0
   forward.normalize()

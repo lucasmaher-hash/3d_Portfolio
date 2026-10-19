@@ -596,7 +596,7 @@
       'virtual_cooking2d', 'to-shove2d', 'unify2d'].some(p => PARENT_PATH.includes(p));
 
     // The logo takes the host page's accent (--accent-orange), so it is purple on
-    // Virtual Cooking, orange on Mac-Lamp, pink on Unify… Pages on the default blue
+    // Virtual Cooking, orange on Mac-Lamp, pink on Unify, the room colour in 3D… Pages on the default blue
     // keep the stylesheet's #809BBC / #475F7E pair; a page with its own accent gets
     // a hover darkened from it.
     (function () {
@@ -618,6 +618,11 @@
       syncLogo();
       window.addEventListener('load', syncLogo);
       try { window.parent.addEventListener('load', syncLogo); } catch (e) {}
+      // The 3D page changes its accent as you walk between rooms (src/main.js,
+      // ROOM_ACCENTS) and posts each step of the fade here.
+      window.addEventListener('message', e => {
+        if (e.data && e.data.type === 'accent') syncLogo();
+      });
     })();
 
     document.getElementById('logo-btn').addEventListener('click', e => {
