@@ -244,7 +244,7 @@ script at the end of the file collects every img/video/canvas/background-image o
 flashed) sets `clip-path: path(evenodd, ...)` with a rounded hole per picture touching the light
 band. clip-path, not mask-image: a new data-URL mask per frame had to be decoded and flickered.
 Holes are stretched by the last scroll step in the direction of travel (max 40px) against Safari's
-threaded-scroll lag. Idles while the light is off. Measured: <0.1ms median, 0.5–1.2ms max per
+threaded-scroll lag. Idles while the light is off. **The old paint test is gone** (it dropped the bar's shading whenever >50% of 9 samples hit a picture, which blinked it off/on as project videos slid past): only the full-bleed `.hero` rule decides `is-2d-mode` now, at every width. Measured: <0.1ms median, 0.5–1.2ms max per
 scroll on 2D/Unify, 0.6ms one-off collect. **Logo, 2D/3D toggle, About
 pill, hamburger** use `--shadow-soft` (4px / 8px, phones 2.6px / 5.2px; was 5px / 12px) and
 `--shadow-soft-hover` (7px / 14px; was 11px / 24px) — close to the pressed segment inside the toggle.
