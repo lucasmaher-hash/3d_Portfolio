@@ -793,7 +793,7 @@
   <script>
     /* Bar light only on the plain page background (2026-10-19, Lucas).
        The light follows the bar (same on/off as its shadow via .is-2d-mode) and is clipped: every
-       picture of the parent page (and every View Work pill) that touches the light band gets a hole, shaped
+       non-background element of the parent page (see collect) that touches the light band gets a hole, shaped
        like its visible frame (nearest of element/parent/grandparent with a corner radius). */
     (function () {
       var light = document.querySelector('.nav-light');
@@ -811,10 +811,58 @@
       new MutationObserver(syncOn).observe(island, { attributes: true, attributeFilter: ['class'] });
       syncOn();
 
-      var frames = [];
+      var frames = [], zones = [];
+      // Phone sections (Lucas): while the bar is over any of these the light goes away entirely
+      // instead of being cut out piece by piece — morrow's Windows-phone row and colour fan,
+      // the staggered phones, every phone shot (morrow + Unify) and Unify's iMessage stage (its
+      // big blue bubble only exists mid-animation, so it cannot be collected as a box).
+      var ZONE_SELECTOR = '.win-devices-inner, .fan-sticky, .stagger-figure, .phone-shot, .imsg-stage';
+      // Everything that is not plain page background gets a hole: img/video/canvas, root <svg>
+      // (charts), anything with a background image or gradient, and anything with an opaque
+      // background colour that differs from the page colour (dark bar charts, card panels,
+      // phone frames, the survey bars, chat bubbles, View Work pills). Text stays lit.
+      // Nested hits are dropped (a pink card inside a dark panel): overlapping holes would
+      // cancel each other out under evenodd. Page-sized boxes are skipped so a wrapper in a
+      // different colour can never cut the whole light away.
       function collect() {
-        var doc = topWin.document, seen = [], out = [];
-        function add(el) {
+        var doc = topWin.document, out = [];
+        function rgba(c) {
+          var m = /rgba?\(([^)]+)\)/.exec(c || '');
+          if (!m) return null;
+          var v = m[1].split(',').map(parseFloat);
+          return { r: v[0], g: v[1], b: v[2], a: v.length > 3 ? v[3] : 1 };
+        }
+        var surface = rgba(topWin.getComputedStyle(doc.body).backgroundColor) || { r: 220, g: 220, b: 227 };
+        function differs(c) {
+          var k = rgba(c);
+          return !!k && k.a >= 0.5 && Math.abs(k.r - surface.r) + Math.abs(k.g - surface.g) + Math.abs(k.b - surface.b) > 12;
+        }
+        var vw = topWin.innerWidth, vh = topWin.innerHeight;
+        var picked = [], skipRoots = [];
+        doc.querySelectorAll('body *').forEach(function (el) {
+          for (var k = 0; k < skipRoots.length; k++) if (skipRoots[k].contains(el)) return;
+          var tag = el.tagName;
+          if (tag === 'IFRAME' || tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return;
+          if (el instanceof topWin.SVGElement && tag.toLowerCase() !== 'svg') return;   // only the svg root
+          var cs = topWin.getComputedStyle(el);
+          // Fixed layers (the hidden mobile-menu overlay, scroll dots) never sit in the page flow
+          // under the bar; a hidden full-screen overlay would otherwise cut away all the light.
+          // Opacity is NOT checked on purpose: sections that fade in on scroll start at 0.
+          if (cs.position === 'fixed' || cs.visibility === 'hidden') { skipRoots.push(el); return; }
+          // Background images count, gradients too, except hover underlines (a gradient sized
+          // to a 1px line, e.g. "0% 1px") which are text decoration, not a surface.
+          var bi = cs.backgroundImage;
+          var hit = tag === 'IMG' || tag === 'VIDEO' || tag === 'CANVAS' || tag.toLowerCase() === 'svg' ||
+            bi.indexOf('url(') >= 0 || (bi !== 'none' && !/(^|\s)1px\b/.test(cs.backgroundSize)) ||
+            differs(cs.backgroundColor);
+          if (!hit) return;
+          var b = el.getBoundingClientRect();
+          if (b.width >= vw * 0.98 && b.height >= vh * 2) return;   // page-sized background
+          picked.push(el);
+        });
+        // frame = nearest of element / parent / grandparent with a corner radius (the visible shape)
+        var seen = [];
+        picked.forEach(function (el) {
           var f = el, r = 0;
           for (var i = 0; i < 3 && f && f !== doc.body; i++, f = f.parentElement) {
             r = parseFloat(topWin.getComputedStyle(f).borderTopLeftRadius) || 0;
@@ -822,15 +870,16 @@
           }
           if (!(r > 0) || !f || f === doc.body) { f = el; r = 0; }
           if (seen.indexOf(f) < 0) { seen.push(f); out.push({ el: f, r: r }); }
-        }
-        doc.querySelectorAll('img, video, canvas').forEach(add);
-        // The blue View Work pills too (Lucas): a white highlight on them read as a pale stripe.
-        doc.querySelectorAll('.btn-view-work').forEach(add);
-        doc.querySelectorAll('body *').forEach(function (el) {
-          if (el.tagName === 'IFRAME') return;
-          if (topWin.getComputedStyle(el).backgroundImage.indexOf('url(') === 0) add(el);
+        });
+        // drop frames that sit inside another frame
+        out = out.filter(function (o) {
+          for (var p = o.el.parentElement; p && p !== doc.body; p = p.parentElement) {
+            if (seen.indexOf(p) >= 0) return false;
+          }
+          return true;
         });
         frames = out;
+        zones = [].slice.call(doc.querySelectorAll(ZONE_SELECTOR));
       }
 
       function rr(x, y, w, h, r) {
@@ -857,6 +906,17 @@
         shape.style.width = ir.width + 'px'; shape.style.height = ir.height + 'px';
         var fe = window.frameElement, fr = fe ? fe.getBoundingClientRect() : { left: 0, top: 0 };
         var W = window.innerWidth, H = window.innerHeight, pad = 30, holes = '';
+        var fe0 = window.frameElement, f0 = fe0 ? fe0.getBoundingClientRect() : { left: 0, top: 0 };
+        for (var z = 0; z < zones.length; z++) {
+          var zb = zones[z].getBoundingClientRect();
+          if (!zb.width || !zb.height) continue;
+          var zx = zb.left - f0.left, zy = zb.top - f0.top;
+          if (zx < ir.right + pad && zx + zb.width > ir.left - pad && zy < ir.bottom + pad + lag && zy + zb.height > ir.top - pad - lag) {
+            var none = 'inset(50%)';   // clip everything: no light while a phone section is under the bar
+            if (none !== lastClip) { light.style.clipPath = none; light.style.webkitClipPath = none; lastClip = none; }
+            return;
+          }
+        }
         for (var i = 0; i < frames.length; i++) {
           var b = frames[i].el.getBoundingClientRect();
           if (!b.width || !b.height) continue;

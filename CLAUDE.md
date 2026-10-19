@@ -238,13 +238,13 @@ iframe and blend modes do not reach the parent page. **The bar's own outer shadi
 stays on `.nav-island.is-2d-mode` (`--shadow-island`); the light (`--island-light`, white 0.7) lives
 on its own full-frame layer `.nav-light` (z 999, under `.top-row`), an island-shaped box whose only
 paint is the highlight, on/off with `is-2d-mode` via a MutationObserver. **Picture cut-outs:** the
-script at the end of the file collects every img/video/canvas/background-image of the parent page, plus every `.btn-view-work` pill,
+script at the end of the file collects every element of the parent page that is not plain page background — img/video/canvas/root svg, background images and gradients (not 1px hover underlines), opaque background colours that differ from the body colour by >12 (bars, panels, pills, phone frames); skipping fixed/hidden layers and their children (the hidden mobile-menu overlay would cut all light), page-sized boxes, and frames nested inside another frame (overlapping holes cancel under evenodd) —
 (frame = nearest of element/parent/grandparent with a corner radius; on load, resize, +500ms,
 +2s) and on every parent `scroll` (synchronously — rAF left the holes a frame behind and the light
 flashed) sets `clip-path: path(evenodd, ...)` with a rounded hole per picture touching the light
 band. clip-path, not mask-image: a new data-URL mask per frame had to be decoded and flickered.
 Holes are stretched by the last scroll step in the direction of travel (max 40px) against Safari's
-threaded-scroll lag. Idles while the light is off. **The old paint test is gone** (it dropped the bar's shading whenever >50% of 9 samples hit a picture, which blinked it off/on as project videos slid past): only the full-bleed `.hero` rule decides `is-2d-mode` now, at every width. Measured: <0.1ms median, 0.5–1.2ms max per
+threaded-scroll lag. **Light-off zones** (`ZONE_SELECTOR`: `.win-devices-inner, .fan-sticky, .stagger-figure, .phone-shot, .imsg-stage`): while any of them touches the light band the whole light is clipped away (`inset(50%)`) instead of cut piece by piece — Lucas wanted no light at all over the phone sections; Unify's big blue bubble only exists mid-animation, hence the whole iMessage stage. Idles while the light is off. **The old paint test is gone** (it dropped the bar's shading whenever >50% of 9 samples hit a picture, which blinked it off/on as project videos slid past): only the full-bleed `.hero` rule decides `is-2d-mode` now, at every width. Measured: <0.1ms median, 0.5–1.2ms max per
 scroll on 2D/Unify, 0.6ms one-off collect. **Logo, 2D/3D toggle, About
 pill, hamburger** use `--shadow-soft` (4px / 8px, phones 2.6px / 5.2px; was 5px / 12px) and
 `--shadow-soft-hover` (7px / 14px; was 11px / 24px) — close to the pressed segment inside the toggle.
