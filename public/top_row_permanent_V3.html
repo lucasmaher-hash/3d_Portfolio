@@ -262,12 +262,12 @@
       aspect-ratio: 400 / 265;
       display: block;
       pointer-events: none;
-      background-color: #809BBC;
+      background-color: var(--logo-color, #809BBC);
       -webkit-mask: url(/images/site/logo-lm.png) center / contain no-repeat;
       mask: url(/images/site/logo-lm.png) center / contain no-repeat;
       transition: background-color 260ms var(--ease);
     }
-    .logo:hover .logo-mark { background-color: #475F7E; transition-duration: 150ms; }
+    .logo:hover .logo-mark { background-color: var(--logo-hover, #475F7E); transition-duration: 150ms; }
 
     .logo:hover {
       transform: translateY(-2px) scale(1.03);
@@ -594,6 +594,31 @@
     const PARENT_PATH = window.top.location.pathname;
     const IS_2D_VIEW = ['2D', 'about2d', 'vaccine2d', 'mac-lamp2d', 'kaffeemaschine2d',
       'virtual_cooking2d', 'to-shove2d', 'unify2d'].some(p => PARENT_PATH.includes(p));
+
+    // The logo takes the host page's accent (--accent-orange), so it is purple on
+    // Virtual Cooking, orange on Mac-Lamp, pink on Unify… Pages on the default blue
+    // keep the stylesheet's #809BBC / #475F7E pair; a page with its own accent gets
+    // a hover darkened from it.
+    (function () {
+      function syncLogo() {
+        let c = '';
+        try {
+          c = getComputedStyle(window.parent.document.documentElement)
+            .getPropertyValue('--accent-orange').trim();
+        } catch (e) {}
+        const root = document.documentElement.style;
+        if (!c || c.toUpperCase() === '#809BBC') {
+          root.removeProperty('--logo-color');
+          root.removeProperty('--logo-hover');
+          return;
+        }
+        root.setProperty('--logo-color', c);
+        root.setProperty('--logo-hover', 'color-mix(in oklch, ' + c + ', black 30%)');
+      }
+      syncLogo();
+      window.addEventListener('load', syncLogo);
+      try { window.parent.addEventListener('load', syncLogo); } catch (e) {}
+    })();
 
     document.getElementById('logo-btn').addEventListener('click', e => {
       e.preventDefault();
