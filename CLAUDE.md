@@ -2395,7 +2395,12 @@ Raised shadow = element pops out. Pressed/inset shadow = element pushed in (used
 
 ## Fonts
 
-- `OCR-A-BT` (local TTF at `/OCR-A-BT.ttf`) — headings / project titles
+- `OCR-A-BT` — headings / project titles. **Every page loads `/OCR-A-BT-DE.ttf`** (2026-10-19, Lucas):
+  a copy of Bitstream's `/OCR-A-BT.ttf` (left untouched) with the German characters it lacked —
+  ä ö ü (a/o/u + Ü's umlaut strokes), ß and ẞ (drawn at the font's stem width), „ “ ‚ ‘, – — …
+  Built by `scripts/build-ocr-a-de.py` (fonttools + shapely); rebuild from the original rather
+  than editing the DE file. Commercial font, modified with Lucas's knowledge of the licence risk.
+  No `local()` source in the @font-face: an installed OCR-A would win and lack the umlauts.
 - `VT323` (Google Fonts) — labels, breadcrumbs, meta text, monospace UI elements
 - `Roboto Flex` (Google Fonts) — body text
 - `Roboto` (Google Fonts) — Unify typography-card labels
