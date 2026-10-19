@@ -612,8 +612,14 @@
           root.removeProperty('--logo-hover');
           return;
         }
+        // A page may set how dark the hover gets (--accent-hover-mix, default 30%).
+        let mixv = '';
+        try {
+          mixv = getComputedStyle(window.parent.document.documentElement)
+            .getPropertyValue('--accent-hover-mix').trim();
+        } catch (e) {}
         root.setProperty('--logo-color', c);
-        root.setProperty('--logo-hover', 'color-mix(in oklch, ' + c + ', black 30%)');
+        root.setProperty('--logo-hover', 'color-mix(in oklch, ' + c + ', black ' + (mixv || '30%') + ')');
       }
       syncLogo();
       window.addEventListener('load', syncLogo);

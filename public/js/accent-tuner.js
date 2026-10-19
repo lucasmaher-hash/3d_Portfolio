@@ -16,9 +16,10 @@
   var STORE = 'accentTuner:colors';
   var root = document.documentElement;
   var original = getComputedStyle(root).getPropertyValue('--accent-orange').trim() || '#809BBC';
+  var pageHover = parseFloat(getComputedStyle(root).getPropertyValue('--accent-hover-mix')) || 30;
   var PRESETS = [
     ['2D / Packaging', '#809BBC'], ['to.morrow', '#7A92B0'], ['Virtual Cooking', '#9693BB'],
-    ['Unify', '#B48A9F'], ['Cybercoffee', '#AD7E7F'], ['Mac-Lamp', '#B78E7A'],
+    ['Unify', '#B48A9F'], ['Cybercoffee', '#AD7E7F'], ['Mac-Lamp', '#E6905B'], ['3D lamp room', '#B78E7A'],
     ['3D main', '#79A48C'], ['3D blue', '#728BAC'], ['3D brown', '#987A5B'], ['App pink', '#FF88C8'],
   ];
 
@@ -75,7 +76,7 @@
   var state = {
     base: parseHex(saved[PAGE] && saved[PAGE].base || original) || [128, 155, 188],
     grey: saved[PAGE] ? saved[PAGE].grey || 0 : 0,        // % mixed toward the page grey
-    hover: saved[PAGE] ? saved[PAGE].hover || 30 : 30,     // % of black in the logo's hover
+    hover: saved[PAGE] ? saved[PAGE].hover || 30 : pageHover, // % of black in the logo's hover
   };
   var PAGE_GREY = [220, 220, 227];
   function finalRgb() { return mix(state.base, PAGE_GREY, state.grey / 100); }
@@ -217,8 +218,8 @@
       try { var nr = navEl.contentDocument.documentElement; nr.style.removeProperty('--logo-color'); nr.style.removeProperty('--logo-hover'); navEl.contentWindow.postMessage({ type: 'accent' }, '*'); } catch (err) {}
       host.remove();
     }
-    else if (a === 'reset') { delete saved[PAGE]; try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch (err) {} state.base = parseHex(original) || state.base; state.grey = 0; state.hover = 30; apply(); }
-    else if (a === 'clear') { saved = {}; try { localStorage.removeItem(STORE); } catch (err) {} state.base = parseHex(original) || state.base; state.grey = 0; state.hover = 30; apply(); }
+    else if (a === 'reset') { delete saved[PAGE]; try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch (err) {} state.base = parseHex(original) || state.base; state.grey = 0; state.hover = pageHover; apply(); }
+    else if (a === 'clear') { saved = {}; try { localStorage.removeItem(STORE); } catch (err) {} state.base = parseHex(original) || state.base; state.grey = 0; state.hover = pageHover; apply(); }
     else if (a === 'copy') {
       var txt = exportText();
       var done = function () { copyNote = 'copied'; render(); setTimeout(function () { copyNote = ''; render(); }, 1500); };
