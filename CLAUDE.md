@@ -238,7 +238,7 @@ iframe and blend modes do not reach the parent page. **The bar's own outer shadi
 stays on `.nav-island.is-2d-mode` (`--shadow-island`); the light (`--island-light`, white 0.7) lives
 on its own full-frame layer `.nav-light` (z 999, under `.top-row`), an island-shaped box whose only
 paint is the highlight, on/off with `is-2d-mode` via a MutationObserver. **Picture cut-outs:** the
-script at the end of the file collects every img/video/canvas/background-image of the parent page
+script at the end of the file collects every img/video/canvas/background-image of the parent page, plus every `.btn-view-work` pill,
 (frame = nearest of element/parent/grandparent with a corner radius; on load, resize, +500ms,
 +2s) and on every parent `scroll` (synchronously — rAF left the holes a frame behind and the light
 flashed) sets `clip-path: path(evenodd, ...)` with a rounded hole per picture touching the light

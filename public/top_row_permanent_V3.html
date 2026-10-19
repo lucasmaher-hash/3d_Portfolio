@@ -793,7 +793,7 @@
   <script>
     /* Bar light only on the plain page background (2026-10-19, Lucas).
        The light follows the bar (same on/off as its shadow via .is-2d-mode) and is clipped: every
-       picture of the parent page that touches the light band gets a hole in the mask, shaped
+       picture of the parent page (and every View Work pill) that touches the light band gets a hole, shaped
        like its visible frame (nearest of element/parent/grandparent with a corner radius). */
     (function () {
       var light = document.querySelector('.nav-light');
@@ -824,6 +824,8 @@
           if (seen.indexOf(f) < 0) { seen.push(f); out.push({ el: f, r: r }); }
         }
         doc.querySelectorAll('img, video, canvas').forEach(add);
+        // The blue View Work pills too (Lucas): a white highlight on them read as a pale stripe.
+        doc.querySelectorAll('.btn-view-work').forEach(add);
         doc.querySelectorAll('body *').forEach(function (el) {
           if (el.tagName === 'IFRAME') return;
           if (topWin.getComputedStyle(el).backgroundImage.indexOf('url(') === 0) add(el);
