@@ -403,14 +403,21 @@
          never re-flows. Numbers are the 1440 layout divided by its 898px
          frame width; the radius is the 24px corner as an x / y percentage
          pair so it stays round. */
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      align-items: start;          /* tops in one line */
-      column-gap: 4%;
-      padding: 5.8% 4.9% 6.2%;
+      /* Since 2026-10-19 a video fills it (see the markup); the box keeps the
+         recorded layout's shape (the video is 1796 x 756, 898 x 378 at 1440 2x). */
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1796 / 756;
       margin-inline: clamp(0px, 8vw, 80px);   /* same inset as .home-copy / .stat-block */
       background: #292925;
       border-radius: 1.6% / 3.9%;   /* was 2.67% / 6.5%, 40% less round (2026-10-08) */
       margin-top: clamp(60px, 9vw, 96px);
+    }
+    .home-previews-video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      pointer-events: none;      /* a picture, not a control: no tap-to-restart */
     }
     .home-panel { position: relative; width: 100%; }
     .home-frame {
@@ -2183,10 +2190,17 @@
            each is the app's real panel (see .home-previews CSS). Two reasons, kept
            apart on purpose: a glance is usually enough, and a preview pulls
            you into the full screen. -->
-      <div class="home-previews" role="img" data-i18n-aria="a-home" aria-label="The three cards on the Unify home screen, opened: connect now (who's free and until when), socials (what's on today), map (friends nearby).">
-        <div class="home-panel" style="aspect-ratio: 377 / 402;"><iframe class="home-frame" src="/unify/app-home/home.html?open=connect&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
-        <div class="home-panel" style="aspect-ratio: 377 / 411;"><iframe class="home-frame" src="/unify/app-home/home.html?open=socials&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
-        <div class="home-panel" style="aspect-ratio: 377 / 402;"><iframe class="home-frame" src="/unify/app-home/home.html?open=map&amp;only=1" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe></div>
+<div class="home-previews" role="img" data-i18n-aria="a-home" aria-label="The three cards on the Unify home screen, opened: connect now (who's free and until when), socials (what's on today), map (friends nearby).">
+        <!-- A screen recording of the three cards, not the cards themselves (Lucas,
+             2026-10-19): /unify/app-home/home.html is still the source, recorded as
+             a seamless 24 s loop by scripts/record-unify-home.mjs (desktop and phone
+             layouts, one file each). To change the cards: put the three iframes back
+             in here, edit home.html, re-record, re-encode, bump ?v=. Always playing,
+             never clickable. -->
+        <video class="home-previews-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1" aria-hidden="true">
+          <source src="/videos/unify/home-previews.mp4?v=20261019" type="video/mp4" media="(min-width: 641px)">
+          <source src="/videos/unify/home-previews-mobile.mp4?v=20261019" type="video/mp4">
+        </video>
       </div>
       <div class="home-copy">
         <div>
@@ -2957,7 +2971,7 @@
     //     control responding.
     (function () {
       var vids = Array.prototype.slice.call(document.querySelectorAll('video'))
-        .filter(function (v) { return !v.closest('a') && !v.closest('.hero'); });
+        .filter(function (v) { return !v.closest('a') && !v.closest('.hero') && !v.closest('.home-previews'); });
 
       vids.forEach(function (v) {
         // See the .vid-press comment in the stylesheet for why this is the
