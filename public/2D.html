@@ -959,6 +959,17 @@
   <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
   <!-- <script src="/theme/theme.js" defer></script>  dark mode detached 2026-10-06 -->
+  <style>
+    /* Desktop type scale (Lucas, 2026-10-19): headings, project titles and the
+       At-a-Glance lead about 20% smaller from 861px up. Each rule restates the
+       page's own size above × 0.8, so phones and tablets are untouched. Keep this
+       the last <style> on the page and add a line here for any new heading size. */
+    @media (min-width: 861px) {
+      .hero-title { font-size: calc(clamp(32px, 8vw, 83px) * 0.8); }
+      .craft-title { font-size: calc(clamp(28px, 3.5vw, 48px) * 0.8); }
+      .project-title { font-size: calc(clamp(22px, 3.8vw, 64px) * 0.8); }
+    }
+  </style>
 </head>
 <body>
   <!-- Site entrance loader — the orange liquid ball, once per tab (see the

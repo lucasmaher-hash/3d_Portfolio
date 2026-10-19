@@ -1269,6 +1269,19 @@
   <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
   <!-- <script src="/theme/theme.js" defer></script>  dark mode detached 2026-10-06 -->
+  <style>
+    /* Desktop type scale (Lucas, 2026-10-19): headings, project titles and the
+       At-a-Glance lead about 20% smaller from 861px up. Each rule restates the
+       page's own size above × 0.8, so phones and tablets are untouched. Keep this
+       the last <style> on the page and add a line here for any new heading size. */
+    @media (min-width: 861px) {
+      .project-title { font-size: calc(clamp(40px, 7vw, 96px) * 0.8); }
+      .section-title { font-size: calc(clamp(28px, 4vw, 44px) * 0.8); }
+      .glance-lead { font-size: calc(clamp(18px, 2.2vw, 24px) * 0.8); }
+      .project-nav-title { font-size: calc(clamp(20px, 3vw, 36px) * 0.8); }
+      .feature-title { font-size: calc(clamp(20px, 2.6vw, 26px) * 0.8); }
+    }
+  </style>
 </head>
 <body>
   <iframe id="top-bar" src="/top_row_permanent_V3.html" allowtransparency="true" scrolling="no"></iframe>
