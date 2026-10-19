@@ -3,6 +3,8 @@ left untouched) with the German characters it lacks (Lucas, 2026-10-19).
 
   ä ö ü   a / o / u + the umlaut strokes of Ü, shortened to sit between the
           x-height and the i's dot line (the font's own lowercase dot height)
+  Ä Ö Ü   redrawn: full-height A / O / U with the same strokes above the cap
+          height (the original squashed the letter to keep them inside it)
   ß ẞ     drawn here: centrelines stroked at the font's stem width (172 units),
           straight runs with the same chamfered corners and round ends as b and h
   „ “ ‚ ‘ the font's own " and ' (OCR-A has no curly quotes), the low ones moved
@@ -98,6 +100,14 @@ dots = [c for c in U if min(p[0][1] for p in c) >= 900]
 dots = xform(dots, sy=244 / 317, oy=924, dy=1069 - 924)
 for base, name, uni in (('a', 'adieresis', 0xE4), ('o', 'odieresis', 0xF6), ('u', 'udieresis', 0xFC)):
     add(name, uni, contours(base) + dots)
+
+# ── Ä Ö Ü redrawn (Lucas): the original squashes the letter under the cap
+#    height to fit the strokes inside it. Now the full-height A / O / U with the
+#    same strokes ABOVE the cap height, the same gap over the letter as on the
+#    lowercase (1069 - 881 = 188).
+cap_dots = xform(dots, dy=(1241 + 188) - 1069)
+for base, name in (('A', 'Adieresis'), ('O', 'Odieresis'), ('U', 'Udieresis')):
+    add(name, ord({'A': 'Ä', 'O': 'Ö', 'U': 'Ü'}[base]), contours(base) + cap_dots)
 
 # ── ß: stem up from the baseline, a narrow upper bowl, a wider lower bowl.
 L, R = 209 + HALF, 1057 - HALF                 # stem centres, as in B (295 / 971)
