@@ -1563,7 +1563,7 @@
     let lastToggleY = 0;
     const topBar = document.getElementById('top-bar');
     const hideThreshold = 250;
-    const showThreshold = 180;
+    const showThreshold = 126;  // was 180: the nav comes back 30% sooner on scroll-up (Lucas, 2026-10-19)
 
     window.addEventListener('scroll', () => {
       const currentScrollY = window.scrollY;

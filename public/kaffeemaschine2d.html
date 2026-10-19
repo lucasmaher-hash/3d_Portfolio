@@ -1296,7 +1296,8 @@
       const y = window.scrollY;
       if (y === 0) { topBar.classList.remove('hide'); lastToggleY = 0; }
       else if (y > lastScrollY && Math.abs(y - lastToggleY) > 250) { topBar.classList.add('hide'); lastToggleY = y; }
-      else if (y < lastScrollY && Math.abs(y - lastToggleY) > 180) { topBar.classList.remove('hide'); lastToggleY = y; }
+      else if (y < lastScrollY && Math.abs(y - lastToggleY) > 126) {  // was 180: 30% sooner (Lucas, 2026-10-19)
+        topBar.classList.remove('hide'); lastToggleY = y; }
       lastScrollY = y;
     });
 
