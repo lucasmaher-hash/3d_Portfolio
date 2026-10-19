@@ -571,7 +571,6 @@
          font-family and font-size, so there is nothing to fight. */
       .project-label { display: none; }
 
-      .footer-section { padding: 8px 20px; }
     }
 
     /* Mobile menu overlay */
@@ -789,13 +788,16 @@
       color: var(--text-primary);
       white-space: nowrap;
     }
-    /* Phones: no links (Lucas, 2026-10-19) — logo left, copyright right on one row; the
-       copyright may wrap there since it does not fit beside the logo at 375px.
+    .copyright-short { display: none; }
+    /* Phones: no links (Lucas, 2026-10-19) — logo left, copyright right on one row, short form
+       "© 2026 LM" so it fits beside the logo; may still wrap on very narrow screens.
        Must stay after the footer rules above (same specificity, source order wins). */
     @media (max-width: 640px) {
-      .footer-section { grid-template-columns: auto 1fr; }
+      .footer-section { grid-template-columns: auto 1fr; padding: 10px 20px; }   /* 8px + 20% (Lucas) */
       .footer-links { display: none; }
       .copyright { white-space: normal; }
+      .copyright-full { display: none; }
+      .copyright-short { display: inline; }
     }
 
     html { scrollbar-width: none; }
@@ -1388,7 +1390,7 @@
         <a href="https://www.linkedin.com/in/lucas-maher-5b53163bb/" target="_blank" rel="noopener">LinkedIn</a>
         <a href="#" id="footer-email-link" data-i18n="footer-email">Email</a>
       </nav>
-      <p class="copyright" data-i18n="footer-copyright">© 2026 Lucas Maher. All Rights Reserved.</p>
+      <p class="copyright"><span class="copyright-full" data-i18n="footer-copyright">© 2026 Lucas Maher. All Rights Reserved.</span><span class="copyright-short" data-i18n="footer-copyright-short">© 2026 LM. All Rights Reserved.</span></p>
     </div>
   </div>
 
@@ -1601,6 +1603,7 @@
         'btn-view-work': 'View Work',
         'footer-copyright': '© 2026 Lucas Maher. All Rights Reserved.',
         'footer-email': 'Email',
+        'footer-copyright-short': '© 2026 LM. All Rights Reserved.',
       },
       de: {
         'menu-about': 'Über mich',
@@ -1615,6 +1618,7 @@
         'btn-view-work': 'Ansehen',
         'footer-copyright': '© 2026 Lucas Maher. Alle Rechte vorbehalten.',
         'footer-email': 'E-Mail',
+        'footer-copyright-short': '© 2026 LM. Alle Rechte vorbehalten.',
       }
     };
     function applyLang(lang) {
