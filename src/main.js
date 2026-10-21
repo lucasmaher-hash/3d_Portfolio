@@ -1,8 +1,10 @@
 import './style.css'
 import { prepareGallery } from './gallery/scene.js'
+import { prepareOriginalGallery } from './gallery/original-scene.js'
 
-const IS_GALLERY = location.pathname === '/gallery.html'
-const RETURN_STATE_KEY = IS_GALLERY ? '_galleryReturnState' : '_3dReturnState'
+const IS_ORIGINAL_GALLERY = location.pathname === '/gallery-original.html'
+const IS_GALLERY = IS_ORIGINAL_GALLERY || location.pathname === '/gallery.html'
+const RETURN_STATE_KEY = IS_ORIGINAL_GALLERY ? '_originalGalleryReturnState' : IS_GALLERY ? '_galleryReturnState' : '_3dReturnState'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 // PERF.lightGlb: the production GLB is meshopt-compressed (scripts/optimize-glb.mjs).
@@ -2177,8 +2179,8 @@ function addRoomTitles(model) {
 // ── Load model ───────────────────────────────────────────────────
 const loader = new GLTFLoader()
 loader.setMeshoptDecoder(MeshoptDecoder)
-const GLB_ORIGINAL  = IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-surfaces' : '/current🟢.glb'
-const GLB_OPTIMIZED = IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-surfaces' : '/scene-optimized.glb'
+const GLB_ORIGINAL  = IS_ORIGINAL_GALLERY ? '/gallery-original-assets/gallery.glb?v=2' : IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-walls-v3' : '/current🟢.glb'
+const GLB_OPTIMIZED = IS_ORIGINAL_GALLERY ? '/gallery-original-assets/gallery.glb?v=2' : IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-walls-v3' : '/scene-optimized.glb'
 // A missing or broken optimized file (the optimizer never fails the build, it just does not
 // write one) falls back to the original GLB instead of leaving the 3D page empty.
 function loadScene(url, onLoad, onProgress, onError) {
@@ -2194,7 +2196,7 @@ loadScene(
   async (gltf) => {
     if (IS_GALLERY) {
       try {
-        const { settings, collidables: galleryWalls } = await prepareGallery(gltf.scene, scene, renderer)
+        const { settings, collidables: galleryWalls } = await (IS_ORIGINAL_GALLERY ? prepareOriginalGallery : prepareGallery)(gltf.scene, scene, renderer)
         collidables = galleryWalls
         // Include the lower cove in shoulder-width collision checks.
         lowCollidables.push(...galleryWalls)

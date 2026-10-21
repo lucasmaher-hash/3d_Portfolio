@@ -12,6 +12,10 @@ from mathutils import Matrix
 
 OUT = os.path.abspath(sys.argv[sys.argv.index('--') + 1])
 REUSE = '--reuse' in sys.argv
+DRAFT = '--final' not in sys.argv
+SEPARATE = '--separate-lights' in sys.argv
+WALLS_ONLY = '--walls-only' in sys.argv
+SAMPLES = 48 if WALLS_ONLY else 16 if DRAFT else 128
 os.makedirs(OUT, exist_ok=True)
 scene = bpy.data.scenes['Scene']
 bpy.context.window.scene = scene
@@ -28,7 +32,7 @@ def report(message):
 # guides, studio floor and the old wall parked beside the gallery.
 def included(ob):
     return ((ob.name.startswith(('Outer Wall |', 'Inner Ring |', 'Floor | fitted',
-                                'Ceiling | five', 'Ceiling 0', 'LED |', 'Podium 0'))
+                                'Ceiling |', 'Ceiling 0', 'LED |', 'Podium 0'))
             or ob.get('galleryRole') == 'project')
             and not ob.name.startswith('SAMPLE'))
 
@@ -57,10 +61,10 @@ for ob in scene.objects:
         ob.data.energy *= HEIGHT_SCALE ** 2
 
 scene.render.engine = 'CYCLES'
-scene.cycles.samples = 128
+scene.cycles.samples = SAMPLES
 scene.cycles.use_denoising = True
 scene.cycles.use_adaptive_sampling = True
-scene.cycles.adaptive_threshold = .01
+scene.cycles.adaptive_threshold = .1 if DRAFT else .01
 try:
     prefs = bpy.context.preferences.addons['cycles'].preferences
     prefs.compute_device_type = 'METAL'
@@ -72,7 +76,7 @@ try:
 except Exception as error:
     report('GPU unavailable; using CPU: ' + str(error))
 
-scene.render.bake.margin = 8
+scene.render.bake.margin = 2 if DRAFT else 8
 scene.render.bake.use_pass_direct = True
 scene.render.bake.use_pass_indirect = True
 scene.render.bake.use_pass_color = True
@@ -88,6 +92,11 @@ for ob in meshes:
         continue
     if 'diffuser' in ob.name.lower():
         ob['galleryRole'] = 'emitter'
+        if SEPARATE:
+            for i, material in enumerate(list(ob.data.materials)):
+                ob.data.materials[i] = material.copy()
+        continue
+    if WALLS_ONLY and not ob.name.startswith(('Outer Wall', 'Inner Ring', 'Podium ')):
         continue
     bpy.ops.object.select_all(action='DESELECT')
     ob.select_set(True)
@@ -107,6 +116,17 @@ for ob in meshes:
         segments = 16 if is_outer else 8
         cols = 4
         atlas_rows = math.ceil(segments * 2 / cols)
+        # Parameterize by physical distance: vertex indices are highly clustered
+        # around the tiny panel grooves, and equal-index UVs amplify those shadows
+        # into broad stripes in a low-resolution bake.
+        arc = [0.0]
+        for j in range(n):
+            a = mesh.vertices[30*n+j].co
+            b = mesh.vertices[30*n+(j+1)%n].co
+            arc.append(arc[-1]+(b-a).length)
+        profile = [0.0]
+        for k in range(1,rows):
+            profile.append(profile[-1]+(mesh.vertices[k*n].co-mesh.vertices[(k-1)*n].co).length)
         # Reserve a real two-dimensional strip for each crown/foot rim.
         # The former 8px strips touched at an 8px bake margin, contaminating
         # the crown. Segment boundaries now follow whole geometry edges.
@@ -128,11 +148,11 @@ for ob in meshes:
             for li, j in zip(poly.loop_indices, js):
                 vi = mesh.loops[li].vertex_index
                 k = (vi % layer) // n
-                u = (j - start) / (end - start)
-                v = k / (rows - 1)
+                u = (arc[j] - arc[start]) / (arc[end] - arc[start])
+                v = profile[k] / profile[-1]
                 pad = .02
                 if rim:
-                    uv.data[li].uv = (.01 + .98 * j / n,
+                    uv.data[li].uv = (.01 + .98 * arc[j] / arc[-1],
                         .01 + (.10 if k > rows / 2 else 0) +
                         (rim_height if vi >= layer else 0))
                 else:
@@ -158,6 +178,18 @@ for ob in meshes:
         bpy.ops.uv.smart_project(angle_limit=1.25, island_margin=.02)
         bpy.ops.object.mode_set(mode='OBJECT')
     resolution = 4096 if is_outer or is_ring or ob.name.startswith(('Floor |', 'Ceiling |')) else 1024 if ob.name.startswith('Podium ') else 512
+    if DRAFT and not WALLS_ONLY:
+        resolution = 512 if is_outer or is_ring or ob.name.startswith(('Floor |', 'Ceiling |')) else 128
+        # Simplify only this disposable draft copy after creating its UV atlas.
+        # The full source model and final-quality export retain the original mesh.
+        if is_outer or is_ring or ob.name.startswith('Podium '):
+            modifier = ob.modifiers.new('Draft simplification', 'DECIMATE')
+            modifier.ratio = .25
+            modifier.use_collapse_triangulate = True
+            bpy.ops.object.modifier_apply(modifier=modifier.name)
+            mesh = ob.data
+    if WALLS_ONLY:
+        resolution = 1024 if is_outer or is_ring else 512
     label = 'outer' if is_outer else 'ring' if is_ring else 'ceiling' if ob.name.startswith('Ceiling |') else 'floor' if ob.name.startswith('Floor |') else 'podium-' + ob.name.split()[1] if ob.name.startswith('Podium ') else 'well-' + ob.name.split()[1]
     image = bpy.data.images.new('Gallery bake ' + label, width=resolution, height=resolution)
     image.colorspace_settings.name = 'sRGB'
@@ -176,7 +208,9 @@ for ob in meshes:
         material.node_tree.nodes.active = target
     image.filepath_raw = os.path.join(OUT, label + '.png')
     image.file_format = 'PNG'
-    if REUSE and os.path.exists(image.filepath_raw) and label not in {'ring', 'outer'}:
+    if SEPARATE:
+        pass  # Bake all prepared surfaces together for each isolated source.
+    elif REUSE and os.path.exists(image.filepath_raw) and label not in {'ring', 'outer'}:
         image = bpy.data.images.load(image.filepath_raw, check_existing=False)
         report('Reusing bake ' + label)
     else:
@@ -184,6 +218,43 @@ for ob in meshes:
         bpy.ops.object.bake(type='DIFFUSE')
         image.save()
     baked.append((ob, image, label))
+
+if SEPARATE:
+    # Linear lighting superposition: ambient/rims plus one complete GI bake per
+    # ceiling source. The browser can then change each source independently.
+    sources, seen = [], set()
+    for ob in scene.objects:
+        if not hasattr(ob.data, 'materials'): continue
+        for material in ob.data.materials:
+            if not material or not material.use_nodes: continue
+            for node in material.node_tree.nodes:
+                socket = node.inputs.get('Strength') if node.type == 'EMISSION' else node.inputs.get('Emission Strength') if node.type == 'BSDF_PRINCIPLED' else None
+                if socket is None or socket.as_pointer() in seen: continue
+                seen.add(socket.as_pointer())
+                index = int(ob.name.split()[1]) if ob.name.startswith('Ceiling 0') and 'diffuser' in ob.name.lower() else 0
+                sources.append((socket, socket.default_value, index))
+    lights = [(ob, ob.data.energy, int(ob.name.split()[1])) for ob in scene.objects if ob.type == 'LIGHT']
+    backgrounds = [(node.inputs['Strength'], node.inputs['Strength'].default_value) for node in scene.world.node_tree.nodes if node.type == 'BACKGROUND']
+    reference = scene.get('independent_lighting_reference', .25)
+    for index in range(7):
+        prefix = 'ambient' if index == 0 else f'light-{index:02d}'
+        for socket, value, source_index in sources:
+            socket.default_value = value / reference if source_index == index and index else value if not source_index and not index else 0
+        for ob, value, source_index in lights:
+            ob.data.energy = value / reference if source_index == index else 0
+        for socket, value in backgrounds: socket.default_value = value if not index else 0
+        for ob, ambient, label in baked:
+            image = ambient if not index else bpy.data.images.new(prefix + '-' + label, width=ambient.size[0], height=ambient.size[1])
+            image.colorspace_settings.name = 'sRGB'
+            image.filepath_raw = os.path.join(OUT, prefix + '-' + label + '.png')
+            image.file_format = 'PNG'
+            for material in ob.data.materials: material.node_tree.nodes.active.image = image
+            bpy.ops.object.select_all(action='DESELECT'); ob.select_set(True); bpy.context.view_layer.objects.active = ob
+            report('Baking ' + prefix + ' / ' + label)
+            bpy.ops.object.bake(type='DIFFUSE'); image.save()
+    for socket, value, _ in sources: socket.default_value = value
+    for ob, value, _ in lights: ob.data.energy = value
+    for socket, value in backgrounds: socket.default_value = value
 
 # Change materials only after ALL bakes: subsequent bakes must still see the
 # original Cycles materials for bounce light and surface colour.
@@ -203,6 +274,7 @@ for ob, image, label in baked:
         poly.material_index = 0
     ob['galleryRole'] = 'floor' if label == 'floor' else 'wall' if label in {'ring', 'outer'} else 'podium' if label.startswith('podium-') else 'ceiling'
     ob['galleryBaked'] = True
+    if SEPARATE: ob['galleryBakeLabel'] = label
 
 for ob in scene.objects:
     if ob.type == 'CURVE':
@@ -221,8 +293,12 @@ with open(os.path.join(OUT, 'scene.json'), 'w') as f:
                'ceilingHeight': 4.922500133514404 - 0.01809215173125267,
                'fov': 90, 'speed': 3.45, 'spawn': [0, EYE, 0],
                'yaw': math.pi, 'pitch': .054,
-               'lighting': 'Cycles diffuse direct + indirect + colour; 128 samples',
-               'surfaceColor': '#3E6281', 'surfaceRoughness': .30,
+               'lighting': f'Cycles diffuse direct + indirect + colour; {SAMPLES} samples',
+               'quality': 'draft' if DRAFT else 'final', 'samples': SAMPLES,
+               'exposure': scene.get('gallery_exposure', 1),
+               'independentLights': SEPARATE, 'defaultLightLevels': [.25] * 6,
+               'ambientLevel': .5, 'emitterReferenceLevel': .25,
+               'surfaceColor': scene.get('gallery_surface_color', '#376478'), 'surfaceRoughness': .30,
                'fixtures': [[ob.location.x, -ob.location.y, ob.location.z] for ob in scene.objects if ob.type == 'LIGHT'],
                'source': 'gallery_layout.blend', 'baked': [label for _, _, label in baked]}, f, indent=2)
 report('Complete')

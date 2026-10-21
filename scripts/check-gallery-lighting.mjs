@@ -33,9 +33,11 @@ for (const primitive of node.getMesh().listPrimitives()) {
       const distance = pa.distanceTo(pb)
       // Limit the check to the crown itself; the lower curved profile includes
       // intentional narrow grooves with real shadow transitions.
+      // Compare along level rim edges. Across the rounded profile, the centre
+      // light creates legitimate gradients as the surface turns away from it.
       // Physically adjacent points along the crown should not alternate between
       // dark and light. This catches the mottled rim in the reported screenshots.
-      if (pa.y < 4.86 || pb.y < 4.86 || distance < .005 || distance > .15 || Math.abs(pa.y - pb.y) > .015) continue
+      if (pa.y < 4.86 || pb.y < 4.86 || distance < .005 || distance > .15 || Math.abs(pa.y - pb.y) > .0005) continue
       const ca = sample(ai), cb = sample(bi)
       const delta = Math.max(...ca.map((x, c) => Math.abs(x - cb[c])))
       tested++; maximum = Math.max(maximum, delta)

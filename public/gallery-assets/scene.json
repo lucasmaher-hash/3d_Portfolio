@@ -12,8 +12,22 @@
   ],
   "yaw": 3.141592653589793,
   "pitch": 0.054,
-  "lighting": "Cycles diffuse direct + indirect + colour; 128 samples",
-  "surfaceColor": "#3E6281",
+  "lighting": "Cycles diffuse direct + indirect + colour; 16 samples",
+  "quality": "draft",
+  "samples": 16,
+  "exposure": 0.56,
+  "independentLights": true,
+  "defaultLightLevels": [
+    0.41,
+    0.3,
+    0.25,
+    0.25,
+    0.25,
+    0.25
+  ],
+  "ambientLevel": 0.59,
+  "emitterReferenceLevel": 0.25,
+  "surfaceColor": "#376478",
   "surfaceRoughness": 0.3,
   "fixtures": [
     [
@@ -40,6 +54,11 @@
       18.526315689086914,
       -6.526315689086914,
       5.240825176239014
+    ],
+    [
+      0,
+      0,
+      5.240825176239014
     ]
   ],
   "source": "gallery_layout.blend",
@@ -53,10 +72,13 @@
     "well-03",
     "well-04",
     "well-05",
+    "well-06",
     "podium-01",
     "podium-02",
     "podium-03",
     "podium-04",
     "podium-05"
-  ]
+  ],
+  "wallFill": 65,
+  "wallLightingVersion": 3
 }

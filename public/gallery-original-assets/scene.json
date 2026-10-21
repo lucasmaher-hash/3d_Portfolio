@@ -1,0 +1,61 @@
+{
+  "floorY": 0,
+  "eyeHeight": 1.9386224159559822,
+  "heightScale": 1.6410608137401594,
+  "ceilingHeight": 4.904407981783152,
+  "fov": 90,
+  "speed": 3.45,
+  "spawn": [
+    0,
+    1.9386224159559822,
+    0
+  ],
+  "yaw": 3.141592653589793,
+  "pitch": 0.054,
+  "lighting": "Cycles diffuse direct + indirect + colour; 128 samples",
+  "source": "gallery_layout.blend",
+  "baked": [
+    "ceiling",
+    "ring",
+    "outer",
+    "floor",
+    "well-01",
+    "well-02",
+    "well-03",
+    "well-04",
+    "well-05"
+  ],
+  "fixtures": [
+    [
+      -8.210526466369629,
+      17.473684310913086,
+      5.240825176239014
+    ],
+    [
+      -14.06315803527832,
+      -7.915789604187012,
+      5.240825176239014
+    ],
+    [
+      9.684210777282715,
+      -14.526315689086914,
+      5.240825176239014
+    ],
+    [
+      11.789473533630371,
+      7.03157901763916,
+      5.240825176239014
+    ],
+    [
+      18.526315689086914,
+      -6.526315689086914,
+      5.240825176239014
+    ],
+    [
+      0,
+      0,
+      5.240825176239014
+    ]
+  ],
+  "variant": "Repaired early gallery at 37923c5 with current blue floor and ceiling, six ceiling lights and five exhibits"
+}

@@ -7,6 +7,7 @@ export default defineConfig({
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         gallery: resolve(import.meta.dirname, 'gallery.html'),
+        galleryOriginal: resolve(import.meta.dirname, 'gallery-original.html'),
       },
     },
   },
