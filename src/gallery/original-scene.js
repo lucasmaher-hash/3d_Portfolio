@@ -19,12 +19,41 @@ export async function prepareOriginalGallery(model, scene, renderer) {
 
   finishCeilingRecesses(model, settings)
 
+  const centerWallPreview = { value: 1 }
   const collidables = []
   const floors = []
   model.traverse(mesh => {
     if (!mesh.isMesh) return
     const role = mesh.userData.galleryRole
     if (role === 'wall' || role === 'podium') collidables.push(mesh)
+    if (role === 'wall' && /^Inner[ _]Ring/.test(mesh.name)) {
+      // The original center-facing bake is much darker than the outer wall.
+      // Remap its illumination with a highlight shoulder; retain the rim gradient
+      // and panel detail, and leave the outward-facing side untouched.
+      const materials = [mesh.material].flat().map(source => {
+        const material = source.clone()
+        material.onBeforeCompile = shader => {
+          shader.vertexShader = 'varying float vCenterWallFacing;\n' + shader.vertexShader
+          shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', `
+            #include <begin_vertex>
+            vec3 centerWallPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+            vec3 centerWallNormal = normalize(mat3(modelMatrix) * normal);
+            vCenterWallFacing = dot(normalize(centerWallPosition.xz), centerWallNormal.xz);
+          `)
+          shader.uniforms.uCenterWallPreview = centerWallPreview
+          shader.fragmentShader = 'uniform float uCenterWallPreview;\nvarying float vCenterWallFacing;\n' + shader.fragmentShader
+          shader.fragmentShader = shader.fragmentShader.replace('#include <emissivemap_fragment>', `
+            #include <emissivemap_fragment>
+            float centerWallMask = 1.0 - smoothstep(-0.15, -0.02, vCenterWallFacing);
+            vec3 centerWallLift = totalEmissiveRadiance * 30.0 / (vec3(1.0) + 29.0 * totalEmissiveRadiance);
+            totalEmissiveRadiance = mix(totalEmissiveRadiance, centerWallLift, centerWallMask * uCenterWallPreview);
+          `)
+        }
+        material.customProgramCacheKey = () => 'gallery-center-wall-match-v1'
+        return material
+      })
+      mesh.material = Array.isArray(mesh.material) ? materials : materials[0]
+    }
     if (role === 'floor' || mesh.userData.galleryBakeLabel === 'ceiling') floors.push(mesh)
     for (const material of [mesh.material].flat()) {
       // Diffuse illumination is already baked into emissiveMap. Adding room
@@ -55,7 +84,9 @@ export async function prepareOriginalGallery(model, scene, renderer) {
   const probe = new THREE.CubeCamera(0.1, 100, cubeTarget)
   probe.position.set(0, settings.eyeHeight, 0)
   for (const floor of floors) floor.visible = false
+  centerWallPreview.value = 0
   probe.update(renderer, scene)
+  centerWallPreview.value = 1
   for (const floor of floors) floor.visible = true
   const pmrem = new THREE.PMREMGenerator(renderer)
   const reflection = pmrem.fromCubemap(cubeTarget.texture)
