@@ -27,13 +27,14 @@ overlays receive the fixed `#809BBC` accent. No room colour switching.
 
 Use the approved `gallery_layout.blend`, not the old portfolio .blend.
 The export process runs on a background copy and never saves over that file.
-Only gallery architecture, rim strips and five ceiling fixtures are exported;
+Gallery architecture, five fitted podiums and exhibits, rim strips and the five
+ceiling fixtures are exported;
 the sample wall, separate light sample, guides and studio are excluded.
 
 1. Run Blender in background with `scripts/export-gallery.py -- OUTPUT_DIR`.
    This exports the new geometry and Cycles diffuse bakes (direct + indirect +
    surface colour). Raw files belong outside `public/`, e.g. `~/TEMP/glb-backups/`.
-   `--reuse` is only for the known rim-atlas repair, not a general fresh bake.
+   Use a new output directory after material or lighting changes.
 2. Run `scripts/denoise-gallery.py OUTPUT_DIR` with Python + NumPy + Pillow.
    It uses Blender's bundled OpenImageDenoise on macOS.
 3. Run `node scripts/optimize-gallery.mjs OUTPUT_DIR`. This packages denoised
@@ -42,8 +43,17 @@ the sample wall, separate light sample, guides and studio are excluded.
 4. `npm run build` creates both HTML entry points. Preview `/gallery.html`
    directly, including in a fresh browser tab.
 
-Baked illumination is exported as emissive maps so it is not lit a second
-time by runtime lights. Three.js uses AgX and a local room reflection probe.
+Floor and ceiling use smooth `#3E6281`, roughness 0.30, without wood grain or
+bump. Wall atlases reserve separate padded crown/foot strips, use integer
+geometry boundaries between panels and bake at 4096px / 128 samples. The rim
+regression check is `node scripts/check-gallery-lighting.mjs`; structural
+checks are `node scripts/check-gallery.mjs`.
+
+Baked architecture illumination is exported as emissive maps so it is not lit
+a second time by runtime lights. Imported exhibits keep their original PBR
+materials, textures and dimensions; five spotlights light
+the exhibits while baked surfaces have zero diffuse albedo. Their vertical placement follows the exported podium top,
+but the product geometry is never stretched. Three.js uses AgX and a local room reflection probe.
 The probe is an approximation: reflections will not exactly match Cycles at
 every camera position. Moving fixtures or changing architecture requires a
 fresh bake. Bake images are denoised LDR, so this preview is not an HDR master.

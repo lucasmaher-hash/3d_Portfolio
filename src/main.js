@@ -2177,8 +2177,8 @@ function addRoomTitles(model) {
 // ── Load model ───────────────────────────────────────────────────
 const loader = new GLTFLoader()
 loader.setMeshoptDecoder(MeshoptDecoder)
-const GLB_ORIGINAL  = IS_GALLERY ? '/gallery-assets/gallery.glb' : '/current🟢.glb'
-const GLB_OPTIMIZED = IS_GALLERY ? '/gallery-assets/gallery.glb' : '/scene-optimized.glb'
+const GLB_ORIGINAL  = IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-surfaces' : '/current🟢.glb'
+const GLB_OPTIMIZED = IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-surfaces' : '/scene-optimized.glb'
 // A missing or broken optimized file (the optimizer never fails the build, it just does not
 // write one) falls back to the original GLB instead of leaving the 3D page empty.
 function loadScene(url, onLoad, onProgress, onError) {

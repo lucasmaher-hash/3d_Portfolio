@@ -27,11 +27,18 @@ def report(message):
 # Use only the approved architecture and its fixtures, excluding sample objects,
 # guides, studio floor and the old wall parked beside the gallery.
 def included(ob):
-    return (ob.name.startswith(('Outer Wall |', 'Inner Ring |', 'Floor | fitted',
-                                'Ceiling | five', 'Ceiling 0', 'LED |'))
+    return ((ob.name.startswith(('Outer Wall |', 'Inner Ring |', 'Floor | fitted',
+                                'Ceiling | five', 'Ceiling 0', 'LED |', 'Podium 0'))
+            or ob.get('galleryRole') == 'project')
             and not ob.name.startswith('SAMPLE'))
 
+# Flatten the imported project hierarchy before deleting its wrapper empties.
+# Transform snapshots prevent parent/child matrices from being scaled twice.
 keep = [ob for ob in scene.objects if included(ob)]
+for ob in keep:
+    matrix = ob.matrix_world.copy()
+    ob.parent = None
+    ob.matrix_world = matrix
 for ob in list(scene.objects):
     if ob not in keep and ob.type not in {'LIGHT'}:
         bpy.data.objects.remove(ob, do_unlink=True)
@@ -40,15 +47,20 @@ for ob in list(scene.objects):
 
 transform = Matrix.Diagonal((1, 1, HEIGHT_SCALE, 1)) @ Matrix.Translation((0, 0, -FLOOR))
 for ob in scene.objects:
-    ob.matrix_world = transform @ ob.matrix_world
+    if ob.get('galleryRole') == 'project':
+        # Keep each product's approved dimensions; raise it onto the taller
+        # exported podium without stretching the product itself.
+        ob.matrix_world.translation.z += .75 * (HEIGHT_SCALE - 1) - FLOOR
+    else:
+        ob.matrix_world = transform @ ob.matrix_world
     if ob.type == 'LIGHT':
         ob.data.energy *= HEIGHT_SCALE ** 2
 
 scene.render.engine = 'CYCLES'
-scene.cycles.samples = 32
+scene.cycles.samples = 128
 scene.cycles.use_denoising = True
 scene.cycles.use_adaptive_sampling = True
-scene.cycles.adaptive_threshold = .05
+scene.cycles.adaptive_threshold = .01
 try:
     prefs = bpy.context.preferences.addons['cycles'].preferences
     prefs.compute_device_type = 'METAL'
@@ -72,6 +84,8 @@ meshes = [ob for ob in scene.objects if ob.type == 'MESH']
 original_materials = {}
 baked = []
 for ob in meshes:
+    if ob.get('galleryRole') == 'project':
+        continue
     if 'diffuser' in ob.name.lower():
         ob['galleryRole'] = 'emitter'
         continue
@@ -93,29 +107,38 @@ for ob in meshes:
         segments = 16 if is_outer else 8
         cols = 4
         atlas_rows = math.ceil(segments * 2 / cols)
+        # Reserve a real two-dimensional strip for each crown/foot rim.
+        # The former 8px strips touched at an 8px bake margin, contaminating
+        # the crown. Segment boundaries now follow whole geometry edges.
+        rim_height = .07
+        surface_bottom = .20
         for poly in mesh.polygons:
             ids = list(poly.vertices)
             rim = not (all(v < layer for v in ids) or all(v >= layer for v in ids))
-            base_j = ids[0] % n
-            segment = min(segments - 1, base_j * segments // n)
+            js = [v % n for v in ids]
+            if max(js) - min(js) > n / 2:
+                js = [j + n if j < n / 2 else j for j in js]
+            first = min(js)
+            segment = min(segments - 1, next((q for q in range(segments)
+                if first < (q + 1) * n // segments), segments - 1))
+            start = segment * n // segments
+            end = (segment + 1) * n // segments
             back = ids[0] >= layer
             tile = segment + (segments if back else 0)
-            for li in poly.loop_indices:
+            for li, j in zip(poly.loop_indices, js):
                 vi = mesh.loops[li].vertex_index
-                k, j = divmod(vi % layer, n)
-                if base_j > n - 3 and j == 0:
-                    j = n
-                u = max(0, min(1, j * segments / n - segment))
+                k = (vi % layer) // n
+                u = (j - start) / (end - start)
                 v = k / (rows - 1)
-                pad = .012
+                pad = .02
                 if rim:
-                    # Dedicated atlas strip: rim faces must not overwrite the
-                    # wall's upper/lower rows with a different surface normal.
-                    uv.data[li].uv = (.005 + .99 * j / n,
-                                      .002 + (.006 if k > rows / 2 else 0) + (.004 if vi >= layer else 0))
+                    uv.data[li].uv = (.01 + .98 * j / n,
+                        .01 + (.10 if k > rows / 2 else 0) +
+                        (rim_height if vi >= layer else 0))
                 else:
                     uv.data[li].uv = ((tile % cols + pad + u * (1 - 2 * pad)) / cols,
-                                      .02 + .98 * (tile // cols + pad + v * (1 - 2 * pad)) / atlas_rows)
+                        surface_bottom + (1 - surface_bottom) *
+                        (tile // cols + pad + v * (1 - 2 * pad)) / atlas_rows)
     elif ob.name.startswith(('Floor |', 'Ceiling |')):
         xs = [v.co.x for v in mesh.vertices]
         ys = [v.co.y for v in mesh.vertices]
@@ -134,8 +157,8 @@ for ob in meshes:
         bpy.ops.mesh.select_all(action='SELECT')
         bpy.ops.uv.smart_project(angle_limit=1.25, island_margin=.02)
         bpy.ops.object.mode_set(mode='OBJECT')
-    resolution = 4096 if is_outer or ob.name.startswith(('Floor |', 'Ceiling |')) else 2048 if is_ring else 512
-    label = 'outer' if is_outer else 'ring' if is_ring else 'ceiling' if ob.name.startswith('Ceiling |') else 'floor' if ob.name.startswith('Floor |') else 'well-' + ob.name.split()[1]
+    resolution = 4096 if is_outer or is_ring or ob.name.startswith(('Floor |', 'Ceiling |')) else 1024 if ob.name.startswith('Podium ') else 512
+    label = 'outer' if is_outer else 'ring' if is_ring else 'ceiling' if ob.name.startswith('Ceiling |') else 'floor' if ob.name.startswith('Floor |') else 'podium-' + ob.name.split()[1] if ob.name.startswith('Podium ') else 'well-' + ob.name.split()[1]
     image = bpy.data.images.new('Gallery bake ' + label, width=resolution, height=resolution)
     image.colorspace_settings.name = 'sRGB'
     original_materials[ob] = list(mesh.materials)
@@ -169,7 +192,7 @@ for ob, image, label in baked:
     material.use_nodes = True
     bsdf = material.node_tree.nodes.get('Principled BSDF')
     bsdf.inputs['Base Color'].default_value = (0, 0, 0, 1)
-    bsdf.inputs['Roughness'].default_value = .43 if label == 'floor' else .8
+    bsdf.inputs['Roughness'].default_value = .30 if label in {'floor', 'ceiling'} else .8
     tex = material.node_tree.nodes.new('ShaderNodeTexImage')
     tex.image = image
     material.node_tree.links.new(tex.outputs['Color'], bsdf.inputs['Emission Color'])
@@ -178,7 +201,7 @@ for ob, image, label in baked:
     ob.data.materials.append(material)
     for poly in ob.data.polygons:
         poly.material_index = 0
-    ob['galleryRole'] = 'floor' if label == 'floor' else 'wall' if label in {'ring', 'outer'} else 'ceiling'
+    ob['galleryRole'] = 'floor' if label == 'floor' else 'wall' if label in {'ring', 'outer'} else 'podium' if label.startswith('podium-') else 'ceiling'
     ob['galleryBaked'] = True
 
 for ob in scene.objects:
@@ -191,13 +214,15 @@ for ob in scene.objects:
         ob.select_set(True)
 report('Exporting baked GLB')
 bpy.ops.export_scene.gltf(filepath=os.path.join(OUT, 'gallery.glb'), export_format='GLB',
-                          use_selection=True, export_apply=True, export_extras=True,
+                          use_selection=True, use_active_scene=True, export_apply=True, export_extras=True,
                           export_cameras=False, export_lights=False)
 with open(os.path.join(OUT, 'scene.json'), 'w') as f:
     json.dump({'floorY': 0, 'eyeHeight': EYE, 'heightScale': HEIGHT_SCALE,
                'ceilingHeight': 4.922500133514404 - 0.01809215173125267,
                'fov': 90, 'speed': 3.45, 'spawn': [0, EYE, 0],
                'yaw': math.pi, 'pitch': .054,
-               'lighting': 'Cycles diffuse direct + indirect + colour; 32 samples',
+               'lighting': 'Cycles diffuse direct + indirect + colour; 128 samples',
+               'surfaceColor': '#3E6281', 'surfaceRoughness': .30,
+               'fixtures': [[ob.location.x, -ob.location.y, ob.location.z] for ob in scene.objects if ob.type == 'LIGHT'],
                'source': 'gallery_layout.blend', 'baked': [label for _, _, label in baked]}, f, indent=2)
 report('Complete')

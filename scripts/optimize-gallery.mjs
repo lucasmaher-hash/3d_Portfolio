@@ -16,8 +16,20 @@ const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies(
   'meshopt.encoder': MeshoptEncoder, 'meshopt.decoder': MeshoptDecoder,
 })
 const document = await io.read(path.join(source, 'gallery.glb'))
-for (const texture of document.getRoot().listTextures()) {
-  const input = await fs.readFile(path.join(source, 'denoised', texture.getName() + '.png'))
+// Background source files may contain independent sample scenes. Package only
+// the default gallery scene, including when reading an older raw export.
+const root = document.getRoot()
+const activeScene = root.getDefaultScene() || root.listScenes()[0]
+const activeNodes = new Set()
+function retain(node) { activeNodes.add(node); for (const child of node.listChildren()) retain(child) }
+for (const child of activeScene.listChildren()) retain(child)
+for (const node of root.listNodes()) if (!activeNodes.has(node)) node.dispose()
+for (const scene of root.listScenes()) if (scene !== activeScene) scene.dispose()
+for (const texture of root.listTextures()) {
+  const denoised = path.join(source, 'denoised', texture.getName() + '.png')
+  // Imported product textures retain their original UVs, alpha and materials.
+  try { await fs.access(denoised) } catch { continue }
+  const input = await fs.readFile(denoised)
   const bytes = await sharp(input).jpeg({ quality: 92, chromaSubsampling: '4:4:4' }).toBuffer()
   texture.setImage(bytes).setMimeType('image/jpeg')
 }
