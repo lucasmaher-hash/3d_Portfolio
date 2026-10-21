@@ -1,4 +1,8 @@
 import './style.css'
+import { prepareGallery } from './gallery/scene.js'
+
+const IS_GALLERY = location.pathname === '/gallery.html'
+const RETURN_STATE_KEY = IS_GALLERY ? '_galleryReturnState' : '_3dReturnState'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 // PERF.lightGlb: the production GLB is meshopt-compressed (scripts/optimize-glb.mjs).
@@ -2173,8 +2177,8 @@ function addRoomTitles(model) {
 // ── Load model ───────────────────────────────────────────────────
 const loader = new GLTFLoader()
 loader.setMeshoptDecoder(MeshoptDecoder)
-const GLB_ORIGINAL  = '/current🟢.glb'
-const GLB_OPTIMIZED = '/scene-optimized.glb'
+const GLB_ORIGINAL  = IS_GALLERY ? '/gallery-assets/gallery.glb' : '/current🟢.glb'
+const GLB_OPTIMIZED = IS_GALLERY ? '/gallery-assets/gallery.glb' : '/scene-optimized.glb'
 // A missing or broken optimized file (the optimizer never fails the build, it just does not
 // write one) falls back to the original GLB instead of leaving the 3D page empty.
 function loadScene(url, onLoad, onProgress, onError) {
@@ -2187,7 +2191,39 @@ function loadScene(url, onLoad, onProgress, onError) {
 const glbT0 = performance.now()
 loadScene(
   PERF.lightGlb ? GLB_OPTIMIZED : GLB_ORIGINAL,
-  (gltf) => {
+  async (gltf) => {
+    if (IS_GALLERY) {
+      try {
+        const { settings, collidables: galleryWalls } = await prepareGallery(gltf.scene, scene, renderer)
+        collidables = galleryWalls
+        // Include the lower cove in shoulder-width collision checks.
+        lowCollidables.push(...galleryWalls)
+        if (PERF.bvh) for (const mesh of galleryWalls) {
+          if (!mesh.geometry.boundsTree) mesh.geometry.computeBoundsTree({ indirect: true })
+        }
+        floorY = settings.floorY
+        playerHeight = settings.eyeHeight
+        camera.position.fromArray(settings.spawn)
+        yaw = settings.yaw
+        pitch = settings.pitch
+        applyRotation()
+        syncSteeringToView()
+        spawnPos = camera.position.clone()
+        spawnYaw = yaw
+        spawnPitch = pitch
+        await renderer.compileAsync(scene, camera)
+        roomAccent.ready = true
+        updateRoomAccent(0, true)
+        res.liveAfter = performance.now() + 1500
+        window._gallery = { settings, model: gltf.scene, collidables: galleryWalls, ready: true }
+        if (window._loader) window._loader.done()
+        if (window._sceneReady) window._sceneReady()
+      } catch (error) {
+        console.error('Gallery setup failed:', error)
+        if (window._sceneReady) window._sceneReady()
+      }
+      return
+    }
     const model  = gltf.scene
     const box    = new THREE.Box3().setFromObject(model)
     const center = box.getCenter(new THREE.Vector3())
@@ -2377,8 +2413,8 @@ loadScene(
     // handler below) so the scene continues where they left it rather than
     // resetting to the fixed spawn every time.
     let restoredReturnState = false
-    const returnStateRaw = sessionStorage.getItem('_3dReturnState')
-    sessionStorage.removeItem('_3dReturnState')
+    const returnStateRaw = sessionStorage.getItem(RETURN_STATE_KEY)
+    sessionStorage.removeItem(RETURN_STATE_KEY)
     if (returnStateRaw) {
       try {
         const rs = JSON.parse(returnStateRaw)
@@ -2475,7 +2511,7 @@ loadScene(
 // All in one washed-out family: the 2D blue's oklch lightness/chroma (0.68 / 0.058),
 // only the hue per room (blue room and brown room a little darker).
 // Exception: the pink room keeps the Unify app's own bright #FF88C8 (Lucas, 2026-10-19).
-const ROOM_ACCENT_DEFAULT = '#79A48C'          // green grey, the hue of the main room's carpet (#52A377)
+const ROOM_ACCENT_DEFAULT = IS_GALLERY ? '#809BBC' : '#79A48C'          // green grey, the hue of the main room's carpet (#52A377)
 const ROOM_ACCENTS = [
   { room: 'PinkRoom',   color: '#FF88C8', x: [6.0, 29.5],    z: [5.4, 28.1]   },  // Unify, the app's own bright pink (as on the Unify page)
   { room: 'YellowRoom', color: '#B78E7A', x: [-29.0, -15.2], z: [6.5, 23.6]   },  // the Mac-Lamp table lamp, Mac-Lamp's orange
@@ -2491,6 +2527,7 @@ const roomAccent = {
   sent: '',
 }
 function roomAccentTarget(p) {
+  if (IS_GALLERY) return '#809BBC'
   for (const r of ROOM_ACCENTS) {
     if (p.x >= r.x[0] && p.x <= r.x[1] && p.z >= r.z[0] && p.z <= r.z[1]) return r.color
   }
@@ -2621,7 +2658,7 @@ window.addEventListener('pageshow', e => {
   // Refreshed rather than merely kept, so a reload lands where the player
   // actually is now — they may have walked on since coming back.
   try {
-    sessionStorage.setItem('_3dReturnState', JSON.stringify({
+    sessionStorage.setItem(RETURN_STATE_KEY, JSON.stringify({
       x: camera.position.x, y: camera.position.y, z: camera.position.z,
       yaw, pitch
     }))
@@ -2888,7 +2925,7 @@ function animate() {
 
   // PinkRoom's central column — circular, so push radially out to the boundary rather than
   // through a face. The dead-centre case can't be normalised, so it ejects along +x.
-  {
+  if (!IS_GALLERY) {
     const dx = camera.position.x - PINK_COLUMN.x
     const dz = camera.position.z - PINK_COLUMN.z
     const d  = Math.hypot(dx, dz)
@@ -2911,7 +2948,7 @@ function animate() {
   // Scoped to BlueRoom's own footprint (measured world extents x -10.34..0.14,
   // z 27.58..39.26) so no other room is affected. Applied AFTER the move + slide above, so
   // it clamps the final position rather than fighting the collision solver.
-  if (camera.position.x > -10.9 && camera.position.x < 0.7 &&
+  if (!IS_GALLERY && camera.position.x > -10.9 && camera.position.x < 0.7 &&
       camera.position.z > BLUEROOM_Z_LIMIT) {
     camera.position.z = BLUEROOM_Z_LIMIT
   }
@@ -3133,7 +3170,7 @@ renderer.domElement.addEventListener('click', e => {
       // Save the exact spot we're leaving from so the Exit button on the
       // destination page can bring us right back to it (read back by the
       // restore logic right after the GLTFLoader spawn block above).
-      sessionStorage.setItem('_3dReturnState', JSON.stringify({
+      sessionStorage.setItem(RETURN_STATE_KEY, JSON.stringify({
         x: camera.position.x, y: camera.position.y, z: camera.position.z,
         yaw, pitch
       }))

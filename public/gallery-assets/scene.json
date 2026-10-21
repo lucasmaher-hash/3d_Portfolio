@@ -1,0 +1,28 @@
+{
+  "floorY": 0,
+  "eyeHeight": 1.9386224159559822,
+  "heightScale": 1.6410608137401594,
+  "ceilingHeight": 4.904407981783152,
+  "fov": 90,
+  "speed": 3.45,
+  "spawn": [
+    0,
+    1.9386224159559822,
+    0
+  ],
+  "yaw": 3.141592653589793,
+  "pitch": 0.054,
+  "lighting": "Cycles diffuse direct + indirect + colour; 32 samples",
+  "source": "gallery_layout.blend",
+  "baked": [
+    "ceiling",
+    "ring",
+    "outer",
+    "floor",
+    "well-01",
+    "well-02",
+    "well-03",
+    "well-04",
+    "well-05"
+  ]
+}
