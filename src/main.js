@@ -1571,6 +1571,164 @@ function updateGalleryExhibits(delta) {
   }
 }
 
+// ── Centre help podium (branch center-help-podium, 2026-10-22, Lucas) ──
+// A copy of the Virtual Cooking podium (and its floor LED ring) stands in the
+// middle of the centre room, under that room's own ceiling well. NO rebake: the
+// copy reuses podium-04's lightmap, so it carries the light it had in its bay —
+// that bay's well sits straight above it too, so the look carries over. On top
+// floats a chrome "?" (the arrows' material and bevel) with the floating
+// exhibits' sway; a click opens the controls ("?") overlay. The spawn moves back
+// (CENTRE_SPAWN_Z) so the podium stands in front of you, not in you.
+const HELP_PODIUM_LABEL = 'podium-04'      // Virtual Cooking
+const HELP_GAP     = 0.22   // m of air between podium top and the "?" (exhibits float 0.18)
+const HELP_ROCK    = 0.35   // rad, slow turn either way (a full spin would show it mirrored)
+const CENTRE_SPAWN_Z = -3.8 // ring's inner face is at r 5.97; spawn yaw π faces +Z
+// The bays' floor has a round hole per podium (r 1.067, measured off the GLB) that ends
+// at the inner edge of the LED ring; the podium's skirt flares down into it. The centre
+// floor has none, so it is cut here in the floor's own shader (discard inside the ring).
+const HELP_HOLE_R = 1.062
+// Shorter than the bays' 1.23 m podium (Lucas): only the straight cylinder between
+// y 0.32 and 0.94 (uniform radius, evenly spaced rings — measured off the GLB) is
+// squeezed, so the rounded top and the flared base keep their exact shape. The
+// lightmap on that band compresses with it; there it is a smooth vertical gradient.
+const HELP_SHORTEN = 0.15
+const HELP_BAND = [0.32, 0.94]
+const helpIcons = []
+
+function makeQuestionGeometry() {
+  // Centre-line of the hook (arc, then an S into the stem), thickened by offsetting
+  // along its normals; the dot is its own disc. ~0.7 m tall, same depth and bevel
+  // as the arrows.
+  const line = []
+  const r = 0.17, cy = 0.5
+  for (let i = 0; i <= 40; i++) {
+    const a = THREE.MathUtils.degToRad(155 - 195 * i / 40)
+    line.push(new THREE.Vector2(r * Math.cos(a), cy + r * Math.sin(a)))
+  }
+  const p0 = line[line.length - 1]
+  const bez = new THREE.CubicBezierCurve(p0, new THREE.Vector2(p0.x - 0.051, p0.y - 0.061),
+    new THREE.Vector2(0, 0.31), new THREE.Vector2(0, 0.25))
+  line.push(...bez.getPoints(16).slice(1), new THREE.Vector2(0, 0.17))
+  const h = 0.085 / 2, left = [], right = []
+  line.forEach((p, i) => {
+    const a = line[Math.max(0, i - 1)], b = line[Math.min(line.length - 1, i + 1)]
+    const t = b.clone().sub(a).normalize(), n = new THREE.Vector2(-t.y, t.x)
+    left.push(p.clone().addScaledVector(n, h)); right.push(p.clone().addScaledVector(n, -h))
+  })
+  const hook = new THREE.Shape([...left, ...right.reverse()])
+  const dot = new THREE.Shape(); dot.absarc(0, 0.075, 0.055, 0, Math.PI * 2, false)
+  const geo = new THREE.ExtrudeGeometry([hook, dot], {
+    depth: ARROW_THICKNESS, bevelEnabled: true,
+    bevelThickness: 0.018, bevelSize: 0.018, bevelSegments: 3, curveSegments: 24,
+  })
+  geo.center()
+  return geo
+}
+
+function addCentreHelpPodium(model, walls, probes) {
+  let src = null
+  model.traverse(o => { if (!src && o.userData.galleryBakeLabel === HELP_PODIUM_LABEL) src = o })
+  if (!src || !galleryArrowMat) { console.warn('Help-Podest: Quelle fehlt'); return }
+  const centreProbe = probes.find(p => /center/.test(p.file)) || probes[0]
+  const srcBox = new THREE.Box3().setFromObject(src)
+  const c = srcBox.getCenter(new THREE.Vector3())
+  const place = o => {
+    const copy = o.clone(true)
+    copy.position.x -= c.x
+    copy.position.z -= c.z
+    copy.traverse(m => {
+      if (!m.isMesh) return
+      // Same lightmap uniforms (onBeforeCompile), the centre room's reflections.
+      const one = mat => {
+        const k = mat.clone()
+        k.onBeforeCompile = mat.onBeforeCompile
+        k.customProgramCacheKey = mat.customProgramCacheKey
+        k.envMap = centreProbe.texture
+        return k
+      }
+      m.material = Array.isArray(m.material) ? m.material.map(one) : one(m.material)
+    })
+    o.parent.add(copy)
+    copy.updateMatrixWorld(true)
+    return copy
+  }
+  const podium = place(src)
+  podium.name = 'HelpPodium'
+  const [b0, b1] = HELP_BAND, k = (b1 - b0 - HELP_SHORTEN) / (b1 - b0)
+  const v = new THREE.Vector3(), inv = new THREE.Matrix4()
+  podium.traverse(m => {
+    if (!m.isMesh) return
+    m.geometry = m.geometry.clone()   // the bay's podium shares the original
+    inv.copy(m.matrixWorld).invert()
+    const pos = m.geometry.getAttribute('position')
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld)
+      if (v.y <= b0) continue
+      v.y = v.y > b1 ? v.y - HELP_SHORTEN : b0 + (v.y - b0) * k
+      v.applyMatrix4(inv)
+      pos.setXYZ(i, v.x, v.y, v.z)
+    }
+    pos.needsUpdate = true
+    m.geometry.computeBoundingBox(); m.geometry.computeBoundingSphere()
+    if (PERF.bvh) m.geometry.computeBoundsTree({ indirect: true })
+  })
+  podium.traverse(m => { if (m.isMesh) { walls.push(m); lowCollidables.push(m) } })
+  // The podium's turquoise floor ring (emissive, not baked) comes along.
+  let led = null
+  model.traverse(o => { if (!led && o !== src && /LED/.test(o.name) && /podium_?04/i.test(o.name)) led = o })
+  if (led) place(led)
+  let floor = null
+  model.traverse(o => { if (!floor && o.isMesh && o.userData.galleryBakeLabel === 'floor') floor = o })
+  if (floor) for (const mat of [floor.material].flat()) {
+    const prev = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey
+    mat.onBeforeCompile = (shader, r) => {
+      prev.call(mat, shader, r)
+      shader.vertexShader = 'varying vec3 vHelpHoleW;\n' + shader.vertexShader.replace('#include <project_vertex>',
+        '#include <project_vertex>\nvHelpHoleW = (modelMatrix * vec4(transformed, 1.0)).xyz;')
+      shader.fragmentShader = 'varying vec3 vHelpHoleW;\n' + shader.fragmentShader.replace('void main() {',
+        'void main() {\nif (length(vHelpHoleW.xz) < ' + HELP_HOLE_R.toFixed(4) + ') discard;')
+    }
+    mat.customProgramCacheKey = () => prevKey.call(mat) + '-help-hole'
+    mat.needsUpdate = true
+  }
+  // The hole's inner edge: the bays' floor slab shows a dark teal face there; without
+  // one the void (scene background) shows between slab and skirt. Colour sampled off
+  // podium 04's gap in a screenshot, drawn untone-mapped so it lands on that value.
+  const wall = new THREE.Mesh(
+    new THREE.CylinderGeometry(HELP_HOLE_R, HELP_HOLE_R, 0.2, 96, 1, true),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(1 / 255, 30 / 255, 38 / 255, THREE.SRGBColorSpace),
+      side: THREE.BackSide, toneMapped: false }))
+  wall.position.y = -0.1
+  wall.name = 'HelpHoleWall'
+  scene.add(wall)
+  const top = new THREE.Box3().setFromObject(podium).max.y
+  const mesh = new THREE.Mesh(makeQuestionGeometry(), galleryArrowMat)
+  mesh.name = 'HelpIcon'
+  const size = new THREE.Box3().setFromObject(mesh).getSize(new THREE.Vector3())
+  const baseY = top + HELP_GAP + size.y / 2
+  mesh.position.set(0, baseY, 0)
+  mesh.userData.helpIcon = mesh
+  // The glyph is thin and has a hole in its hook; an invisible box around it is
+  // what the click ray hits (material.visible false still raycasts, never draws).
+  const hit = new THREE.Mesh(new THREE.BoxGeometry(size.x + 0.1, size.y + 0.1, 0.3),
+    new THREE.MeshBasicMaterial({ visible: false }))
+  hit.userData.helpIcon = mesh
+  mesh.add(hit)
+  scene.add(mesh)
+  clickables.push(mesh, hit)
+  helpIcons.push({ mesh, baseY, t: 0, phase: 0.6 })
+  console.log(`Help-Podest: Kopie von ${HELP_PODIUM_LABEL} bei (0, 0), LED ${led ? 'ja' : 'nein'}, Bodenloch ${floor ? 'ja' : 'nein'}, "?" bei y ${baseY.toFixed(2)}`)
+}
+
+function updateHelpIcons(delta) {
+  for (const h of helpIcons) {
+    if (popAnims.some(a => a.parts.some(p => p.target === h.mesh))) continue
+    h.t += delta
+    h.mesh.position.y = h.baseY + Math.sin(h.t * Math.PI * 2 * SWAY_FREQ + h.phase) * SWAY_AMP
+    h.mesh.rotation.y = Math.sin(h.t * Math.PI * 2 * SWAY_FREQ * 0.5) * HELP_ROCK
+  }
+}
+
 // ── Camera rotation ──────────────────────────────────────────────
 let yaw   = 0
 let pitch = 0
@@ -2330,7 +2488,7 @@ loadScene(
   async (gltf) => {
     if (IS_GALLERY) {
       try {
-        const { settings, collidables: galleryWalls, view } = await prepareBakedGallery(gltf.scene, scene, renderer, p => loadProgress(GLB_SHARE + p * (0.9 - GLB_SHARE)))
+        const { settings, collidables: galleryWalls, view, probes } = await prepareBakedGallery(gltf.scene, scene, renderer, p => loadProgress(GLB_SHARE + p * (0.9 - GLB_SHARE)))
         await roundAndTintMacLamp(gltf.scene, loader)
         collidables = galleryWalls
         // Include the lower cove in shoulder-width collision checks.
@@ -2341,6 +2499,7 @@ loadScene(
         floorY = settings.floorY
         playerHeight = settings.eyeHeight
         camera.position.fromArray(settings.spawn)
+        if (IS_BAKED_GALLERY) camera.position.z = CENTRE_SPAWN_Z
         yaw = settings.yaw
         pitch = settings.pitch
         applyRotation()
@@ -2376,6 +2535,7 @@ loadScene(
             }
             addGalleryExhibit(group, project, data, bounds, view)
           }
+          addCentreHelpPodium(gltf.scene, galleryWalls, probes)
           try {
             const saved = JSON.parse(sessionStorage.getItem(RETURN_STATE_KEY))
             if (saved && ['x','y','z','yaw','pitch'].every(k => Number.isFinite(saved[k]))) {
@@ -2958,6 +3118,7 @@ function animate() {
   const delta = Math.min(rawDelta, 0.1)
   updatePops(delta)   // click-pop pulses run regardless of overlay state
   if (galleryExhibits.length && !isOverlayOpen) updateGalleryExhibits(delta)
+  if (helpIcons.length && !isOverlayOpen) updateHelpIcons(delta)
   updateRoomAccent(delta)
   camera.getWorldDirection(forward)
   forward.y = 0
@@ -3351,6 +3512,14 @@ renderer.domElement.addEventListener('click', e => {
   const hits = clickRay.intersectObjects(clickables, false).filter(h => h.object.visible)
   if (hits.length === 0) return
   const obj  = hits[0].object
+  // Centre help podium: the "?" pops, then opens the controls overlay.
+  if (obj.userData.helpIcon) {
+    const icon = obj.userData.helpIcon
+    if (icon.userData.popping) return
+    icon.userData.popping = true
+    startPop([icon], () => { icon.userData.popping = false; openControls() }, false)
+    return
+  }
   // Gallery: an exhibit (or its arrow) only answers while its arrow is up.
   if (obj.userData.galleryExhibit && !obj.userData.galleryExhibit.near) return
   const name = obj.name in CONTENT ? obj.name : obj.parent?.name

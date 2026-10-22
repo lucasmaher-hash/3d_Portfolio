@@ -78,5 +78,5 @@ export async function prepareBakedGallery(model,scene,renderer,onProgress=()=>{}
     }
   })
   scene.add(model);model.updateMatrixWorld(true)
-  return {settings,collidables,view}
+  return {settings,collidables,view,probes}
 }
