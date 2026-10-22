@@ -4116,3 +4116,15 @@ the four `.mp4` URLs. Posters unchanged (frame 0 does not move).
 plate around project media, desktop or phone. **Favicon** (`images/site/favicon.svg|-32|-180`, `/favicon.ico`):
 logo 69% of the badge (was 43%), `#90A4BD` background (the Unify canvas blue; the site accent is
 `#809BBC`, so this may want matching).
+
+## Gallery exhibits: sway + proximity arrows (2026-10-22, Lucas)
+
+Default 3D route (`/`, `/gallery-4.html`), `addGalleryExhibit` / `updateGalleryExhibits` in
+`src/main.js`. The three exhibits that float 0.18 m above their podium (Unify, Virtual Cooking,
+Cybercoffee) bob ±`SWAY_AMP` 0.04 m at `SWAY_FREQ` 0.22 Hz; bottle and Mac-Lamp sit on theirs
+and stay still. Every exhibit (Unify included — it needs one, or it could never be clicked) gets
+the old chrome arrow, which grows in (easeOutBack) once the camera is within `ARROW_NEAR` 6 m
+horizontally of the exhibit centre (≈5× the 1.23 m podium) and shrinks away past `ARROW_FAR`
+6.6 m. **The exhibit and its arrow are only clickable while the arrow is up** (click-handler
+guard on `userData.galleryExhibit.near`). The arrow material binds the Blender-view LUT uniform
+(`view` is now returned by `prepareBakedGallery`). Sway pauses while the group pops.

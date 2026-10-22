@@ -59,16 +59,6 @@
       "meanLinearError": 0.00001811864240153227,
       "p99LinearError": 0.0001126723363995552
     },
-    "egg-rig": {
-      "file": "egg-rig.png",
-      "range": 4,
-      "width": 512,
-      "height": 512,
-      "maxHDR": 3.51953125,
-      "encoding": "RGBM-linear",
-      "meanLinearError": 0.00006067754657124169,
-      "p99LinearError": 0.0009895563125610352
-    },
     "floor": {
       "file": "floor.png",
       "range": 4,
@@ -138,16 +128,6 @@
       "encoding": "RGBM-linear",
       "meanLinearError": 0.0000045559554564533755,
       "p99LinearError": 0.00005315057933330536
-    },
-    "pivot-vrpanel": {
-      "file": "pivot-vrpanel.png",
-      "range": 4,
-      "width": 512,
-      "height": 512,
-      "maxHDR": 3.578125,
-      "encoding": "RGBM-linear",
-      "meanLinearError": 0.0001011168715194799,
-      "p99LinearError": 0.0008197128772735596
     },
     "podium-01": {
       "file": "podium-01.png",
@@ -500,5 +480,9 @@
   "bottleSourceSHA256": "084ed362ae0ff47f774db25e9b47baa5fa756bd71548d8204a4e1260fdd37c41",
   "bottlePreservation": "Decoded geometry, indices, transforms, materials and texture bytes verified after serialization",
   "runtimeRoomLights": 0,
-  "displayTransform": "Frozen Blender 5.1 OCIO AgX + Medium High Contrast; exposure baked into display LUT once"
+  "displayTransform": "Frozen Blender 5.1 OCIO AgX + Medium High Contrast; exposure baked into display LUT once",
+  "oldSceneExhibits": [
+    "egg-rig",
+    "Pivot_VRPanel"
+  ]
 }

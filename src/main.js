@@ -1492,6 +1492,80 @@ function addProjectArrows(model) {
   console.log(`Project-Arrows: ${placed.length} — ${placed.join(' | ')}`)
 }
 
+// ── Gallery exhibits: sway + proximity arrows (default / gallery-4 route) ──
+// Lucas, 2026-10-22. The three exhibits that FLOAT above their podium (Unify,
+// Virtual Cooking, Cybercoffee — 0.18 m of air, measured off the GLB) bob
+// gently; the bottle and the Mac-Lamp sit on theirs and stay put. Each exhibit
+// gets the old chrome arrow, but it only grows in once the player is within
+// ARROW_NEAR of the exhibit (≈5× the 1.23 m podium height), and the exhibit
+// (and its arrow) is only clickable while the arrow is up. ARROW_FAR > NEAR
+// is hysteresis, so standing on the line does not flicker it.
+const SWAY_AMP     = 0.04   // m — under a quarter of the 0.18 m gap to the podium
+const SWAY_FREQ    = 0.22   // cycles/s; a plain sine is already eased at both ends
+const ARROW_NEAR   = 6.0    // m, horizontal, camera → exhibit centre: appear
+const ARROW_FAR    = 6.6    // m: disappear
+const ARROW_GROW   = 7      // /s, exponential ease of the appear/disappear
+const galleryExhibits = []
+let galleryArrowMat = null
+
+function addGalleryExhibit(group, project, data, bounds, view) {
+  if (!galleryArrowMat) {
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    pmrem.dispose()
+    galleryArrowMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff, metalness: 1.0, roughness: 0.12, envMap: envTex, envMapIntensity: 1.2,
+    })
+    // Every shader on this route runs through the Blender view LUT (CustomToneMapping);
+    // without its uniform the arrow would sample an unbound 3D texture.
+    galleryArrowMat.onBeforeCompile = shader => view.bind(shader)
+    galleryArrowMat.customProgramCacheKey = () => 'gallery-arrow-ocio-v1'
+  }
+  const ex = {
+    group, project,
+    floating: !['Double Packaging', 'Mac-Lamp'].includes(project),
+    baseY: group.position.y,
+    t: 0, phase: galleryExhibits.length * 1.7,
+    near: false, show: 0,
+  }
+  const arrow = new THREE.Mesh(makeArrowGeometry(), galleryArrowMat)
+  arrow.name = 'ProjectArrow_Gallery_' + galleryExhibits.length
+  arrow.position.set(ex.group.position.x, bounds.max.y + ARROW_GAP + ARROW_HEIGHT / 2, ex.group.position.z)
+  arrow.visible = false
+  arrow.scale.setScalar(0.001)
+  arrow.userData.galleryExhibit = ex
+  CONTENT[arrow.name] = data
+  scene.add(arrow)
+  clickables.push(arrow)
+  ex.arrow = arrow
+  ex.arrowBaseY = arrow.position.y
+  group.traverse(m => { if (m.isMesh) m.userData.galleryExhibit = ex })
+  galleryExhibits.push(ex)
+}
+
+function updateGalleryExhibits(delta) {
+  const popping = o => popAnims.some(a => a.parts.some(p => p.target === o))
+  arrowTime += delta   // the old room's arrow loop never runs here (projectArrows is empty)
+  for (const ex of galleryExhibits) {
+    if (ex.floating && !popping(ex.group)) {
+      ex.t += delta
+      ex.group.position.y = ex.baseY + Math.sin(ex.t * Math.PI * 2 * SWAY_FREQ + ex.phase) * SWAY_AMP
+    }
+    const d = Math.hypot(camera.position.x - ex.group.position.x, camera.position.z - ex.group.position.z)
+    ex.near = d < (ex.near ? ARROW_FAR : ARROW_NEAR)
+    ex.show += ((ex.near ? 1 : 0) - ex.show) * Math.min(1, ARROW_GROW * delta)
+    if (!ex.near && ex.show < 0.002) ex.show = 0
+    const a = ex.arrow
+    a.visible = ex.show > 0
+    if (!a.visible || popping(a)) continue
+    // Overshoot on the way in (easeOutBack), plain shrink on the way out.
+    const k = ex.near ? 1 + 2.2 * Math.pow(ex.show - 1, 3) + 1.2 * Math.pow(ex.show - 1, 2) : ex.show
+    a.scale.setScalar(Math.max(0.001, k))
+    a.position.y = ex.arrowBaseY + Math.sin(arrowTime * Math.PI * 2 * ARROW_BOB_FREQ + ex.phase) * ARROW_BOB_AMP
+    a.rotation.y += ARROW_SPIN * delta
+  }
+}
+
 // ── Camera rotation ──────────────────────────────────────────────
 let yaw   = 0
 let pitch = 0
@@ -2234,7 +2308,7 @@ loadScene(
   async (gltf) => {
     if (IS_GALLERY) {
       try {
-        const { settings, collidables: galleryWalls } = await prepareBakedGallery(gltf.scene, scene, renderer)
+        const { settings, collidables: galleryWalls, view } = await prepareBakedGallery(gltf.scene, scene, renderer)
         collidables = galleryWalls
         // Include the lower cove in shoulder-width collision checks.
         lowCollidables.push(...galleryWalls)
@@ -2277,6 +2351,7 @@ loadScene(
               CONTENT[mesh.name] = data
               clickables.push(mesh)
             }
+            addGalleryExhibit(group, project, data, bounds, view)
           }
           try {
             const saved = JSON.parse(sessionStorage.getItem(RETURN_STATE_KEY))
@@ -2858,6 +2933,7 @@ function animate() {
   const rawDelta = clock.getDelta()
   const delta = Math.min(rawDelta, 0.1)
   updatePops(delta)   // click-pop pulses run regardless of overlay state
+  if (galleryExhibits.length && !isOverlayOpen) updateGalleryExhibits(delta)
   updateRoomAccent(delta)
   camera.getWorldDirection(forward)
   forward.y = 0
@@ -3083,6 +3159,7 @@ if (PERF_HUD) {
       return { blocked: r.blocked, name: r.name, normal: r.normal ? [r.normal.x, r.normal.y, r.normal.z] : null }
     },
     collidableCount: () => collidables.length,
+    exhibits: galleryExhibits,
     // What a click at normalised screen coords would hit: first collidable and first clickable.
     pick(nx, ny) {
       const rc = new THREE.Raycaster()
@@ -3247,9 +3324,11 @@ renderer.domElement.addEventListener('click', e => {
     console.log('Geklickt → Mesh:', JSON.stringify(o.name), '| Parent:', JSON.stringify(o.parent?.name))
   }
 
-  const hits = clickRay.intersectObjects(clickables, false)
+  const hits = clickRay.intersectObjects(clickables, false).filter(h => h.object.visible)
   if (hits.length === 0) return
   const obj  = hits[0].object
+  // Gallery: an exhibit (or its arrow) only answers while its arrow is up.
+  if (obj.userData.galleryExhibit && !obj.userData.galleryExhibit.near) return
   const name = obj.name in CONTENT ? obj.name : obj.parent?.name
   if (name) {
     const data = CONTENT[name]
