@@ -1721,104 +1721,117 @@ function addCentreHelpPodium(model, walls, probes) {
 }
 
 // The podium tops carry 12 seam grooves that meet in the middle. Near the centre the
-// grooves narrow to slits whose 4 mm side walls belong to the plaster mesh; the bake
-// has them near-black (no light reaches into a slit), and at lightmap resolution that
-// black spreads into dashes (Lucas: "black streaks in the middle", all podiums).
-// (Filling the lightmap's empty padding did nothing.) So in the centre of each top,
-// plaster and seam-strip fragments below the top surface are dropped, and a disc 5 mm
-// down shows through instead. The disc is vertex-coloured from the podium's OWN
-// lightmap — each disc vertex takes the bake of the nearest top-surface vertex, ×0.85
-// for the groove — so it follows the baked shading, e.g. the Unify creature's shadow
-// (a flat colour read as light lines inside that shadow).
-// Runs on all podiums, the centre copy included; the bake is untouched.
+// grooves narrow to slits; their side walls and the lightmap texels along those thin
+// UV islands bake near-black, and at lightmap resolution that reads as black dashes
+// (Lucas: "black streaks in the middle", all podiums). Filling the lightmap's empty
+// padding did nothing, and discarding the slits over a disc still left single dark
+// texels on the top surface. So within PODIUM_CAP_R of each top's centre the baked
+// light is not read per texel at all: it comes from a small smoothed field built from
+// that podium's own lightmap (each cell = the 75th-percentile radiance of the top-
+// surface vertices around it, which drops the dark outliers), ×0.85 inside the
+// grooves, blended back into the real bake over the outer 10 cm. Geometry and bake
+// files are untouched. Runs on all podiums, the centre copy included.
 const PODIUM_CAP_R = 0.5          // the top is flat out to r ≈ 0.6
-const PODIUM_CAP_DROP = 0.0053    // top 1.2308, groove floors 1.2267
 const PODIUM_CAP_GROOVE = 0.85
+const PODIUM_FIELD_N = 64         // field cells across 2R (≈1.6 cm each)
 async function readLightmap(file) {
-  // RGBM PNG: rgb · a · range = linear radiance. Decoded without premultiplying, so
-  // the rgb survives wherever a is small.
+  // RGBM PNG: rgb · a · range = linear radiance. Read through WebGL so nothing is
+  // premultiplied or colour-converted.
   const blob = await (await fetch('/gallery-baked-assets/maps/' + file)).blob()
   const bmp = await createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })
-  const cv = new OffscreenCanvas(bmp.width, bmp.height)
-  const gl = cv.getContext('webgl2')
+  const gl = new OffscreenCanvas(bmp.width, bmp.height).getContext('webgl2')
   const tex = gl.createTexture()
   gl.bindTexture(gl.TEXTURE_2D, tex)
-  gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE)
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bmp)
-  const fb = gl.createFramebuffer()
-  gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.createFramebuffer())
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0)
   const data = new Uint8Array(bmp.width * bmp.height * 4)
   gl.readPixels(0, 0, bmp.width, bmp.height, gl.RGBA, gl.UNSIGNED_BYTE, data)
   gl.getExtension('WEBGL_lose_context')?.loseContext()
   return { w: bmp.width, h: bmp.height, data }
 }
-async function capPodiumTops(model, settings, view) {
-  const maps = new Map()
-  const tops = []
-  const jobs = []
+async function capPodiumTops(model, settings) {
+  const maps = new Map(), done = []
+  const mains = []
   model.traverse(o => {
-    if (!o.isMesh || o.userData.galleryRole !== 'podium') return
-    if (/seam/i.test([o.material].flat()[0].name)) return
-    jobs.push(o)
+    if (o.isMesh && o.userData.galleryRole === 'podium' && !/seam/i.test([o.material].flat()[0].name)) mains.push(o)
   })
-  for (const o of jobs) {
+  for (const o of mains) {
     const box = new THREE.Box3().setFromObject(o), c = box.getCenter(new THREE.Vector3())
     const top = box.max.y
-    // Top-surface vertices near the axis, with their bake UVs.
     const info = settings.lightmaps[o.userData.galleryBakeLabel]
     const uvA = o.geometry.getAttribute('galleryBakeUV'), pos = o.geometry.getAttribute('position')
     if (!info || !uvA) continue
     if (!maps.has(info.file)) maps.set(info.file, await readLightmap(info.file))
     const lm = maps.get(info.file)
-    const pts = [], v = new THREE.Vector3()
+    // Radiance at every top-surface vertex near the axis.
+    const R = PODIUM_CAP_R, N = PODIUM_FIELD_N, cell = 2 * R / N
+    const buckets = Array.from({ length: N * N }, () => [])
+    const v = new THREE.Vector3()
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
-      if (v.y < top - 0.0006 || Math.hypot(v.x - c.x, v.z - c.z) > PODIUM_CAP_R + 0.05) continue
-      pts.push(v.x - c.x, v.z - c.z, uvA.getX(i), uvA.getY(i))
-    }
-    const geo = new THREE.RingGeometry(0.0005, PODIUM_CAP_R, 128, 40).rotateX(-Math.PI / 2)
-    const gp = geo.getAttribute('position'), col = new Float32Array(gp.count * 3)
-    for (let i = 0; i < gp.count; i++) {
-      const x = gp.getX(i), z = gp.getZ(i)
-      let best = Infinity, bu = 0, bv = 0
-      for (let j = 0; j < pts.length; j += 4) {
-        const d = (pts[j] - x) ** 2 + (pts[j + 1] - z) ** 2
-        if (d < best) { best = d; bu = pts[j + 2]; bv = pts[j + 3] }
+      if (v.y < top - 0.0006) continue
+      const gx = Math.floor((v.x - c.x + R) / cell), gz = Math.floor((v.z - c.z + R) / cell)
+      if (gx < -1 || gz < -1 || gx > N || gz > N) continue
+      const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
+      const py = Math.min(lm.h - 1, Math.max(0, Math.floor(uvA.getY(i) * lm.h)))
+      const k = (py * lm.w + px) * 4, m = lm.data[k + 3] / 255 * info.range / 255
+      const rad = [lm.data[k] * m, lm.data[k + 1] * m, lm.data[k + 2] * m]
+      // Each vertex feeds its own cell and the 8 around it (a 3x3 gather per cell).
+      for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) {
+        const x = gx + dx, z = gz + dz
+        if (x >= 0 && z >= 0 && x < N && z < N) buckets[z * N + x].push(rad)
       }
-      // flipY is false for these maps: uv (0,0) is the image's first row; readPixels
-      // returns rows bottom-up, i.e. the same first row first.
-      const px = Math.min(lm.w - 1, Math.max(0, Math.floor(bu * lm.w)))
-      const py = Math.min(lm.h - 1, Math.max(0, Math.floor(bv * lm.h)))
-      const k = (py * lm.w + px) * 4, m = lm.data[k + 3] / 255 * info.range / 255 * PODIUM_CAP_GROOVE
-      col[i * 3] = lm.data[k] * m; col[i * 3 + 1] = lm.data[k + 1] * m; col[i * 3 + 2] = lm.data[k + 2] * m
     }
-    geo.setAttribute('color', new THREE.BufferAttribute(col, 3))
-    // The seam strips too: near the centre they are hairlines of the same near-black.
+    const field = new Float32Array(N * N * 4), have = new Uint8Array(N * N)
+    buckets.forEach((b, i) => {
+      if (!b.length) return
+      b.sort((p, q) => (p[0] + p[1] + p[2]) - (q[0] + q[1] + q[2]))
+      const r = b[Math.min(b.length - 1, Math.floor(b.length * 0.75))]
+      field.set([r[0], r[1], r[2], 1], i * 4); have[i] = 1
+    })
+    for (let i = 0; i < N * N; i++) if (!have[i]) {   // empty cells: nearest filled one
+      let best = Infinity, bj = -1
+      for (let j = 0; j < N * N; j++) if (have[j]) {
+        const d = (i % N - j % N) ** 2 + (Math.floor(i / N) - Math.floor(j / N)) ** 2
+        if (d < best) { best = d; bj = j }
+      }
+      if (bj >= 0) field.set(field.subarray(bj * 4, bj * 4 + 4), i * 4)
+    }
+    const tex = new THREE.DataTexture(field, N, N, THREE.RGBAFormat, THREE.FloatType)
+    tex.minFilter = tex.magFilter = THREE.LinearFilter
+    tex.colorSpace = THREE.NoColorSpace
+    tex.needsUpdate = true
+    // Plaster and seam strips of this podium read the field near the centre.
     const parts = (o.parent ? o.parent.children : [o]).filter(x => x.isMesh && x.userData.galleryRole === 'podium')
+    const key = c.x.toFixed(2) + ',' + c.z.toFixed(2)
     for (const m of parts.flatMap(x => [x.material].flat())) {
       const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey
-      const cut = `if (length(vCapW.xz - vec2(${c.x.toFixed(4)}, ${c.z.toFixed(4)})) < ${PODIUM_CAP_R.toFixed(3)}` +
-        ` && vCapW.y < ${(top - 0.0003).toFixed(4)}) discard;`
       m.onBeforeCompile = (shader, r) => {
         prev.call(m, shader, r)
+        shader.uniforms.uCapField = { value: tex }
         shader.vertexShader = 'varying vec3 vCapW;\n' + shader.vertexShader.replace('#include <project_vertex>',
           '#include <project_vertex>\nvCapW = (modelMatrix * vec4(transformed, 1.0)).xyz;')
-        shader.fragmentShader = 'varying vec3 vCapW;\n' + shader.fragmentShader.replace('void main() {', 'void main() {\n' + cut)
+        const bakeLine = 'totalEmissiveRadiance+=galleryRadiance.rgb*galleryRadiance.a*uBakedRange;'
+        if (!shader.fragmentShader.includes(bakeLine)) throw Error('Podium cap: bake line not found')
+        shader.fragmentShader = 'varying vec3 vCapW;\nuniform sampler2D uCapField;\n' + shader.fragmentShader.replace(bakeLine, `{
+          vec3 bakeRad = galleryRadiance.rgb * galleryRadiance.a * uBakedRange;
+          vec2 capD = vCapW.xz - vec2(${c.x.toFixed(4)}, ${c.z.toFixed(4)});
+          float capR = length(capD);
+          if (capR < ${R.toFixed(3)} && vCapW.y > ${(top - 0.02).toFixed(4)}) {
+            vec3 fieldRad = texture2D(uCapField, capD / ${(2 * R).toFixed(3)} + 0.5).rgb;
+            if (vCapW.y < ${(top - 0.0003).toFixed(4)}) fieldRad *= ${PODIUM_CAP_GROOVE.toFixed(2)};
+            bakeRad = mix(fieldRad, bakeRad, smoothstep(${(R - 0.1).toFixed(3)}, ${R.toFixed(3)}, capR));
+          }
+          totalEmissiveRadiance += bakeRad;
+        }`)
       }
-      m.customProgramCacheKey = () => prevKey.call(m) + '-cap-' + c.x.toFixed(2) + ',' + c.z.toFixed(2)
+      m.customProgramCacheKey = () => prevKey.call(m) + '-capfield-' + key
       m.needsUpdate = true
     }
-    const mat = new THREE.MeshBasicMaterial({ vertexColors: true })
-    mat.onBeforeCompile = shader => view.bind(shader)   // through the Blender view LUT
-    mat.customProgramCacheKey = () => 'podium-cap-ocio-v1'
-    const cap = new THREE.Mesh(geo, mat)
-    cap.name = 'PodiumCap_' + tops.length
-    cap.position.set(c.x, box.max.y - PODIUM_CAP_DROP, c.z)
-    scene.add(cap)
-    tops.push(c.x.toFixed(1) + ',' + c.z.toFixed(1))
+    done.push(key)
   }
-  console.log(`Podest-Deckel: ${tops.length} (${tops.join(' | ')})`)
+  console.log(`Podest-Mitte geglättet: ${done.length} (${done.join(' | ')})`)
 }
 
 function updateHelpIcons(delta) {
@@ -2637,7 +2650,7 @@ loadScene(
             addGalleryExhibit(group, project, data, bounds, view)
           }
           addCentreHelpPodium(gltf.scene, galleryWalls, probes)
-          await capPodiumTops(gltf.scene, settings, view)
+          await capPodiumTops(gltf.scene, settings)
           try {
             const saved = JSON.parse(sessionStorage.getItem(RETURN_STATE_KEY))
             if (saved && ['x','y','z','yaw','pitch'].every(k => Number.isFinite(saved[k]))) {
