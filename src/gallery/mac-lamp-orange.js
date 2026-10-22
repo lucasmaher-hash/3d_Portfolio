@@ -13,7 +13,7 @@ import * as THREE from 'three'
 // lowering opacity alone would read as grey ghost-metal. It becomes an orange dielectric with
 // part of the glow kept, then transparent. depthWrite off so the two parts never punch holes
 // into each other; FrontSide so a part does not show its own inside walls.
-// Under `npm run dev` the silver dials (bottom right) are shown; nothing of them ships.
+// addDial() below is a dev-only tuning panel; no dial is wired up at the moment.
 // Values dialled in by Lucas on 2026-10-22.
 export const LAMP_ORANGE = { opacity: 0.92, glow: 0.43, roughness: 0 }
 
@@ -31,8 +31,8 @@ export const EGG_SILVER = { brightness: 1.5, metalness: 1, roughness: 0, glow: 1
 export const PANEL_SILVER = { brightness: 3.17, metalness: 1, roughness: 0.14, glow: 3.89, texture: 1.5 }   // Lucas, 2026-10-22
 
 // Virtual Cooking's step tiles above the purple one (M_Seg, a plain light grey dielectric).
-// Being dialled in: dev only. glow = emissive in the tile's own colour.
-export const PANEL_TILES = { brightness: 1, glow: 0, roughness: 0.5 }
+// glow = emissive in the tile's own colour. Lucas's values, 2026-10-22.
+export const PANEL_TILES = { brightness: 2.33, glow: 0.26, roughness: 0.13 }
 
 const NAMES = ['Base_Orange_Table', 'VerticalPlate_Orange_Table']
 const GREY_NAMES = ['Back_Grey_Panel_Table', 'KB_Grey_Panel_Table', 'Trackpad_Back_Grey_Table', 'Trackpad_Front_Grey_Table']
@@ -105,8 +105,6 @@ function metalGrey(model) {
   if (egg.length) metalFinish(egg, EGG_SILVER, null, { base: egg[0].color.clone() })
   const panel = materialsNamed(model, 'M_Silver_Panel')
   if (panel.length) metalFinish(panel, PANEL_SILVER, null, { base: panel[0].color.clone() })
-  // Step tiles: still being dialled in (2026-10-22), dev only — live keeps the authored look.
-  if (!import.meta.env.DEV) return
   const tiles = materialsNamed(model, 'M_Seg')
   if (!tiles.length) return
   const tileBase = tiles[0].color.clone()
@@ -119,9 +117,6 @@ function metalGrey(model) {
     }
   }
   applyTiles()
-  addDial('Virtual Cooking tiles', PANEL_TILES, [
-    ['brightness', 'Brightness', 0.05, 3, 0.01], ['glow', 'Glow', 0, 3, 0.01], ['roughness', 'Roughness', 0, 1, 0.01],
-  ], applyTiles)
 }
 
 export async function roundAndTintMacLamp(model, gltfLoader) {
