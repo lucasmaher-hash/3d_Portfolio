@@ -262,8 +262,8 @@
        .scene-loading and removes it once the scene is on screen), the hint says
        so instead of inviting a click: dismissing early used to uncover an empty
        dark canvas for as long as the 12 MB model took on mobile data. A click
-       in that state is remembered and the screen closes the moment the scene
-       is ready. */
+       in that state is ignored; the screen only closes on a click after the
+       scene is ready. */
     .hint-loading { display: none; }
     .scene-loading .start-hint .desc-pointer,
     .scene-loading .start-hint .desc-touch { display: none; }
@@ -774,9 +774,11 @@
       });
     })();
 
-    // Any click / key dismisses the intro — parent fades the iframe out
-    // (or, if the scene is not ready yet, closes it as soon as it is)
+    // Any click / key dismisses the intro — parent fades the iframe out.
+    // While the scene is still loading (.scene-loading) clicks do nothing;
+    // index.html ignores an early dismiss too.
     function dismiss() {
+      if (document.documentElement.classList.contains('scene-loading')) return;
       window.parent.postMessage({ type: 'intro-controls-dismiss' }, '*');
     }
     document.addEventListener('click', dismiss);

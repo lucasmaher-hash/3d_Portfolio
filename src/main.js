@@ -2185,11 +2185,48 @@ const GLB_OPTIMIZED = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=1'
 // A missing or broken optimized file (the optimizer never fails the build, it just does not
 // write one) falls back to the original GLB instead of leaving the 3D page empty.
 function loadScene(url, onLoad, onProgress, onError) {
-  loader.load(url, onLoad, onProgress, err => {
+  const fail = err => {
     if (url === GLB_ORIGINAL) return onError(err)
     console.warn(`GLB ${url} nicht ladbar, lade ${GLB_ORIGINAL}:`, err)
     loadScene(GLB_ORIGINAL, onLoad, onProgress, onError)
-  })
+  }
+  fetchGlb(url, onProgress).then(
+    buf => loader.parse(buf, THREE.LoaderUtils.extractUrlBase(url), onLoad, fail),
+    fail
+  )
+}
+// Fetched by hand instead of loader.load() for an HONEST progress figure. The host gzips the
+// GLB, so Content-Length is the COMPRESSED size while the bytes the browser hands over are
+// decompressed: GitHub Pages sends 6.2 MB for the 17.2 MB gallery, and loaded/total climbed to
+// 275%. A GLB states its own decoded length in its header (uint32 at byte 8, after the
+// 'glTF' magic), so that is the denominator; Content-Length is only the fallback.
+async function fetchGlb(url, onProgress) {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`)
+  if (!res.body) return res.arrayBuffer()
+  let total = Number(res.headers.get('content-length')) || 0
+  const reader = res.body.getReader()
+  const chunks = []
+  let loaded = 0, headerRead = false
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    chunks.push(value)
+    loaded += value.length
+    if (!headerRead && loaded >= 12) {
+      headerRead = true
+      const head = new Uint8Array(12)
+      let o = 0
+      for (const c of chunks) { const n = Math.min(12 - o, c.length); head.set(c.subarray(0, n), o); o += n; if (o === 12) break }
+      const dv = new DataView(head.buffer)
+      if (dv.getUint32(0, true) === 0x46546C67) total = dv.getUint32(8, true)
+    }
+    if (onProgress && total) onProgress({ loaded: Math.min(loaded, total), total })
+  }
+  const out = new Uint8Array(loaded)
+  let o = 0
+  for (const c of chunks) { out.set(c, o); o += c.length }
+  return out.buffer
 }
 const glbT0 = performance.now()
 loadScene(
@@ -2259,7 +2296,9 @@ loadScene(
             camera.updateProjectionMatrix();syncSteeringToView()
           }
         }
-        await renderer.compileAsync(scene, camera)
+        // Capped like the main path's 4s reveal timeout: the welcome screen cannot be closed
+        // until _sceneReady() fires, so a compileAsync that never settles must not hold it.
+        await Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 4000))])
         roomAccent.ready = true
         updateRoomAccent(0, true)
         res.liveAfter = performance.now() + 1500

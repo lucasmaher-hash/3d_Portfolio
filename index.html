@@ -363,9 +363,11 @@
         // long as the 12 MB model took on mobile data, which read as a black,
         // broken page. src/main.js calls window._loader.progress() while the
         // GLB downloads and window._sceneReady() once the scene is visible (or
-        // the load failed). A click before that is remembered and the intro
-        // closes the moment the scene is ready.
-        var ready = false, wantsOut = false, lastP = null, closed = false;
+        // the load failed). A click before that is IGNORED (2026-10-22, Lucas) —
+        // it used to be remembered and closed the intro the moment the scene
+        // was ready, which read as the screen vanishing on its own. Only once
+        // the hint reads "click anywhere to start" does a click close it.
+        var ready = false, lastP = null, closed = false;
         function post(msg) {
           try { intro.contentWindow.postMessage(msg, '*'); } catch (e) {}
         }
@@ -376,14 +378,13 @@
           setTimeout(function () { intro.remove(); }, 750);
         }
         window._loader = {
-          progress: function (p) { lastP = p; post({ type: 'intro-scene-progress', p: p }); },
+          progress: function (p) { p = Math.min(1, p); lastP = p; post({ type: 'intro-scene-progress', p: p }); },
           done: function () {}
         };
         window._sceneReady = function () {
           if (ready) return;
           ready = true;
           post({ type: 'intro-scene-ready' });
-          if (wantsOut) close();
         };
 
         intro.addEventListener('load', function () {
@@ -396,7 +397,7 @@
         intro.src = '/controls_fullscreen3d.html';
         window.addEventListener('message', function (e) {
           if (e.data && e.data.type === 'intro-controls-dismiss') {
-            if (ready) close(); else wantsOut = true;
+            if (ready) close();
           }
         });
       })();
