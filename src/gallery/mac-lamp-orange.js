@@ -20,15 +20,15 @@ export const LAMP_ORANGE = { opacity: 0.92, glow: 0.43, roughness: 0 }
 // Metal finish for three exhibits, one value set each (same five dials):
 //  - Mac-Lamp's light grey parts (Lamp_Grey, authored as black metal + grey glow), values
 //    dialled in by Lucas on 2026-10-22;
-//  - Cybercoffee's silver egg (M_Silver_Egg) and Virtual Cooking's silver panel
-//    (M_Silver_Panel), defaults = their authored values, still being dialled (dev dial).
+//  - Cybercoffee's silver egg (M_Silver_Egg), Lucas's values, live;
+//  - Virtual Cooking's silver panel (M_Silver_Panel), still being dialled (dev dial only).
 // colour = base x brightness, emissive = authored emissive x glow. The brushed streak texture
 // is always attached as roughness + bump map: `texture` scales the bump and the roughness
 // multiplier, and the streaks (~0.5 mean) swing roughness around the set value — so 0.11 at
 // texture 0 renders as ~0.05 with a faint grain. Kept that way because it is what Lucas tuned.
 export const LAMP_GREY = { brightness: 0.94, metalness: 0.61, roughness: 0.11, glow: 0.3, texture: 0 }
-export const EGG_SILVER = { brightness: 1, metalness: 1, roughness: 0.14, glow: 1, texture: 0 }
-export const PANEL_SILVER = { brightness: 1, metalness: 1, roughness: 0.14, glow: 1, texture: 0 }
+export const EGG_SILVER = { brightness: 1.5, metalness: 1, roughness: 0, glow: 1.05, texture: 0 }   // Lucas, 2026-10-22
+export const PANEL_SILVER = { brightness: 1.5, metalness: 1, roughness: 0.14, glow: 1.29, texture: 1.5 }   // still dialling
 
 const NAMES = ['Base_Orange_Table', 'VerticalPlate_Orange_Table']
 const GREY_NAMES = ['Back_Grey_Panel_Table', 'KB_Grey_Panel_Table', 'Trackpad_Back_Grey_Table', 'Trackpad_Front_Grey_Table']
@@ -59,7 +59,7 @@ function brushedTexture() {
 }
 
 let brushed = null
-function metalFinish(materials, values, title, { base, emissive }) {
+function metalFinish(materials, values, title, { base, emissive, max = {} }) {
   if (!materials.length) return
   brushed = brushed || brushedTexture()
   for (const mat of materials) {
@@ -82,8 +82,8 @@ function metalFinish(materials, values, title, { base, emissive }) {
   }
   apply()
   if (import.meta.env.DEV && title) addDial(title, values, [
-    ['brightness', 'Brightness', 0.05, 1.5, 0.01], ['metalness', 'Metalness', 0, 1, 0.01],
-    ['roughness', 'Roughness', 0, 1, 0.01], ['glow', 'Glow', 0, 1.5, 0.01], ['texture', 'Brush texture', 0, 1.5, 0.01],
+    ['brightness', 'Brightness', 0.05, max.brightness || 1.5, 0.01], ['metalness', 'Metalness', 0, 1, 0.01],
+    ['roughness', 'Roughness', 0, 1, 0.01], ['glow', 'Glow', 0, max.glow || 1.5, 0.01], ['texture', 'Brush texture', 0, 1.5, 0.01],
   ], apply)
 }
 
@@ -97,12 +97,13 @@ function metalGrey(model) {
   const meshes = GREY_NAMES.map(n => model.getObjectByName(n)).filter(o => o && o.isMesh)
   metalFinish(meshes.flatMap(m => [m.material].flat()), LAMP_GREY, null,
     { base: new THREE.Color(1, 1, 1), emissive: new THREE.Color().setRGB(0.58, 0.58, 0.58) })
-  // Silver: still being dialled in (2026-10-22), dev only — the live site keeps the authored look.
+  const egg = materialsNamed(model, 'M_Silver_Egg')
+  if (egg.length) metalFinish(egg, EGG_SILVER, null, { base: egg[0].color.clone() })
+  // Virtual Cooking silver: still being dialled in (2026-10-22), dev only — the live site
+  // keeps the authored look. Brightness and glow go further here (Lucas: 1.5 was not enough).
   if (!import.meta.env.DEV) return
-  for (const [name, values, title] of [['M_Silver_Egg', EGG_SILVER, 'Cybercoffee silver'], ['M_Silver_Panel', PANEL_SILVER, 'Virtual Cooking silver']]) {
-    const mats = materialsNamed(model, name)
-    if (mats.length) metalFinish(mats, values, title, { base: mats[0].color.clone() })
-  }
+  const panel = materialsNamed(model, 'M_Silver_Panel')
+  if (panel.length) metalFinish(panel, PANEL_SILVER, 'Virtual Cooking silver', { base: panel[0].color.clone(), max: { brightness: 5, glow: 6 } })
 }
 
 export async function roundAndTintMacLamp(model, gltfLoader) {
