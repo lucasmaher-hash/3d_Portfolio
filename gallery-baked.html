@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>location.replace('/gallery-4.html'+location.search+location.hash)</script>
     <meta charset="UTF-8" />
     <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". This pre-paint script no longer runs, so nothing sets
          data-theme: no stored choice, no evening clock.
@@ -11,7 +12,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
     <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lucas Maher — Gallery preview</title>
+    <title>Lucas Maher — Gallery — baked lighting</title>
     <script src="/analytics.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -280,7 +281,7 @@
          so the intro stays skipped there. -->
     <script>
       (function () {
-        var KEY = 'galleryIntroSeen';
+        var KEY = 'bakedGalleryIntroSeen';
         // Redirecting to the 2D landing (see the guard in <head>): touch NOTHING.
         // Marking introSeen here would silently burn the once-per-tab intro on a
         // visit that never showed the 3D page at all — the first real switch to
@@ -317,7 +318,7 @@
          scrollbar down its right edge, over the scene. Nothing is actually
          down there to scroll to: .top-row inside is position: fixed, so the
          padding contributes height without contributing content. -->
-    <iframe id="top-bar" src="/gallery-nav.html" allowtransparency="true" scrolling="no"></iframe>
+    <iframe id="top-bar" src="/gallery-baked-nav.html" allowtransparency="true" scrolling="no"></iframe>
 
     <!-- Fullscreen controls intro — first 3D entry per tab; click/key dismisses.
          src is set from JS below rather than here so that a gated reload does not fetch

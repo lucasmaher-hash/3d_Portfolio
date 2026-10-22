@@ -1,0 +1,504 @@
+{
+  "variant": "fourth",
+  "pilot": false,
+  "floorY": 0,
+  "eyeHeight": 1.9386224159559822,
+  "heightScale": 1.6410608137401594,
+  "ceilingHeight": 4.904407981783152,
+  "fov": 90,
+  "speed": 3.45,
+  "spawn": [
+    0,
+    1.9386224159559822,
+    0
+  ],
+  "yaw": 3.141592653589793,
+  "pitch": 0.054,
+  "exposureEV": -0.8624964952468872,
+  "viewTransform": "AgX",
+  "look": "AgX - Medium High Contrast",
+  "source": "gallery-review-v05.blend",
+  "receivers": [
+    "ceiling",
+    "ring",
+    "outer",
+    "floor",
+    "well-01",
+    "well-02",
+    "well-03",
+    "well-04",
+    "well-05",
+    "well-06",
+    "pinkroom-creature-body",
+    "pinkroom-creature-eyel",
+    "pinkroom-creature-eyer",
+    "pinkroom-creature-pupill",
+    "pinkroom-creature-pupilr",
+    "pivot-vrpanel",
+    "egg-rig",
+    "podium-01",
+    "podium-02",
+    "podium-03",
+    "podium-04",
+    "podium-05"
+  ],
+  "quality": {
+    "samples": 256,
+    "adaptiveThreshold": 0.01,
+    "floatMasters": "OpenEXR half float ZIP",
+    "noRescale": true
+  },
+  "lightmaps": {
+    "ceiling": {
+      "file": "ceiling.png",
+      "range": 1,
+      "width": 2048,
+      "height": 2048,
+      "maxHDR": 0.10357666015625,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00001811864240153227,
+      "p99LinearError": 0.0001126723363995552
+    },
+    "egg-rig": {
+      "file": "egg-rig.png",
+      "range": 4,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 3.51953125,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00006067754657124169,
+      "p99LinearError": 0.0009895563125610352
+    },
+    "floor": {
+      "file": "floor.png",
+      "range": 4,
+      "width": 2048,
+      "height": 2048,
+      "maxHDR": 3.080078125,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.000054590971558354795,
+      "p99LinearError": 0.00041919946670532227
+    },
+    "outer": {
+      "file": "outer.png",
+      "range": 2,
+      "width": 3072,
+      "height": 3072,
+      "maxHDR": 1.5751953125,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00013038478209637105,
+      "p99LinearError": 0.0011380314826965332
+    },
+    "pinkroom-creature-body": {
+      "file": "pinkroom-creature-body.png",
+      "range": 8,
+      "width": 1024,
+      "height": 1024,
+      "maxHDR": 4.109375,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.0002903530839830637,
+      "p99LinearError": 0.0039479732513427734
+    },
+    "pinkroom-creature-eyel": {
+      "file": "pinkroom-creature-eyel.png",
+      "range": 4,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 2.9453125,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00030755935586057603,
+      "p99LinearError": 0.0037126541137695312
+    },
+    "pinkroom-creature-eyer": {
+      "file": "pinkroom-creature-eyer.png",
+      "range": 4,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 3.21875,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00021573765843641013,
+      "p99LinearError": 0.0031709671020507812
+    },
+    "pinkroom-creature-pupill": {
+      "file": "pinkroom-creature-pupill.png",
+      "range": 1,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 0.0565185546875,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.000004852430720347911,
+      "p99LinearError": 0.00005803629755973816
+    },
+    "pinkroom-creature-pupilr": {
+      "file": "pinkroom-creature-pupilr.png",
+      "range": 1,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 0.0491943359375,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.0000045559554564533755,
+      "p99LinearError": 0.00005315057933330536
+    },
+    "pivot-vrpanel": {
+      "file": "pivot-vrpanel.png",
+      "range": 4,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 3.578125,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.0001011168715194799,
+      "p99LinearError": 0.0008197128772735596
+    },
+    "podium-01": {
+      "file": "podium-01.png",
+      "range": 2,
+      "width": 1024,
+      "height": 1024,
+      "maxHDR": 1.7109375,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00025614339392632246,
+      "p99LinearError": 0.0021600723266601562
+    },
+    "podium-02": {
+      "file": "podium-02.png",
+      "range": 4,
+      "width": 1024,
+      "height": 1024,
+      "maxHDR": 2.09765625,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00030132566462270916,
+      "p99LinearError": 0.0028116703033447266
+    },
+    "podium-03": {
+      "file": "podium-03.png",
+      "range": 2,
+      "width": 1024,
+      "height": 1024,
+      "maxHDR": 1.8779296875,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00029845614335499704,
+      "p99LinearError": 0.0025336742401123047
+    },
+    "podium-04": {
+      "file": "podium-04.png",
+      "range": 4,
+      "width": 1024,
+      "height": 1024,
+      "maxHDR": 2.23828125,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.0003321694675832987,
+      "p99LinearError": 0.0026952028274536133
+    },
+    "podium-05": {
+      "file": "podium-05.png",
+      "range": 2,
+      "width": 1024,
+      "height": 1024,
+      "maxHDR": 1.9482421875,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.0003363872820045799,
+      "p99LinearError": 0.0025544166564941406
+    },
+    "ring": {
+      "file": "ring.png",
+      "range": 2,
+      "width": 2048,
+      "height": 2048,
+      "maxHDR": 1.5556640625,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00016072533617261797,
+      "p99LinearError": 0.0014172494411468506
+    },
+    "well-01": {
+      "file": "well-01.png",
+      "range": 2,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 1.490234375,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00007542569801444188,
+      "p99LinearError": 0.0013479366898536682
+    },
+    "well-02": {
+      "file": "well-02.png",
+      "range": 2,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 1.4755859375,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00007748881762381643,
+      "p99LinearError": 0.0013445292133837938
+    },
+    "well-03": {
+      "file": "well-03.png",
+      "range": 2,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 1.4638671875,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00007649214239791036,
+      "p99LinearError": 0.0013375282287597656
+    },
+    "well-04": {
+      "file": "well-04.png",
+      "range": 2,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 1.4765625,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00007814935088390484,
+      "p99LinearError": 0.001351766288280487
+    },
+    "well-05": {
+      "file": "well-05.png",
+      "range": 2,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 1.443359375,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00007790163363097236,
+      "p99LinearError": 0.0013596965000033379
+    },
+    "well-06": {
+      "file": "well-06.png",
+      "range": 2,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 1.0107421875,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00005940317714703269,
+      "p99LinearError": 0.0010474324226379395
+    }
+  },
+  "probes": [
+    {
+      "file": "center.exr",
+      "position": [
+        0,
+        1.94,
+        0
+      ],
+      "project": null
+    },
+    {
+      "file": "unify.exr",
+      "position": [
+        -8.211,
+        2.05,
+        17.474
+      ],
+      "project": "Unify"
+    },
+    {
+      "file": "bottle.exr",
+      "position": [
+        -14.063,
+        2.05,
+        -7.916
+      ],
+      "project": "Double Packaging"
+    },
+    {
+      "file": "mac-lamp.exr",
+      "position": [
+        9.684,
+        2.05,
+        -14.526
+      ],
+      "project": "Mac-Lamp"
+    },
+    {
+      "file": "virtual-cooking.exr",
+      "position": [
+        11.789,
+        2.05,
+        7.032
+      ],
+      "project": "Virtual Cooking"
+    },
+    {
+      "file": "cybercoffee.exr",
+      "position": [
+        18.526,
+        2.05,
+        -6.526
+      ],
+      "project": "Cybercoffee"
+    }
+  ],
+  "reviewViews": {
+    "01-center-room": {
+      "position": [
+        0,
+        1.9386223554611206,
+        0
+      ],
+      "target": [
+        0,
+        2.0481882095336914,
+        -0.9939796924591064
+      ],
+      "lens": 14
+    },
+    "02-podium-area": {
+      "position": [
+        3,
+        1.9386223554611206,
+        7
+      ],
+      "target": [
+        3.9998700618743896,
+        1.9228521585464478,
+        7.00341272354126
+      ],
+      "lens": 22
+    },
+    "03-bottle-area": {
+      "position": [
+        -7,
+        1.9386223554611206,
+        -3
+      ],
+      "target": [
+        -7.820656776428223,
+        1.922515869140625,
+        -3.571194648742676
+      ],
+      "lens": 22
+    },
+    "04-mac-lamp-area": {
+      "position": [
+        6,
+        1.9386223554611206,
+        -7
+      ],
+      "target": [
+        6.4395952224731445,
+        1.922081470489502,
+        -7.898043632507324
+      ],
+      "lens": 22
+    },
+    "05-unify-area": {
+      "position": [
+        -3,
+        1.9386223554611206,
+        10
+      ],
+      "target": [
+        -3.5718629360198975,
+        1.9234095811843872,
+        10.820207595825195
+      ],
+      "lens": 22
+    },
+    "01-center-wall": {
+      "position": [
+        0,
+        1.9386223554611206,
+        0
+      ],
+      "target": [
+        0,
+        2.0481882095336914,
+        -0.9939796924591064
+      ],
+      "lens": 14
+    },
+    "02-center-light-and-exit": {
+      "position": [
+        -2,
+        1.9386223554611206,
+        -1.5
+      ],
+      "target": [
+        -1.5495624542236328,
+        2.357839822769165,
+        -0.7117342352867126
+      ],
+      "lens": 16
+    },
+    "Unify friendly expression close-up": {
+      "position": [
+        -6.656924247741699,
+        2.0199999809265137,
+        14.507131576538086
+      ],
+      "target": [
+        -7.080583095550537,
+        2.0075011253356934,
+        15.412867546081543
+      ],
+      "lens": 48
+    },
+    "01-unify": {
+      "position": [
+        -7.593082904815674,
+        3.444129228591919,
+        14.02897834777832
+      ],
+      "target": [
+        -7.756187438964844,
+        3.0613889694213867,
+        14.938322067260742
+      ],
+      "lens": 44
+    },
+    "02-bottle": {
+      "position": [
+        -10.672578811645508,
+        3.2244322299957275,
+        -7.047066688537598
+      ],
+      "target": [
+        -11.567510604858398,
+        2.8416919708251953,
+        -7.276429176330566
+      ],
+      "lens": 44
+    },
+    "03-mac-lamp": {
+      "position": [
+        8.562429428100586,
+        3.016876220703125,
+        -11.210569381713867
+      ],
+      "target": [
+        8.858477592468262,
+        2.634136199951172,
+        -12.08570671081543
+      ],
+      "lens": 44
+    },
+    "04-virtual-cooking": {
+      "position": [
+        8.421496391296387,
+        3.382014274597168,
+        6.078103542327881
+      ],
+      "target": [
+        9.310379028320312,
+        2.9992737770080566,
+        6.329893112182617
+      ],
+      "lens": 44
+    },
+    "05-cybercoffee": {
+      "position": [
+        15.638288497924805,
+        3.412609815597534,
+        -4.548342704772949
+      ],
+      "target": [
+        16.40052604675293,
+        3.029869556427002,
+        -5.0703630447387695
+      ],
+      "lens": 44
+    }
+  },
+  "bottleSourceSHA256": "084ed362ae0ff47f774db25e9b47baa5fa756bd71548d8204a4e1260fdd37c41",
+  "bottlePreservation": "Decoded geometry, indices, transforms, materials and texture bytes verified after serialization",
+  "runtimeRoomLights": 0,
+  "displayTransform": "Frozen Blender 5.1 OCIO AgX + Medium High Contrast; exposure baked into display LUT once"
+}

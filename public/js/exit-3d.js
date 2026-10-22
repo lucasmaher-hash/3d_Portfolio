@@ -23,7 +23,10 @@
   '@keyframes exitPop{0%{transform:translateY(-2px) scale(1.03)}50%{transform:translateY(-2px) scale(1.15)}100%{transform:translateY(-2px) scale(1.03)}}';
   document.head.appendChild(style);
   var btn = document.createElement('a');
-  btn.href = '/';
+  // Each numbered iteration returns to its own scene; normal 3D uses the default.
+  var sceneId = new URLSearchParams(location.search).get('scene');
+  var sceneEntries = { 'gallery-1': '/gallery-1.html', 'gallery-4': '/gallery-4.html', 'gallery-baked': '/gallery-4.html' };
+  btn.href = Object.prototype.hasOwnProperty.call(sceneEntries, sceneId) ? sceneEntries[sceneId] : '/';
   btn.className = 'exit-3d-btn';
   btn.textContent = 'Exit';
   document.body.appendChild(btn);
