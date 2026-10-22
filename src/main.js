@@ -1,14 +1,11 @@
 import './style.css'
-import { prepareGallery } from './gallery/scene.js'
-import { prepareOriginalGallery } from './gallery/original-scene.js'
 import { prepareBakedGallery } from './gallery/baked-scene.js'
 
 const IS_DEFAULT_GALLERY = ['/', '/index.html'].includes(location.pathname)
 const IS_BAKED_GALLERY = IS_DEFAULT_GALLERY || ['/gallery-baked.html','/gallery-4.html'].includes(location.pathname)
-const IS_ORIGINAL_GALLERY = ['/gallery-original.html','/gallery-3.html'].includes(location.pathname)
-const IS_GALLERY = IS_BAKED_GALLERY || IS_ORIGINAL_GALLERY || ['/gallery.html','/gallery-2.html'].includes(location.pathname)
-const GALLERY_ENTRY_ID = IS_DEFAULT_GALLERY ? 'default' : IS_BAKED_GALLERY ? 'gallery-4' : IS_ORIGINAL_GALLERY ? 'gallery-3' : IS_GALLERY ? 'gallery-2' : 'gallery-1'
-const RETURN_STATE_KEY = IS_DEFAULT_GALLERY ? '_defaultBakedGalleryReturnState' : IS_BAKED_GALLERY ? '_bakedGalleryReturnState' : IS_ORIGINAL_GALLERY ? '_originalGalleryReturnState' : IS_GALLERY ? '_galleryReturnState' : '_3dReturnState'
+const IS_GALLERY = IS_BAKED_GALLERY
+const GALLERY_ENTRY_ID = IS_DEFAULT_GALLERY ? 'default' : IS_BAKED_GALLERY ? 'gallery-4' : 'gallery-1'
+const RETURN_STATE_KEY = IS_DEFAULT_GALLERY ? '_defaultBakedGalleryReturnState' : IS_BAKED_GALLERY ? '_bakedGalleryReturnState' : '_3dReturnState'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 // PERF.lightGlb: the production GLB is meshopt-compressed (scripts/optimize-glb.mjs).
@@ -2183,8 +2180,8 @@ function addRoomTitles(model) {
 // ── Load model ───────────────────────────────────────────────────
 const loader = new GLTFLoader()
 loader.setMeshoptDecoder(MeshoptDecoder)
-const GLB_ORIGINAL  = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=1' : IS_ORIGINAL_GALLERY ? '/gallery-original-assets/gallery.glb?v=2' : IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-walls-v3' : '/current🟢.glb'
-const GLB_OPTIMIZED = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=1' : IS_ORIGINAL_GALLERY ? '/gallery-original-assets/gallery.glb?v=2' : IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-walls-v3' : '/scene-optimized.glb'
+const GLB_ORIGINAL  = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=1' : '/current🟢.glb'
+const GLB_OPTIMIZED = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=1' : '/scene-optimized.glb'
 // A missing or broken optimized file (the optimizer never fails the build, it just does not
 // write one) falls back to the original GLB instead of leaving the 3D page empty.
 function loadScene(url, onLoad, onProgress, onError) {
@@ -2200,7 +2197,7 @@ loadScene(
   async (gltf) => {
     if (IS_GALLERY) {
       try {
-        const { settings, collidables: galleryWalls } = await (IS_BAKED_GALLERY ? prepareBakedGallery : IS_ORIGINAL_GALLERY ? prepareOriginalGallery : prepareGallery)(gltf.scene, scene, renderer)
+        const { settings, collidables: galleryWalls } = await prepareBakedGallery(gltf.scene, scene, renderer)
         collidables = galleryWalls
         // Include the lower cove in shoulder-width collision checks.
         lowCollidables.push(...galleryWalls)

@@ -6,12 +6,14 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import assert from 'node:assert/strict'
+import {execFileSync} from 'node:child_process'
 const root=process.argv[2]
 if(!root)throw Error('Pass final HDR bake directory')
 const output='public/gallery-baked-assets'
 const sourcePath='public/gallery-original-assets/gallery.glb'
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex')
-const sourceBytes=await fs.readFile(sourcePath)
+// The removed third iteration remains available as a pinned source in Git.
+const sourceBytes=execFileSync('git',['show',`gallery-third-preserved-2026-10-22:${sourcePath}`],{maxBuffer:100*1024*1024})
 assert.equal(hash(sourceBytes),'084ed362ae0ff47f774db25e9b47baa5fa756bd71548d8204a4e1260fdd37c41','Third version changed')
 await Promise.all([MeshoptEncoder.ready,MeshoptDecoder.ready])
 const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.encoder':MeshoptEncoder,'meshopt.decoder':MeshoptDecoder})

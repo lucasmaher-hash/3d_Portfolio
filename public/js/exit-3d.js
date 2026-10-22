@@ -25,8 +25,7 @@
   var btn = document.createElement('a');
   // Each numbered iteration returns to its own scene; normal 3D uses the default.
   var sceneId = new URLSearchParams(location.search).get('scene');
-  var sceneEntries = { 'gallery-1': '/gallery-1.html', 'gallery-2': '/gallery-2.html',
-    'gallery-3': '/gallery-3.html', 'gallery-4': '/gallery-4.html', 'gallery-baked': '/gallery-4.html' };
+  var sceneEntries = { 'gallery-1': '/gallery-1.html', 'gallery-4': '/gallery-4.html', 'gallery-baked': '/gallery-4.html' };
   btn.href = Object.prototype.hasOwnProperty.call(sceneEntries, sceneId) ? sceneEntries[sceneId] : '/';
   btn.className = 'exit-3d-btn';
   btn.textContent = 'Exit';
