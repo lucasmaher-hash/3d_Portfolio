@@ -1,0 +1,83 @@
+# Web runtime, reflection and alternative baking tradeoffs
+
+## How should the approved Cycles illumination be delivered to Three.js?
+
+### Takeaway
+Use a static Cycles diffuse-light bake plus view-dependent PBR reflections, not a Combined beauty bake containing fixed highlights/refraction. Two legitimate representations exist; choose one deliberately and validate its linear-light normalization in a small pilot before processing the entire gallery.
+
+### Cited Findings
+- Three's `lightMap` holds precomputed illumination; its documentation recommends linear-sRGB HDR data. Material color and surface texture remain separate from that illumination. The texture UV channel can explicitly select `uv1` with `texture.channel = 1`. — [MeshStandardMaterial](https://threejs.org/docs/pages/MeshStandardMaterial.html), [Texture UV channel](https://threejs.org/docs/pages/Texture.html)
+- The pinned r184 shader accumulates `lightMap` irradiance and environment diffuse irradiance separately. Therefore attaching a complete diffuse lightmap while leaving ordinary diffuse IBL enabled can count ambient light twice. — [r184 lights_fragment_maps](https://raw.githubusercontent.com/mrdoob/three.js/r184/src/renderers/shaders/ShaderChunk/lights_fragment_maps.glsl.js)
+- r184 environment code separately evaluates diffuse from normal direction and specular from view reflection direction/roughness. This is concrete evidence that disabling only the diffuse IBL path is possible while retaining specular. — [r184 environment shader](https://raw.githubusercontent.com/mrdoob/three.js/r184/src/renderers/shaders/ShaderChunk/envmap_physical_pars_fragment.glsl.js)
+- The standard physical shader uses an explicitly view-dependent BRDF, and transmission has separate material state. A single RGB value stored per surface point cannot encode every eye direction. — [r184 physical shader](https://raw.githubusercontent.com/mrdoob/three.js/r184/src/renderers/shaders/ShaderChunk/lights_physical_pars_fragment.glsl.js)
+- EXRLoader in the installed/pinned r184 supports HalfFloat and Float outputs and multiple EXR compression schemes. — [EXRLoader r184](https://raw.githubusercontent.com/mrdoob/three.js/r184/examples/jsm/loaders/EXRLoader.js)
+- The Three manual distinguishes scene-linear working values from display sRGB; output conversion and input annotation must be intentional. An ordinary tone-mapped screenshot is not interchangeable with a scene-linear lighting texture. — [Color management, pinned r184](https://raw.githubusercontent.com/mrdoob/three.js/r184/manual/en/color-management.html)
+- Local code observation: `/src/gallery/original-scene.js` currently sets AgX exposure 1, applies a nonlinear center-wall emissive remap, uses black-base emissive architecture with an environment map, and adds five realtime exhibit spots. These are separate runtime appearance decisions, not a literal replay of native Cycles shading. — [Local source](/Users/lucasmaher/TEMP/3D_Portfolio/src/gallery/original-scene.js)
+
+### Inferences
+- **Preferred physical representation proposal:** preserve base color/roughness/normal; bake diffuse direct + indirect without albedo into scene-linear irradiance; assign as `lightMap` on a unique UV set; remove realtime diffuse lights and environment diffuse for these already-baked surfaces, retain environment specular. Check whether the Blender pass corresponds to irradiance E or unit-white outgoing diffuse E/π; the normalization must be validated, not guessed. One global mathematical conversion is appropriate; per-wall artistic correction shaders are not.
+- **Simpler faithful representation proposal:** bake outgoing *diffuse* radiance including albedo and procedural wall panel detail into an emissive-map term, keep black base color, add only the PBR specular term from probes. This can preserve the approved room without the lightMap/albedo normalization ambiguity. It is not physically literal emission; it is an efficient representation of static outgoing diffuse. Do not also apply the albedo map, diffuse IBL, or dynamic diffuse lights.
+- The second method resembles the current architecture superficially, but the required changes are significant: use the approved native source, linear HDR masters, exclude glossy/transmission bake components, remove arbitrary post-bake center remaps, and verify before compression.
+- Avoid an AO multiplication pass on already-occluded baked diffuse unless the pilot proves a missing contribution; otherwise dark contact regions are counted twice.
+- Preserve the exact current **web bottle** geometry, materials, texture bytes, scale and orientation in the new option. Glass and polished surfaces should retain their web PBR/transmission representation. Bake their contact shadow onto the podium separately; do not force glass into the architecture's opaque diffuse bake.
+- Use separate `/gallery-final.html` and asset directories, preserving third option files and a checksum manifest. This recommendation follows the user's scope, not a source claim.
+
+### Gaps
+- The actual v05 bake radiometric normalization and OCIO configuration must be measured. Matching the names “AgX” and “exposure” alone does not establish pixel-identical Blender and Three tone transforms.
+- Static thin maps cannot exactly reproduce Cycles glass refraction, glossy multiple bounces, or changing reflected parallax. The user's preserved web bottle is a deliberate exception to full literal Cycles reproduction.
+
+## What reflection method is the best practical compromise for walking through the gallery?
+
+### Takeaway
+Use a small set of offline room/exhibit environment captures filtered with PMREM. Treat accurate planar floor reflections as an optional desktop upgrade only if the pilot shows obvious sliding; avoid SSR or full realtime path tracing as the default mobile portfolio renderer.
+
+### Cited Findings
+- PMREM prefilters an environment according to roughness for PBR sampling, supports HDR input, and supports scene capture. Current docs identify 256-pixel cube faces / 1024×512 equirectangular input as standard useful dimensions. — [PMREMGenerator](https://threejs.org/docs/pages/PMREMGenerator.html)
+- In r184 the default specular IBL lookup depends on reflected direction and roughness, **not world position**. It therefore has no local-room intersection/parallax correction built in. — [r184 environment shader](https://raw.githubusercontent.com/mrdoob/three.js/r184/src/renderers/shaders/ShaderChunk/envmap_physical_pars_fragment.glsl.js)
+- Three's planar Reflector renders the scene from a reflected camera into a half-float render target and is designed for flat reflective surfaces. It is an additional scene rendering pass, not a baked cubemap. — [Reflector r184 implementation](https://raw.githubusercontent.com/mrdoob/three.js/r184/examples/jsm/objects/Reflector.js)
+- SSRPass is documented as a basic screen-space reflection pass; its half-resolution option trades quality for overhead. The shader explicitly samples the current depth, normal, metalness and color buffers. — [SSRPass](https://threejs.org/docs/pages/SSRPass.html), [SSRShader r184](https://raw.githubusercontent.com/mrdoob/three.js/r184/examples/jsm/shaders/SSRShader.js)
+- The maintained Three GPU path tracer currently uses WebGPU compute, progressive sample rendering, and BVH acceleration. Its README suggests blurred environments to improve convergence at a cost to reflection sharpness. — [Maintainer README](https://raw.githubusercontent.com/gkjohnson/three-gpu-pathtracer/main/README.md)
+
+### Inferences
+- Reflection captures are **not actual dynamic lights** and satisfy the user's wish to avoid realtime room lighting. Six local captures (center + five bays), each filtered once, are a sensible initial *proposal*, not a measured requirement. Start with 256 faces; only increase after sharp exhibit reflections require it.
+- Separate probe assignment by bay is easy and cheaper than capturing six cube faces every animation frame. A small static baked scene needs no per-frame cubemap recapture.
+- A cubemap's angular appearance changes with camera direction, but reflected features can still slide incorrectly as the camera walks because they were recorded at one origin. Use local probes first; optional box-projected probes can intersect reflection rays with proxy room volumes, then reproject toward the captured origin. Curved rooms are not boxes, so this remains an approximation and needs custom shader work and boundary blending. Do not market it as exact.
+- Ordinary SSR cannot see objects outside the camera's depth/color buffers, giving missing/disappearing reflections at screen edges and behind occluders. That follows directly from its buffer inputs. Its thickness tests and extra passes are a poor first fix for a stable art-directed gallery.
+- An optional blurred planar floor reflection can reflect off-screen geometry more correctly than SSR, but costs another scene render and needs a roughness-aware blend, depth clipping and recursion handling. Keep it disabled on mobile until measured.
+- Glass/bottle should have an exhibit-local probe if global room reflection looks wrong. Preserve its existing material parameters initially so probe changes are evaluated independently from geometry/material differences.
+- Realtime path tracing is a different deployment project: repeated rays/noisy convergence during motion and WebGPU capability requirements. Offline Cycles diffuse + runtime raster specular is the stronger portfolio compromise here. No unsupported FPS promise is made.
+
+### Gaps
+- No frame-time or battery measurements exist for this gallery on Lucas's target iPhone/Android devices. Neither “six probes is free” nor “SSR will hit 60 FPS” can be asserted.
+- No official stock r184 built-in box-projected MeshStandardMaterial option was found. Treat it as a custom implementation, not a toggle.
+
+## Which formats, baker alternatives and validation steps improve quality without wasting another full bake?
+
+### Takeaway
+Keep high-quality linear masters and optimize *delivery copies* only after a representative browser pilot matches the approved render. GPU texture compression can save much more runtime memory than smaller JPEG downloads; another baker is not automatically more faithful to already-approved Cycles materials and lighting.
+
+### Cited Findings
+- Standard `KHR_texture_basisu` supports ETC1S/BasisLZ and UASTC with optional Zstd. The spec describes efficient transmission, mip levels and reduced GPU memory through native texture transcoding. It does not define HDR UASTC as a portable glTF material-image option. — [Khronos extension specification](https://raw.githubusercontent.com/KhronosGroup/glTF/main/extensions/2.0/Khronos/KHR_texture_basisu/README.md)
+- r184 KTX2Loader goes beyond that extension: standalone HDR UASTC is recognized; supported hardware may receive ASTC-HDR or BC6H, while unsupported cases fall back to RGBA half-float. This is version-pinned code evidence, and is more specific than the generic current docs. — [KTX2Loader r184](https://raw.githubusercontent.com/mrdoob/three.js/r184/examples/jsm/loaders/KTX2Loader.js)
+- KTX2Loader needs the matching WASM transcoder and `detectSupport(renderer)` before loading. — [KTX2Loader docs](https://threejs.org/docs/pages/KTX2Loader.html)
+- r184 GLTFLoader supports meshopt and Basis texture extensions and provides separate decoder/texture-loader integration. These are independent compression concerns. — [GLTFLoader r184](https://raw.githubusercontent.com/mrdoob/three.js/r184/examples/jsm/loaders/GLTFLoader.js)
+- PNG/JPEG texture file size does not determine GPU texture memory; Three's manual uses the uncompressed dimensions and mipmaps for the estimate. — [Texture memory explanation](https://raw.githubusercontent.com/mrdoob/three.js/r184/manual/en/textures.html)
+- Meshoptimizer optimizes mesh storage and vertex/index processing; it does not improve illumination sampling or texture bake quality. — [Maintainer documentation](https://raw.githubusercontent.com/zeux/meshoptimizer/master/README.md)
+- Marmoset Toolbag does offer complete, diffuse, specular and indirect lighting bakes. Its documentation explicitly calls specular a camera-dependent effect. These are real alternatives, but no source establishes that importing this approved Cycles gallery there preserves the same result. — [Toolbag map types](https://docs.marmoset.co/docs/map-types/)
+- Unreal GPU Lightmass bakes static/stationary illumination into textures using DX12/DXR. Its setup requires a compatible raytracing hardware/Windows pipeline and engine-specific virtual lightmaps. — [Epic GPU Lightmass documentation](https://dev.epicgames.com/documentation/en-us/unreal-engine/gpu-lightmass-global-illumination-in-unreal-engine)
+
+### Inferences
+- Retain 16/32-bit scene-linear EXR masters outside published assets. For the pilot, use direct half-float EXR lightmaps, establishing appearance before introducing lossy texture compression. Deploying many EXR masters is not the final mobile plan.
+- HDR-KTX2 is a **candidate delivery option**, not a free universal memory win: its half-float fallback can be several times larger than block-compressed GPU data. Keep HDR maps external to GLB with an explicit loader/manifest rather than assuming standard `KHR_texture_basisu` portability. Benchmark actual device transcode targets.
+- Proposed conservative fallback: normalized linear irradiance encoded into an LDR delivery texture plus one documented scalar range, or baked outgoing diffuse with a documented linear scale. This handles moderate fixed ranges without clipping but requires testing gradient quantization. It is not an excuse for per-object brightness hacks.
+- For LDR base/normal/roughness delivery, compare high-quality UASTC+Zstd against ETC1S. Favor UASTC for subtle smooth blue gradients, normals and labels when ETC1S causes visible block/banding artifacts; use ETC1S only where inspected. Include full mip chains. Do not recompress the preserved bottle without an explicit byte-preserving baseline.
+- Illustrative arithmetic, **not measured scene usage**: a 2048² RGBA8 map is 16 MiB base, about 21.3 MiB with a full mip chain. RGBA16F is 32 / 42.7 MiB. An 8-bits-per-pixel block texture is 4 / 5.3 MiB. Doubling each dimension costs four times memory. Actual format fallback determines the final result.
+- Proposed initial maps: room/large floor tiles mostly 2K, exhibit/podium maps 1K, local-detail strips isolated where necessary; evaluate texel density in world units instead of making every object one giant 4K image. Numbers are pilot starting points, not final quality promises.
+- Marmoset is worth testing for object high-to-low map baking, not a justified reauthoring of this already-approved gallery. Unreal Lightmass is also not a drop-in web export tool. Switching engines adds material translation, tone matching, license/setup and export work without evidence of better fidelity. Keep Cycles unless a specific reproducible defect blocks it.
+- **Measured pilot proposal:** retain the full scene as light/shadow occluders but bake only one representative wall patch, podium, adjacent floor, rim and ceiling-light area; also include a center-wall crop so its approved top gradient/fade is tested. Export this as an isolated fourth-option test, leaving option three untouched. Use the exact same camera transforms, FOV and output dimensions as two approved renders.
+- Pilot comparisons: (1) linear bake uncompressed versus Cycles reference; (2) browser tone/output pipeline; (3) no glossy baked into diffuse and no diffuse IBL double count; (4) grazing UV seams and mip bleed while walking; (5) current web bottle asset checksums; (6) reflection parallax from three camera positions; (7) UASTC/ETC1S/HDR fallback delivery variants; (8) network bytes, decoded GPU-format bytes, first interactive frame, steady frame-time distribution on desktop and phone. If it fails, fix that cause before committing full bake time.
+- Only after the pilot passes should full-scene samples/resolution be increased. More samples remove noise; they cannot correct wrong UVs, albedo counted twice, clipped HDR, frozen specular or a duplicate tone transform.
+
+### Gaps
+- No justified full-scene bake duration, exact atlas budget, or browser performance result exists until a pilot is measured. Any universal runtime/frame-rate or exact bake-time estimate would be invented.
+- Blender online manual fetches were blocked during this subtask; other research tracks should provide version-specific Cycles pass setup and denoising details. This note intentionally does not invent supported bake controls.
