@@ -1720,6 +1720,107 @@ function addCentreHelpPodium(model, walls, probes) {
   console.log(`Help-Podest: Kopie von ${HELP_PODIUM_LABEL} bei (0, 0), LED ${led ? 'ja' : 'nein'}, Bodenloch ${floor ? 'ja' : 'nein'}, "?" bei y ${baseY.toFixed(2)}`)
 }
 
+// The podium tops carry 12 seam grooves that meet in the middle. Near the centre the
+// grooves narrow to slits whose 4 mm side walls belong to the plaster mesh; the bake
+// has them near-black (no light reaches into a slit), and at lightmap resolution that
+// black spreads into dashes (Lucas: "black streaks in the middle", all podiums).
+// (Filling the lightmap's empty padding did nothing.) So in the centre of each top,
+// plaster and seam-strip fragments below the top surface are dropped, and a disc 5 mm
+// down shows through instead. The disc is vertex-coloured from the podium's OWN
+// lightmap — each disc vertex takes the bake of the nearest top-surface vertex, ×0.85
+// for the groove — so it follows the baked shading, e.g. the Unify creature's shadow
+// (a flat colour read as light lines inside that shadow).
+// Runs on all podiums, the centre copy included; the bake is untouched.
+const PODIUM_CAP_R = 0.5          // the top is flat out to r ≈ 0.6
+const PODIUM_CAP_DROP = 0.0053    // top 1.2308, groove floors 1.2267
+const PODIUM_CAP_GROOVE = 0.85
+async function readLightmap(file) {
+  // RGBM PNG: rgb · a · range = linear radiance. Decoded without premultiplying, so
+  // the rgb survives wherever a is small.
+  const blob = await (await fetch('/gallery-baked-assets/maps/' + file)).blob()
+  const bmp = await createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })
+  const cv = new OffscreenCanvas(bmp.width, bmp.height)
+  const gl = cv.getContext('webgl2')
+  const tex = gl.createTexture()
+  gl.bindTexture(gl.TEXTURE_2D, tex)
+  gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE)
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bmp)
+  const fb = gl.createFramebuffer()
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0)
+  const data = new Uint8Array(bmp.width * bmp.height * 4)
+  gl.readPixels(0, 0, bmp.width, bmp.height, gl.RGBA, gl.UNSIGNED_BYTE, data)
+  gl.getExtension('WEBGL_lose_context')?.loseContext()
+  return { w: bmp.width, h: bmp.height, data }
+}
+async function capPodiumTops(model, settings, view) {
+  const maps = new Map()
+  const tops = []
+  const jobs = []
+  model.traverse(o => {
+    if (!o.isMesh || o.userData.galleryRole !== 'podium') return
+    if (/seam/i.test([o.material].flat()[0].name)) return
+    jobs.push(o)
+  })
+  for (const o of jobs) {
+    const box = new THREE.Box3().setFromObject(o), c = box.getCenter(new THREE.Vector3())
+    const top = box.max.y
+    // Top-surface vertices near the axis, with their bake UVs.
+    const info = settings.lightmaps[o.userData.galleryBakeLabel]
+    const uvA = o.geometry.getAttribute('galleryBakeUV'), pos = o.geometry.getAttribute('position')
+    if (!info || !uvA) continue
+    if (!maps.has(info.file)) maps.set(info.file, await readLightmap(info.file))
+    const lm = maps.get(info.file)
+    const pts = [], v = new THREE.Vector3()
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
+      if (v.y < top - 0.0006 || Math.hypot(v.x - c.x, v.z - c.z) > PODIUM_CAP_R + 0.05) continue
+      pts.push(v.x - c.x, v.z - c.z, uvA.getX(i), uvA.getY(i))
+    }
+    const geo = new THREE.RingGeometry(0.0005, PODIUM_CAP_R, 128, 40).rotateX(-Math.PI / 2)
+    const gp = geo.getAttribute('position'), col = new Float32Array(gp.count * 3)
+    for (let i = 0; i < gp.count; i++) {
+      const x = gp.getX(i), z = gp.getZ(i)
+      let best = Infinity, bu = 0, bv = 0
+      for (let j = 0; j < pts.length; j += 4) {
+        const d = (pts[j] - x) ** 2 + (pts[j + 1] - z) ** 2
+        if (d < best) { best = d; bu = pts[j + 2]; bv = pts[j + 3] }
+      }
+      // flipY is false for these maps: uv (0,0) is the image's first row; readPixels
+      // returns rows bottom-up, i.e. the same first row first.
+      const px = Math.min(lm.w - 1, Math.max(0, Math.floor(bu * lm.w)))
+      const py = Math.min(lm.h - 1, Math.max(0, Math.floor(bv * lm.h)))
+      const k = (py * lm.w + px) * 4, m = lm.data[k + 3] / 255 * info.range / 255 * PODIUM_CAP_GROOVE
+      col[i * 3] = lm.data[k] * m; col[i * 3 + 1] = lm.data[k + 1] * m; col[i * 3 + 2] = lm.data[k + 2] * m
+    }
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3))
+    // The seam strips too: near the centre they are hairlines of the same near-black.
+    const parts = (o.parent ? o.parent.children : [o]).filter(x => x.isMesh && x.userData.galleryRole === 'podium')
+    for (const m of parts.flatMap(x => [x.material].flat())) {
+      const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey
+      const cut = `if (length(vCapW.xz - vec2(${c.x.toFixed(4)}, ${c.z.toFixed(4)})) < ${PODIUM_CAP_R.toFixed(3)}` +
+        ` && vCapW.y < ${(top - 0.0003).toFixed(4)}) discard;`
+      m.onBeforeCompile = (shader, r) => {
+        prev.call(m, shader, r)
+        shader.vertexShader = 'varying vec3 vCapW;\n' + shader.vertexShader.replace('#include <project_vertex>',
+          '#include <project_vertex>\nvCapW = (modelMatrix * vec4(transformed, 1.0)).xyz;')
+        shader.fragmentShader = 'varying vec3 vCapW;\n' + shader.fragmentShader.replace('void main() {', 'void main() {\n' + cut)
+      }
+      m.customProgramCacheKey = () => prevKey.call(m) + '-cap-' + c.x.toFixed(2) + ',' + c.z.toFixed(2)
+      m.needsUpdate = true
+    }
+    const mat = new THREE.MeshBasicMaterial({ vertexColors: true })
+    mat.onBeforeCompile = shader => view.bind(shader)   // through the Blender view LUT
+    mat.customProgramCacheKey = () => 'podium-cap-ocio-v1'
+    const cap = new THREE.Mesh(geo, mat)
+    cap.name = 'PodiumCap_' + tops.length
+    cap.position.set(c.x, box.max.y - PODIUM_CAP_DROP, c.z)
+    scene.add(cap)
+    tops.push(c.x.toFixed(1) + ',' + c.z.toFixed(1))
+  }
+  console.log(`Podest-Deckel: ${tops.length} (${tops.join(' | ')})`)
+}
+
 function updateHelpIcons(delta) {
   for (const h of helpIcons) {
     if (popAnims.some(a => a.parts.some(p => p.target === h.mesh))) continue
@@ -2536,6 +2637,7 @@ loadScene(
             addGalleryExhibit(group, project, data, bounds, view)
           }
           addCentreHelpPodium(gltf.scene, galleryWalls, probes)
+          await capPodiumTops(gltf.scene, settings, view)
           try {
             const saved = JSON.parse(sessionStorage.getItem(RETURN_STATE_KEY))
             if (saved && ['x','y','z','yaw','pitch'].every(k => Number.isFinite(saved[k]))) {
