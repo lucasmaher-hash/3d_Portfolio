@@ -1587,6 +1587,12 @@ const CENTRE_SPAWN_Z = -3.8 // ring's inner face is at r 5.97; spawn yaw π face
 // at the inner edge of the LED ring; the podium's skirt flares down into it. The centre
 // floor has none, so it is cut here in the floor's own shader (discard inside the ring).
 const HELP_HOLE_R = 1.062
+// Shorter than the bays' 1.23 m podium (Lucas): only the straight cylinder between
+// y 0.32 and 0.94 (uniform radius, evenly spaced rings — measured off the GLB) is
+// squeezed, so the rounded top and the flared base keep their exact shape. The
+// lightmap on that band compresses with it; there it is a smooth vertical gradient.
+const HELP_SHORTEN = 0.15
+const HELP_BAND = [0.32, 0.94]
 const helpIcons = []
 
 function makeQuestionGeometry() {
@@ -1648,6 +1654,24 @@ function addCentreHelpPodium(model, walls, probes) {
   }
   const podium = place(src)
   podium.name = 'HelpPodium'
+  const [b0, b1] = HELP_BAND, k = (b1 - b0 - HELP_SHORTEN) / (b1 - b0)
+  const v = new THREE.Vector3(), inv = new THREE.Matrix4()
+  podium.traverse(m => {
+    if (!m.isMesh) return
+    m.geometry = m.geometry.clone()   // the bay's podium shares the original
+    inv.copy(m.matrixWorld).invert()
+    const pos = m.geometry.getAttribute('position')
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld)
+      if (v.y <= b0) continue
+      v.y = v.y > b1 ? v.y - HELP_SHORTEN : b0 + (v.y - b0) * k
+      v.applyMatrix4(inv)
+      pos.setXYZ(i, v.x, v.y, v.z)
+    }
+    pos.needsUpdate = true
+    m.geometry.computeBoundingBox(); m.geometry.computeBoundingSphere()
+    if (PERF.bvh) m.geometry.computeBoundsTree({ indirect: true })
+  })
   podium.traverse(m => { if (m.isMesh) { walls.push(m); lowCollidables.push(m) } })
   // The podium's turquoise floor ring (emissive, not baked) comes along.
   let led = null
