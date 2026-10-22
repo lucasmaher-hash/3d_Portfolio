@@ -1583,6 +1583,10 @@ const HELP_PODIUM_LABEL = 'podium-04'      // Virtual Cooking
 const HELP_GAP     = 0.22   // m of air between podium top and the "?" (exhibits float 0.18)
 const HELP_ROCK    = 0.35   // rad, slow turn either way (a full spin would show it mirrored)
 const CENTRE_SPAWN_Z = -3.8 // ring's inner face is at r 5.97; spawn yaw π faces +Z
+// The bays' floor has a round hole per podium (r 1.067, measured off the GLB) that ends
+// at the inner edge of the LED ring; the podium's skirt flares down into it. The centre
+// floor has none, so it is cut here in the floor's own shader (discard inside the ring).
+const HELP_HOLE_R = 1.062
 const helpIcons = []
 
 function makeQuestionGeometry() {
@@ -1649,6 +1653,30 @@ function addCentreHelpPodium(model, walls, probes) {
   let led = null
   model.traverse(o => { if (!led && o !== src && /LED/.test(o.name) && /podium_?04/i.test(o.name)) led = o })
   if (led) place(led)
+  let floor = null
+  model.traverse(o => { if (!floor && o.isMesh && o.userData.galleryBakeLabel === 'floor') floor = o })
+  if (floor) for (const mat of [floor.material].flat()) {
+    const prev = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey
+    mat.onBeforeCompile = (shader, r) => {
+      prev.call(mat, shader, r)
+      shader.vertexShader = 'varying vec3 vHelpHoleW;\n' + shader.vertexShader.replace('#include <project_vertex>',
+        '#include <project_vertex>\nvHelpHoleW = (modelMatrix * vec4(transformed, 1.0)).xyz;')
+      shader.fragmentShader = 'varying vec3 vHelpHoleW;\n' + shader.fragmentShader.replace('void main() {',
+        'void main() {\nif (length(vHelpHoleW.xz) < ' + HELP_HOLE_R.toFixed(4) + ') discard;')
+    }
+    mat.customProgramCacheKey = () => prevKey.call(mat) + '-help-hole'
+    mat.needsUpdate = true
+  }
+  // The hole's inner edge: the bays' floor slab shows a dark teal face there; without
+  // one the void (scene background) shows between slab and skirt. Colour sampled off
+  // podium 04's gap in a screenshot, drawn untone-mapped so it lands on that value.
+  const wall = new THREE.Mesh(
+    new THREE.CylinderGeometry(HELP_HOLE_R, HELP_HOLE_R, 0.2, 96, 1, true),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(1 / 255, 30 / 255, 38 / 255, THREE.SRGBColorSpace),
+      side: THREE.BackSide, toneMapped: false }))
+  wall.position.y = -0.1
+  wall.name = 'HelpHoleWall'
+  scene.add(wall)
   const top = new THREE.Box3().setFromObject(podium).max.y
   const mesh = new THREE.Mesh(makeQuestionGeometry(), galleryArrowMat)
   mesh.name = 'HelpIcon'
@@ -1665,7 +1693,7 @@ function addCentreHelpPodium(model, walls, probes) {
   scene.add(mesh)
   clickables.push(mesh, hit)
   helpIcons.push({ mesh, baseY, t: 0, phase: 0.6 })
-  console.log(`Help-Podest: Kopie von ${HELP_PODIUM_LABEL} bei (0, 0), LED ${led ? 'ja' : 'nein'}, "?" bei y ${baseY.toFixed(2)}`)
+  console.log(`Help-Podest: Kopie von ${HELP_PODIUM_LABEL} bei (0, 0), LED ${led ? 'ja' : 'nein'}, Bodenloch ${floor ? 'ja' : 'nein'}, "?" bei y ${baseY.toFixed(2)}`)
 }
 
 function updateHelpIcons(delta) {
