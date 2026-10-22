@@ -2,22 +2,26 @@ import * as THREE from 'three'
 import {EXRLoader} from 'three/addons/loaders/EXRLoader.js'
 import {installBlenderView} from './blender-view.js'
 
-export async function prepareBakedGallery(model,scene,renderer) {
+// onProgress(0..1) reports the downloads below (colour LUT, probes, lightmaps) for the
+// welcome screen's percentage. The LUT is ~7 MB, so it counts as six items.
+export async function prepareBakedGallery(model,scene,renderer,onProgress=()=>{}) {
   const response=await fetch('/gallery-baked-assets/scene.json')
   if(!response.ok)throw Error('Fourth gallery settings unavailable')
   const settings=await response.json()
+  const LUT_WEIGHT=6,total=LUT_WEIGHT+settings.probes.length+Object.keys(settings.lightmaps).length
+  let done=0;const tick=(w=1)=>{done+=w;onProgress(Math.min(1,done/total))}
   for(const child of [...scene.children])if(child.isLight)scene.remove(child)
   scene.fog=null;scene.background=new THREE.Color(0x071012);scene.environment=null
   renderer.shadowMap.enabled=false
   renderer.domElement.tabIndex=0
   renderer.domElement.addEventListener('pointerdown',()=>renderer.domElement.focus({preventScroll:true}))
-  const view=await installBlenderView(renderer)
+  const view=await installBlenderView(renderer);tick(LUT_WEIGHT)
   const pmrem=new THREE.PMREMGenerator(renderer)
   const probeLoader=new EXRLoader().setDataType(THREE.HalfFloatType)
   const probes=await Promise.all(settings.probes.map(async probe=>{
     const hdr=await probeLoader.loadAsync('/gallery-baked-assets/probes/'+probe.file)
     hdr.mapping=THREE.EquirectangularReflectionMapping
-    const filtered=pmrem.fromEquirectangular(hdr);hdr.dispose()
+    const filtered=pmrem.fromEquirectangular(hdr);hdr.dispose();tick()
     return {...probe,texture:filtered.texture}
   }))
   pmrem.dispose();scene.environment=probes[0].texture;scene.environmentIntensity=1
@@ -27,7 +31,7 @@ export async function prepareBakedGallery(model,scene,renderer) {
     texture.flipY=false;texture.colorSpace=THREE.NoColorSpace
     texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter
     texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());texture.needsUpdate=true
-    maps.set(key,{...info,texture})
+    maps.set(key,{...info,texture});tick()
   }))
   const collidables=[]
   model.updateMatrixWorld(true)

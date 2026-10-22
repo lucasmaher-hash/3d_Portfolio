@@ -2308,12 +2308,29 @@ async function fetchGlb(url, onProgress) {
   return out.buffer
 }
 const glbT0 = performance.now()
+// Welcome-screen percentage for the WHOLE load, not just the GLB (2026-10-22, Lucas: it read
+// 100% while the scene behind was still empty). The GLB download fills up to GLB_SHARE; on the
+// gallery the colour LUT, probes and lightmaps fill to 0.9, the shader compile to 0.97. Never
+// goes backwards and stops at 99% until sceneReady() sends the real 100%.
+const GLB_SHARE = IS_GALLERY ? 0.45 : 0.9
+let loadShown = 0
+function loadProgress(p) {
+  p = Math.min(0.99, p)
+  if (p <= loadShown) return
+  loadShown = p
+  if (window._loader) window._loader.progress(p)
+}
+function sceneReady() {
+  loadShown = 1
+  if (window._loader) window._loader.progress(1)
+  if (window._sceneReady) window._sceneReady()
+}
 loadScene(
   PERF.lightGlb ? GLB_OPTIMIZED : GLB_ORIGINAL,
   async (gltf) => {
     if (IS_GALLERY) {
       try {
-        const { settings, collidables: galleryWalls, view } = await prepareBakedGallery(gltf.scene, scene, renderer)
+        const { settings, collidables: galleryWalls, view } = await prepareBakedGallery(gltf.scene, scene, renderer, p => loadProgress(GLB_SHARE + p * (0.9 - GLB_SHARE)))
         await roundAndTintMacLamp(gltf.scene, loader)
         collidables = galleryWalls
         // Include the lower cove in shoulder-width collision checks.
@@ -2380,15 +2397,16 @@ loadScene(
         // Capped like the main path's 4s reveal timeout: the welcome screen cannot be closed
         // until _sceneReady() fires, so a compileAsync that never settles must not hold it.
         await Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 4000))])
+        loadProgress(0.97)
         roomAccent.ready = true
         updateRoomAccent(0, true)
         res.liveAfter = performance.now() + 1500
         window._gallery = { settings, model: gltf.scene, collidables: galleryWalls, ready: true }
         if (window._loader) window._loader.done()
-        if (window._sceneReady) window._sceneReady()
+        sceneReady()
       } catch (error) {
         console.error('Gallery setup failed:', error)
-        if (window._sceneReady) window._sceneReady()
+        sceneReady()
       }
       return
     }
@@ -2646,7 +2664,7 @@ loadScene(
       // Lets the welcome screen close (index.html holds it until now).
       roomAccent.ready = true
       updateRoomAccent(0, true)
-      if (window._sceneReady) window._sceneReady()
+      sceneReady()
       console.log(`Szene sichtbar — Shader kompiliert nach ${Math.round(performance.now() - glbT0)}ms`)
     }
     try {
@@ -2657,14 +2675,14 @@ loadScene(
   e => {
     // Real download progress for the loading screen (e.total is 0 if the
     // server sends no content-length — then the loader just eases on done())
-    if (window._loader && e.total) window._loader.progress(e.loaded / e.total)
+    if (e.total) loadProgress(GLB_SHARE * e.loaded / e.total)
   },
   err => {
     console.error('GLB load error:', err)
     if (window.track) window.track('scene_load_failed', { mobile: isMobile })
     if (window._loader) window._loader.done()
     // Never hold the welcome screen forever on a failed load.
-    if (window._sceneReady) window._sceneReady()
+    sceneReady()
   }
 )
 
