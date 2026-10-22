@@ -1561,7 +1561,11 @@ function updateGalleryExhibits(delta) {
     // Overshoot on the way in (easeOutBack), plain shrink on the way out.
     const k = ex.near ? 1 + 2.2 * Math.pow(ex.show - 1, 3) + 1.2 * Math.pow(ex.show - 1, 2) : ex.show
     a.scale.setScalar(Math.max(0.001, k))
-    a.position.y = ex.arrowBaseY + Math.sin(arrowTime * Math.PI * 2 * ARROW_BOB_FREQ + ex.phase) * ARROW_BOB_AMP
+    // Over a floating exhibit the arrow rides the exhibit's own sway (same offset, in
+    // unison); over a seated one it keeps the old independent bob.
+    a.position.y = ex.arrowBaseY + (ex.floating
+      ? ex.group.position.y - ex.baseY
+      : Math.sin(arrowTime * Math.PI * 2 * ARROW_BOB_FREQ + ex.phase) * ARROW_BOB_AMP)
     a.rotation.y += ARROW_SPIN * delta
   }
 }
