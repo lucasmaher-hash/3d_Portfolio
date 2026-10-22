@@ -136,28 +136,26 @@ function metalGrey(model) {
   applyTiles()
 }
 
-// Double Packaging bottle: glass, label, lid. Being dialled in (2026-10-22), dev only — the
-// live site keeps the imported look. Defaults = the imported values, so opening the dial
-// changes nothing until a slider moves.
-export const BOTTLE_GLASS = { tint: 1, roughness: 0.03, transmission: 1, ior: 1.45, thickness: 0 }
-export const BOTTLE_LABEL = { brightness: 1, metalness: 1, roughness: 1, glow: 0 }
-export const BOTTLE_LID = { brightness: 1, metalness: 1, roughness: 0.34, glow: 0 }
+// Double Packaging bottle: glass, label, lid. Lucas's values, 2026-10-22.
+export const BOTTLE_GLASS = { tint: 1.02, roughness: 0.03, transmission: 1, ior: 1.45, thickness: 0 }
+export const BOTTLE_LABEL = { brightness: 1.52, metalness: 1, roughness: 0.9, glow: 0.35 }
+export const BOTTLE_LID = { brightness: 2.3, metalness: 1, roughness: 0.34, glow: 0 }
 
-// One dial over a set of materials: rows are [key, label, min, max, set(mat, value, base)].
+// Applies a value set to materials: rows are [key, label, min, max, set(mat, value, base)].
+// Pass a title to get a dev dial for it again.
 function tune(title, materials, values, rows) {
   if (!materials.length) return
   const base = materials.map(m => ({ color: m.color.clone() }))
   const apply = () => materials.forEach((m, i) => { for (const r of rows) r[4](m, values[r[0]], base[i]) })
   apply()
-  addDial(title, values, rows.map(([k, l, min, max]) => [k, l, min, max, 0.01]), apply)
+  if (import.meta.env.DEV && title) addDial(title, values, rows.map(([k, l, min, max]) => [k, l, min, max, 0.01]), apply)
 }
 
 function bottleDials(model) {
-  if (!import.meta.env.DEV) return
   const glow = (m, v, b) => { m.emissive.copy(b.color); m.emissiveIntensity = v }
   const bright = (m, v, b) => m.color.copy(b.color).multiplyScalar(v)
   const glass = materialsNamed(model, 'transparent_V2')
-  tune('Bottle glass', glass, BOTTLE_GLASS, [
+  tune(null, glass, BOTTLE_GLASS, [
     ['tint', 'Tint brightness', 0.05, 1.5, bright],
     ['roughness', 'Roughness', 0, 1, (m, v) => { m.roughness = v }],
     ['transmission', 'Transmission', 0, 1, (m, v) => { m.transmission = v }],
@@ -167,12 +165,12 @@ function bottleDials(model) {
   const label = materialsNamed(model, 'label')
   // Glow on the label uses its own print as the glow map, so the type stays dark.
   for (const m of label) if (m.map) { m.emissiveMap = m.map; m.needsUpdate = true }
-  tune('Bottle label', label, BOTTLE_LABEL, [
+  tune(null, label, BOTTLE_LABEL, [
     ['brightness', 'Brightness', 0.05, 3, bright], ['metalness', 'Metalness', 0, 1, (m, v) => { m.metalness = v }],
     ['roughness', 'Roughness', 0, 1, (m, v) => { m.roughness = v }],
     ['glow', 'Glow', 0, 3, (m, v) => { m.emissive.set(0xffffff); m.emissiveIntensity = v }],
   ])
-  tune('Bottle lid', materialsNamed(model, 'blue metal'), BOTTLE_LID, [
+  tune(null, materialsNamed(model, 'blue metal'), BOTTLE_LID, [
     ['brightness', 'Brightness', 0.05, 5, bright], ['metalness', 'Metalness', 0, 1, (m, v) => { m.metalness = v }],
     ['roughness', 'Roughness', 0, 1, (m, v) => { m.roughness = v }], ['glow', 'Glow', 0, 3, glow],
   ])
