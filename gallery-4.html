@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". This pre-paint script no longer runs, so nothing sets
+         data-theme: no stored choice, no evening clock.
+    <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script> -->
+    <!-- Unlisted gallery experiment: direct entry, no homepage redirect. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lucas Maher — Gallery — baked lighting</title>
+    <script src="/analytics.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wdth@100&display=swap" rel="stylesheet" />
+  <link href="/fonts/roboto-flex-ui.css" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-surface: #DCDCE3;
+      --accent-orange: #809BBC;
+      --text-primary: #1A1A1A;
+      --text-secondary: #8E8E93;
+      --shadow-raised: 8px 8px 18px rgba(174,174,192,0.65), -8px -8px 18px rgba(255,255,255,1);
+      --shadow-raised-sm: 5px 5px 12px rgba(174,174,192,0.65), -5px -5px 12px rgba(255,255,255,1);
+      --shadow-pressed: inset 5px 5px 10px rgba(174,174,192,0.6), inset -5px -5px 10px rgba(255,255,255,1);
+    }
+
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 250ms ease;
+    }
+    .mobile-menu.open { opacity: 1; pointer-events: auto; }
+
+    .mobile-menu-panel {
+      width: 64%;
+      background: var(--bg-surface);
+      border-radius: 28px;
+      /* No outer shadow/highlight — a neumorphic glow would read as a halo
+         against the darkened backdrop. Depth lives on the buttons inside. */
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transform: translateY(10px);
+      transition: transform 250ms ease;
+    }
+    .mobile-menu.open .mobile-menu-panel { transform: translateY(0); }
+
+    .mobile-view-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      background: var(--bg-surface);
+      border-radius: 9999px;
+      box-shadow: var(--shadow-raised-sm);
+      padding: 5px;
+    }
+    /* No extra margin on any one control: every item in the burger menu is
+       separated by the panel's own uniform 24px gap (2026-09-15). The theme
+       toggle moved to the TOP of the panel, which silently handed it a
+       `:first-child { margin-bottom: 22px }` rule written for the 2D/3D toggle
+       that used to lead — so it alone sat further from its neighbour than
+       anything else. Removed rather than re-targeted: the menu reads better
+       evenly spaced, and a rule keyed on position breaks again the next time
+       the order changes. */
+
+    .mobile-mode-btn {
+      border: none;
+      background: transparent;
+      border-radius: 9999px;
+      padding: 11px 0;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      /* Matched to .mobile-nav-btn: same 22px VT323 and the same inherited 1.6
+         line-height, so a segment's text box is identical to a nav button's. The
+         segment keeps 11px vertical padding, which is exactly what makes the TRACK
+         come out level with a nav button: the track adds its own 5px padding top and
+         bottom, so 5+11 and 11+5 sum to the nav button's 16px — the two pills end up
+         the same height without hardcoding one. line-height is stated explicitly
+         because these are <button>s, which do not reliably inherit it. */
+      font-size: 22px;
+      /* `normal`, NOT the 1.6 the 2D pages use here: line-height must match whatever
+         .mobile-nav-btn resolves to ON THIS PAGE, since that is what the two pills are
+         being levelled against. The 2D pages set line-height: 1.6 on body, so their nav
+         buttons inherit 35.2px; index.html sets none, so its nav buttons resolve to
+         `normal` (22px) and a 1.6 here made the toggle 67px against their 54px. Stated
+         explicitly rather than left to inherit because <button> does not inherit
+         line-height reliably across engines. */
+      line-height: normal;
+      color: #555;
+      cursor: pointer;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: box-shadow 150ms ease, color 150ms ease, transform 150ms ease;
+    }
+    .mobile-mode-btn.is-active {
+      /* Shared by BOTH toggles: the selected segment is a recessed well. The inset is
+         --shadow-pressed's 5px offset / 10px blur reduced 35%, matching the desktop nav's
+         .pill__seg.is-active in top_row_permanent_V3.html. Scoped to the segments INSIDE
+         the toggle — .mobile-view-toggle's own raised track shadow is untouched, mirroring
+         the desktop .pill track.
+         background must be a real colour, NOT transparent: an inset shadow paints over the
+         element's own background, so without one the segment would read as a hole punched
+         through to the track rather than a well.
+         Deliberately sets NO color — selecting a segment must not darken its text, so both
+         toggles keep the base #555 and the inset alone marks the language selection. */
+      background: var(--bg-surface);
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
+    }
+
+    .mobile-mode-btn:active:not(.is-active) {
+      /* Scale is the tap feedback both toggles share. */
+      transform: scale(0.96);
+    }
+
+    /* Press inset for the LANGUAGE toggle only. A tap should preview the state it lands
+       in: a language segment lands in an inset well, but a 2D/3D segment now lands in a
+       flat orange pill, so flashing an inset there would animate to something that no
+       longer exists in that control. Same reduced spread as the settled state. */
+    .mobile-mode-btn[data-lang]:active:not(.is-active) {
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(174, 174, 192, 0.6), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
+    }
+    .mobile-nav-btn {
+      display: block;
+      background: var(--bg-surface);
+      border-radius: 9999px;
+      box-shadow: var(--shadow-raised-sm);
+      padding: 16px 24px;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: 22px;
+      color: #555;
+      text-transform: none;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: box-shadow 150ms ease, transform 150ms ease;
+    }
+    .mobile-nav-btn.is-active { box-shadow: var(--shadow-pressed); color: #000; }
+    .mobile-nav-btn:active { transform: scale(0.98); box-shadow: var(--shadow-pressed); }
+
+    /* Virtual joystick — touch devices only */
+    #joystick-container {
+      position: fixed;
+      bottom: 48px;
+      left: 36px;
+      z-index: 8;
+      display: none;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    @media (pointer: coarse) {
+      #joystick-container { display: block; }
+    }
+    #joystick-base {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(220, 220, 227, 0.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255, 255, 255, 0.20);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* The orange liquid loading ball moved to 2D.html (2026-08-14): it is the
+       SITE's entrance animation now, not the 3D world's — see the loader
+       block near the top of 2D.html's <body>. */
+
+    /* ── Fullscreen controls intro (first 3D entry per tab) ───────── */
+    #intro-controls {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 9999; /* above nav (same value, later in DOM), below loader (10000) */
+      background: transparent; /* the page itself paints a translucent veil */
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 700ms ease;
+    }
+    #intro-controls.is-visible { opacity: 1; pointer-events: auto; }
+
+    #joystick-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(220, 220, 227, 0.50);
+      border: 1.5px solid rgba(255, 255, 255, 0.55);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+      position: absolute;
+      will-change: transform;
+    }
+
+    /* The "?" from the nav bar, relocated on touch devices (the bar hides its
+       copy under pointer:coarse — see top_row_permanent_V3.html). Same look as
+       the bar's version: 44px neumorphic circle, VT323 mark. Sits low in the corner (bottom 58px), mirroring the joystick's 36px
+       edge inset, so the two anchor the screen's bottom
+       corners as one row of controls. display:none here, flex under the same
+       pointer:coarse query that shows the joystick. */
+    #help-fab {
+      display: none;
+      position: fixed;
+      bottom: 58px;
+      right: 36px;
+      z-index: 8;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      /* flat — no neumorphic highlight/shade floating over the 3D scene */
+      box-shadow: none;
+      border: none;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: 20px;
+      color: var(--text-primary);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #help-fab:active { transform: scale(0.94); }
+
+    /* Must come AFTER the base #help-fab rule: both selectors are the same
+       specificity, so putting this inside the earlier pointer:coarse block up
+       top let the base display:none win on source order and the button never
+       appeared. */
+    @media (pointer: coarse) {
+      #help-fab { display: flex; }
+    }
+    /* Mobile: neumorphic shadow spread/radius reduced 35% (offsets & blur ×0.65),
+       matching the nav's 2D/3D toggle segment. Redefining only the tokens keeps
+       desktop untouched; loader circle / mobile menu inherit automatically. */
+    @media (max-width: 640px) {
+      :root {
+        --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(174,174,192,0.65), -3.25px -3.25px 7.8px rgba(255,255,255,1);
+        --shadow-raised: 5.2px 5.2px 11.7px rgba(174,174,192,0.65), -5.2px -5.2px 11.7px rgba(255,255,255,1);
+        --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(174,174,192,0.6), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
+      }
+    }
+  
+    /* Former pixel-font labels that are buttons or carry weight: one step
+       heavier than body text so they still read as UI (Lucas, 2026-10-06). */
+    .mobile-nav-btn,
+    .mobile-mode-btn,
+    .pill__seg,
+    #help-fab { font-weight: 500; }
+  </style>
+  <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
+  <link rel="stylesheet" href="/theme/mobile-menu.css" />
+  <!-- <script src="/theme/theme.js" defer></script>  dark mode detached 2026-10-06 -->
+  </head>
+  <body>
+    <!-- Intro gate — decides ONCE per tab whether the fullscreen controls intro runs
+         (the orange loading ball moved to 2D.html and has its own per-tab gate there).
+
+         sessionStorage is the right store here precisely because it is neither permanent
+         nor per-request: it survives reloads within the same tab, and the browser wipes it
+         when that tab is closed. So the intro is skipped on every reload (including a hard
+         reload) and on returning from a 2D project page in the same tab, but plays again
+         on a genuinely fresh tab. localStorage would be wrong — it would show the intro
+         once ever and then never again.
+
+         Known edge cases, all deliberate: restoring a session (Cmd+Shift+T / "reopen
+         windows from last time") and duplicating a tab both carry sessionStorage across,
+         so the intro stays skipped there. -->
+    <script>
+      (function () {
+        var KEY = 'bakedGalleryIntroSeen';
+        // Redirecting to the 2D landing (see the guard in <head>): touch NOTHING.
+        // Marking introSeen here would silently burn the once-per-tab intro on a
+        // visit that never showed the 3D page at all — the first real switch to
+        // 3D would then skip the welcome/controls screens.
+        if (window._redirecting2d) { window._introGate = { show: false }; return; }
+        var seen = false;
+        // Private mode / disabled storage must not break the page — fall back to showing.
+        try { seen = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+        // Set immediately, not when the loader finishes, so a reload part-way through the
+        // load still counts as "seen" and does not restart the whole intro.
+        if (!seen) { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} }
+        window._introGate = { show: !seen };
+      })();
+    </script>
+
+    <!-- The orange liquid loader that used to live here moved to 2D.html — it
+         is the site's entrance animation, not the 3D world's. src/main.js
+         still calls window._loader defensively (`if (window._loader) ...`);
+         with no loader defined those calls are no-ops by design. -->
+
+    <div id="info-overlay">
+      <div id="info-panel">
+        <button id="info-close">&#x2715;</button>
+        <h2 id="info-title"></h2>
+        <img id="info-image" src="" alt="" />
+        <div id="info-text"></div>
+      </div>
+    </div>
+
+    <!-- scrolling="no" is required, and this was the only page missing it (all 8
+         2D pages already have it). The nav document's body carries
+         padding-top: 130px, but this page sizes the frame to 100px — the 2D
+         pages give it 140px — so 30px of it overflows and the frame renders a
+         scrollbar down its right edge, over the scene. Nothing is actually
+         down there to scroll to: .top-row inside is position: fixed, so the
+         padding contributes height without contributing content. -->
+    <iframe id="top-bar" src="/gallery-4-nav.html" allowtransparency="true" scrolling="no"></iframe>
+
+    <!-- Fullscreen controls intro — first 3D entry per tab; click/key dismisses.
+         src is set from JS below rather than here so that a gated reload does not fetch
+         the page at all. With the orange loader moved to 2D.html, this intro is the only
+         cover for the loading 3D scene and reveals ITSELF on its iframe's load event —
+         previously the loader called _showIntroControls() when its fill finished. -->
+    <iframe id="intro-controls" allowtransparency="true"></iframe>
+    <script>
+      (function () {
+        var intro = document.getElementById('intro-controls');
+
+        // Reload / same-tab return: no intro at all.
+        if (!window._introGate.show) { intro.remove(); return; }
+
+        // Reveal on the iframe's load event, not immediately: the WELCOME
+        // sequence is started via postMessage, and posting before the child
+        // document's listener exists would silently drop the message (that
+        // was a real bug in the original loader-driven version too).
+        // The intro must not close before the scene is on screen (2026-10-16):
+        // a click during WELCOME used to uncover an empty dark canvas for as
+        // long as the 12 MB model took on mobile data, which read as a black,
+        // broken page. src/main.js calls window._loader.progress() while the
+        // GLB downloads and window._sceneReady() once the scene is visible (or
+        // the load failed). A click before that is remembered and the intro
+        // closes the moment the scene is ready.
+        var ready = false, wantsOut = false, lastP = null, closed = false;
+        function post(msg) {
+          try { intro.contentWindow.postMessage(msg, '*'); } catch (e) {}
+        }
+        function close() {
+          if (closed) return;
+          closed = true;
+          intro.classList.remove('is-visible');
+          setTimeout(function () { intro.remove(); }, 750);
+        }
+        window._loader = {
+          progress: function (p) { lastP = p; post({ type: 'intro-scene-progress', p: p }); },
+          done: function () {}
+        };
+        window._sceneReady = function () {
+          if (ready) return;
+          ready = true;
+          post({ type: 'intro-scene-ready' });
+          if (wantsOut) close();
+        };
+
+        intro.addEventListener('load', function () {
+          intro.classList.add('is-visible');
+          post({ type: 'intro-controls-show' });
+          // Messages sent before this point were dropped (no listener yet).
+          if (lastP !== null) post({ type: 'intro-scene-progress', p: lastP });
+          if (ready) post({ type: 'intro-scene-ready' });
+        });
+        intro.src = '/controls_fullscreen3d.html';
+        window.addEventListener('message', function (e) {
+          if (e.data && e.data.type === 'intro-controls-dismiss') {
+            if (ready) close(); else wantsOut = true;
+          }
+        });
+      })();
+    </script>
+
+    <script>
+      /* ── Shrink overlay frames to their content (touch only) ───────────────
+         The overlay wrappers are a fixed 85vh on touch devices, which left a lot
+         of empty panel below short content. The embedded page measures itself and
+         posts its height (see the reporter at the bottom of about3d.html); we
+         apply it here, because an <iframe> can't size itself to its content.
+
+         Touch-only on purpose: desktop keeps its 66.66vw x 66.66vh box, so the
+         `pointer: coarse` guard is what keeps this change off the desktop view.
+         Clamped to 85vh — the old fixed height becomes the ceiling, so a tall
+         state (an open accordion item) can never exceed the screen and just
+         scrolls inside the frame exactly as it does today. */
+      (function () {
+        var MAX_VH = 0.85;
+        window.addEventListener('message', function (e) {
+          var d = e.data;
+          if (!d || d.type !== 'overlay-autoheight' || !d.height) return;
+          if (!window.matchMedia('(pointer: coarse)').matches) return;
+          var wrap = document.getElementById(d.frame + '-wrapper');
+          if (!wrap) return;
+          wrap.style.height = Math.min(d.height, Math.round(window.innerHeight * MAX_VH)) + 'px';
+        });
+      })();
+    </script>
+
+    <!-- Virtual joystick (touch only) -->
+    <div id="joystick-container">
+      <div id="joystick-base">
+        <div id="joystick-thumb"></div>
+      </div>
+    </div>
+
+    <!-- "?" — opens the controls overlay; the nav bar's copy is hidden on touch -->
+    <button id="help-fab" aria-label="Help">?</button>
+    <script>
+      // Same-window postMessage: src/main.js owns openControls() inside its
+      // module scope and already listens for this exact message from the nav
+      // iframe, so the page's own button goes through the same door.
+      document.getElementById('help-fab').addEventListener('click', function () {
+        window.postMessage({ type: 'openControls' }, '*');
+      });
+    </script>
+
+    <!-- Mobile menu overlay -->
+    <div id="mobile-menu" class="mobile-menu">
+      <div class="mobile-menu-panel">
+        <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". The burger menu's light/dark toggle — restore by
+     un-commenting it and re-linking the two /theme files in <head>.
+     Light/dark toggle, first in the panel above Craft, built from the
+             same two classes, so the pair always match. Mobile-only, like the menu.
+             The labels are 13x13 pixel-art glyphs (sun / moon), not text, so they carry
+             no data-i18n — /theme/theme.js sets the aria-label in the current language.
+        <div class="mobile-view-toggle mobile-theme-toggle">
+          <button class="mobile-mode-btn" data-theme-choice="light" aria-label="Hell"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="6" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="5" y="3" width="3" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="0" y="6" width="2" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="11" y="6" width="2" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="3" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="1" y="11" width="1" height="1"/><rect x="6" y="11" width="1" height="1"/><rect x="11" y="11" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/></svg></button>
+          <button class="mobile-mode-btn" data-theme-choice="dark" aria-label="Dunkel"><svg class="theme-pix" viewBox="0 0 13 13" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="3" y="0" width="5" height="1"/><rect x="2" y="1" width="4" height="1"/><rect x="1" y="2" width="4" height="1"/><rect x="1" y="3" width="3" height="1"/><rect x="0" y="4" width="4" height="1"/><rect x="0" y="5" width="4" height="1"/><rect x="0" y="6" width="4" height="1"/><rect x="0" y="7" width="4" height="1"/><rect x="0" y="8" width="5" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="1" y="9" width="6" height="1"/><rect x="10" y="9" width="2" height="1"/><rect x="1" y="10" width="11" height="1"/><rect x="2" y="11" width="9" height="1"/><rect x="4" y="12" width="5" height="1"/></svg></button>
+        </div> -->
+        <a class="mobile-nav-btn" data-page="about" data-i18n="menu-about">About</a>
+        <!-- Language toggle. Deliberately the SAME component as the 2D/3D toggle
+             above — same two classes, no styling of its own — so the pair can
+             never drift apart. The nav bar's own de/en text is hidden below
+             640px; this replaces it. -->
+        <div class="mobile-view-toggle mobile-lang-toggle">
+          <button class="mobile-mode-btn" data-lang="de">Deutsch</button>
+          <button class="mobile-mode-btn" data-lang="en">English</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ── Page transitions ──────────────────────────────────────────
+      (function() {
+        // The 3D scene deliberately does NOT slide in — it just appears, and any wait is
+        // covered by the orange-bubble loading screen defined above.
+        //
+        // Removed: this page used to hold the entire <html> element off-screen at
+        // translateX(±100%) with overflow hidden, then animate it in over 380ms via
+        // injected _sR/_sL keyframes, with the #top-bar nav iframe counter-animated in the
+        // opposite direction so it appeared to stay put. Animating the root element fought
+        // the WebGL canvas and the loader, and the effect is redundant now that the loader
+        // covers the load. The 2D pages still slide in — that animation is separate and
+        // lives in each 2D page's own script (each defines its own _sR/_sL keyframes), so
+        // nothing here is shared with them.
+        //
+        // `_sv` is still CONSUMED here even though it is no longer used: a 2D page sets it
+        // on its way out, and if the 3D page did not clear it the flag would linger in
+        // sessionStorage and fire a stray slide on whatever page was visited next.
+        sessionStorage.removeItem('_sv');
+
+        window._nav = function(url, into) {
+          if (into !== 'right') { location.href = url; return; }
+          sessionStorage.setItem('_sv', into);
+          var dim = document.createElement('div');
+          dim.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0);z-index:9999;transition:background 220ms ease;pointer-events:none;';
+          document.body.appendChild(dim);
+          requestAnimationFrame(function() { dim.style.background = 'rgba(0,0,0,0.28)'; });
+          setTimeout(function() { location.href = url; }, 220);
+        };
+
+        window.addEventListener('message', function(e) {
+          if (e.data && e.data.type === 'page-slide') window._nav(e.data.url, e.data.enterFrom);
+        });
+      })();
+
+      (function () {
+        const menu = document.getElementById('mobile-menu');
+
+        /* The mobile menu is an opaque neumorphic panel using the site's own
+           surface colour and shadow tokens, so it no longer adapts its shading
+           to the page behind it (that was needed only for the old glass look). */
+
+        function openMenu()  {
+          menu.classList.add('open');
+          // Reported from here rather than from the hamburger itself — the button
+          // lives in the nav iframe and only posts a *toggle*, so this is the one
+          // place that knows the menu actually opened.
+          if (window.track) window.track('mobile_menu_open');
+        }
+        function closeMenu() { menu.classList.remove('open'); }
+
+        window.addEventListener('message', e => {
+          if (e.data.type === 'mobile-menu-toggle') {
+            menu.classList.contains('open') ? closeMenu() : openMenu();
+          }
+        });
+
+        menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
+
+        menu.querySelectorAll('[data-page]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            closeMenu();
+            if (btn.dataset.page === 'about' && window.openAboutOverlay) window.openAboutOverlay();
+          });
+        });
+
+        // Lets an overlay iframe hand an external-scheme URL (mailto:) to the
+        // TOP-LEVEL document so this page performs the navigation itself.
+        // Why it exists: about3d.html lives in #about-frame, and mobile Safari
+        // drops a mailto: navigation that originates inside a nested frame — even
+        // with target="_top" on the link — so the tap did nothing at all. Desktop
+        // hands it off either way, which is why it only failed on a phone.
+        // Called SYNCHRONOUSLY from the frame's click handler (a plain same-origin
+        // function call, not postMessage) so the navigation stays inside the user
+        // gesture; an async round-trip would lose it and be blocked for a different
+        // reason. Deliberately assignment, not location.assign(), so no history
+        // entry is added — mailto: never unloads the page anyway.
+        window.openExternalScheme = function (href) {
+          if (typeof href === 'string' && /^(mailto|tel):/i.test(href)) window.location.href = href;
+        };
+
+        // Language toggle. It does NOT translate this page directly — it writes
+        // the preference and hands the change to the nav iframe, which is already
+        // the site's single owner of language and broadcasts 'lang-change' back
+        // to the menu-i18n handler below. One path, so nothing desyncs. Writing
+        // localStorage also fires a `storage` event inside the about/controls
+        // overlay iframes, which is how they already re-translate.
+        const langBtns = menu.querySelectorAll('[data-lang]');
+        function markLang(l) {
+          langBtns.forEach(b => b.classList.toggle('is-active', b.dataset.lang === l));
+        }
+        // Seed the highlight synchronously; the nav also broadcasts the stored
+        // language ~100ms after it loads, which corrects a stale value (e.g. an
+        // old 'fr' preference, which the nav rewrites to 'en').
+        try { markLang(localStorage.getItem('lang') || 'de'); } catch (e) { markLang('de'); }
+        langBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const l = btn.dataset.lang;
+            try { localStorage.setItem('lang', l); } catch (e) {}
+            markLang(l);
+            const bar = document.getElementById('top-bar');
+            if (bar && bar.contentWindow) bar.contentWindow.postMessage({ type: 'lang-change', lang: l }, '*');
+          });
+        });
+        window.addEventListener('message', e => {
+          if (e.data && e.data.type === 'lang-change') markLang(e.data.lang);
+        });
+      })();
+
+      // ── i18n for the mobile menu (EN + DE) ──────────────────────
+      (function () {
+        var T = {
+          de: { 'menu-about': 'Über mich' },
+          en: { 'menu-about': 'About' }
+        };
+        function apply(lang) {
+          var t = T[lang] || T.en;
+          document.querySelectorAll('[data-i18n]').forEach(function (el) { if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n]; });
+        }
+        apply(localStorage.getItem('lang') || 'de');
+        window.addEventListener('message', function (e) {
+          if (e.data && e.data.type === 'lang-change') apply(e.data.lang);
+        });
+      })();
+
+      // Auto-fullscreen on landscape tilt (Android/Chrome; silently no-ops on iOS)
+      (function () {
+        function tryFullscreen() {
+          const el = document.documentElement;
+          const req = el.requestFullscreen || el.webkitRequestFullscreen;
+          if (req) req.call(el).catch(() => {});
+        }
+        function tryExitFullscreen() {
+          const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+          if (!isFs) return;
+          const exit = document.exitFullscreen || document.webkitExitFullscreen;
+          if (exit) exit.call(document).catch(() => {});
+        }
+        function onOrientationChange() {
+          const landscape = screen.orientation
+            ? screen.orientation.type.includes('landscape')
+            : Math.abs(window.orientation || 0) === 90;
+          landscape ? tryFullscreen() : tryExitFullscreen();
+        }
+        if (screen.orientation) {
+          screen.orientation.addEventListener('change', onOrientationChange);
+        } else {
+          window.addEventListener('orientationchange', onOrientationChange);
+        }
+        // Handle case where page loads already in landscape
+        onOrientationChange();
+      })();
+    </script>
+    <iframe id="floating-button" src="/Questionmark_Button3d.html" allowtransparency="true"></iframe>
+
+    <!-- About / Controls have no .overlay-topbar: the ← / ✕ bar
+         was mobile-only chrome (it renders only under `pointer: coarse`) and it
+         sat semi-transparent over the panel. These two dismiss by tapping the
+         backdrop instead — see the `if (e.target === overlay) close…()` handlers
+         in src/main.js. Kaffeemaschine below deliberately keeps its bar, since
+         its iframe is an interactive app that fills the frame edge to edge and
+         leaves no backdrop worth tapping.
+         The close/back wiring in main.js uses optional chaining (`?.`), so the
+         now-absent button IDs are a no-op rather than an error, and restoring a
+         bar here would re-activate it with no JS change. -->
+    <div id="about-overlay">
+      <div id="about-wrapper">
+        <iframe id="about-frame" data-src="/about3d.html" loading="lazy"></iframe>
+      </div>
+    </div>
+    <div id="controls-overlay">
+      <div id="controls-wrapper">
+        <iframe id="controls-frame" data-src="/controls_open3d.html" loading="lazy"></iframe>
+      </div>
+    </div>
+    <div id="kaffeemaschine-overlay">
+      <div id="kaffeemaschine-wrapper">
+        <div class="overlay-topbar"><button class="overlay-back" id="kaffeemaschine-back-btn">←</button><button class="overlay-close" id="kaffeemaschine-close-btn">✕</button></div>
+        <iframe id="kaffeemaschine-frame" data-src="/kaffeemaschine/kaffeemaschine.html" loading="lazy"></iframe>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

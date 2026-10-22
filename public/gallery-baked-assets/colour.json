@@ -1,0 +1,15 @@
+{
+  "size": 97,
+  "logMin": -14.0,
+  "logMax": 8.0,
+  "exposureEV": -0.8624964952468872,
+  "view": "AgX",
+  "look": "AgX - Medium High Contrast",
+  "output": "linear Rec.709; renderer encodes sRGB once",
+  "sourceConfigSHA256": "27282e81548ac61eb561a9ea6672412d9a20731c12c0f1f256f562e2443a1021",
+  "validation": {
+    "meanDisplayError": 0.00029484438709914684,
+    "p99DisplayError": 0.0035474111791700125,
+    "maxDisplayError": 0.027707539498806
+  }
+}

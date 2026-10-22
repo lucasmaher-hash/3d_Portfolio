@@ -1,10 +1,14 @@
 import './style.css'
 import { prepareGallery } from './gallery/scene.js'
 import { prepareOriginalGallery } from './gallery/original-scene.js'
+import { prepareBakedGallery } from './gallery/baked-scene.js'
 
-const IS_ORIGINAL_GALLERY = location.pathname === '/gallery-original.html'
-const IS_GALLERY = IS_ORIGINAL_GALLERY || location.pathname === '/gallery.html'
-const RETURN_STATE_KEY = IS_ORIGINAL_GALLERY ? '_originalGalleryReturnState' : IS_GALLERY ? '_galleryReturnState' : '_3dReturnState'
+const IS_DEFAULT_GALLERY = ['/', '/index.html'].includes(location.pathname)
+const IS_BAKED_GALLERY = IS_DEFAULT_GALLERY || ['/gallery-baked.html','/gallery-4.html'].includes(location.pathname)
+const IS_ORIGINAL_GALLERY = ['/gallery-original.html','/gallery-3.html'].includes(location.pathname)
+const IS_GALLERY = IS_BAKED_GALLERY || IS_ORIGINAL_GALLERY || ['/gallery.html','/gallery-2.html'].includes(location.pathname)
+const GALLERY_ENTRY_ID = IS_DEFAULT_GALLERY ? 'default' : IS_BAKED_GALLERY ? 'gallery-4' : IS_ORIGINAL_GALLERY ? 'gallery-3' : IS_GALLERY ? 'gallery-2' : 'gallery-1'
+const RETURN_STATE_KEY = IS_DEFAULT_GALLERY ? '_defaultBakedGalleryReturnState' : IS_BAKED_GALLERY ? '_bakedGalleryReturnState' : IS_ORIGINAL_GALLERY ? '_originalGalleryReturnState' : IS_GALLERY ? '_galleryReturnState' : '_3dReturnState'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 // PERF.lightGlb: the production GLB is meshopt-compressed (scripts/optimize-glb.mjs).
@@ -2179,8 +2183,8 @@ function addRoomTitles(model) {
 // ── Load model ───────────────────────────────────────────────────
 const loader = new GLTFLoader()
 loader.setMeshoptDecoder(MeshoptDecoder)
-const GLB_ORIGINAL  = IS_ORIGINAL_GALLERY ? '/gallery-original-assets/gallery.glb?v=2' : IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-walls-v3' : '/current🟢.glb'
-const GLB_OPTIMIZED = IS_ORIGINAL_GALLERY ? '/gallery-original-assets/gallery.glb?v=2' : IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-walls-v3' : '/scene-optimized.glb'
+const GLB_ORIGINAL  = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=1' : IS_ORIGINAL_GALLERY ? '/gallery-original-assets/gallery.glb?v=2' : IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-walls-v3' : '/current🟢.glb'
+const GLB_OPTIMIZED = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=1' : IS_ORIGINAL_GALLERY ? '/gallery-original-assets/gallery.glb?v=2' : IS_GALLERY ? '/gallery-assets/gallery.glb?v=20261021-walls-v3' : '/scene-optimized.glb'
 // A missing or broken optimized file (the optimizer never fails the build, it just does not
 // write one) falls back to the original GLB instead of leaving the 3D page empty.
 function loadScene(url, onLoad, onProgress, onError) {
@@ -2196,7 +2200,7 @@ loadScene(
   async (gltf) => {
     if (IS_GALLERY) {
       try {
-        const { settings, collidables: galleryWalls } = await (IS_ORIGINAL_GALLERY ? prepareOriginalGallery : prepareGallery)(gltf.scene, scene, renderer)
+        const { settings, collidables: galleryWalls } = await (IS_BAKED_GALLERY ? prepareBakedGallery : IS_ORIGINAL_GALLERY ? prepareOriginalGallery : prepareGallery)(gltf.scene, scene, renderer)
         collidables = galleryWalls
         // Include the lower cove in shoulder-width collision checks.
         lowCollidables.push(...galleryWalls)
@@ -2213,6 +2217,51 @@ loadScene(
         spawnPos = camera.position.clone()
         spawnYaw = yaw
         spawnPitch = pitch
+        if (IS_BAKED_GALLERY) {
+          // Fourth gallery has independent project groups and return-state storage.
+          const routes = {
+            'Unify': { title: 'Unify', url: '/unify2d.html' },
+            'Double Packaging': { title: 'Double Packaging', url: '/vaccine2d.html' },
+            'Mac-Lamp': { title: 'Mac-Lamp', url: '/mac-lamp2d.html' },
+            'Virtual Cooking': { title: 'Virtual Cooking', url: '/virtual_cooking2d.html' },
+            'Cybercoffee': { title: 'Cybercoffee', url: '/kaffeemaschine2d.html' },
+          }
+          const exhibits = []
+          gltf.scene.traverse(mesh => { if (mesh.isMesh && mesh.userData.galleryRole === 'project') exhibits.push(mesh) })
+          for (const [project,data] of Object.entries(routes)) {
+            const meshes = exhibits.filter(mesh => mesh.userData.galleryProject === project)
+            if (!meshes.length) continue
+            const bounds = new THREE.Box3()
+            for (const mesh of meshes) bounds.expandByObject(mesh)
+            const group = new THREE.Group()
+            group.name = 'BakedProject_' + project.replaceAll(' ', '_')
+            group.position.copy(bounds.getCenter(new THREE.Vector3()))
+            gltf.scene.add(group);group.updateMatrixWorld(true)
+            for (const mesh of meshes) {
+              group.attach(mesh)
+              mesh.userData.bakedProjectGroup = group
+              CONTENT[mesh.name] = data
+              clickables.push(mesh)
+            }
+          }
+          try {
+            const saved = JSON.parse(sessionStorage.getItem(RETURN_STATE_KEY))
+            if (saved && ['x','y','z','yaw','pitch'].every(k => Number.isFinite(saved[k]))) {
+              camera.position.set(saved.x,saved.y,saved.z);yaw=saved.yaw;pitch=saved.pitch
+              applyRotation();syncSteeringToView()
+            }
+          } catch { /* Malformed return state falls back to the gallery spawn. */ }
+          sessionStorage.removeItem(RETURN_STATE_KEY)
+          const review = settings.reviewViews?.[new URLSearchParams(location.search).get('view')]
+          if (review) {
+            camera.position.fromArray(review.position)
+            camera.lookAt(new THREE.Vector3().fromArray(review.target))
+            yaw=camera.rotation.y;pitch=camera.rotation.x
+            playerHeight=review.position[1]-floorY
+            camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(36/(2*review.lens*camera.aspect)))
+            camera.updateProjectionMatrix();syncSteeringToView()
+          }
+        }
         await renderer.compileAsync(scene, camera)
         roomAccent.ready = true
         updateRoomAccent(0, true)
@@ -2670,6 +2719,7 @@ window.addEventListener('pageshow', e => {
 // The clicked mesh → the object(s) that should visually pop, or null for a
 // plain instant navigation. Mirrors the click handler's CONTENT resolution.
 function resolvePopTargets(obj) {
+  if (IS_BAKED_GALLERY && obj.userData.bakedProjectGroup) return { targets: [obj.userData.bakedProjectGroup], bottom: ['Double Packaging','Mac-Lamp'].includes(obj.userData.galleryProject) }
   const t = obj.name in CONTENT ? obj : obj.parent
   if (!t) return null
   if (POP_ENABLED.has(t.name) || t.name.startsWith('ProjectArrow_'))
@@ -3179,7 +3229,7 @@ renderer.domElement.addEventListener('click', e => {
       // ?from=3d tells the destination page it was opened from the 3D scene,
       // so it swaps its usual nav bar for a fixed "Exit" button that returns
       // here — see the per-page <script> block that checks this param.
-      const navigate = () => window._nav(data.url + '?from=3d', 'left')
+      const navigate = () => window._nav(data.url + '?from=3d&scene=' + GALLERY_ENTRY_ID, 'left')
       const pop = resolvePopTargets(obj)
       if (pop && pop.targets.length) {
         if (popNavigating) return

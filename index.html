@@ -33,7 +33,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
     <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>lucasmaher.com</title>
+    <title>Lucas Maher</title>
     <script src="/analytics.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -42,6 +42,7 @@
   <style>
     :root {
       --bg-surface: #DCDCE3;
+      --accent-orange: #809BBC;
       --text-primary: #1A1A1A;
       --text-secondary: #8E8E93;
       --shadow-raised: 8px 8px 18px rgba(174,174,192,0.65), -8px -8px 18px rgba(255,255,255,1);
@@ -301,7 +302,7 @@
          so the intro stays skipped there. -->
     <script>
       (function () {
-        var KEY = 'introSeen';
+        var KEY = 'defaultBakedGalleryIntroSeen';
         // Redirecting to the 2D landing (see the guard in <head>): touch NOTHING.
         // Marking introSeen here would silently burn the once-per-tab intro on a
         // visit that never showed the 3D page at all — the first real switch to
@@ -338,7 +339,7 @@
          scrollbar down its right edge, over the scene. Nothing is actually
          down there to scroll to: .top-row inside is position: fixed, so the
          padding contributes height without contributing content. -->
-    <iframe id="top-bar" src="/top_row_permanent_V3.html?v=20261019" allowtransparency="true" scrolling="no"></iframe>
+    <iframe id="top-bar" src="/gallery-default-nav.html" allowtransparency="true" scrolling="no"></iframe>
 
     <!-- Fullscreen controls intro — first 3D entry per tab; click/key dismisses.
          src is set from JS below rather than here so that a gated reload does not fetch

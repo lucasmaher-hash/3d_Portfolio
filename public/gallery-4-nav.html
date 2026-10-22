@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". This pre-paint script no longer runs, so nothing sets
+       data-theme: no stored choice, no evening clock.
+  <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Top Row v3 · Lucas Maher</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wdth@100&display=swap"
+    rel="stylesheet" />
+  <link href="/fonts/roboto-flex-ui.css" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'OCR-A BT';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('/OCR-A-BT-DE.ttf?v=20261019b') format('truetype');
+    }
+
+    :root {
+      --bg-surface: #DCDCE3;
+      --text-primary: #1A1A1A;
+      --text-secondary: #8E8E93;
+      --accent-orange: #809BBC;
+
+      /* Shadows are a real shade (2026-10-19, Lucas): a dark blue-grey at low alpha instead of
+         the old light grey rgba(174,174,192,a). Alpha-blending a dark colour multiplies whatever
+         is under it, so over a dark hero image the shadow darkens instead of painting light grey
+         on top. Alpha = old x 46/180, which gives exactly the old darkness on #DCDCE3.
+         The white highlight already acts as light (white at alpha = screen). */
+      --shadow-raised-sm:
+        5px 5px 12px rgba(40, 40, 90, 0.166),
+        -5px -5px 12px rgba(255, 255, 255, 1);
+      /* The bar's own outer shading is the only part that falls on page content (hero images),
+         so its light is weaker (white 0.7 instead of 1; 0.45 was too faint): over a dark image a full-white
+         highlight washed out to a bright halo. The buttons' own highlights stay full. */
+      --shadow-island: 5px 5px 12px rgba(40, 40, 90, 0.166);
+      /* The bar's light lives on its own layer (.nav-light) so it can be cut out wherever a
+         picture of the page sits under it — see the script at the end. */
+      --island-light: -5px -5px 12px rgba(255, 255, 255, 0.7);
+      /* Logo, 2D/3D toggle, About pill, hamburger: outer shading as tight as the pressed
+         segment inside the toggle, a touch wider (4px offset / 8px blur instead of 5px / 12px), Lucas
+         2026-10-19. Hover lifts by the same ratio as before (about x2). */
+      --shadow-soft:
+        4px 4px 8px rgba(40, 40, 90, 0.166),
+        -4px -4px 8px rgba(255, 255, 255, 1);
+      --shadow-soft-hover:
+        7px 7px 14px rgba(40, 40, 90, 0.23),
+        -5px -5px 12px rgba(255, 255, 255, 1);
+      --shadow-raised:
+        8px 8px 18px rgba(40, 40, 90, 0.166),
+        -8px -8px 18px rgba(255, 255, 255, 1);
+      --shadow-pressed:
+        inset 5px 5px 10px rgba(40, 40, 90, 0.153),
+        inset -5px -5px 10px rgba(255, 255, 255, 1);
+      --shadow-hover:
+        11px 11px 22px rgba(40, 40, 90, 0.204),
+        -8px -8px 18px rgba(255, 255, 255, 1);
+
+      --ease: cubic-bezier(.2, .7, .2, 1);
+
+      /* Minimum air around the floating island */
+      --island-edge-x: clamp(44px, 8.6vw, 122px);
+      --island-edge-top: clamp(20px, 2.5vw, 24px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      min-height: 100vh;
+      overflow: visible;
+    }
+
+    body {
+      font-family: 'Roboto', system-ui, sans-serif; font-size-adjust: none;
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: transparent;
+      padding-top: 130px;
+    }
+
+    /* ── Outer track — a transparent layout layer that pins the
+         island near the top of the viewport and enforces the side
+         margins. Does NOT stretch the visible bar. ────────────── */
+    .top-row {
+      position: fixed;
+      top: var(--island-edge-top);
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      overflow: visible;
+
+      display: flex;
+      justify-content: center;
+      /* +10px each side insets the nav bar a touch on MacBook-aspect screens
+         (where the pill is padding-constrained). On wide-aspect the pill is
+         capped by its own max-width (1330px, set below) with room to spare, so
+         this extra padding never bites there. Mobile pill is a fixed 60px
+         centred chip, so it's unaffected too. */
+      padding: 0 calc(var(--island-edge-x) + 10px);
+
+      /* clicks pass through except where children opt in */
+      pointer-events: none;
+    }
+
+    /* ── The floating bar — stretches across the screen (with a
+         small breathing gutter from the edges) but has NO shadow.
+         Three children are placed via grid: logo left, toggle
+         optically centred, nav right. ─────────────────────────── */
+    .nav-island {
+      pointer-events: auto;
+      background: var(--bg-surface);
+      border-radius: 9999px;
+      /* same pill shape as the inner buttons */
+      padding: 10px clamp(14px, 2vw, 24px);
+      box-shadow: none;
+      /* no shadow on the outer container */
+      width: 100%;
+      /* Cap so the nav sits inside the 1440px content card with the same
+         gap it has on a MacBook. On a MacBook the pill is inset ~67px inside
+         the card border (island padding 122 vs body padding 55); 1440 − 2×67
+         = 1306 keeps that gap on wide monitors instead of the pill edge
+         landing on the card's border line. */
+      max-width: 1286px;   /* 1306 − 20: 10px narrower each side on MacBook-aspect (wide-aspect overrides to 1330 below) */
+      margin: 0 auto;
+      /* stretch within the gutter track */
+      /* Clip every child's shadow/highlight to the bar's own rounded
+         silhouette — see the note under .is-2d-mode below. */
+      overflow: hidden;
+
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: clamp(16px, 2.5vw, 28px);
+      transition: box-shadow 260ms var(--ease);
+    }
+
+    /* Over a full-bleed hero the nav bar stays (its light background),
+       only the outer raised shadow/highlight drops; it returns once the
+       nav leaves the image (or on pages with no full-bleed hero). */
+    /* Light layer: a full-frame layer just under the bar (z 999 < .top-row 1000) holding an
+       island-shaped box whose only paint is the white highlight. A per-frame clip-path (evenodd
+       path, pure geometry: no image to decode, so no flicker) punches holes wherever a picture of the page (img, video, canvas, background image) lies under
+       the light, so the light falls on the plain page background only (Lucas, 2026-10-19). */
+    .nav-light {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 260ms var(--ease);
+    }
+    .nav-light.on { opacity: 1; }
+    .nav-light-shape {
+      position: absolute;
+      border-radius: 9999px;
+      box-shadow: var(--island-light);
+    }
+
+    .nav-island.is-2d-mode {
+      box-shadow: var(--shadow-island);
+    }
+
+    /* Why .nav-island is overflow: hidden (base rule above, EVERY view).
+       .logo and .pill carry big neumorphic shadows — ~24px of blur at 11px
+       offset on hover — which always spill well past their own box and past
+       the island's 10px padding. It used to be clipped in 3D only
+       (.is-3d-view) on the theory that on a 2D page the bleed lands on a
+       background the exact same colour as the island, so nobody sees it.
+       That is only true for the dark half: the -8px -8px 20px pure-WHITE
+       highlight is brighter than #DCDCE3 and reads as a glow escaping the
+       bar's top-left, and the dark half is visible too wherever the bar
+       passes over a hero image. Clipping unconditionally keeps every child's
+       shading inside the rim.
+       The island's OWN raised shadow (.is-2d-mode) is unaffected — overflow
+       clips descendants, never the element's own box-shadow. .is-3d-view is
+       still set by the JS below (now a no-op for overflow, kept as the view
+       marker). */
+
+    .nav-island>.nav-left {
+      justify-self: start;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0 1px;
+      line-height: 1;
+      letter-spacing: 0.04em;
+    }
+
+    .lang-btn.active {
+      color: var(--text-primary);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .lang-sep {
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: 14px;
+      color: var(--text-secondary);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .nav-island>.view-toggle {
+      justify-self: center;
+    }
+
+    .nav-right {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: clamp(8px, 1.5vw, 16px);
+    }
+
+    /* ── Logo (neumorphic circle) ─────────────────────────────── */
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-soft);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      flex-shrink: 0;
+      transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
+    }
+
+    /* The mark is a mask, not an <img>, so its colour can change on hover: the accent
+       blue at rest, the dark hover blue of the View Work buttons under the cursor. */
+    .logo-mark {
+      width: 34.56px;
+      aspect-ratio: 400 / 265;
+      display: block;
+      pointer-events: none;
+      background-color: var(--logo-color, #809BBC);
+      -webkit-mask: url(/images/site/logo-lm.png) center / contain no-repeat;
+      mask: url(/images/site/logo-lm.png) center / contain no-repeat;
+      transition: background-color 260ms var(--ease);
+    }
+    .logo:hover .logo-mark { background-color: var(--logo-hover, #475F7E); transition-duration: 150ms; }
+
+    .logo:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: var(--shadow-soft-hover);
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+
+    /* ── Pill (shared) ────────────────────────────────────────── */
+    .pill {
+      background: var(--bg-surface);
+      border-radius: 9999px;
+      box-shadow: var(--shadow-soft);
+      padding: 5px;
+      display: inline-flex;
+      gap: 4px;
+      transition: transform 300ms ease-out, box-shadow 300ms ease-out;
+    }
+
+    .pill:hover {
+      box-shadow: var(--shadow-soft-hover);
+      transform: translateY(-2px) scale(1.03);
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+
+    .pill__seg {
+      min-width: 70px;
+      padding: 6px 18px;
+      border-radius: 18px;
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: 16px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      transition: color 200ms var(--ease), box-shadow 220ms var(--ease),
+        background-color 220ms var(--ease);
+      -webkit-tap-highlight-color: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pill__seg:hover {
+      color: var(--text-primary);
+    }
+
+    .pill__seg:focus-visible {
+      outline: 2px solid var(--accent-orange);
+      outline-offset: 2px;
+    }
+
+    .pill__seg.is-active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      /* --shadow-pressed's offset/blur (5px/10px) reduced 35% — scoped to the
+         active toggle segment only, not the shared variable, so the outer
+         .view-toggle/.pill track's own raised shadow is untouched. */
+      box-shadow: inset 3.25px 3.25px 6.5px rgba(40, 40, 90, 0.153), inset -3.25px -3.25px 6.5px rgba(255, 255, 255, 1);
+      cursor: default;
+    }
+
+    /* ── Nav-pill variant: unpressed, without an active underline ── */
+    /* The About pill's width (2026-10-06) is set by the segment's side
+       padding, --about-pad (10.5px, dialled in by Lucas; was 14). */
+    .nav-pill .pill__seg {
+      min-width: 0;
+      padding: 6px var(--about-pad, 10.5px) 4px;
+      border-radius: 0;
+      position: relative;
+    }
+
+    .nav-pill .pill__seg.is-active {
+      background: transparent;
+      box-shadow: none;
+      color: var(--text-primary);
+      cursor: default;
+    }
+
+    /* ── Hamburger button ────────────────────────────────────── */
+    .hamburger {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-soft);
+      border: none;
+      cursor: pointer;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
+    }
+
+    .hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+    }
+
+    .hamburger:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: var(--shadow-soft-hover);
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+
+    /* ── Help (?) button — mobile landscape 3D only ─────────────── */
+    .help-btn {
+      display: none;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      /* A <button> does NOT inherit font-family — browsers force their own
+         system UA font on form controls. .logo can't supply it either (its font
+         properties were dropped when the logo text became an <img>), so the "?"
+         must set the pixel font itself or it renders in system sans. The
+         explicit colour also overrides iOS's default blue button text. */
+      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+      font-size: 18px;
+      line-height: 1;
+      color: var(--text-primary);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      /* 19, not the original 14: .top-row's padding is
+         calc(var(--island-edge-x) + 10px), so +5px here takes 5px off each side
+         and makes the bar 10px narrower overall. */
+      :root { --island-edge-x: 19px; }
+
+      .view-toggle,
+      .nav-pill { display: none; }
+
+      .hamburger { display: flex; }
+
+      .nav-island {
+        grid-template-columns: 1fr auto;
+        padding: 8px;
+        gap: 12px;
+        /* Clip the children's hover/raised shadows to the bar's own rounded
+           silhouette. .logo carries --shadow-raised-sm, whose blur always
+           extends past the 8px padding — invisible on a 2D page while the bar
+           sat on a background the exact same colour as itself, but obvious now
+           that the bar passes over images, as a white glow bleeding off the
+           left end. Same fix the 3D view already uses (.nav-island.is-3d-view),
+           applied here for every mobile view. */
+        overflow: hidden;
+      }
+    }
+
+    /* Mobile 3D used to collapse the island behind the LM button until tapped
+       (.is-collapsible / .is-open). Removed — the bar now stays fully open on
+       mobile 3D, same as everywhere else. Desktop never used this. */
+
+    /* Wide-aspect monitors only: widen the nav bar 12px each side (1306→1330)
+       — it grows a little while the content card comes in. 17/10 not 1.7
+       (Safari ignores the decimal aspect form). */
+    @media (min-aspect-ratio: 17/10) {
+      .nav-island { max-width: 1330px; }
+    }
+
+    /* ── Mobile only: the language toggle moves into the hamburger menu ──────
+       "de / en" here was 14px VT323 — effectively ~11-12px of a proportional
+       face given VT323's small x-height and 1px strokes — and it was a tap
+       target at that size, wedged beside the logo. It now lives in the mobile
+       menu as a proper 2D/3D-style segmented toggle (see .mobile-lang-toggle in
+       each page), so the bar drops it entirely at phone widths.
+       Hidden rather than removed: the .lang-btn elements are still what the
+       language IIFE below reads and marks active, and the desktop bar (>640px)
+       still shows and uses them unchanged.
+       Width-based query, so this is safe inside the iframe — an orientation
+       query would resolve against the iframe's own landscape-shaped 390x140
+       box rather than the device. */
+    @media (max-width: 640px) {
+      .lang-toggle { display: none; }
+    }
+  
+    /* ── Mobile: the 2D/3D toggle returns to the bar, scaled down ──────────
+       Same component desktop uses — same .pill track, same inset-well active
+       segment — only the metrics shrink. The bar's mobile grid grows a centre
+       column for it (1fr auto 1fr keeps it dead-centred between logo and
+       hamburger regardless of their widths). .nav-pill (About) stays hidden;
+       it lives in the mobile menu. */
+    @media (max-width: 640px) {
+      .nav-island { grid-template-columns: 1fr auto 1fr; }
+      /* Sized to land at the logo/hamburger's 44px: 5px track padding x2 +
+         segment (16px text x 1.2 line-height + 7.4px padding x2) = 44. Same
+         font size as desktop — only the widths shrink. */
+      .view-toggle { display: inline-flex; padding: 5px; gap: 4px; }
+      .view-toggle .pill__seg { min-width: 70px; padding: 7.4px 16px; font-size: 16px; }
+    }
+
+    /* The bar's "?" is retired everywhere. It was only ever SHOWN by a
+       pointer:coarse rule (desktop never had it — the base rule below this
+       comment's old position is display:none), and on touch it now lives on
+       the 3D page itself as #help-fab, bottom-right beside the joystick. The
+       button markup and its openControls wiring stay, in case it ever returns
+       to the bar. */
+    /* Mobile: neumorphic shadow spread/radius reduced 35% (offsets & blur ×0.65),
+       matching the 2D/3D toggle segment above. Redefining only the tokens keeps
+       desktop untouched; logo / pill / hamburger inherit automatically. */
+    @media (max-width: 640px) {
+      :root {
+        --shadow-raised-sm: 3.25px 3.25px 7.8px rgba(40, 40, 90, 0.166), -3.25px -3.25px 7.8px rgba(255,255,255,1);
+        --shadow-soft: 2.6px 2.6px 5.2px rgba(40, 40, 90, 0.166), -2.6px -2.6px 5.2px rgba(255,255,255,1);
+        --shadow-island: 3.25px 3.25px 7.8px rgba(40, 40, 90, 0.166);
+        --island-light: -3.25px -3.25px 7.8px rgba(255,255,255,0.7);
+        --shadow-raised: 5.2px 5.2px 11.7px rgba(40, 40, 90, 0.166), -5.2px -5.2px 11.7px rgba(255,255,255,1);
+        --shadow-pressed: inset 3.25px 3.25px 6.5px rgba(40, 40, 90, 0.153), inset -3.25px -3.25px 6.5px rgba(255,255,255,1);
+      }
+    }
+  
+    /* Former pixel-font labels that are buttons or carry weight: one step
+       heavier than body text so they still read as UI (Lucas, 2026-10-06). */
+    .pill__seg,
+    .help-btn { font-weight: 500; }
+  </style>
+  <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
+  <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". The nav's theme listener:
+  <script>
+    /* The nav is its own document, so it follows the page's theme itself: the
+       head script above covers first paint, this keeps it in step when the
+       burger menu's toggle is tapped (postMessage from /theme/theme.js) or the
+       theme changes in another tab (storage event). */
+    (function () {
+      function apply(t) {
+        if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        else document.documentElement.removeAttribute('data-theme');
+      }
+      window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'theme-change') apply(e.data.theme);
+      });
+      window.addEventListener('storage', function (e) {
+        if (e.key === 'theme' || e.key === null) {
+          // Three states, same rule as /theme/theme.js and the pre-paint
+          // one-liner above: an explicit choice wins, no key means the clock
+          // decides (dark 20:00-08:00). Change all three together.
+          var t = 'light';
+          try {
+            var s = localStorage.getItem('theme'), h = new Date().getHours();
+            t = (s === 'dark' || s === 'light') ? s : ((h >= 20 || h < 8) ? 'dark' : 'light');
+          } catch (err) {}
+          apply(t);
+        }
+      });
+    })();
+  </script> -->
+</head>
+
+<body>
+
+  <div class="nav-light" aria-hidden="true"><div class="nav-light-shape"></div></div>
+  <header class="top-row" role="banner">
+    <div class="nav-island">
+
+      <!-- Left: lang toggle + logo -->
+      <div class="nav-left">
+        <a href="#" class="logo" aria-label="Lucas Maher home" id="logo-btn"><span class="logo-mark" aria-hidden="true"></span></a>
+        <!-- Deliberately still "de / en", NOT the "Deutsch / English" used in the mobile
+             menu: .lang-toggle is hidden below 640px (see the @media block above), so this
+             is the DESKTOP control and the bar's width budget is tight here — it has been
+             narrowed 10px per side twice for MacBook aspect ratios. The long labels are
+             ~75px wider and belong to the mobile menu, which has a full-width column to
+             spend. Keep the two spellings separate. -->
+        <div class="lang-toggle">
+          <button class="lang-btn" data-lang="de">de</button>
+          <span class="lang-sep">/</span>
+          <button class="lang-btn" data-lang="en">en</button>
+        </div>
+      </div>
+
+      <!-- Middle button: 2D / 3D toggle -->
+      <div class="pill view-toggle" role="tablist" aria-label="View mode">
+        <button type="button" class="pill__seg" role="tab" aria-selected="false" data-mode="2d">2D</button>
+        <button type="button" class="pill__seg is-active" role="tab" aria-selected="true" data-mode="3d">3D</button>
+      </div>
+
+      <!-- Right side: nav + hamburger + help button -->
+      <div class="nav-right">
+        <nav class="pill nav-pill" role="tablist" aria-label="Primary">
+          <a href="#" class="pill__seg" role="tab" aria-selected="false" data-page="about">About</a>
+        </nav>
+        <button class="logo help-btn" id="help-btn" aria-label="Help">?</button>
+        <button class="hamburger" id="hamburger-btn" aria-label="Open menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <script>
+    // Which kind of page is hosting this nav: every 2D page is listed here, the
+    // 3D scene (index.html, at "/") is not. The one place to add a new 2D page.
+    const PARENT_PATH = window.top.location.pathname;
+    const IS_COLOR_PREVIEW = PARENT_PATH === '/a.html';
+    const IS_2D_VIEW = IS_COLOR_PREVIEW || ['2D', 'about2d', 'vaccine2d', 'mac-lamp2d', 'kaffeemaschine2d',
+      'virtual_cooking2d', 'to-shove2d', 'unify2d'].some(p => PARENT_PATH.includes(p));
+
+    // The logo takes the host page's accent (--accent-orange), so it is purple on
+    // Virtual Cooking, orange on Mac-Lamp, pink on Unify, the room colour in 3D… Pages on the default blue
+    // keep the stylesheet's #809BBC / #475F7E pair; a page with its own accent gets
+    // a hover darkened from it.
+    (function () {
+      function syncLogo() {
+        let c = '';
+        try {
+          c = getComputedStyle(window.parent.document.documentElement)
+            .getPropertyValue('--accent-orange').trim();
+        } catch (e) {}
+        const root = document.documentElement.style;
+        if (!c || c.toUpperCase() === '#809BBC') {
+          root.removeProperty('--logo-color');
+          root.removeProperty('--logo-hover');
+          return;
+        }
+        // A page may set how dark the hover gets (--accent-hover-mix, default 30%).
+        let mixv = '';
+        try {
+          mixv = getComputedStyle(window.parent.document.documentElement)
+            .getPropertyValue('--accent-hover-mix').trim();
+        } catch (e) {}
+        root.setProperty('--logo-color', c);
+        root.setProperty('--logo-hover', 'color-mix(in oklch, ' + c + ', black ' + (mixv || '30%') + ')');
+      }
+      syncLogo();
+      window.addEventListener('load', syncLogo);
+      try { window.parent.addEventListener('load', syncLogo); } catch (e) {}
+      // The 3D page changes its accent as you walk between rooms (src/main.js,
+      // ROOM_ACCENTS) and posts each step of the fade here.
+      window.addEventListener('message', e => {
+        if (e.data && e.data.type === 'accent') syncLogo();
+      });
+    })();
+
+    document.getElementById('logo-btn').addEventListener('click', e => {
+      e.preventDefault();
+      if (IS_2D_VIEW) {
+        if (window.top.location.pathname === '/2D.html' || IS_COLOR_PREVIEW) {
+          window.top.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          window.top.location.href = '/2D.html';
+        }
+      } else if (window.top.resetScene) {
+        window.top.resetScene();
+      }
+    });
+
+    (function () {
+      const is2DView = IS_2D_VIEW;
+      const isAbout2D = PARENT_PATH.includes('about2d');
+      const navIsland = document.querySelector('.nav-island');
+
+      // 3D view: clip hover shadow bleed to the island's own rounded edge
+      // (see .nav-island.is-3d-view rule above) — not needed in 2D.
+      if (!is2DView) {
+        navIsland.classList.add('is-3d-view');
+      }
+
+      // 2D-mode shading. Over a full-bleed `.hero` image the nav stays
+      // transparent; the raised pill turns on the moment it scrolls past the
+      // hero. Pages without a full-bleed `.hero` keep the pill on always.
+      //
+      // `.hero` is queried LIVE on every call (not cached once) and
+      // updateNavShadow is retriggered on load/DOMContentLoaded/rAF/timeout —
+      // this beats the iframe-vs-parent race that used to leave the shadow
+      // stuck (missing, or wrongly on over the hero) until a manual refresh.
+      if (is2DView) {
+        // (A paint test that dropped the shading whenever a picture sat behind the bar lived
+        // here until 2026-10-19 — see the note in updateNavShadow. Git history has it.)
+
+        function updateNavShadow() {
+          var doc = window.top.document;
+          // 2026-10-19: the "bar over a picture -> drop the shading" paint test is gone. Its
+          // reason (light-grey shadow + white highlight reading as a halo on pictures) no longer
+          // exists: shadows now darken what is under them and the light is cut out over
+          // pictures (.nav-light). It also blinked the shading off/on while a picture slid past
+          // the bar. Only the full-bleed hero rule below remains, now at every width.
+          var hero = doc.querySelector('.hero');
+          if (hero && hero.offsetHeight > 0) {
+            navIsland.classList.toggle('is-2d-mode', window.top.scrollY > hero.offsetHeight - 60);
+          } else if (!hero && doc.readyState !== 'loading') {
+            // No full-bleed hero anywhere in the parent → pill always on.
+            //
+            // Gated on readyState !== 'loading' (i.e. 'interactive' OR 'complete'), NOT on
+            // 'complete'. 'interactive' means the document is fully PARSED, which is all
+            // that is needed to know whether a `.hero` exists — it is static markup on
+            // every page. 'complete' additionally waits for every image, video and iframe
+            // to finish downloading, and the hero-less pages (2D.html, about2d,
+            // unify2d) are exactly the ones carrying the heavy media: the
+            // homepage alone pulls ~16 MB across 3 videos + 2 large images. That made the
+            // nav sit un-shaded for several seconds on the real domain, then fade in (the
+            // fade being the 260ms box-shadow transition finally running), while localhost
+            // hid the bug completely by serving everything off disk instantly.
+            navIsland.classList.add('is-2d-mode');
+          }
+          // else: a `.hero` exists but has no layout yet — stay undecided and let a later
+          // call settle it. Deliberately NOT treated as "no hero": adding the shadow here
+          // would flash it on over a hero image and then toggle it back off.
+        }
+        // rAF-throttled on scroll: the paint test runs nine hit tests plus a
+        // getComputedStyle walk per sample, which must not happen more than once
+        // per frame. That applied to the mobile branch alone before; the test is
+        // shared now, so the throttle matters at every width.
+        var navTick = false;
+        function requestNavShadow() {
+          if (navTick) return;
+          navTick = true;
+          requestAnimationFrame(function () { navTick = false; updateNavShadow(); });
+        }
+        window.top.addEventListener('scroll', requestNavShadow, { passive: true });
+        window.top.addEventListener('resize', requestNavShadow, { passive: true });
+        window.top.addEventListener('load', updateNavShadow);
+        if (window.top.document.readyState !== 'complete') {
+          window.top.document.addEventListener('DOMContentLoaded', updateNavShadow);
+        }
+        updateNavShadow();
+        requestAnimationFrame(updateNavShadow);
+        setTimeout(updateNavShadow, 120);
+        setTimeout(updateNavShadow, 500);
+      }
+
+      // Set initial active state based on current page
+      const modeSegs = document.querySelectorAll('[data-mode]');
+      modeSegs.forEach(s => {
+        const on = is2DView ? s.dataset.mode === '2d' : s.dataset.mode === '3d';
+        s.classList.toggle('is-active', on);
+        s.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+
+      // Set nav pill active state
+      const pageTabs = document.querySelectorAll('[data-page]');
+      pageTabs.forEach(seg => {
+        let isActive = false;
+        if (seg.dataset.page === 'about' && isAbout2D) isActive = true;
+        seg.classList.toggle('is-active', isActive);
+        seg.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      document.querySelectorAll('.pill').forEach(group => {
+        const segs = group.querySelectorAll('.pill__seg');
+        segs.forEach(seg => {
+          seg.addEventListener('click', e => {
+            if (seg.tagName === 'A') e.preventDefault();
+            if (seg.classList.contains('is-active')) {
+              if (seg.dataset.mode === '2d') window.top.location.href = '/2D.html';
+              if (seg.dataset.mode === '3d' && window.top.resetScene) window.top.resetScene();
+              return;
+            }
+            segs.forEach(s => {
+              const on = s === seg;
+              s.classList.toggle('is-active', on);
+              s.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+            if (seg.dataset.mode === '2d') {
+              window.top.location.href = '/2D.html';
+            } else if (seg.dataset.mode === '3d') {
+              // _enter3d marks a deliberate switch to 3D — without it the "/"
+              // guard on index.html forwards straight back to /2D.html.
+              try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
+              sessionStorage.setItem('_sv', 'right');
+              window.top.location.href = '/gallery-4.html';
+            } else if (seg.dataset.page === 'about') {
+              if (is2DView) {
+                window.top.location.href = '/about2d.html';
+              } else {
+                window.top.openAboutOverlay();
+              }
+            }
+          });
+        });
+      });
+    })();
+
+    // ── Hamburger → tell parent page to toggle the mobile menu ──
+    document.getElementById('hamburger-btn').addEventListener('click', () => {
+      window.parent.postMessage({ type: 'mobile-menu-toggle' }, '*');
+    });
+
+    // ── Help button → open controls overlay (3D only) ────────────
+    (function () {
+      const helpBtn = document.getElementById('help-btn');
+      if (IS_2D_VIEW) helpBtn.style.setProperty('display', 'none', 'important');
+      helpBtn.addEventListener('click', () => {
+        window.parent.postMessage({ type: 'openControls' }, '*');
+      });
+    })();
+
+    // ── Language toggle ───────────────────────────────────────────
+    (function() {
+      const NAV_LANG = {
+        en: { about: 'About' },
+        de: { about: 'Über mich' }
+      };
+      function applyNavLang(l) {
+        const t = NAV_LANG[l] || NAV_LANG.en;
+        document.querySelector('[data-page="about"]').textContent = t.about;
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === l);
+        });
+      }
+      // French was removed — coerce any old stored 'fr' preference back to English
+      let initLang = localStorage.getItem('lang') || 'de';
+      if (initLang === 'fr') { initLang = 'en'; localStorage.setItem('lang', 'en'); }
+      applyNavLang(initLang);
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const l = btn.dataset.lang;
+          localStorage.setItem('lang', l);
+          applyNavLang(l);
+          try { window.parent.postMessage({ type: 'lang-change', lang: l }, '*'); } catch(e) {}
+        });
+      });
+      // The mobile menu's own DE/EN toggle (the bar's pair is hidden below
+      // 640px) posts the change in here rather than translating the page
+      // itself, so this iframe stays the single place that owns language.
+      // Re-broadcasting to the parent is what actually translates the page —
+      // every page already listens for 'lang-change'. No loop: the parent's
+      // handlers only apply, they never post back.
+      window.addEventListener('message', e => {
+        if (!e.data || e.data.type !== 'lang-change') return;
+        applyNavLang(e.data.lang);
+        try { window.parent.postMessage({ type: 'lang-change', lang: e.data.lang }, '*'); } catch(err) {}
+      });
+      setTimeout(() => {
+        try { window.parent.postMessage({ type: 'lang-change', lang: localStorage.getItem('lang') || 'de' }, '*'); } catch(e) {}
+      }, 100);
+    })();
+  </script>
+
+  <script>
+    /* Bar light only on the plain page background (2026-10-19, Lucas).
+       The light follows the bar (same on/off as its shadow via .is-2d-mode) and is clipped: every
+       non-background element of the parent page (see collect) that touches the light band gets a hole, shaped
+       like its visible frame (nearest of element/parent/grandparent with a corner radius). */
+    (function () {
+      var light = document.querySelector('.nav-light');
+      var shape = light && light.querySelector('.nav-light-shape');
+      var island = document.querySelector('.nav-island');
+      if (!light || !shape || !island) return;
+      var topWin;
+      try { topWin = window.top; void topWin.document.body; } catch (e) { return; }
+
+      function syncOn() {
+        var on = island.classList.contains('is-2d-mode');
+        light.classList.toggle('on', on);
+        if (on) request();   // catch up: update() idles while the light is off
+      }
+      new MutationObserver(syncOn).observe(island, { attributes: true, attributeFilter: ['class'] });
+      syncOn();
+
+      var frames = [], zones = [];
+      // Phone sections (Lucas): while the bar is over any of these the light goes away entirely
+      // instead of being cut out piece by piece — morrow's Windows-phone row and colour fan,
+      // the staggered phones, every phone shot (morrow + Unify) and Unify's iMessage stage (its
+      // big blue bubble only exists mid-animation, so it cannot be collected as a box).
+      var ZONE_SELECTOR = '.win-devices-inner, .fan-sticky, .stagger-figure, .phone-shot, .imsg-stage';
+      // Everything that is not plain page background gets a hole: img/video/canvas, root <svg>
+      // (charts), anything with a background image or gradient, and anything with an opaque
+      // background colour that differs from the page colour (dark bar charts, card panels,
+      // phone frames, the survey bars, chat bubbles, View Work pills). Text stays lit.
+      // Nested hits are dropped (a pink card inside a dark panel): overlapping holes would
+      // cancel each other out under evenodd. Page-sized boxes are skipped so a wrapper in a
+      // different colour can never cut the whole light away.
+      function collect() {
+        var doc = topWin.document, out = [];
+        function rgba(c) {
+          var m = /rgba?\(([^)]+)\)/.exec(c || '');
+          if (!m) return null;
+          var v = m[1].split(',').map(parseFloat);
+          return { r: v[0], g: v[1], b: v[2], a: v.length > 3 ? v[3] : 1 };
+        }
+        var surface = rgba(topWin.getComputedStyle(doc.body).backgroundColor) || { r: 220, g: 220, b: 227 };
+        function differs(c) {
+          var k = rgba(c);
+          return !!k && k.a >= 0.5 && Math.abs(k.r - surface.r) + Math.abs(k.g - surface.g) + Math.abs(k.b - surface.b) > 12;
+        }
+        var vw = topWin.innerWidth, vh = topWin.innerHeight;
+        var picked = [], skipRoots = [];
+        doc.querySelectorAll('body *').forEach(function (el) {
+          for (var k = 0; k < skipRoots.length; k++) if (skipRoots[k].contains(el)) return;
+          var tag = el.tagName;
+          if (tag === 'IFRAME' || tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return;
+          if (el instanceof topWin.SVGElement && tag.toLowerCase() !== 'svg') return;   // only the svg root
+          var cs = topWin.getComputedStyle(el);
+          // Fixed layers (the hidden mobile-menu overlay, scroll dots) never sit in the page flow
+          // under the bar; a hidden full-screen overlay would otherwise cut away all the light.
+          // Opacity is NOT checked on purpose: sections that fade in on scroll start at 0.
+          if (cs.position === 'fixed' || cs.visibility === 'hidden') { skipRoots.push(el); return; }
+          // Background images count, gradients too, except hover underlines (a gradient sized
+          // to a 1px line, e.g. "0% 1px") which are text decoration, not a surface.
+          var bi = cs.backgroundImage;
+          var hit = tag === 'IMG' || tag === 'VIDEO' || tag === 'CANVAS' || tag.toLowerCase() === 'svg' ||
+            bi.indexOf('url(') >= 0 || (bi !== 'none' && !/(^|\s)1px\b/.test(cs.backgroundSize)) ||
+            differs(cs.backgroundColor);
+          if (!hit) return;
+          var b = el.getBoundingClientRect();
+          if (b.width >= vw * 0.98 && b.height >= vh * 2) return;   // page-sized background
+          picked.push(el);
+        });
+        // frame = nearest of element / parent / grandparent with a corner radius (the visible shape)
+        var seen = [];
+        picked.forEach(function (el) {
+          var f = el, r = 0;
+          for (var i = 0; i < 3 && f && f !== doc.body; i++, f = f.parentElement) {
+            r = parseFloat(topWin.getComputedStyle(f).borderTopLeftRadius) || 0;
+            if (r > 0) break;
+          }
+          if (!(r > 0) || !f || f === doc.body) { f = el; r = 0; }
+          if (seen.indexOf(f) < 0) { seen.push(f); out.push({ el: f, r: r }); }
+        });
+        // drop frames that sit inside another frame
+        out = out.filter(function (o) {
+          for (var p = o.el.parentElement; p && p !== doc.body; p = p.parentElement) {
+            if (seen.indexOf(p) >= 0) return false;
+          }
+          return true;
+        });
+        frames = out;
+        zones = [].slice.call(doc.querySelectorAll(ZONE_SELECTOR));
+      }
+
+      function rr(x, y, w, h, r) {
+        r = Math.max(0, Math.min(r, w / 2, h / 2));
+        return 'M' + (x + r) + ' ' + y + 'H' + (x + w - r) +
+          'A' + r + ' ' + r + ' 0 0 1 ' + (x + w) + ' ' + (y + r) + 'V' + (y + h - r) +
+          'A' + r + ' ' + r + ' 0 0 1 ' + (x + w - r) + ' ' + (y + h) + 'H' + (x + r) +
+          'A' + r + ' ' + r + ' 0 0 1 ' + x + ' ' + (y + h - r) + 'V' + (y + r) +
+          'A' + r + ' ' + r + ' 0 0 1 ' + (x + r) + ' ' + y + 'Z';
+      }
+
+      var lastClip = null, lastY = topWin.scrollY;
+      function update() {
+        // Idle while the light is off (over a hero, in 3D): nothing to cut.
+        var dy = topWin.scrollY - lastY; lastY = topWin.scrollY;
+        if (!light.classList.contains('on')) return;
+        // Lag guard: where scrolling runs on its own thread (Safari) the scroll event can land a
+        // frame after the page moved, so each hole is stretched by the last scroll step in the
+        // direction of travel (max 40px). Fast scrolling hides the light a touch early at picture
+        // edges instead of flashing it over them.
+        var lag = Math.min(40, Math.abs(dy));
+        var ir = island.getBoundingClientRect();
+        shape.style.left = ir.left + 'px'; shape.style.top = ir.top + 'px';
+        shape.style.width = ir.width + 'px'; shape.style.height = ir.height + 'px';
+        var fe = window.frameElement, fr = fe ? fe.getBoundingClientRect() : { left: 0, top: 0 };
+        var W = window.innerWidth, H = window.innerHeight, pad = 30, holes = '';
+        var fe0 = window.frameElement, f0 = fe0 ? fe0.getBoundingClientRect() : { left: 0, top: 0 };
+        for (var z = 0; z < zones.length; z++) {
+          var zb = zones[z].getBoundingClientRect();
+          if (!zb.width || !zb.height) continue;
+          var zx = zb.left - f0.left, zy = zb.top - f0.top;
+          if (zx < ir.right + pad && zx + zb.width > ir.left - pad && zy < ir.bottom + pad + lag && zy + zb.height > ir.top - pad - lag) {
+            var none = 'inset(50%)';   // clip everything: no light while a phone section is under the bar
+            if (none !== lastClip) { light.style.clipPath = none; light.style.webkitClipPath = none; lastClip = none; }
+            return;
+          }
+        }
+        for (var i = 0; i < frames.length; i++) {
+          var b = frames[i].el.getBoundingClientRect();
+          if (!b.width || !b.height) continue;
+          var x = b.left - fr.left, y = b.top - fr.top;
+          if (x > ir.right + pad || x + b.width < ir.left - pad || y > ir.bottom + pad + lag || y + b.height < ir.top - pad - lag) continue;
+          var yy = dy > 0 ? y - lag : y, hh = b.height + lag;
+          holes += rr(x, yy, b.width, hh, frames[i].r);
+        }
+        // clip-path, not mask-image: a new data-URL mask every frame had to be decoded first and
+        // the light flickered in the gap; a path is applied synchronously.
+        var clip = holes ? 'path(evenodd, "M0 0H' + W + 'V' + H + 'H0Z' + holes + '")' : 'none';
+        if (clip !== lastClip) { light.style.clipPath = clip; light.style.webkitClipPath = clip; lastClip = clip; }
+      }
+
+      var ticking = false;
+      function request() { if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; update(); }); } }
+      function recollect() { collect(); request(); }
+      // Scroll updates synchronously (before the frame is painted); deferring to rAF left the
+      // holes one frame behind the page and the light flashed over picture edges.
+      topWin.addEventListener('scroll', update, { passive: true });
+      topWin.addEventListener('resize', recollect, { passive: true });
+      window.addEventListener('resize', request, { passive: true });
+      topWin.addEventListener('load', recollect);
+      if (topWin.document.readyState === 'loading') topWin.document.addEventListener('DOMContentLoaded', recollect);
+      recollect();
+      setTimeout(recollect, 500);
+      setTimeout(recollect, 2000);   // late content (lazy media, scripted sections)
+    })();
+  </script>
+</body>
+
+</html>
