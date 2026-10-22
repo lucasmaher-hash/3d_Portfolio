@@ -27,8 +27,8 @@ export const LAMP_ORANGE = { opacity: 0.92, glow: 0.43, roughness: 0 }
 // multiplier, and the streaks (~0.5 mean) swing roughness around the set value — so 0.11 at
 // texture 0 renders as ~0.05 with a faint grain. Kept that way because it is what Lucas tuned.
 export const LAMP_GREY = { brightness: 0.94, metalness: 0.61, roughness: 0.11, glow: 0.3, texture: 0 }
-export const EGG_SILVER = { brightness: 1.5, metalness: 1, roughness: 0, glow: 1.05, texture: 0 }   // Lucas, 2026-10-22
-export const EGG_BUTTONS = { brightness: 1, metalness: 0, roughness: 0.12, glow: 0 }   // authored; being dialled
+export const EGG_SILVER = { brightness: 2.02, metalness: 1, roughness: 0, glow: 1.05, texture: 0 }   // Lucas, 2026-10-22
+export const EGG_BUTTONS = { brightness: 1.97, metalness: 0, roughness: 0.12, glow: 0.15 }   // Lucas, 2026-10-22
 export const PANEL_SILVER = { brightness: 3.17, metalness: 1, roughness: 0.14, glow: 3.89, texture: 1.5 }   // Lucas, 2026-10-22
 
 // Virtual Cooking's step tiles above the purple one (M_Seg, a plain light grey dielectric).
@@ -103,12 +103,11 @@ function metalGrey(model) {
   metalFinish(meshes.flatMap(m => [m.material].flat()), LAMP_GREY, null,
     { base: new THREE.Color(1, 1, 1), emissive: new THREE.Color().setRGB(0.58, 0.58, 0.58) })
   const egg = materialsNamed(model, 'M_Silver_Egg')
-  if (egg.length) metalFinish(egg, EGG_SILVER, 'Cybercoffee silver', { base: egg[0].color.clone(), max: { brightness: 5, glow: 6 } })
-  // The egg's white buttons (M_ShinyWhite, only on egg-rig). Defaults = authored look; being
-  // dialled in (2026-10-22), dev only.
+  if (egg.length) metalFinish(egg, EGG_SILVER, null, { base: egg[0].color.clone(), max: { brightness: 5, glow: 6 } })
+  // The egg's white buttons (M_ShinyWhite, only on egg-rig).
   const eggRig = model.getObjectByName('egg-rig')
   const white = eggRig ? materialsNamed(eggRig, 'M_ShinyWhite') : []
-  if (import.meta.env.DEV && white.length) {
+  if (white.length) {
     const whiteBase = white[0].color.clone()
     const applyWhite = () => {
       for (const mat of white) {
@@ -120,10 +119,6 @@ function metalGrey(model) {
       }
     }
     applyWhite()
-    addDial('Cybercoffee buttons', EGG_BUTTONS, [
-      ['brightness', 'Brightness', 0.05, 3, 0.01], ['metalness', 'Metalness', 0, 1, 0.01],
-      ['roughness', 'Roughness', 0, 1, 0.01], ['glow', 'Glow', 0, 3, 0.01],
-    ], applyWhite)
   }
   const panel = materialsNamed(model, 'M_Silver_Panel')
   if (panel.length) metalFinish(panel, PANEL_SILVER, null, { base: panel[0].color.clone() })
