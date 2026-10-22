@@ -13,14 +13,22 @@ import * as THREE from 'three'
 // lowering opacity alone would read as grey ghost-metal. It becomes an orange dielectric with
 // part of the glow kept, then transparent. depthWrite off so the two parts never punch holes
 // into each other; FrontSide so a part does not show its own inside walls.
-// Under `npm run dev` the grey-metal dial (bottom right) is shown; nothing of it ships.
+// Under `npm run dev` the silver dials (bottom right) are shown; nothing of them ships.
 // Values dialled in by Lucas on 2026-10-22.
 export const LAMP_ORANGE = { opacity: 0.92, glow: 0.43, roughness: 0 }
 
-// The light grey parts (Lamp_Grey: also black metal + grey glow) become brushed metal: darker,
-// truly metallic so they reflect the gallery's probe, with a fine streak texture driving
-// roughness and bump. `brightness` is the linear base colour, `texture` the streak strength.
-export const LAMP_GREY = { brightness: 0.75, metalness: 1, roughness: 0.32, glow: 0.22, texture: 0.3 }
+// Metal finish for three exhibits, one value set each (same five dials):
+//  - Mac-Lamp's light grey parts (Lamp_Grey, authored as black metal + grey glow), values
+//    dialled in by Lucas on 2026-10-22;
+//  - Cybercoffee's silver egg (M_Silver_Egg) and Virtual Cooking's silver panel
+//    (M_Silver_Panel), defaults = their authored values, still being dialled (dev dial).
+// colour = base x brightness, emissive = authored emissive x glow. The brushed streak texture
+// is always attached as roughness + bump map: `texture` scales the bump and the roughness
+// multiplier, and the streaks (~0.5 mean) swing roughness around the set value — so 0.11 at
+// texture 0 renders as ~0.05 with a faint grain. Kept that way because it is what Lucas tuned.
+export const LAMP_GREY = { brightness: 0.94, metalness: 0.61, roughness: 0.11, glow: 0.3, texture: 0 }
+export const EGG_SILVER = { brightness: 1, metalness: 1, roughness: 0.14, glow: 1, texture: 0 }
+export const PANEL_SILVER = { brightness: 1, metalness: 1, roughness: 0.14, glow: 1, texture: 0 }
 
 const NAMES = ['Base_Orange_Table', 'VerticalPlate_Orange_Table']
 const GREY_NAMES = ['Back_Grey_Panel_Table', 'KB_Grey_Panel_Table', 'Trackpad_Back_Grey_Table', 'Trackpad_Front_Grey_Table']
@@ -50,36 +58,51 @@ function brushedTexture() {
   return t
 }
 
-function metalGrey(model) {
-  // Still being dialled in (2026-10-22): local dev only, the live site keeps the old grey.
-  if (!import.meta.env.DEV) return
-  const meshes = GREY_NAMES.map(n => model.getObjectByName(n)).filter(o => o && o.isMesh)
-  const materials = meshes.flatMap(m => [m.material].flat())
+let brushed = null
+function metalFinish(materials, values, title, { base, emissive }) {
   if (!materials.length) return
-  const tex = brushedTexture()
-  const grey = new THREE.Color().setRGB(0.58, 0.58, 0.58)   // the authored emissive grey
+  brushed = brushed || brushedTexture()
   for (const mat of materials) {
-    mat.roughnessMap = tex
-    mat.bumpMap = tex
-    mat.emissive.copy(grey)
+    mat.roughnessMap = brushed
+    mat.bumpMap = brushed
+    if (emissive) mat.emissive.copy(emissive)
     mat.needsUpdate = true
   }
+  const baseColor = base.clone(), baseEm = materials[0].emissive.clone()
   const apply = () => {
-    const k = LAMP_GREY
+    const k = values
     for (const mat of materials) {
-      mat.color.setScalar(k.brightness)
+      mat.color.copy(baseColor).multiplyScalar(k.brightness)
       mat.metalness = k.metalness
-      // roughnessMap multiplies: the streaks (~0.5 mean) swing roughness around the set value.
       mat.roughness = Math.min(1, k.roughness * (1 + k.texture))
       mat.bumpScale = k.texture * 0.6
+      mat.emissive.copy(baseEm)
       mat.emissiveIntensity = k.glow
     }
   }
   apply()
-  if (import.meta.env.DEV) addDial('Mac-Lamp grey metal', LAMP_GREY, [
-    ['brightness', 'Brightness', 0.05, 1, 0.01], ['metalness', 'Metalness', 0, 1, 0.01],
-    ['roughness', 'Roughness', 0, 1, 0.01], ['glow', 'Glow', 0, 1, 0.01], ['texture', 'Brush texture', 0, 1.5, 0.01],
+  if (import.meta.env.DEV && title) addDial(title, values, [
+    ['brightness', 'Brightness', 0.05, 1.5, 0.01], ['metalness', 'Metalness', 0, 1, 0.01],
+    ['roughness', 'Roughness', 0, 1, 0.01], ['glow', 'Glow', 0, 1.5, 0.01], ['texture', 'Brush texture', 0, 1.5, 0.01],
   ], apply)
+}
+
+const materialsNamed = (model, name) => {
+  const out = []
+  model.traverse(o => { if (o.isMesh) for (const m of [o.material].flat()) if (m.name === name && !out.includes(m)) out.push(m) })
+  return out
+}
+
+function metalGrey(model) {
+  const meshes = GREY_NAMES.map(n => model.getObjectByName(n)).filter(o => o && o.isMesh)
+  metalFinish(meshes.flatMap(m => [m.material].flat()), LAMP_GREY, null,
+    { base: new THREE.Color(1, 1, 1), emissive: new THREE.Color().setRGB(0.58, 0.58, 0.58) })
+  // Silver: still being dialled in (2026-10-22), dev only — the live site keeps the authored look.
+  if (!import.meta.env.DEV) return
+  for (const [name, values, title] of [['M_Silver_Egg', EGG_SILVER, 'Cybercoffee silver'], ['M_Silver_Panel', PANEL_SILVER, 'Virtual Cooking silver']]) {
+    const mats = materialsNamed(model, name)
+    if (mats.length) metalFinish(mats, values, title, { base: mats[0].color.clone() })
+  }
 }
 
 export async function roundAndTintMacLamp(model, gltfLoader) {
@@ -118,9 +141,16 @@ export async function roundAndTintMacLamp(model, gltfLoader) {
 
 // DEV ONLY (npm run dev): a small panel to dial the look in. Never in the build.
 function addDial(title, values, rows, apply) {
+  let col = document.getElementById('dev-dials')
+  if (!col) {
+    col = document.createElement('div')
+    col.id = 'dev-dials'
+    col.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:9998;display:flex;gap:8px;align-items:flex-end'
+    document.body.append(col)
+  }
   const box = document.createElement('div')
-  box.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:9998;background:rgba(20,20,24,.82);color:#eee;' +
-    'font:12px/1.4 system-ui,sans-serif;padding:10px 12px;border-radius:10px;width:230px'
+  box.style.cssText = 'background:rgba(20,20,24,.82);color:#eee;' +
+    'font:12px/1.4 system-ui,sans-serif;padding:10px 12px;border-radius:10px;width:210px'
   const out = document.createElement('div')
   out.style.cssText = 'margin-top:6px;opacity:.75;user-select:all;word-break:break-all'
   const show = () => { out.textContent = JSON.stringify(values) }
@@ -141,5 +171,5 @@ function addDial(title, values, rows, apply) {
   }
   for (const t of ['pointerdown', 'mousedown', 'click', 'wheel', 'touchstart']) box.addEventListener(t, e => e.stopPropagation())
   box.append(out)
-  document.body.append(box)
+  col.append(box)
 }
