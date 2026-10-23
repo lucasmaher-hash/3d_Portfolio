@@ -1,0 +1,121 @@
+<!doctype html>
+<!-- Stage for the Cybercoffee landing loop (render.mjs films it frame by frame).
+     The real interactive machine (with the 3D egg) in an iframe, framed exactly like the
+     old loop (coffeemachine_interface_video.mov), on the hero render's navy, with a
+     touch-style cursor: a soft circle that presses down and rings out when it touches.
+     The steps and their timing are the old loop's, read off its frames (see TIMELINE).
+     Dev-only: served by the Vite dev server from the repo root, never built. -->
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; overflow: hidden; background: #131A2F; }   /* hero render's navy, rgb(19,26,47) */
+  #stage { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+  iframe { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0; background: transparent; }
+  #cursor { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; z-index: 5; }
+  #cursor .dot, #cursor .ring { position: absolute; left: 0; top: 0; border-radius: 50%; transform: translate(-50%, -50%); }
+  #cursor .dot { width: 62px; height: 62px; background: rgba(110,122,150,.32); border: 2.5px solid rgba(255,255,255,.92);
+    box-shadow: 0 4px 14px rgba(0,0,0,.28); box-sizing: border-box; }
+  #cursor .ring { width: 62px; height: 62px; border: 2.5px solid rgba(255,255,255,.9); box-sizing: border-box; opacity: 0; }
+</style></head>
+<body><div id="stage">
+  <iframe id="m" src="/kaffeemaschine/kaffeemaschine.html"></iframe>
+  <div id="cursor"><div class="ring"></div><div class="dot"></div></div>
+</div>
+<script>
+// Framing: the old loop is 1064x1104 with the egg's x 22..946 / y 91.5..1187 (Figma frame
+// px of .machine) at 0.9924 video px per frame px, egg top 8 px from the frame's top and
+// centred. This stage is either 1064 (phone) or 1340 (desktop tile, 680/560) wide at
+// 1104 tall; the egg stays centred, so the phone cut is the desktop cut's middle.
+const SCALE = 0.9924, MACHINE_W = 969 * SCALE, MACHINE_TOP = 8 - 91.54 * SCALE
+const frame = document.getElementById('m')
+const cur = document.getElementById('cursor'), dot = cur.querySelector('.dot'), ring = cur.querySelector('.ring')
+
+frame.addEventListener('load', () => {
+  const d = frame.contentDocument, st = d.createElement('style')
+  st.textContent = `body{padding-top:0!important;background:transparent!important}
+    .machine{width:${MACHINE_W}px!important;margin-top:${MACHINE_TOP}px}
+    *{cursor:none!important}`
+  d.head.append(st)
+})
+
+// ── where things are, in stage px ──
+function rectOf(sel) {
+  const d = frame.contentDocument
+  let el
+  if (sel.startsWith('btn:')) el = d.querySelector('.btn-' + sel.slice(4))
+  else if (sel.startsWith('cell:')) el = [...d.querySelectorAll('.grid-cell:not(.empty):not(.no-border)')]
+    .find(c => (c.getAttribute('onclick') || '').includes("'" + sel.slice(5) + "'"))
+  if (!el) return null
+  const r = el.getBoundingClientRect()
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }
+}
+// Side buttons are touched a little inside their inner edge (where a thumb would land),
+// not at the box centre, which sits half off the egg's curve.
+function aim(sel) {
+  const p = rectOf(sel); if (!p) return null
+  if (sel.startsWith('btn:')) {
+    // toward the screen and onto the chevron, which sits low on the top buttons and high
+    // on the bottom ones
+    const side = sel[4] === 'L' ? 1 : -1, row = +sel[5]
+    p.x += side * 0.14 * p.w
+    p.y += row === 1 ? 0.1 * p.h : row === 3 ? -0.1 * p.h : 0
+  }
+  return p
+}
+
+// ── the old loop's steps (seconds) ──
+// move: travel from wherever the cursor is to `to` between t0 and t1 (eased in and out);
+// press: touch at t (circle presses, ring rings out) and press that machine button.
+const TIMELINE = [
+  { move: 'btn:R2', t0: 0.30, t1: 0.75 }, { press: 'R2', t: 0.85 },
+  { move: 'btn:R1', t0: 1.60, t1: 2.60 }, { press: 'R1', t: 2.90 },
+  { move: 'cell:L1', t0: 3.60, t1: 4.30 }, { move: 'btn:L1', t0: 4.45, t1: 4.85 }, { press: 'L1', t: 4.95 },
+  { move: 'btn:L2', t0: 5.60, t1: 6.30 }, { press: 'L2', t: 6.65 },
+  { move: 'cell:R2', t0: 6.95, t1: 7.65 }, { move: 'btn:R2', t0: 7.80, t1: 8.25 }, { press: 'R2', t: 8.40 },
+  { move: 'btn:R3', t0: 8.90, t1: 9.60 }, { press: 'R3', t: 9.95 },
+  { press: 'R3', t: 11.00 },
+  { press: 'R3', t: 12.25 },
+  // The old loop then picked the empty favourite slot and pressed ADD. The app has changed
+  // since: in preparation, R3 is REPLACE and saves the preset in one press ("UPDATED", then
+  // back to the brew), so the same moment is one press, and the cursor rests on R3 while the
+  // brew finishes into "here's your coffee", as in the old loop.
+  { press: 'R3', t: 16.40 },
+]
+const ease = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2   // easeInOutCubic
+const easeOut = x => 1 - Math.pow(1 - x, 3)
+
+let t0 = null, pos = null, seg = null, segFrom = null, segTo = null, fired = new Set(), lastPress = -9
+window.__filmReady = () => !!(frame.contentDocument && frame.contentDocument.querySelector('.machine.egg3d-ready') && frame.contentWindow.pressButton)
+window.__filmStart = () => {
+  t0 = performance.now()
+  pos = aim('btn:R3')   // rests on R3 at the start and the end, so the loop closes
+  draw(0)
+}
+function draw(t) {
+  // movement
+  const m = TIMELINE.find(e => e.move && t >= e.t0 && t <= e.t1 + 1e-6)
+  if (m && seg !== m) { seg = m; segFrom = { ...pos }; segTo = aim(m.move) || segFrom }
+  if (m) { const k = ease(Math.min(1, (t - m.t0) / (m.t1 - m.t0))); pos = { x: segFrom.x + (segTo.x - segFrom.x) * k, y: segFrom.y + (segTo.y - segFrom.y) * k } }
+  else if (seg) { pos = { ...segTo }; seg = null }
+  // presses
+  for (const e of TIMELINE) if (e.press && t >= e.t && !fired.has(e)) {
+    fired.add(e); lastPress = e.t
+    try { frame.contentWindow.pressButton(e.press) } catch (err) { console.error(err) }
+  }
+  // touch visual: approach (0.08 s before) → down → release (0.22 s) ; ring 0.5 s
+  const nextPress = TIMELINE.find(e => e.press && e.t >= t)
+  const before = nextPress ? nextPress.t - t : 9, after = t - lastPress
+  let down = 0
+  if (before < 0.08) down = easeOut(1 - before / 0.08)
+  if (after >= 0 && after < 0.22) down = Math.max(down, 1 - ease(after / 0.22))
+  dot.style.transform = `translate(-50%,-50%) scale(${1 - 0.18 * down})`
+  dot.style.background = `rgba(110,122,150,${0.32 + 0.3 * down})`
+  if (after >= 0 && after < 0.5) {
+    const k = easeOut(after / 0.5)
+    ring.style.opacity = String(0.9 * (1 - after / 0.5))
+    ring.style.transform = `translate(-50%,-50%) scale(${1 + 1.1 * k})`
+  } else ring.style.opacity = '0'
+  cur.style.transform = `translate(${pos.x}px, ${pos.y}px)`
+}
+function loop() { if (t0 !== null) draw((performance.now() - t0) / 1000); requestAnimationFrame(loop) }
+requestAnimationFrame(loop)
+</script></body></html>

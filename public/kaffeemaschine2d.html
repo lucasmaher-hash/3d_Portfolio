@@ -147,12 +147,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(220, 220, 227, 0.68);
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
+      /* A blurred STILL of the 3D egg (2026-10-23), not a backdrop-filter over the live
+         iframe: Safari blurred a stale frame of the old flat egg there. The still is
+         /images/cybercoffee/machine-overlay.webp (scripts/kaffeemaschine/film/
+         overlay-still.mjs), rendered at this box's own size; the live iframe stays
+         invisible under it until the overlay is clicked away. */
+      background: none;
       cursor: pointer;
       transition: opacity 350ms ease;
     }
+
+    .machine-overlay-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      filter: blur(3px); pointer-events: none;
+    }
+    .machine-overlay::before {
+      content: ''; position: absolute; inset: 0; z-index: 1;
+      background: rgba(220, 220, 227, 0.68);
+    }
+    .machine-overlay-btn { position: relative; z-index: 2; }
+    .machine-frame-wrap iframe { opacity: 0; transition: opacity 350ms ease; }
+    .machine-frame-wrap.live iframe { opacity: 1; }
 
     .machine-overlay.hidden {
       opacity: 0;
@@ -1148,6 +1163,7 @@
           <div class="machine-frame-wrap">
             <iframe src="/kaffeemaschine/kaffeemaschine.html" title="Cybercoffee" loading="lazy" allowtransparency="true"></iframe>
             <div class="machine-overlay" id="machine-overlay">
+              <img class="machine-overlay-img" src="/images/cybercoffee/machine-overlay.webp" alt="" aria-hidden="true">
               <button class="machine-overlay-btn"><span style="font-size: 1.6em; line-height: 1;">[</span><span style="position: relative; top: -5px;" data-i18n="machine-click"> click me </span><span style="font-size: 1.6em; line-height: 1;">]</span></button>
             </div>
           </div>
@@ -1282,6 +1298,7 @@
     (function() {
       const overlay = document.getElementById('machine-overlay');
       overlay.addEventListener('click', function() {
+        overlay.parentElement.classList.add('live');   // the live machine fades in under the fading still
         overlay.classList.add('hidden');
         setTimeout(() => overlay.style.display = 'none', 350);
       });
