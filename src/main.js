@@ -3501,7 +3501,9 @@ function closeControls() {
   isOverlayOpen = false
 }
 
-controlsOverlay.addEventListener('click', e => { if (e.target === controlsOverlay) closeControls() })
+// Any click closes it, inside the panel too (Lucas, 2026-10-23), like the welcome screen.
+// Clicks inside the iframe never reach this document, so the frame posts 'controls-dismiss'.
+controlsOverlay.addEventListener('click', closeControls)
 
 // The first-visit greeting is now the fullscreen controls intro in index.html
 // (shown after the loading screen), so the windowed overlay no longer auto-opens.
@@ -3511,6 +3513,7 @@ window.addEventListener('message', e => {
   if (e.data.type === 'openControls') {
     openControls()
   }
+  if (e.data.type === 'controls-dismiss' && controlsOverlay.classList.contains('open')) closeControls()
 })
 
 // ── About Overlay ────────────────────────────────────────────────

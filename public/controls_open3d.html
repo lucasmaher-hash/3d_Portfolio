@@ -661,6 +661,13 @@
       report();
     })();
   </script>
+  <script>
+    // A click/tap anywhere in the panel closes it (the parent hides the overlay), same as
+    // the welcome screen. A scroll gesture is not a click, so scrolling still works.
+    if (window.parent !== window) document.addEventListener('click', function () {
+      window.parent.postMessage({ type: 'controls-dismiss' }, '*');
+    });
+  </script>
   <script src="/js/room-accent.js"></script>
 </body>
 </html>
