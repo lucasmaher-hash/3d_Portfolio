@@ -2445,6 +2445,22 @@ The interactive coffee machine is a self-contained mini-app:
 - The machine's own CSS caps its width: `width: min(504px, 96vw)` — changing the wrapper size alone won't resize the egg; both files need updating
 - An overlay (`#machine-overlay`) grays out the machine on load with a bouncing "[ click me ]" prompt; clicking dismisses it via JS
 
+### The egg is real 3D now (2026-10-23, Lucas)
+
+`public/kaffeemaschine/egg3d.js` renders the modelled egg from the old 3D scene
+(`egg.glb`, 0.6 MB, exported from `egg-rig_staging` in `current🟢.glb` by
+`scripts/kaffeemaschine/export-egg.mjs` — the staging copy because there every part is its own
+node) into a canvas behind the app's HTML, with Three.js vendored under
+`public/kaffeemaschine/vendor/three/` (r184, importmap; `public/` is not bundled by Vite).
+An orthographic camera puts the egg exactly where the flat Figma egg was, then the HTML
+buttons are moved over their 3D parts as invisible hit areas and the screen content onto the
+3D screen. The app logic is untouched: egg3d.js only mirrors `.phys-pressed` (3D button
+shrinks to 90 % with its chevron / the RLB letters, sinks 6 mm) and `.chev-active` (chevron
+lights red, grey otherwise). `.egg3d-ready` hides the SVG egg; without WebGL it stays.
+Materials (egg metal, button plastic, chevron glow, light) have a **localhost-only dial** on
+the project page (`egg-dial.js`, folds into a button, values in `localStorage.eggDial`,
+"copy" for baking them into `DEFAULTS` in egg3d.js).
+
 ### Mobile: the egg fills the phone, and the 641–860px band was broken
 
 **A media query inside `kaffeemaschine.html` resolves against the IFRAME's box, not the device.**

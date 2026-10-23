@@ -727,7 +727,21 @@
       min-height: 0;
     }
 
+
+    /* ── 3D egg (egg3d.js, 2026-10-23): the canvas draws the egg, bezel and buttons;
+       the HTML buttons stay as invisible hit areas placed over their 3D parts, the
+       screen content sits on the 3D screen. Until .egg3d-ready (or if WebGL fails)
+       the flat SVG egg below is what shows. ── */
+    .egg3d-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: block; }
+    .egg3d-ready .egg-body { display: none; }
+    .egg3d-ready .phys-btn > svg { visibility: hidden; }
+    .egg3d-ready .phys-btn, .egg3d-ready .phys-btn.phys-pressed,
+    .egg3d-ready .logo-btn, .egg3d-ready .logo-btn.phys-pressed { transform: none; filter: none; }
+    .egg3d-ready .logo-btn { background: transparent; box-shadow: none; }
+    .egg3d-ready .logo-btn img { visibility: hidden; }
+    .egg3d-ready .display { background: transparent; padding: 0; box-shadow: none; border-radius: 0; }
   </style>
+  <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js" } }</script>
 </head>
 <body>
 
@@ -2050,5 +2064,6 @@
   </defs>
 </svg>
 
+<script type="module" src="egg3d.js"></script>
 </body>
 </html>
