@@ -1505,7 +1505,8 @@ const SWAY_AMP     = 0.04   // m — under a quarter of the 0.18 m gap to the po
 const SWAY_FREQ    = 0.22   // cycles/s; a plain sine is already eased at both ends
 const ARROW_NEAR   = 6.0    // m, horizontal, camera → exhibit centre: appear
 const ARROW_FAR    = 6.6    // m: disappear
-const ARROW_GROW   = 7      // /s, exponential ease of the appear/disappear
+const ARROW_IN     = 1.2    // s to grow to full size (Lucas, 2026-10-23: was a ~0.5 s exponential pop)
+const ARROW_OUT    = 0.5    // s to shrink away
 const galleryExhibits = []
 let galleryArrowMat = null
 
@@ -1554,13 +1555,13 @@ function updateGalleryExhibits(delta) {
     }
     const d = Math.hypot(camera.position.x - ex.group.position.x, camera.position.z - ex.group.position.z)
     ex.near = d < (ex.near ? ARROW_FAR : ARROW_NEAR)
-    ex.show += ((ex.near ? 1 : 0) - ex.show) * Math.min(1, ARROW_GROW * delta)
-    if (!ex.near && ex.show < 0.002) ex.show = 0
+    // Linear progress 0..1, shaped below; reversing mid-way continues from where it is.
+    ex.show = ex.near ? Math.min(1, ex.show + delta / ARROW_IN) : Math.max(0, ex.show - delta / ARROW_OUT)
     const a = ex.arrow
     a.visible = ex.show > 0
     if (!a.visible || popping(a)) continue
-    // Overshoot on the way in (easeOutBack), plain shrink on the way out.
-    const k = ex.near ? 1 + 2.2 * Math.pow(ex.show - 1, 3) + 1.2 * Math.pow(ex.show - 1, 2) : ex.show
+    // easeOutBack with a gentle overshoot (~6 %); played backwards on the way out.
+    const k = 1 + 2.2 * Math.pow(ex.show - 1, 3) + 1.2 * Math.pow(ex.show - 1, 2)
     a.scale.setScalar(Math.max(0.001, k))
     // Over a floating exhibit the arrow rides the exhibit's own sway (same offset, in
     // unison); over a seated one it keeps the old independent bob.
