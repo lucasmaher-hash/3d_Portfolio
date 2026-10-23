@@ -17,12 +17,23 @@ import * as THREE from 'three'
 import { GLTFLoader } from './vendor/three/addons/loaders/GLTFLoader.js'
 import { RoomEnvironment } from './vendor/three/addons/environments/RoomEnvironment.js'
 
-export const DEFAULTS = {
-  metal:   { r: 0.403, g: 0.41, b: 0.429, brightness: 1.45, metalness: 1, roughness: 0.28, clearcoat: 0, brushed: 0.15 },
-  plastic: { brightness: 0.9, roughness: 0.32, clearcoat: 0.25, glow: 0 },
-  chevron: { glow: 0.9 },
-  light:   { env: 0.55, key: 2.2, exposure: 1.0 },
+export const DEFAULTS = {   // Lucas's dial values, 2026-10-23
+  metal:   { r: 0.403, g: 0.41, b: 0.429, brightness: 0.56, metalness: 0.87, roughness: 0, clearcoat: 0.12, brushed: 0 },
+  plastic: { brightness: 0.61, roughness: 0, clearcoat: 1, glow: 0.09 },
+  chevron: { glow: 0 },
+  light:   { env: 0.59, key: 1.54, exposure: 1.1, preset: 0 },
 }
+// Where the light comes from (Lucas: "not entirely from the top"). Each preset places the
+// key light (with its shadow), a soft opposite fill/rim, and turns the studio environment
+// whose bright panels otherwise all sit overhead. 0 is the look that was tuned first.
+export const LIGHT_PRESETS = [
+  { name: 'Top left',      key: [-2.0, 2.8, 1.6],  fill: [2, -1, 2],    fillI: 0,    env: [0, 0, 0] },
+  { name: 'Side left',     key: [-3.2, 0.5, 1.4],  fill: [2.5, 0.3, 1], fillI: 0.25, env: [0, -1.2, 0] },
+  { name: 'Front 3/4',     key: [-1.4, 0.9, 3.2],  fill: [2, 0.5, 2],   fillI: 0.2,  env: [0.5, -0.5, 0] },
+  { name: 'Side right',    key: [3.2, 0.7, 1.4],   fill: [-2.5, 0.3, 1],fillI: 0.25, env: [0, 1.2, 0] },
+  { name: 'Low left',      key: [-2.0, -1.6, 2.4], fill: [1.5, 2, 1.5], fillI: 0.3,  env: [Math.PI, 0, 0] },
+  { name: 'Window + rim',  key: [-3.0, 1.2, 0.9],  fill: [2.6, 1.4, -1.2], fillI: 1.2, env: [0, -1.57, 0] },
+]
 const CHEV_ON = new THREE.Color('#ff7171'), CHEV_OFF = new THREE.Color('#939393')
 const FRAME = { w: 969, h: 1344, egg: { x0: 22, x1: 946, y0: 91.54, y1: 1187.07 } }   // Figma frame of the flat egg
 const BTNS = ['L1', 'L2', 'L3', 'R1', 'R2', 'R3']
@@ -58,13 +69,13 @@ async function start() {
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
   pmrem.dispose()
   const key = new THREE.DirectionalLight(0xffffff, 1)
-  key.position.set(-2.0, 2.8, 1.6)   // high and from the left: a gradient across the dome
   key.castShadow = true
   key.shadow.mapSize.set(1024, 1024)
   key.shadow.bias = -0.0004
   key.shadow.normalBias = 0.002
   key.shadow.radius = 4
-  scene.add(key, key.target)
+  const fill = new THREE.DirectionalLight(0xffffff, 0)   // no shadow: only shape
+  scene.add(key, key.target, fill)
 
   const gltf = await new GLTFLoader().loadAsync('egg.glb')
   const model = gltf.scene
@@ -132,6 +143,11 @@ async function start() {
     plastic.emissive.setScalar(0.95)
     plastic.emissiveIntensity = p.glow
     scene.environmentIntensity = l.env
+    const pr = LIGHT_PRESETS[Math.round(l.preset)] || LIGHT_PRESETS[0]
+    key.position.fromArray(pr.key)
+    fill.position.fromArray(pr.fill)
+    fill.intensity = pr.fillI * l.key
+    scene.environmentRotation.set(pr.env[0], pr.env[1], pr.env[2])
     key.intensity = l.key
     renderer.toneMappingExposure = l.exposure
     dirty = true
@@ -215,6 +231,7 @@ async function start() {
 
   window.Egg3D = {
     values, defaults: DEFAULTS,
+    presets: LIGHT_PRESETS,
     set(next) { for (const k in next) Object.assign(values[k], next[k]); apply() },
   }
   window.dispatchEvent(new Event('egg3d-ready'))

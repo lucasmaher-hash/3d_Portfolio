@@ -32,6 +32,7 @@
       '#egg-dial .bar{display:flex;gap:6px;justify-content:flex-end}' +
       '#egg-dial button{all:unset;cursor:pointer;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.1)}' +
       '#egg-dial .dot{width:40px;height:40px;padding:0;display:grid;place-items:center;border-radius:50%;background:rgba(20,20,24,.86);font-size:16px}' +
+      '#egg-dial .presets{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px}#egg-dial .presets button{font-size:11px;padding:3px 6px}#egg-dial .presets button.on{background:#809BBC;color:#fff}' +
       '#egg-dial[data-open="0"] .box{display:none}#egg-dial[data-open="1"] .dot{display:none}'
     document.head.append(css)
     const el = document.createElement('div')
@@ -53,6 +54,17 @@
         })
         show(); inputs.push(show)
         box.append(lab, input)
+      }
+      if (group === 'light' && E.presets) {   // light direction: one button per preset
+        const h = document.createElement('h4'); h.textContent = 'Light direction'; box.append(h)
+        const row = document.createElement('div'); row.className = 'presets'
+        const mark = () => row.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i === Math.round(v.light.preset)))
+        E.presets.forEach((p, i) => {
+          const b = document.createElement('button'); b.textContent = (i + 1) + ' ' + p.name
+          b.onclick = () => { E.set({ light: { preset: i } }); mark(); set('eggDial', JSON.stringify(v)) }
+          row.append(b)
+        })
+        mark(); inputs.push(mark); box.append(row)
       }
     }
     const dot = document.createElement('button'); dot.className = 'dot'; dot.title = 'Egg material dial'; dot.textContent = '◐'
