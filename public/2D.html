@@ -331,7 +331,7 @@
       min-width: 0;
       aspect-ratio: 680 / 560;
       background: var(--bg-surface);
-      border-radius: 16px;
+      border-radius: 13.44px;   /* 84% of the old 16px (Lucas, 2026-10-23, from the corner dial) */
       box-shadow: none;   /* no raised plate round the project media, desktop or phone (Lucas, 2026-10-08) */
     }
 
@@ -1314,7 +1314,7 @@
              the antialiased fringe the key alone couldn't fully clean up —
              both filled with the recording's own sampled background colour,
              so nothing shows a seam. Full frame width preserved. -->
-          <div class="project-tile tile-tall-media" style="box-shadow: none; overflow: hidden; cursor: pointer; border-radius: 24px;">
+          <div class="project-tile tile-tall-media" style="box-shadow: none; overflow: hidden; cursor: pointer; border-radius: 20.16px;">
           <video class="cc-vid-light" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: contain; display: block;">
             <source src="/videos/kaffeemaschine/coffeemachine_interface_video.mov" type="video/mp4">
           </video>
@@ -1354,7 +1354,7 @@
         <a href="/mac-lamp2d.html" class="btn-view-work" data-i18n="btn-view-work" style="margin-top: auto; align-self: flex-start;">View Work</a>
       </div>
       <div class="project-tile tile-crop-sides" style="position: relative;">
-        <a href="/mac-lamp2d.html" style="position: absolute; inset: 0; overflow: hidden; border-radius: 16px; text-decoration: none; display: block;">
+        <a href="/mac-lamp2d.html" style="position: absolute; inset: 0; overflow: hidden; border-radius: 13.44px; text-decoration: none; display: block;">
           <img src="/images/mac-lamp/IMG_3729_SnapseedCopy.jpeg" alt="Mac-Lamp" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
         </a>
       </div>
@@ -1363,7 +1363,7 @@
     <!-- Project 06 -->
     <div class="project-section reverse" style="align-items: stretch;">
       <div class="project-tile tile-crop-sides" style="position: relative;">
-        <a href="/vaccine2d.html" style="position: absolute; inset: 0; overflow: hidden; border-radius: 16px; background: #000; text-decoration: none;">
+        <a href="/vaccine2d.html" style="position: absolute; inset: 0; overflow: hidden; border-radius: 13.44px; background: #000; text-decoration: none;">
           <video autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover; display: block; transform: translateY(-15px);">
             <source src="/videos/vaccine/vaccine_render_V1.mov" type="video/quicktime" />
             <source src="/videos/vaccine/vaccine_render_V1.mov" type="video/mp4" />
@@ -1647,7 +1647,6 @@
     </div>
   </div>
   <script src="/js/page-chrome.js"></script>
-  <script src="/js/radius-dial.js"></script>
 
   <script>
     // Cybercoffee tile: the light/dark clip swap is CSS-only (dark-mobile.css
