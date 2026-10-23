@@ -52,7 +52,7 @@ const CLOCK = (startEpochMs) => `(() => {
   }
 })()`
 
-export async function capture({ url, width, height, fps, startEpochMs, chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' }) {
+export async function capture({ url, width, height, fps, startEpochMs, dpr = 1, chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' }) {
   const port = 9400 + Math.floor(Math.random() * 400)
   const prof = fs.mkdtempSync('/tmp/cc-film-')
   const proc = spawn(chrome, ['--headless=new', '--remote-debugging-port=' + port, '--user-data-dir=' + prof,
@@ -67,7 +67,7 @@ export async function capture({ url, width, height, fps, startEpochMs, chrome = 
     if (m.method === 'Runtime.consoleAPICalled' && ['error', 'warning'].includes(m.params.type)) logs.push(m.params.type + ' ' + m.params.args.map(a => a.value ?? a.description).join(' ')) }
   const send = (method, params = {}) => new Promise((r, j) => { const i = ++id; pend.set(i, m => m.error ? j(new Error(method + ': ' + m.error.message)) : r(m.result)); ws.send(JSON.stringify({ id: i, method, params })) })
   await send('Runtime.enable'); await send('Page.enable')
-  await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false })
+  await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: dpr, mobile: false })
   await send('Page.addScriptToEvaluateOnNewDocument', { source: CLOCK(startEpochMs) })
   await send('Page.navigate', { url })
   const ev = async e => { const r = await send('Runtime.evaluate', { expression: e, returnByValue: true, awaitPromise: true }); if (r.exceptionDetails) throw new Error(e + ': ' + r.exceptionDetails.exception?.description); return r.result?.value }

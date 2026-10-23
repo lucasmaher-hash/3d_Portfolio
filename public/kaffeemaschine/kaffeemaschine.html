@@ -868,6 +868,7 @@
     replaceDone: false,      // true once the preset has been replaced this brew
     drinkPending: false,
     paused: false,
+    prepStepMs: 802,         // one progress segment while brewing; 1042 until 2026-10-23, now 30 % faster (Lucas)
     // settings
     language: 'ENGLISH',
     clockH: 15, clockM: 4,     // editor values for the CHANGE CLOCK screen
@@ -1401,7 +1402,7 @@
               setTimeout(() => fadeOutThen(() => navigate('drink-ready')), 500);
             }
           }
-        }, 1042);
+        }, STATE.prepStepMs);
       }
     },
 
