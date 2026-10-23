@@ -2457,9 +2457,9 @@ buttons are moved over their 3D parts as invisible hit areas and the screen cont
 3D screen. The app logic is untouched: egg3d.js only mirrors `.phys-pressed` (3D button
 shrinks to 90 % with its chevron / the RLB letters, sinks 6 mm) and `.chev-active` (chevron
 lights red, grey otherwise). `.egg3d-ready` hides the SVG egg; without WebGL it stays.
-Materials (egg metal, button plastic, chevron glow, light) have a **localhost-only dial** on
-the project page (`egg-dial.js`, folds into a button, values in `localStorage.eggDial`,
-"copy" for baking them into `DEFAULTS` in egg3d.js).
+Materials and light are Lucas's dial values, baked into `DEFAULTS` in egg3d.js (light
+preset 5 "Window + rim" of `LIGHT_PRESETS`). The dial (`egg-dial.js`) was removed after
+tuning; it is in git history if the look needs re-dialling.
 
 ### Mobile: the egg fills the phone, and the 641–860px band was broken
 

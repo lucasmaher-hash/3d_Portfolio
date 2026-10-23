@@ -11,17 +11,17 @@
 // If WebGL or the model fails, nothing is hidden and the flat SVG egg stays.
 //
 // Materials: egg = brushed-able metal, buttons/bezel/logo button = shiny white plastic,
-// starting from the values Lucas tuned for the egg in the 3D gallery. window.Egg3D.set()
-// takes new values (the dev dial on kaffeemaschine2d.html calls it).
+// tuned by Lucas with a dial (removed 2026-10-23; window.Egg3D.set() still takes new values
+// from the console, and the dial is in git history: public/kaffeemaschine/egg-dial.js).
 import * as THREE from 'three'
 import { GLTFLoader } from './vendor/three/addons/loaders/GLTFLoader.js'
 import { RoomEnvironment } from './vendor/three/addons/environments/RoomEnvironment.js'
 
-export const DEFAULTS = {   // Lucas's dial values, 2026-10-23
-  metal:   { r: 0.403, g: 0.41, b: 0.429, brightness: 0.56, metalness: 0.87, roughness: 0, clearcoat: 0.12, brushed: 0 },
-  plastic: { brightness: 0.61, roughness: 0, clearcoat: 1, glow: 0.09 },
+export const DEFAULTS = {   // Lucas's dial values, 2026-10-23 (light: preset 5 = "Window + rim")
+  metal:   { r: 0.403, g: 0.41, b: 0.429, brightness: 0.63, metalness: 0.95, roughness: 0, clearcoat: 0, brushed: 0 },
+  plastic: { brightness: 0.85, roughness: 0, clearcoat: 1, glow: 0 },
   chevron: { glow: 0 },
-  light:   { env: 0.59, key: 1.54, exposure: 1.1, preset: 0 },
+  light:   { env: 0.82, key: 0.4, exposure: 1.29, preset: 5 },
 }
 // Where the light comes from (Lucas: "not entirely from the top"). Each preset places the
 // key light (with its shadow), a soft opposite fill/rim, and turns the studio environment
@@ -40,12 +40,6 @@ const BTNS = ['L1', 'L2', 'L3', 'R1', 'R2', 'R3']
 
 const machine = document.querySelector('.machine')
 const values = structuredClone(DEFAULTS)
-try {   // the dial's last values, on this machine only (see kaffeemaschine2d.html)
-  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
-    const saved = JSON.parse(localStorage.getItem('eggDial') || 'null')
-    if (saved) for (const k in values) Object.assign(values[k], saved[k] || {})
-  }
-} catch (e) {}
 
 let renderer
 try {
