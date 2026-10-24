@@ -1835,17 +1835,16 @@ async function capPodiumTops(model, settings) {
   console.log(`Podest-Mitte geglättet: ${done.length} (${done.join(' | ')})`)
 }
 
-// The outer wall and the inner ring are panelled: a V-groove every ~0.72 m, running
-// floor to ceiling through both coves. The grooves are in the geometry, but they are
-// ~8 mm wide and the bake gave them too few lightmap texels, so most of their shading
-// was lost (Lucas: "the vertical dividing panel lines are gone"). The podiums kept
-// theirs because their seams are 2.5 cm wide. So the lines are drawn back at load, no
-// rebake: wall-seams.json (scripts/extract-wall-seams.mjs) holds one plane per seam,
-// every wall vertex gets its distance to the nearest seam plane as an attribute (exact
-// under interpolation: a plane distance is linear and no triangle crosses a seam), and
-// the shader darkens the baked light in a band around 0. Antialiased with fwidth, so a
-// far line fades out instead of shimmering. Values dialled in by Lucas with a slider
-// panel (2026-10-24, since removed; it is in git history, commit 9a159e1).
+// The outer wall and the inner ring are panelled every ~0.72 m, the line running floor
+// to ceiling through both coves. Since v06 (2026-10-24) the walls are FLAT in Blender:
+// the old 8 mm V-grooves got too few lightmap texels and baked as random lines, blots and
+// nothing, which then needed lightmap clean-up scripts. Now the bake is clean plaster and
+// the lines are only drawn here, sharp at any distance. wall-seams.json is written by the
+// Blender build (scripts/gallery-v06/build_v06.py): per wall, per profile row (y in mm), every
+// line centre [x, z, ...] in 0.1 mm. Every wall vertex gets its horizontal distance to the
+// nearest line of its own row (the lines drift sideways through the flared coves), and the
+// shader darkens the baked light in a band around 0, antialiased with fwidth.
+// Values dialled in by Lucas with a slider panel (2026-10-24, in git history, 9a159e1).
 const WALL_SEAM = { dark: 0.14, width: 0.013, soft: 0.45 }   // dark = share of light removed at the line's centre
 const WALL_SEAM_U = { uSeamDark: { value: 0 }, uSeamWidth: { value: 0 }, uSeamSoft: { value: 0 } }
 function setWallSeams(s) {
@@ -1864,9 +1863,9 @@ async function drawWallSeams(model, settings) {
   let meshes = 0
   const CELL = 0.5, MAX_D = 0.9
   for (const o of walls) {
-    // Groove centres per height level (scripts/extract-wall-seams.mjs). A vertex's seam
-    // distance is its horizontal distance to the nearest groove centre of its OWN level,
-    // so the line follows the groove through the flared coves instead of a straight plane.
+    // Line centres per height level (written by the Blender build). A vertex's seam
+    // distance is its horizontal distance to the nearest line centre of its OWN level,
+    // so the line follows the panel joint through the flared coves.
     const levels = new Map()
     for (const [key, flat] of Object.entries(planes[o.userData.galleryBakeLabel])) {
       const pts = new Float64Array(flat.length)
@@ -1882,7 +1881,10 @@ async function drawWallSeams(model, settings) {
     const dist = new Float32Array(pos.count).fill(10)
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
-      const key = Math.round(v.y * 1000), L = levels.get(key)
+      // Levels are profile rows written from Blender; the GLB's 16-bit quantized
+      // positions can land a millimetre either side of the key.
+      const key = Math.round(v.y * 1000)
+      const L = levels.get(key) || levels.get(key - 1) || levels.get(key + 1) || levels.get(key - 2) || levels.get(key + 2)
       if (!L) continue
       const gx = Math.floor(v.x / CELL), gz = Math.floor(v.z / CELL)
       let best = MAX_D, hit = false
@@ -1893,9 +1895,6 @@ async function drawWallSeams(model, settings) {
         }
       dist[i] = hit ? best : 10
     }
-    // The bake's own groove shading (uneven: some lines, some blots, mostly nothing)
-    // is cleaned out of outer.png / ring.png (scripts/clean-wall-lightmaps.py), so every
-    // seam starts as plain plaster and this one band is the only line there is.
     o.geometry.setAttribute('gallerySeamD', new THREE.BufferAttribute(dist, 1))
     for (const m of [o.material].flat()) {
       const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey
@@ -2619,8 +2618,8 @@ function addRoomTitles(model) {
 // ── Load model ───────────────────────────────────────────────────
 const loader = new GLTFLoader()
 loader.setMeshoptDecoder(MeshoptDecoder)
-const GLB_ORIGINAL  = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=1' : '/current🟢.glb'
-const GLB_OPTIMIZED = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=1' : '/scene-optimized.glb'
+const GLB_ORIGINAL  = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=2' : '/current🟢.glb'
+const GLB_OPTIMIZED = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=2' : '/scene-optimized.glb'
 // A missing or broken optimized file (the optimizer never fails the build, it just does not
 // write one) falls back to the original GLB instead of leaving the 3D page empty.
 function loadScene(url, onLoad, onProgress, onError) {
@@ -2717,6 +2716,7 @@ loadScene(
             'Mac-Lamp': { title: 'Mac-Lamp', url: '/mac-lamp2d.html' },
             'Virtual Cooking': { title: 'Virtual Cooking', url: '/virtual_cooking2d.html' },
             'Cybercoffee': { title: 'Cybercoffee', url: '/kaffeemaschine2d.html' },
+            'to.morrow': { title: 'to.morrow', url: '/to-shove2d.html' },
           }
           const exhibits = []
           gltf.scene.traverse(mesh => { if (mesh.isMesh && mesh.userData.galleryRole === 'project') exhibits.push(mesh) })

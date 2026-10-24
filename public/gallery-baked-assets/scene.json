@@ -17,7 +17,7 @@
   "exposureEV": -0.8624964952468872,
   "viewTransform": "AgX",
   "look": "AgX - Medium High Contrast",
-  "source": "gallery-review-v05.blend",
+  "source": "gallery-review-v06.blend",
   "receivers": [
     "ceiling",
     "ring",
@@ -29,6 +29,7 @@
     "well-04",
     "well-05",
     "well-06",
+    "well-07",
     "pinkroom-creature-body",
     "pinkroom-creature-eyel",
     "pinkroom-creature-eyer",
@@ -40,7 +41,9 @@
     "podium-02",
     "podium-03",
     "podium-04",
-    "podium-05"
+    "podium-05",
+    "podium-06",
+    "tomorrow-continuousshell"
   ],
   "quality": {
     "samples": 256,
@@ -54,169 +57,189 @@
       "range": 1,
       "width": 2048,
       "height": 2048,
-      "maxHDR": 0.10357666015625,
+      "maxHDR": 0.10760498046875,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00001811864240153227,
-      "p99LinearError": 0.0001126723363995552
+      "meanLinearError": 0.000020075307475053705,
+      "p99LinearError": 0.00011073797941207886
     },
     "floor": {
       "file": "floor.png",
       "range": 4,
       "width": 2048,
       "height": 2048,
-      "maxHDR": 3.080078125,
+      "maxHDR": 2.990234375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.000054590971558354795,
-      "p99LinearError": 0.00041919946670532227
+      "meanLinearError": 0.00007066054968163371,
+      "p99LinearError": 0.0006388723850250244
     },
     "outer": {
       "file": "outer.png",
       "range": 2,
       "width": 3072,
       "height": 3072,
-      "maxHDR": 1.5751953125,
+      "maxHDR": 1.4033203125,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00013038478209637105,
-      "p99LinearError": 0.0011380314826965332
+      "meanLinearError": 0.0001307252241531387,
+      "p99LinearError": 0.0010422468185424805
     },
     "pinkroom-creature-body": {
       "file": "pinkroom-creature-body.png",
       "range": 8,
       "width": 1024,
       "height": 1024,
-      "maxHDR": 4.109375,
+      "maxHDR": 4.07421875,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.0002903530839830637,
-      "p99LinearError": 0.0039479732513427734
+      "meanLinearError": 0.0002930247865151614,
+      "p99LinearError": 0.0039484500885009766
     },
     "pinkroom-creature-eyel": {
       "file": "pinkroom-creature-eyel.png",
       "range": 4,
       "width": 512,
       "height": 512,
-      "maxHDR": 2.9453125,
+      "maxHDR": 3.048828125,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00030755935586057603,
-      "p99LinearError": 0.0037126541137695312
+      "meanLinearError": 0.00031431892421096563,
+      "p99LinearError": 0.0037436485290527344
     },
     "pinkroom-creature-eyer": {
       "file": "pinkroom-creature-eyer.png",
       "range": 4,
       "width": 512,
       "height": 512,
-      "maxHDR": 3.21875,
+      "maxHDR": 3.26953125,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00021573765843641013,
-      "p99LinearError": 0.0031709671020507812
+      "meanLinearError": 0.00021779246162623167,
+      "p99LinearError": 0.003195524215698242
     },
     "pinkroom-creature-pupill": {
       "file": "pinkroom-creature-pupill.png",
       "range": 1,
       "width": 512,
       "height": 512,
-      "maxHDR": 0.0565185546875,
+      "maxHDR": 0.05682373046875,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.000004852430720347911,
-      "p99LinearError": 0.00005803629755973816
+      "meanLinearError": 0.000004979736786481226,
+      "p99LinearError": 0.00005830824375152588
     },
     "pinkroom-creature-pupilr": {
       "file": "pinkroom-creature-pupilr.png",
       "range": 1,
       "width": 512,
       "height": 512,
-      "maxHDR": 0.0491943359375,
+      "maxHDR": 0.050140380859375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.0000045559554564533755,
-      "p99LinearError": 0.00005315057933330536
+      "meanLinearError": 0.0000046396507968893275,
+      "p99LinearError": 0.00005366094410419464
     },
     "podium-01": {
       "file": "podium-01.png",
       "range": 2,
       "width": 1024,
       "height": 1024,
-      "maxHDR": 1.7109375,
+      "maxHDR": 1.759765625,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00025614339392632246,
-      "p99LinearError": 0.0021600723266601562
+      "meanLinearError": 0.00025977028417401016,
+      "p99LinearError": 0.0021652854047715664
     },
     "podium-02": {
       "file": "podium-02.png",
       "range": 4,
       "width": 1024,
       "height": 1024,
-      "maxHDR": 2.09765625,
+      "maxHDR": 2.068359375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00030132566462270916,
-      "p99LinearError": 0.0028116703033447266
+      "meanLinearError": 0.00030139225418679416,
+      "p99LinearError": 0.0028134584426879883
     },
     "podium-03": {
       "file": "podium-03.png",
       "range": 2,
       "width": 1024,
       "height": 1024,
-      "maxHDR": 1.8779296875,
+      "maxHDR": 1.896484375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00029845614335499704,
-      "p99LinearError": 0.0025336742401123047
+      "meanLinearError": 0.000298331055091694,
+      "p99LinearError": 0.0025309324264526367
     },
     "podium-04": {
       "file": "podium-04.png",
       "range": 4,
       "width": 1024,
       "height": 1024,
-      "maxHDR": 2.23828125,
+      "maxHDR": 2.2734375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.0003321694675832987,
-      "p99LinearError": 0.0026952028274536133
+      "meanLinearError": 0.00033327730488963425,
+      "p99LinearError": 0.0027071237564086914
     },
     "podium-05": {
       "file": "podium-05.png",
       "range": 2,
       "width": 1024,
       "height": 1024,
-      "maxHDR": 1.9482421875,
+      "maxHDR": 1.8974609375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.0003363872820045799,
-      "p99LinearError": 0.0025544166564941406
+      "meanLinearError": 0.0003351600607857108,
+      "p99LinearError": 0.0025502443313598633
+    },
+    "podium-06": {
+      "file": "podium-06.png",
+      "range": 2,
+      "width": 1024,
+      "height": 1024,
+      "maxHDR": 1.86328125,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00028397442656569183,
+      "p99LinearError": 0.0022428035736083984
     },
     "ring": {
       "file": "ring.png",
       "range": 2,
       "width": 2048,
       "height": 2048,
-      "maxHDR": 1.5556640625,
+      "maxHDR": 1.68359375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00016072533617261797,
-      "p99LinearError": 0.0014172494411468506
+      "meanLinearError": 0.00016012559353839606,
+      "p99LinearError": 0.0014188885688781738
+    },
+    "tomorrow-continuousshell": {
+      "file": "tomorrow-continuousshell.png",
+      "range": 2,
+      "width": 1024,
+      "height": 1024,
+      "maxHDR": 1.970703125,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.0002142034936696291,
+      "p99LinearError": 0.002068042755126953
     },
     "well-01": {
       "file": "well-01.png",
       "range": 2,
       "width": 512,
       "height": 512,
-      "maxHDR": 1.490234375,
+      "maxHDR": 1.49609375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00007542569801444188,
-      "p99LinearError": 0.0013479366898536682
+      "meanLinearError": 0.00007578430086141452,
+      "p99LinearError": 0.0013459324836730957
     },
     "well-02": {
       "file": "well-02.png",
       "range": 2,
       "width": 512,
       "height": 512,
-      "maxHDR": 1.4755859375,
+      "maxHDR": 1.4677734375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00007748881762381643,
-      "p99LinearError": 0.0013445292133837938
+      "meanLinearError": 0.00007779127918183804,
+      "p99LinearError": 0.0013538002967834473
     },
     "well-03": {
       "file": "well-03.png",
       "range": 2,
       "width": 512,
       "height": 512,
-      "maxHDR": 1.4638671875,
+      "maxHDR": 1.4697265625,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00007649214239791036,
+      "meanLinearError": 0.00007632074266439304,
       "p99LinearError": 0.0013375282287597656
     },
     "well-04": {
@@ -224,30 +247,40 @@
       "range": 2,
       "width": 512,
       "height": 512,
-      "maxHDR": 1.4765625,
+      "maxHDR": 1.5078125,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00007814935088390484,
-      "p99LinearError": 0.001351766288280487
+      "meanLinearError": 0.00007775706035317853,
+      "p99LinearError": 0.001372694969177246
     },
     "well-05": {
       "file": "well-05.png",
       "range": 2,
       "width": 512,
       "height": 512,
-      "maxHDR": 1.443359375,
+      "maxHDR": 1.4501953125,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00007790163363097236,
-      "p99LinearError": 0.0013596965000033379
+      "meanLinearError": 0.00007784336776239797,
+      "p99LinearError": 0.0013560428051277995
     },
     "well-06": {
       "file": "well-06.png",
       "range": 2,
       "width": 512,
       "height": 512,
-      "maxHDR": 1.0107421875,
+      "maxHDR": 1.0146484375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00005940317714703269,
-      "p99LinearError": 0.0010474324226379395
+      "meanLinearError": 0.000059326655900804326,
+      "p99LinearError": 0.0010488518746569753
+    },
+    "well-07": {
+      "file": "well-07.png",
+      "range": 2,
+      "width": 512,
+      "height": 512,
+      "maxHDR": 1.3330078125,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.00006159392796689644,
+      "p99LinearError": 0.0011655092239379883
     }
   },
   "probes": [
@@ -290,9 +323,9 @@
     {
       "file": "virtual-cooking.exr",
       "position": [
-        11.789,
+        13.93,
         2.05,
-        7.032
+        9.13
       ],
       "project": "Virtual Cooking"
     },
@@ -304,6 +337,15 @@
         -6.526
       ],
       "project": "Cybercoffee"
+    },
+    {
+      "file": "tomorrow.exr",
+      "position": [
+        6.35,
+        2.05,
+        15.42
+      ],
+      "project": "to.morrow"
     }
   ],
   "reviewViews": {
@@ -452,14 +494,14 @@
     },
     "04-virtual-cooking": {
       "position": [
-        8.421496391296387,
+        10.605894088745117,
         3.382014274597168,
-        6.078103542327881
+        8.034412384033203
       ],
       "target": [
-        9.310379028320312,
+        11.483321189880371,
         2.9992737770080566,
-        6.329893112182617
+        8.323602676391602
       ],
       "lens": 44
     },
@@ -473,6 +515,19 @@
         16.40052604675293,
         3.029869556427002,
         -5.0703630447387695
+      ],
+      "lens": 44
+    },
+    "06-tomorrow": {
+      "position": [
+        4.225058078765869,
+        3.382014274597168,
+        12.638882637023926
+      ],
+      "target": [
+        4.785955429077148,
+        2.9992740154266357,
+        13.372983932495117
       ],
       "lens": 44
     }

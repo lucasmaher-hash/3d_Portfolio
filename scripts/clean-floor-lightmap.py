@@ -8,8 +8,9 @@
 # falloff away from the edge is kept, only the lumps along the edge go. Fades back to
 # the untouched bake over the band's inner part.
 #
-#   python3 scripts/clean-floor-lightmap.py
-# Reads the original bake from git (ORIGINAL_REV), writes maps/floor.png.
+#   python3 scripts/clean-floor-lightmap.py <bake>/web-maps/floor.png
+# Reads the untouched encoded bake (the encoder's own output, never the cleaned file in
+# public/), writes maps/floor.png. Without an argument it falls back to ORIGINAL_REV in git.
 import json, subprocess, sys, io
 from pathlib import Path
 import numpy as np
@@ -25,7 +26,10 @@ FADE = 4           # last texels of the band blend back into the bake
 SIGMA = 7          # along-edge smoothing, texels
 SS = 4             # supersampling for the island mask
 
-raw = subprocess.run(['git', 'show', f'{ORIGINAL_REV}:{MAP}'], cwd=ROOT, capture_output=True, check=True).stdout
+if len(sys.argv) > 1:
+    raw = Path(sys.argv[1]).read_bytes()
+else:
+    raw = subprocess.run(['git', 'show', f'{ORIGINAL_REV}:{MAP}'], cwd=ROOT, capture_output=True, check=True).stdout
 a = np.asarray(Image.open(io.BytesIO(raw)).convert('RGBA')).astype(np.float64) / 255
 H, W = a.shape[:2]
 hdr = a[..., :3] * a[..., 3:4] * RANGE
