@@ -2620,18 +2620,6 @@
     .ov p { font-size: 14.4px; line-height: 1.7; color: var(--text-secondary); }
     .ov b { color: var(--text-primary); font-weight: 500; }
 
-    /* Try-it block: QR code for the desktop reader, the badge for everyone. */
-    .try-it { display: flex; align-items: center; gap: clamp(20px, 4vw, 48px); flex-wrap: wrap; }
-    .try-qr {
-      flex: none; width: clamp(110px, 12vw, 150px); aspect-ratio: 1;
-      padding: 10px; background: #fff; border-radius: 16px; box-shadow: var(--shadow-raised-sm);
-    }
-    .try-qr img { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
-    .try-copy { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-    .try-copy .appstore-row { margin: 0; }
-    .try-title { font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: clamp(20px, 2.6vw, 26px); line-height: 1.1; letter-spacing: -0.02em; color: var(--text-primary); }
-    .try-text { font-size: 14.4px; line-height: 1.6; color: var(--text-secondary); }
-    @media (max-width: 640px) { .try-qr { display: none; } }
 
     /* Sub-headings inside a section. */
     .cs-h3 { margin-top: clamp(32px, 5vw, 64px); }
@@ -2918,6 +2906,14 @@
          five labelled lines answer what it is, for whom, my part, what I made and
          what came out of it before any process image. -->
     <div class="section" style="border-bottom: none; padding-bottom: 0;">
+      <!-- The App Store badge sits directly under the header, as on the live page. -->
+      <div class="appstore-row appstore-row--top">
+        <a class="appstore-link" href="https://apps.apple.com/app/id6798337661"
+           target="_blank" rel="noopener noreferrer">
+          <img class="appstore-badge" src="/images/to.morrow/appstore-badge.webp" width="760" height="225"
+               alt="Im App Store laden" />
+        </a>
+      </div>
       <h2 class="section-title" data-i18n="n-ov-title">Projektüberblick</h2>
       <div class="ov">
         <p data-i18n-html="n-ov-1"><b>Was ist to.morrow?</b> Eine iOS-App mit drei Listen, Heute, Morgen und Bald, in der das Verschieben einer Aufgabe auf einen anderen Tag eine einzige Wischgeste ist.</p>
@@ -2950,23 +2946,6 @@
       </div>
     </div>
 
-    <!-- Try it: the app is live, so the way in sits right under the overview.
-         The QR code points at the App Store listing (desktop readers scan it,
-         phones tap the badge; the code is hidden below 640px). -->
-    <div class="section" style="border-bottom: none;">
-      <div class="try-it">
-        <div class="try-qr"><img src="/images/to.morrow/appstore-qr.svg" width="37" height="37" alt="QR-Code zum App-Store-Eintrag von to.morrow" /></div>
-        <div class="try-copy">
-          <p class="try-title" data-i18n="n-try-title">Im App Store ausprobieren</p>
-          <p class="try-text" data-i18n="n-try-text">Mit der Kamera scannen oder das Badge antippen.</p>
-          <div class="appstore-row appstore-row--top">
-            <a class="appstore-link" href="https://apps.apple.com/app/id6798337661" target="_blank" rel="noopener noreferrer">
-              <img class="appstore-badge" src="/images/to.morrow/appstore-badge.webp" width="760" height="225" alt="Im App Store laden" />
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
     <!-- ══ 1. Problem ═══════════════════════════════════════════════ -->
     <div class="guide-section">
           <div class="section-heading-row">
@@ -3860,8 +3839,6 @@
   "n-ov-4": "<b>What I designed:</b> The three-list model with the swipe, the Live task on the Lock Screen and in the Dynamic Island, a design system built from three shapes, workspaces and themes.",
   "n-ov-5": "<b>Outcome:</b> Available on the App Store. The first version was replaced entirely after TestFlight feedback. Usage figures are in the Result section.",
   "n-ov-title": "Project overview",
-  "n-try-title": "Try it on the App Store",
-  "n-try-text": "Scan with your camera or tap the badge.",
   "n-taps-title": "Moving one task to tomorrow: steps and time",
   "n-tag-ex": "Example values",
   "n-taps-1": "5 taps · 6.8 s",
@@ -4000,8 +3977,6 @@
   "n-ov-4": "<b>Was ich gestaltet habe:</b> Das Drei-Listen-Modell mit der Wischgeste, die Live-Aufgabe auf Sperrbildschirm und Dynamic Island, ein Designsystem aus drei Formen, Workspaces und Themes.",
   "n-ov-5": "<b>Ergebnis:</b> Im App Store verfügbar. Die erste Version wurde nach dem Feedback aus TestFlight vollständig ersetzt. Nutzungszahlen stehen im Abschnitt Ergebnis.",
   "n-ov-title": "Projektüberblick",
-  "n-try-title": "Im App Store ausprobieren",
-  "n-try-text": "Mit der Kamera scannen oder das Badge antippen.",
   "n-taps-title": "Eine Aufgabe auf morgen verschieben: Schritte und Zeit",
   "n-tag-ex": "Beispielwerte",
   "n-taps-1": "5 Taps · 6,8 s",
