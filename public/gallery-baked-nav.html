@@ -369,13 +369,18 @@
       transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
     }
 
+    /* Lines in the 2D/3D toggle's text grey; black while pressed and while the menu is
+       open (Lucas, 2026-10-23). .is-open follows the host page's .mobile-menu.open. */
     .hamburger span {
       display: block;
       width: 18px;
       height: 2px;
-      background: var(--text-primary);
+      background: var(--text-secondary);
       border-radius: 2px;
+      transition: background-color 200ms var(--ease);
     }
+    .hamburger:active span,
+    .hamburger.is-open span { background: var(--text-primary); }
 
     .hamburger:hover {
       transform: translateY(-2px) scale(1.03);
@@ -758,6 +763,20 @@
     document.getElementById('hamburger-btn').addEventListener('click', () => {
       window.parent.postMessage({ type: 'mobile-menu-toggle' }, '*');
     });
+    // Black while the host page's menu is open: watch its .mobile-menu (same origin).
+    (function () {
+      const btn = document.getElementById('hamburger-btn');
+      const init = () => {
+        let menu = null
+        try { menu = window.parent.document.querySelector('.mobile-menu') } catch (e) {}
+        if (!menu) return false;
+        const sync = () => btn.classList.toggle('is-open', menu.classList.contains('open'));
+        new MutationObserver(sync).observe(menu, { attributes: true, attributeFilter: ['class'] });
+        sync();
+        return true;
+      };
+      if (!init()) try { window.parent.addEventListener('DOMContentLoaded', init, { once: true }) } catch (e) {}
+    })();
 
     // ── Help button → open controls overlay (3D only) ────────────
     (function () {
