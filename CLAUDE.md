@@ -4203,3 +4203,23 @@ the lightmap and divided out in the shader (`vSeam.y`), so baked-in and missing 
 same darkness, the slider's. Defaults `WALL_SEAM = { dark 0.14, width 0.013, soft 0.45 }` (Lucas's
 dialled values). **`/gallery-4.html?lines`** shows sliders (saved per browser in
 `localStorage.wallSeamTune`, "copy settings" for the numbers).
+
+## Gallery floor edge glow, cleaned in the lightmap (2026-10-24, Lucas)
+
+The LED strips' glow was baked onto the floor as a lumpy band along every floor edge (outer wall,
+inner ring, podium wells) and rendered as cyan splotches. `scripts/clean-floor-lightmap.py`
+post-processes `maps/floor.png` (no rebake): inside ~12 texels of the floor island's edge each
+texel becomes the average of the band texels at the same edge distance nearby, plus the 8 px of
+padding outside the island; everything else is byte-identical. It always reads the original bake
+from git (`ORIGINAL_REV`), so re-running it is safe; **if the floor is ever re-baked, update
+`ORIGINAL_REV` or the script will overwrite the new bake with a cleaned old one.**
+
+## HANDOFF — wall panel lines, in progress (2026-10-24)
+
+Another session is reworking the gallery wall lines on branch **`wall-lines`** (worktree
+`../3D_Portfolio-wall-lines`). Until it is merged, please do not edit: `drawWallSeams()` /
+`wallSeamTuner()` / `WALL_SEAM*` in `src/main.js`, `scripts/extract-wall-seams.mjs`,
+`public/gallery-baked-assets/wall-seams.json`, `maps/outer.png`, `maps/ring.png`. Everything
+else (floor, podiums, lights, other code) is free. Plan: clean the old baked groove shading out of
+`outer.png`/`ring.png` (same idea as the floor script) so every seam is plain plaster, then the
+shader draws one uniform line per seam with no per-seam compensation.
