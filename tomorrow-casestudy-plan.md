@@ -339,6 +339,7 @@ Rules, from the vault guide and the references:
 3. Is in-app event counting in place, or does Study 6 have to rely on App Store Connect alone?
 4. Do real low-fidelity frames or paper sketches of the swipe exist? If not, the pivot opens on the Windows 95 screens alone; nothing gets drawn after the fact.
 5. Is the working swipeable phone (§6 #23) worth building? It would be the page's strongest asset and the most work; decide before the flow rows are captured, because it replaces them.
+
 ---
 
 ## Appendix A. The app, in full
