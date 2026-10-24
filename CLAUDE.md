@@ -1729,6 +1729,45 @@ Two things that will bite again:
   `delayRender`), so renders never depend on Google Fonts. Word widths for the map caption's
   "your" slide are Nunito 800 measured at 100 px in Chrome (in `MapScene.tsx`).
 
+## to.morrow case-study rebuild draft (`public/to-shove2d1.html`, 2026-10-24)
+
+The rebuild from `tomorrow-casestudy-plan.md`, in a **separate, unlinked file** like the Unify draft
+(`<meta name="robots" content="noindex, nofollow">`; nothing may link to it; the nav recognises it because
+`to-shove2d` is a substring match). It is a copy of `to-shove2d.html` (same head, CSS, scripts, SkeuKit
+components, videos) with the body re-ordered; **the live `to-shove2d.html` is untouched** until Lucas says the
+draft replaces it. Generated once by a script, so **edit the HTML directly from now on**. New CSS is one
+`<style>` block before the last one (comment "Case-study rebuild"); new copy is in DE + EN through a
+`Object.assign(TRANSLATIONS.en/de, {...})` block (keys `n-…`) before `pick()`, which overrides old keys.
+
+Order: hero film + claim "Ein Wisch bis morgen." → **Projektüberblick** (five labelled lines, after
+Calmsphere/Asuo) + page map → meta grid → **Try-it block** (QR `images/to.morrow/appstore-qr.svg` + badge; QR
+hidden ≤640px) → 1 Problem (+ taps chart) → 2 Idee (flow row, swipe video, rule card with a collapsible
+week diagram) → 3 Live (flow row, existing live rows) → 4 Pivot (sketch spread, Windows 95 strip,
+same-view side-by-side `windows8` vs `theme-grey`, retention curve, legibility pair, then the type/icons
+block) → 5 **Regeln des Designsystems** → 6 Barrierefreiheit → 7 Rest (share chart, workspaces, settings,
+colour fan) → 8 Ergebnis (fact bar, review cards, learnings, three next steps, tools) → foot badge + nav.
+
+**Section 5 is Lucas's own: "what I was thinking".** Four rules (one light · height is a ladder · pressing
+costs height · every surface has thickness), taken from `SKEUOMORPHIC_DESIGN_SYSTEM.md` §1.2 in the to.morrow
+repo and phrased as the reason, then the **Seitenansicht**: three cross-section SVGs (bubble raised, trough
+recessed, toggle = bubble in trough) on a paper-coloured sheet with a hand-wobble filter (`#s-rough`),
+each with its explanation. **It is a placeholder for Lucas's paper sketch**: when he has drawn it, replace the
+`.side-grid` inside `.paper` with the scan (`/images/to.morrow/seitenansicht-skizze.webp`). After it come the
+existing live "Drei Formen" demos and a shape-test mock.
+
+**Everything that needs data is a mockup with example values, and says so.** Two markers, both `.mock-tag`
+(grep that word): "Mockup" = wireframe or placeholder to be swapped for a real screenshot/scan (the two
+flow rows, the AX5 pair, the review cards), "Beispielwerte" = invented numbers in a real-looking chart (taps
+benchmark, retention, legibility, shape test, accessibility contrast, usage share, fact bar). **None of
+those numbers is a result.** Replace each with the real study value, with source and period, or delete the
+figure; do not remove the tag while the number is still an example. Wireframes (`.wf`) are sized in `cqw`
+units, so the styled screen is the container's CHILD (`.wf-s`): `cqw` on the container itself resolves
+against an ancestor and blew the phones up to 3x.
+
+Facts used from the app (Appendix A of the plan, dated 2026-09-03, check against the source before shipping):
+three lists as filters over a date, overdue → Today with a chip, no rollover job, swipe commit ≈ a fifth of the
+row width, Dynamic Type to AX5, VoiceOver custom actions, Reduce Motion, 44 pt targets.
+
 ## to.morrow page (`public/to-shove2d.html`)
 
 **The project is called `to.morrow`, not `morrow` (2026-09-08).** Every user-visible name

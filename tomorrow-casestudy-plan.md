@@ -19,6 +19,27 @@ works, the research it was based on, the page structure it set and its list of t
 
 ---
 
+## Status 2026-10-24: draft built
+
+`public/to-shove2d1.html` (same URL with a `1`, unlinked, noindex) implements §2 to §6 as a first pass. Details
+and the list of what is mock vs real are in CLAUDE.md, "to.morrow case-study rebuild draft". What Lucas added
+on top of the plan:
+
+- **A section on the rules of the design system ("what I was thinking")**, section 5 of the page: four rules
+  as the reason behind SkeuKit, then the live three-shapes demos, then the shape test (Study 7).
+- **A Seitenansicht (side view) sketch inside that section.** Lucas's brief: *"Add a Seitenansicht sketch to
+  the hierarchy in the design assets. Side view of the bubble button protruding, the indented input field
+  and the combination, explaining what each does."* Built as three cross-section SVGs (bubble · trough ·
+  toggle) on a paper-coloured sheet, each with its explanation. **Lucas will draw the paper version; the SVGs
+  are the placeholder** and get replaced by the scan.
+- **Mockups instead of empty frames.** Wherever an asset or a measurement is missing, the draft shows a basic
+  wireframe or a chart with example values, each tagged (`.mock-tag`), so the layout can be judged now.
+
+Work order from here: capture the real flow-row stills, draw the sketch, run Studies 6/9/4 and replace the
+tagged example values one by one.
+
+---
+
 ## 0. What the interview established
 
 | Topic | Answer |
