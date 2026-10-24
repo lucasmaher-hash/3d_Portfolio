@@ -1,6 +1,7 @@
 import './style.css'
 import { prepareBakedGallery } from './gallery/baked-scene.js'
 import { roundAndTintMacLamp } from './gallery/mac-lamp-orange.js'
+import { applyTomorrowLook } from './gallery/tomorrow-look.js'
 
 const IS_DEFAULT_GALLERY = ['/', '/index.html'].includes(location.pathname)
 const IS_BAKED_GALLERY = IS_DEFAULT_GALLERY || ['/gallery-baked.html','/gallery-4.html'].includes(location.pathname)
@@ -2691,6 +2692,7 @@ loadScene(
       try {
         const { settings, collidables: galleryWalls, view, probes } = await prepareBakedGallery(gltf.scene, scene, renderer, p => loadProgress(GLB_SHARE + p * (0.9 - GLB_SHARE)))
         await roundAndTintMacLamp(gltf.scene, loader)
+        applyTomorrowLook(gltf.scene)
         collidables = galleryWalls
         // Include the lower cove in shoulder-width collision checks.
         lowCollidables.push(...galleryWalls)

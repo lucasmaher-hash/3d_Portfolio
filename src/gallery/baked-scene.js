@@ -57,17 +57,21 @@ export async function prepareBakedGallery(model,scene,renderer,onProgress=()=>{}
     // Do not modify the preserved bottle's imported material parameters.
     for(const material of [mesh.material].flat()){
       material.envMap=probe.texture
-      if(baked){material.emissiveMap=null;material.emissive.set(0)}
+      if(baked){material.emissiveMap=null;material.emissive.set(0)
+        // Uniform objects live on the material so a dev dial can scale / tint the baked light live.
+        material.userData.bakeRange={value:baked.range};material.userData.bakeTint={value:new THREE.Color(1,1,1)}}
       material.onBeforeCompile=shader=>{
         view.bind(shader)
         if(!baked)return
         shader.uniforms.uBakedDiffuse={value:baked.texture}
-        shader.uniforms.uBakedRange={value:baked.range}
+        shader.uniforms.uBakedRange=material.userData.bakeRange
+        shader.uniforms.uBakeTint=material.userData.bakeTint
         shader.vertexShader='attribute vec2 galleryBakeUV;\nvarying vec2 vGalleryBakeUV;\n'+shader.vertexShader
         shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvGalleryBakeUV=galleryBakeUV;')
-        shader.fragmentShader='uniform sampler2D uBakedDiffuse;\nuniform float uBakedRange;\nvarying vec2 vGalleryBakeUV;\n'+shader.fragmentShader
+        shader.fragmentShader='uniform sampler2D uBakedDiffuse;\nuniform float uBakedRange;\nuniform vec3 uBakeTint;\nvarying vec2 vGalleryBakeUV;\n'+shader.fragmentShader
         shader.fragmentShader=shader.fragmentShader.replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
           vec4 galleryRadiance=texture2D(uBakedDiffuse,vGalleryBakeUV);
+          galleryRadiance.rgb*=uBakeTint;
           totalEmissiveRadiance+=galleryRadiance.rgb*galleryRadiance.a*uBakedRange;
         `)
         // Bake already contains all diffuse illumination. Keep environment specular.
