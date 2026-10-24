@@ -1,7 +1,9 @@
 // Helper for clean-wall-lightmaps.py: rasterises each gallery wall into its lightmap's
 // texel grid and writes, per texel, the seam distance (m, interpolated from the vertices
 // exactly as the shader sees it) and the world position. Output: <dir>/<label>.bin =
-// Float32 [W*H d][W*H x][W*H y][W*H z], d = -1 where no triangle covers the texel.
+// Float32 [W*H d][W*H x][W*H y][W*H z][W*H nx][W*H ny][W*H nz], d = -1 where no triangle
+// covers the texel. The normal is what keeps the cleaner from mixing the wall's front and
+// back faces (9 cm apart in world space, but one lit and one dark).
 //   node scripts/raster-wall-seams.mjs <outdir>
 import fs from 'node:fs'
 import { NodeIO } from '@gltf-transform/core'
@@ -32,14 +34,17 @@ for (const node of doc.getRoot().listNodes()) {
     levels.set(+key, grid)
   }
   const m = new THREE.Matrix4().fromArray(node.getWorldMatrix())
-  const buf = new Float32Array(W * H * 4)
-  const D = buf.subarray(0, W * H).fill(-1), X = buf.subarray(W * H, 2 * W * H), Y = buf.subarray(2 * W * H, 3 * W * H), Z = buf.subarray(3 * W * H)
+  const buf = new Float32Array(W * H * 7), S = W * H
+  const D = buf.subarray(0, S).fill(-1), X = buf.subarray(S, 2 * S), Y = buf.subarray(2 * S, 3 * S), Z = buf.subarray(3 * S, 4 * S)
+  const NX = buf.subarray(4 * S, 5 * S), NY = buf.subarray(5 * S, 6 * S), NZ = buf.subarray(6 * S)
+  const nm = new THREE.Matrix3().getNormalMatrix(m)
   for (const prim of node.getMesh().listPrimitives()) {
-    const pos = prim.getAttribute('POSITION'), uvA = prim.getAttribute('TEXCOORD_' + (e.galleryBakeUV || 0)), idx = prim.getIndices().getArray()
-    const n = pos.getCount(), P = new Float64Array(n * 3), U = new Float64Array(n * 2), d = new Float64Array(n)
-    const v = new THREE.Vector3()
+    const nor = prim.getAttribute('NORMAL'), pos = prim.getAttribute('POSITION'), uvA = prim.getAttribute('TEXCOORD_' + (e.galleryBakeUV || 0)), idx = prim.getIndices().getArray()
+    const n = pos.getCount(), P = new Float64Array(n * 3), U = new Float64Array(n * 2), d = new Float64Array(n), N = new Float64Array(n * 3)
+    const v = new THREE.Vector3(), nv = new THREE.Vector3()
     for (let i = 0; i < n; i++) {
       v.fromArray(pos.getElement(i, [])).applyMatrix4(m); P.set([v.x, v.y, v.z], i * 3)
+      nv.fromArray(nor.getElement(i, [])).applyMatrix3(nm).normalize(); N.set([nv.x, nv.y, nv.z], i * 3)
       const uv = uvA.getElement(i, []); U[i * 2] = uv[0] * W - 0.5; U[i * 2 + 1] = uv[1] * H - 0.5
       const grid = levels.get(Math.round(v.y * 1000)); let best = 10
       if (grid) {
@@ -67,6 +72,9 @@ for (const node of doc.getRoot().listNodes()) {
         X[k] = l0 * P[a * 3] + l1 * P[b * 3] + l2 * P[c * 3]
         Y[k] = l0 * P[a * 3 + 1] + l1 * P[b * 3 + 1] + l2 * P[c * 3 + 1]
         Z[k] = l0 * P[a * 3 + 2] + l1 * P[b * 3 + 2] + l2 * P[c * 3 + 2]
+        NX[k] = l0 * N[a * 3] + l1 * N[b * 3] + l2 * N[c * 3]
+        NY[k] = l0 * N[a * 3 + 1] + l1 * N[b * 3 + 1] + l2 * N[c * 3 + 1]
+        NZ[k] = l0 * N[a * 3 + 2] + l1 * N[b * 3 + 2] + l2 * N[c * 3 + 2]
       }
     }
   }

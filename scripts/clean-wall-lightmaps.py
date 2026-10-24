@@ -23,6 +23,10 @@ R = {'outer': 0.06, 'ring': 0.06}    # seam band radius (m): covers the baked li
 SOURCE = 0.08                   # clean texels taken from R .. R + SOURCE
 K = 16                          # nearest clean texels; their per-channel MEDIAN is used (drops blots)
 PAD = 6                         # padding texels refilled around the islands
+NOISE_K = 20                    # world-space neighbours for the noise pass (~5 cm radius)
+SAME_FACE = 0.5                 # min dot of normals for a texel to count as a neighbour
+NOISE_T = 0.02                  # relative luminance deviation that counts as noise
+LUM = np.array([.2126, .7152, .0722])
 settings = json.loads((ROOT / 'public/gallery-baked-assets/scene.json').read_text())['lightmaps']
 
 for lab, r in R.items():
@@ -31,21 +35,46 @@ for lab, r in R.items():
     raw = subprocess.run(['git', 'show', f'{ORIGINAL_REV}:{path}'], cwd=ROOT, capture_output=True, check=True).stdout
     a = np.asarray(Image.open(io.BytesIO(raw)).convert('RGBA')).astype(np.float64) / 255
     hdr = a[..., :3] * a[..., 3:4] * RANGE
-    D, X, Y, Z = np.fromfile(RASTER / f'{lab}.bin', np.float32).reshape(4, H, W)
+    D, X, Y, Z, NX, NY, NZ = np.fromfile(RASTER / f'{lab}.bin', np.float32).reshape(7, H, W)
+    Nrm = np.stack([NX, NY, NZ], -1); Nrm /= np.maximum(np.linalg.norm(Nrm, axis=-1, keepdims=True), 1e-9)
     cov = D >= 0
     band = cov & (D < r)
     src = cov & (D >= r) & (D < r + SOURCE)
     P = np.stack([X, Y, Z], -1)
     tree = cKDTree(P[src])
     srcv = hdr[src]
-    dist, idx = tree.query(P[band], k=K, distance_upper_bound=0.25)
+    # Neighbours must face the same way: the wall's dark back face is only 9 cm away.
+    dist, idx = tree.query(P[band], k=K * 4, distance_upper_bound=0.25, workers=-1)
     ok = np.isfinite(dist)
+    srcn = Nrm[src]
+    ok &= np.einsum('nkc,nc->nk', srcn[np.where(ok, idx, 0)], Nrm[band]) > SAME_FACE
+    keep = np.cumsum(ok, axis=1) <= K
+    ok &= keep
     vals = np.where(ok[..., None], srcv[np.where(ok, idx, 0)], np.nan)
     vals = np.nanmedian(vals, axis=1)
     filled = ok.any(1)
     out = hdr.copy()
     bi = np.argwhere(band)
     out[bi[filled, 0], bi[filled, 1]] = vals[filled]
+    # Pass 2, bake noise: dark specks (Lucas: black dots on the wall behind the Double
+    # Packaging podium) and grainy light patches (the inner ring's entrance returns).
+    # Every covered texel is compared with the median of its NOISE_K nearest texels in
+    # world space (~5 cm); if it is off by more than NOISE_T it takes that median.
+    # Smooth light gradients pass untouched, isolated outliers go.
+    Pc = P[cov]
+    tree2 = cKDTree(Pc)
+    _, nidx = tree2.query(Pc, k=NOISE_K * 2, workers=-1)
+    cur = out[cov]
+    Nc = Nrm[cov]
+    same = np.einsum('nkc,nc->nk', Nc[nidx], Nc) > SAME_FACE
+    same &= np.cumsum(same, axis=1) <= NOISE_K
+    med = np.nanmedian(np.where(same[..., None], cur[nidx], np.nan), axis=1)
+    Lc, Lm = cur @ LUM, med @ LUM
+    noisy = np.abs(Lc / np.maximum(Lm, 1e-9) - 1) > NOISE_T
+    cur[noisy] = med[noisy]
+    out[cov] = cur
+    noise = np.zeros_like(cov); noise[cov] = noisy
+    band = band | noise
     # Padding: uncovered texels next to an island take the nearest covered texel.
     edt, (iy, ix) = nd.distance_transform_edt(~cov, return_indices=True)
     pad = ~cov & (edt <= PAD)
@@ -60,6 +89,6 @@ for lab, r in R.items():
     L = lambda x: np.einsum('...c,c->...', x, np.array([.2126, .7152, .0722]))
     ref = nd.gaussian_filter(np.where(src, L(hdr), 0), 6) / np.maximum(nd.gaussian_filter(src.astype(float), 6), 1e-9)
     m = band & (Y > 0.9) & (Y < 3.7)
-    print(f'{lab}: band {band.sum()} texels ({(~filled).sum()} unfilled), padding {pad.sum()}; '
+    print(f'{lab}: noise texels replaced {int(noise.sum())}; band {band.sum()} texels ({(~filled).sum()} unfilled), padding {pad.sum()}; '
           f'groove/plaster brightness {np.median(L(hdr)[m] / ref[m]):.3f} -> {np.median(L(out)[m] / ref[m]):.3f}, '
           f'p5 {np.percentile(L(hdr)[m] / ref[m], 5):.3f} -> {np.percentile(L(out)[m] / ref[m], 5):.3f}')

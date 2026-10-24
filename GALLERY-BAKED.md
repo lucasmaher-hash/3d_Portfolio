@@ -15,6 +15,13 @@ The native source is the approved `gallery-review-v05.blend` in the local `new 3
 
 7. `node scripts/swap-gallery-old-exhibits.mjs` — run AFTER step 6, every time. Replaces the baked Cybercoffee egg (`egg-rig`) and Virtual Cooking panel (`Pivot_VRPanel`) with the untouched meshes and materials from the old coloured-rooms scene (`public/current🟢.glb`), at the exact spot the baked copies stood (fitted per vertex, <0.2 mm). Both are polished metal, and a diffuse bake made them look wrong (Lucas, 2026-10-22). Their silver materials carry the old site's `MATERIAL_FIXUPS` values (metal 1, rough .14, tint #c9ced8, emissive #353b47); they render as native PBR with the local reflection probes, like the bottle. Their two lightmaps are dropped from `scene.json` and `maps/`, so 20 receivers are baked, not 22.
 
+8. **Post-bake fixes, no rebake (2026-10-24) — run after step 7, every time, in this order:**
+   - `node scripts/extract-wall-seams.mjs` → `wall-seams.json`: the groove centre of every wall seam per height level. The panel grooves are ~8 mm and get too few lightmap texels, so the site draws them in the shader (`drawWallSeams()` in `src/main.js`; Lucas's values `WALL_SEAM = { dark 0.14, width 0.013, soft 0.45 }`). Per level, not straight planes: the coves make a groove drift up to ~0.65 m sideways.
+   - `node scripts/raster-wall-seams.mjs <tmp>` then `python3 scripts/clean-wall-lightmaps.py <tmp>`: removes the bake's own uneven groove shading (6 cm band, median of world-space plaster neighbours) and isolated bake noise from `outer.png`/`ring.png`, and refills the island padding.
+   - `python3 scripts/clean-floor-lightmap.py`: smooths the lumpy LED glow along every floor edge in `floor.png`.
+   - **All three clean scripts read the ORIGINAL bake from Git (`ORIGINAL_REV`, currently `c42ce82`). After a new bake, set it to the commit that adds the new maps first**, or they overwrite the new bake with a cleaned copy of the old one.
+   - Lesson for the next bake: grooves narrower than ~2 texels bake unreliably (some line, some blot, mostly nothing). Either give them real texel width, or leave them to the shader as now.
+
 ## Colour and reflection limits
 
 The LUT calibration uses a visible browser test, not only a matching setting name. The small native-versus-baked Cycles pilot separates diffuse fidelity from view-dependent specular. Whole-scene reflection/refraction pixels cannot be identical to Cycles: local environment captures approximate parallax and Three transmission differs from path tracing. Do not compensate with arbitrary wall multipliers. The approved physical lighting is authoritative.

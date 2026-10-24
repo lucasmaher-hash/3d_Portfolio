@@ -4210,8 +4210,9 @@ over-corrected). Measured over 1626 seam views (each seam at 3 heights, 3 m, hea
 bake artefacts p99 0.29 -> 0.04, line darkness spread p1-p99 0.04-0.29 -> 0.045-0.10. The script
 reads the original bake from git (`ORIGINAL_REV`); re-run both scripts after any wall re-export/rebake
 (and update `ORIGINAL_REV`). Defaults `WALL_SEAM = { dark 0.14, width 0.013, soft 0.45 }` (Lucas's
-dialled values). **`/gallery-4.html?lines`** shows sliders (saved per browser in
-`localStorage.wallSeamTune`, "copy settings" for the numbers).
+dialled values; the `?lines` slider panel he used is removed, see commit 9a159e1). Bake noise
+(dark specks, grain) is filtered in the same script; neighbours must share the texel's normal,
+or the wall's dark BACK face 9 cm away bleeds in as black dots (that happened once).
 
 ## Gallery floor edge glow, cleaned in the lightmap (2026-10-24, Lucas)
 

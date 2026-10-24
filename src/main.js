@@ -1844,7 +1844,8 @@ async function capPodiumTops(model, settings) {
 // every wall vertex gets its distance to the nearest seam plane as an attribute (exact
 // under interpolation: a plane distance is linear and no triangle crosses a seam), and
 // the shader darkens the baked light in a band around 0. Antialiased with fwidth, so a
-// far line fades out instead of shimmering. `?lines` shows sliders to dial it in.
+// far line fades out instead of shimmering. Values dialled in by Lucas with a slider
+// panel (2026-10-24, since removed; it is in git history, commit 9a159e1).
 const WALL_SEAM = { dark: 0.14, width: 0.013, soft: 0.45 }   // dark = share of light removed at the line's centre
 const WALL_SEAM_U = { uSeamDark: { value: 0 }, uSeamWidth: { value: 0 }, uSeamSoft: { value: 0 } }
 function setWallSeams(s) {
@@ -1857,9 +1858,7 @@ async function drawWallSeams(model, settings) {
   const res = await fetch('/gallery-baked-assets/wall-seams.json')
   if (!res.ok) { console.warn('Wandfugen: wall-seams.json fehlt'); return }
   const planes = await res.json()
-  let tune = null
-  try { tune = JSON.parse(localStorage.getItem('wallSeamTune')) } catch (e) {}
-  setWallSeams(new URLSearchParams(location.search).has('lines') && tune ? tune : {})
+  setWallSeams({})
   const walls = []
   model.traverse(o => { if (o.isMesh && o.userData.galleryRole === 'wall' && planes[o.userData.galleryBakeLabel]) walls.push(o) })
   let meshes = 0
@@ -1922,37 +1921,7 @@ async function drawWallSeams(model, settings) {
     meshes++
   }
   console.log(`Wandfugen: ${meshes} Wände`)
-  if (new URLSearchParams(location.search).has('lines')) wallSeamTuner()
 }
-function wallSeamTuner() {
-  const box = document.createElement('div')
-  box.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:100000;background:rgba(20,24,28,.88);color:#eee;font:12px/1.4 -apple-system,system-ui,sans-serif;padding:12px 14px;border-radius:10px;width:250px'
-  const rows = [
-    ['dark', 'Intensity', 0, 0.6, 0.005, v => Math.round(v * 100) + ' %'],
-    ['width', 'Width', 0.003, 0.06, 0.001, v => (v * 100).toFixed(1) + ' cm'],
-    ['soft', 'Softness', 0, 1, 0.01, v => Math.round(v * 100) + ' %'],
-  ]
-  box.innerHTML = '<b>Wall lines</b>' + rows.map(([k, label, min, max, step]) =>
-    `<label style="display:block;margin-top:8px">${label} <span data-v="${k}" style="float:right"></span>
-     <input data-k="${k}" type="range" min="${min}" max="${max}" step="${step}" value="${WALL_SEAM[k]}" style="width:100%"></label>`).join('') +
-    '<button style="margin-top:10px;width:100%">copy settings</button>'
-  const show = () => rows.forEach(([k, , , , , f]) => { box.querySelector(`[data-v="${k}"]`).textContent = f(WALL_SEAM[k]) })
-  box.addEventListener('input', e => {
-    const k = e.target.dataset.k; if (!k) return
-    setWallSeams({ [k]: +e.target.value }); show()
-    try { localStorage.setItem('wallSeamTune', JSON.stringify(WALL_SEAM)) } catch (err) {}
-  })
-  // Keys typed into the sliders must not walk the camera.
-  for (const t of ['keydown', 'mousedown', 'pointerdown', 'touchstart', 'wheel', 'click']) box.addEventListener(t, e => e.stopPropagation())
-  box.querySelector('button').addEventListener('click', e => {
-    const text = JSON.stringify(WALL_SEAM)
-    navigator.clipboard?.writeText(text).catch(() => {})
-    e.target.textContent = 'copied: ' + text
-  })
-  show()
-  document.body.appendChild(box)
-}
-
 function updateHelpIcons(delta) {
   for (const h of helpIcons) {
     if (popAnims.some(a => a.parts.some(p => p.target === h.mesh))) continue
