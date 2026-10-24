@@ -4189,15 +4189,17 @@ guard on `userData.galleryExhibit.near`). The arrow material binds the Blender-v
 
 ## Gallery wall panel lines, redrawn at load (2026-10-24, Lucas)
 
-The outer wall and inner ring have a V-groove every ~0.72 m (224 + 94 seams, running through
-both coves), but the grooves are ~8 mm wide and the bake gave them too few lightmap texels, so
-most of their shading is gone. No rebake: `scripts/extract-wall-seams.mjs` reads the grooves out
-of `gallery.glb` into `public/gallery-baked-assets/wall-seams.json` (one plane per seam: point +
-wall tangent; re-run after any wall re-export), and `drawWallSeams()` in `src/main.js` gives every
-wall vertex its distance to the nearest seam plane (exact under interpolation — plane distance is
-linear and no triangle crosses a seam) and darkens the baked light in a band around it (fwidth-
-antialiased). The ~39 seams whose bake already kept some darkening are measured from the lightmap
-and only get the missing part (`vSeam.y`), so they are not darkened twice. Defaults
-`WALL_SEAM = { dark, width, soft }`; dark 0.18 ≈ 30 % lighter than the podium seams (measured
-off renders at 5 m: podium line −30 %, wall −21 %). **`/gallery-4.html?lines`** shows sliders
-(saved per browser in `localStorage.wallSeamTune`, "copy settings" for the numbers).
+The outer wall and inner ring have a V-groove every ~0.72 m running floor to ceiling through both
+coves, but the grooves are ~8 mm wide and the bake gave them too few lightmap texels, so most of
+their shading is gone. No rebake: `scripts/extract-wall-seams.mjs` reads the grooves out of
+`gallery.glb` into `public/gallery-baked-assets/wall-seams.json` (per wall, per height level in mm,
+every groove centre in that horizontal slice; re-run after any wall re-export), and
+`drawWallSeams()` in `src/main.js` gives every wall vertex its horizontal distance to the nearest
+groove centre **of its own level** and darkens the baked light in a band around it (fwidth-
+antialiased). **Not straight planes:** the coves flare, a groove drifts up to ~0.65 m sideways
+toward floor/ceiling, and planes drew a second line next to the real one there. **Uniform:** for
+every groove at every level the bake's own darkness (groove vs 8-25 cm beside it) is measured from
+the lightmap and divided out in the shader (`vSeam.y`), so baked-in and missing lines end at the
+same darkness, the slider's. Defaults `WALL_SEAM = { dark 0.14, width 0.013, soft 0.45 }` (Lucas's
+dialled values). **`/gallery-4.html?lines`** shows sliders (saved per browser in
+`localStorage.wallSeamTune`, "copy settings" for the numbers).

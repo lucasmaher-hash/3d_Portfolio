@@ -1845,7 +1845,7 @@ async function capPodiumTops(model, settings) {
 // under interpolation: a plane distance is linear and no triangle crosses a seam), and
 // the shader darkens the baked light in a band around 0. Antialiased with fwidth, so a
 // far line fades out instead of shimmering. `?lines` shows sliders to dial it in.
-const WALL_SEAM = { dark: 0.18, width: 0.025, soft: 0.5 }   // dark = share of light removed at the line's centre
+const WALL_SEAM = { dark: 0.14, width: 0.013, soft: 0.45 }   // dark = share of light removed at the line's centre
 const WALL_SEAM_U = { uSeamDark: { value: 0 }, uSeamWidth: { value: 0 }, uSeamSoft: { value: 0 } }
 function setWallSeams(s) {
   Object.assign(WALL_SEAM, s)
@@ -1857,64 +1857,74 @@ async function drawWallSeams(model, settings) {
   const res = await fetch('/gallery-baked-assets/wall-seams.json')
   if (!res.ok) { console.warn('Wandfugen: wall-seams.json fehlt'); return }
   const planes = await res.json()
-  const CELL = 1.5, MAX_N = 0.9   // seams move up to ~0.66 m inward along the coves
   let tune = null
   try { tune = JSON.parse(localStorage.getItem('wallSeamTune')) } catch (e) {}
   setWallSeams(new URLSearchParams(location.search).has('lines') && tune ? tune : {})
   const walls = []
-  model.traverse(o => { if (o.isMesh && o.userData.galleryRole === 'wall' && planes[o.userData.galleryBakeLabel]?.length) walls.push(o) })
+  model.traverse(o => { if (o.isMesh && o.userData.galleryRole === 'wall' && planes[o.userData.galleryBakeLabel]) walls.push(o) })
   let meshes = 0
   const kept = []
+  const CELL = 0.5, NEAR_D = 0.015, SIDE0 = 0.08, SIDE1 = 0.25, MAX_D = 0.9
   for (const o of walls) {
-    const seams = planes[o.userData.galleryBakeLabel]
-    const grid = new Map()
-    seams.forEach((s, i) => {
-      const k = Math.floor(s[0] / CELL) + ',' + Math.floor(s[1] / CELL)
-      if (!grid.has(k)) grid.set(k, []); grid.get(k).push(i)
-    })
+    // Groove centres per height level (scripts/extract-wall-seams.mjs). A vertex's seam
+    // distance is its horizontal distance to the nearest groove centre of its OWN level,
+    // so the line follows the groove through the flared coves instead of a straight plane.
+    const levels = new Map()
+    for (const [key, flat] of Object.entries(planes[o.userData.galleryBakeLabel])) {
+      const pts = new Float64Array(flat.length)
+      for (let i = 0; i < flat.length; i++) pts[i] = flat[i] / 1e4
+      const grid = new Map()
+      for (let i = 0; i < pts.length; i += 2) {
+        const k = Math.floor(pts[i] / CELL) + ',' + Math.floor(pts[i + 1] / CELL)
+        if (!grid.has(k)) grid.set(k, []); grid.get(k).push(i >> 1)
+      }
+      levels.set(+key, { pts, grid })
+    }
     const pos = o.geometry.getAttribute('position'), v = new THREE.Vector3()
-    const dist = new Float32Array(pos.count), which = new Int32Array(pos.count)
+    const dist = new Float32Array(pos.count).fill(10), lvl = new Int32Array(pos.count), which = new Int32Array(pos.count).fill(-1)
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
+      const key = Math.round(v.y * 1000), L = levels.get(key)
+      lvl[i] = key
+      if (!L) continue
       const gx = Math.floor(v.x / CELL), gz = Math.floor(v.z / CELL)
-      let best = 10, bi = -1
+      let best = MAX_D, bi = -1
       for (let x = gx - 1; x <= gx + 1; x++) for (let z = gz - 1; z <= gz + 1; z++)
-        for (const j of grid.get(x + ',' + z) || []) {
-          const s = seams[j], dx = v.x - s[0], dz = v.z - s[1]
-          if (Math.abs(dx * s[3] - dz * s[2]) > MAX_N) continue   // along the wall normal
-          const d = Math.abs(dx * s[2] + dz * s[3])                // along the wall
+        for (const j of L.grid.get(x + ',' + z) || []) {
+          const d = Math.hypot(v.x - L.pts[2 * j], v.z - L.pts[2 * j + 1])
           if (d < best) { best = d; bi = j }
         }
-      dist[i] = best; which[i] = bi
+      dist[i] = bi < 0 ? 10 : best; which[i] = bi
     }
-    // A few seams kept their baked shading. Measure, per seam, how much darker the
-    // bake already is right at the groove than 8–25 cm beside it (mid-height only),
-    // so the shader only adds what is missing instead of darkening those twice.
+    // Some grooves kept part of their shading in the bake, and by different amounts at
+    // different heights. For every groove at every level: how dark is the bake at the
+    // groove vs 8-25 cm beside it? The shader divides that out, so every line ends up
+    // at exactly the same darkness (the slider's), whatever the bake did there.
     const info = settings.lightmaps[o.userData.galleryBakeLabel], uvA = o.geometry.getAttribute('galleryBakeUV')
-    const near = new Float64Array(seams.length), nearN = new Uint32Array(seams.length)
-    const side = new Float64Array(seams.length), sideN = new Uint32Array(seams.length)
+    const acc = new Map()
+    const slot = (key, j) => { const k = key * 4096 + j; let a = acc.get(k); if (!a) acc.set(k, a = [0, 0, 0, 0]); return a }
     if (info && uvA) {
       const lm = await readLightmap(info.file)
       for (let i = 0; i < pos.count; i++) {
         const j = which[i], d = dist[i]
-        if (j < 0 || (d > 0.015 && (d < 0.08 || d > 0.25))) continue
-        v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
-        if (v.y < 0.9 || v.y > 3.7) continue
+        if (j < 0 || (d > NEAR_D && (d < SIDE0 || d > SIDE1))) continue
         const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
         const py = Math.min(lm.h - 1, Math.max(0, Math.floor(uvA.getY(i) * lm.h)))
         const k = (py * lm.w + px) * 4
         const lum = (0.2126 * lm.data[k] + 0.7152 * lm.data[k + 1] + 0.0722 * lm.data[k + 2]) * lm.data[k + 3]
-        if (d <= 0.015) { near[j] += lum; nearN[j]++ } else { side[j] += lum; sideN[j]++ }
+        const a = slot(lvl[i], j)
+        if (d <= NEAR_D) { a[0] += lum; a[1]++ } else { a[2] += lum; a[3]++ }
       }
     }
-    // ^1.5 / 0.98: calibrated against renders — an untouched groove samples ~0.98 and
-    // shows no line; a baked line renders darker than its vertex samples say.
-    const baked = seams.map((_, j) => nearN[j] && sideN[j] && side[j] > 0
-      ? Math.min(1, Math.max(0.2, (near[j] / nearN[j]) / (side[j] / sideN[j]) / 0.98)) ** 1.5 : 1)
-    kept.push(...baked.filter(e => e < 0.9).map(e => e.toFixed(2)))
-    if (new URLSearchParams(location.search).has('lines')) (window.__wallSeams ||= {})[o.userData.galleryBakeLabel] = { seams, baked }
+    const baked = new Float32Array(pos.count).fill(1)
+    for (let i = 0; i < pos.count; i++) {
+      if (which[i] < 0) continue
+      const a = acc.get(lvl[i] * 4096 + which[i])
+      if (a && a[1] && a[3] && a[2] > 0) baked[i] = Math.min(1, Math.max(0.2, (a[0] / a[1]) / (a[2] / a[3])))
+    }
+    kept.push(baked.reduce((n, e) => n + (e < 0.9 ? 1 : 0), 0))
     const attr = new Float32Array(pos.count * 2)
-    for (let i = 0; i < pos.count; i++) { attr[i * 2] = dist[i]; attr[i * 2 + 1] = which[i] < 0 ? 1 : baked[which[i]] }
+    for (let i = 0; i < pos.count; i++) { attr[i * 2] = dist[i]; attr[i * 2 + 1] = baked[i] }
     o.geometry.setAttribute('gallerySeam', new THREE.BufferAttribute(attr, 2))
     for (const m of [o.material].flat()) {
       const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey
@@ -1940,7 +1950,7 @@ async function drawWallSeams(model, settings) {
     }
     meshes++
   }
-  console.log(`Wandfugen: ${meshes} Wände, ${Object.values(planes).reduce((a, s) => a + s.length, 0)} Fugen; schon gebacken (<0.9): ${kept.length} [${kept.join(' ')}]`)
+  console.log(`Wandfugen: ${meshes} Wände; Vertices mit schon gebackener Fuge (<0.9): ${kept.join(' / ')}`)
   if (new URLSearchParams(location.search).has('lines')) wallSeamTuner()
 }
 function wallSeamTuner() {
