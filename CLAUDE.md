@@ -1739,12 +1739,16 @@ draft replaces it. Generated once by a script, so **edit the HTML directly from 
 `<style>` block before the last one (comment "Case-study rebuild"); new copy is in DE + EN through a
 `Object.assign(TRANSLATIONS.en/de, {...})` block (keys `n-…`) before `pick()`, which overrides old keys.
 
-Order: hero film → App Store badge directly under the header (the QR/"try it" block was removed 2026-10-24, Lucas wanted the plain badge back) → **Projektüberblick** (five labelled lines, after
-Calmsphere/Asuo; no claim line and no page map, removed 2026-10-24 at Lucas's request) → meta grid → 1 Problem (+ taps chart) → 2 Idee (flow row, swipe video, rule card with a collapsible
-week diagram) → 3 Live (flow row, existing live rows) → 4 Pivot (sketch spread, Windows 95 strip,
-same-view side-by-side `windows8` vs `theme-grey`, retention curve, legibility pair, then the type/icons
-block) → 5 **Regeln des Designsystems** → 6 Barrierefreiheit → 7 Rest (share chart, workspaces, settings,
-colour fan) → 8 Ergebnis (fact bar, review cards, learnings, three next steps, tools) → foot badge + nav.
+Order (cut to six sections on 2026-10-24, ~1,600 words, page height 17.3k → 13.3k px at 1440): hero film →
+App Store badge directly under the header (no QR/"try it" block, Lucas wanted the plain badge) →
+**Projektüberblick** (four labelled lines; the role line is gone because the **meta grid stays**, Lucas likes
+it; no claim line, no page map) → meta grid → 1 Problem (+ taps chart) → 2 Idee (flow row, swipe video,
+rule card with a collapsible week diagram) → 3 Live (flow row, existing live rows) → 4 Pivot (sketch spread,
+Windows 95 strip, same-view side-by-side `windows8` vs `theme-grey`, retention curve, then the type/icons
+block) → 5 **Regeln des Designsystems** (rules, Seitenansicht, live demos, colour fan, one accessibility
+paragraph) → 6 Ergebnis und Ausblick (learnings, three next steps, tools) → foot badge + nav. **Cut and
+parked until there is real data:** legibility pair, shape test, usage chart, contrast table, AX5 pair, the
+fact bar and the review cards, plus the workspaces/settings rows (their videos still exist).
 
 **Section 5 is Lucas's own: "what I was thinking".** Four rules (one light · height is a ladder · pressing
 costs height · every surface has thickness), taken from `SKEUOMORPHIC_DESIGN_SYSTEM.md` §1.2 in the to.morrow
@@ -1754,7 +1758,7 @@ each with its explanation. **It is a placeholder for Lucas's paper sketch**: whe
 `.side-grid` inside `.paper` with the scan (`/images/to.morrow/seitenansicht-skizze.webp`). After it come the
 existing live "Drei Formen" demos and a shape-test mock.
 
-**Everything that needs data is a mockup with example values, and says so.** Two markers, both `.mock-tag`
+**Everything that needs data is a mockup with example values, and says so.** Two markers, both `.mock-tag` (left: the taps chart, retention curve, the two flow rows, the sketch placeholders)
 (grep that word): "Mockup" = wireframe or placeholder to be swapped for a real screenshot/scan (the two
 flow rows, the AX5 pair, the review cards), "Beispielwerte" = invented numbers in a real-looking chart (taps
 benchmark, retention, legibility, shape test, accessibility contrast, usage share, fact bar). **None of

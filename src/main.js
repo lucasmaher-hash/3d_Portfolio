@@ -1835,6 +1835,113 @@ async function capPodiumTops(model, settings) {
   console.log(`Podest-Mitte geglättet: ${done.length} (${done.join(' | ')})`)
 }
 
+// The outer wall and the inner ring are panelled: a V-groove every ~0.72 m, running
+// floor to ceiling through both coves. The grooves are in the geometry, but they are
+// ~8 mm wide and the bake gave them too few lightmap texels, so most of their shading
+// was lost (Lucas: "the vertical dividing panel lines are gone"). The podiums kept
+// theirs because their seams are 2.5 cm wide. So the lines are drawn back at load, no
+// rebake: wall-seams.json (scripts/extract-wall-seams.mjs) holds one plane per seam,
+// every wall vertex gets its distance to the nearest seam plane as an attribute (exact
+// under interpolation: a plane distance is linear and no triangle crosses a seam), and
+// the shader darkens the baked light in a band around 0. Antialiased with fwidth, so a
+// far line fades out instead of shimmering. `?lines` shows sliders to dial it in.
+const WALL_SEAM = { dark: 0.15, width: 0.025, soft: 0.5 }   // dark = share of light removed at the line's centre
+const WALL_SEAM_U = { uSeamDark: { value: 0 }, uSeamWidth: { value: 0 }, uSeamSoft: { value: 0 } }
+function setWallSeams(s) {
+  Object.assign(WALL_SEAM, s)
+  WALL_SEAM_U.uSeamDark.value = WALL_SEAM.dark
+  WALL_SEAM_U.uSeamWidth.value = WALL_SEAM.width
+  WALL_SEAM_U.uSeamSoft.value = WALL_SEAM.soft
+}
+async function drawWallSeams(model) {
+  const res = await fetch('/gallery-baked-assets/wall-seams.json')
+  if (!res.ok) { console.warn('Wandfugen: wall-seams.json fehlt'); return }
+  const planes = await res.json()
+  const CELL = 1.5, MAX_N = 0.9   // seams move up to ~0.66 m inward along the coves
+  let tune = null
+  try { tune = JSON.parse(localStorage.getItem('wallSeamTune')) } catch (e) {}
+  setWallSeams(new URLSearchParams(location.search).has('lines') && tune ? tune : {})
+  let meshes = 0
+  model.traverse(o => {
+    if (!o.isMesh || o.userData.galleryRole !== 'wall') return
+    const seams = planes[o.userData.galleryBakeLabel]
+    if (!seams?.length) return
+    const grid = new Map()
+    seams.forEach((s, i) => {
+      const k = Math.floor(s[0] / CELL) + ',' + Math.floor(s[1] / CELL)
+      if (!grid.has(k)) grid.set(k, []); grid.get(k).push(s)
+    })
+    const pos = o.geometry.getAttribute('position'), v = new THREE.Vector3()
+    const dist = new Float32Array(pos.count)
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
+      const gx = Math.floor(v.x / CELL), gz = Math.floor(v.z / CELL)
+      let best = 10
+      for (let x = gx - 1; x <= gx + 1; x++) for (let z = gz - 1; z <= gz + 1; z++)
+        for (const s of grid.get(x + ',' + z) || []) {
+          const dx = v.x - s[0], dz = v.z - s[1]
+          if (Math.abs(dx * s[3] - dz * s[2]) > MAX_N) continue   // along the wall normal
+          const d = Math.abs(dx * s[2] + dz * s[3])                // along the wall
+          if (d < best) best = d
+        }
+      dist[i] = best
+    }
+    o.geometry.setAttribute('gallerySeamD', new THREE.BufferAttribute(dist, 1))
+    for (const m of [o.material].flat()) {
+      const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey
+      m.onBeforeCompile = (shader, r) => {
+        prev.call(m, shader, r)
+        Object.assign(shader.uniforms, WALL_SEAM_U)
+        shader.vertexShader = 'attribute float gallerySeamD;\nvarying float vSeamD;\n' + shader.vertexShader
+          .replace('#include <begin_vertex>', '#include <begin_vertex>\nvSeamD = gallerySeamD;')
+        const bakeLine = 'totalEmissiveRadiance+=galleryRadiance.rgb*galleryRadiance.a*uBakedRange;'
+        if (!shader.fragmentShader.includes(bakeLine)) throw Error('Wall seams: bake line not found')
+        shader.fragmentShader = 'varying float vSeamD;\nuniform float uSeamDark, uSeamWidth, uSeamSoft;\n' + shader.fragmentShader
+          .replace(bakeLine, bakeLine + `
+          {
+            float sw = 0.5 * uSeamWidth, sf = max(fwidth(vSeamD), 1e-6);
+            float se = max(sf, uSeamSoft * sw);
+            float sc = (1.0 - smoothstep(sw - se, sw + se, vSeamD)) * min(1.0, sw / sf);
+            totalEmissiveRadiance *= 1.0 - uSeamDark * sc;
+          }`)
+      }
+      m.customProgramCacheKey = () => prevKey.call(m) + '-wallseams'
+      m.needsUpdate = true
+    }
+    meshes++
+  })
+  console.log(`Wandfugen: ${meshes} Wände, ${Object.values(planes).reduce((a, s) => a + s.length, 0)} Fugen`)
+  if (new URLSearchParams(location.search).has('lines')) wallSeamTuner()
+}
+function wallSeamTuner() {
+  const box = document.createElement('div')
+  box.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:100000;background:rgba(20,24,28,.88);color:#eee;font:12px/1.4 -apple-system,system-ui,sans-serif;padding:12px 14px;border-radius:10px;width:250px'
+  const rows = [
+    ['dark', 'Intensity', 0, 0.6, 0.005, v => Math.round(v * 100) + ' %'],
+    ['width', 'Width', 0.003, 0.06, 0.001, v => (v * 100).toFixed(1) + ' cm'],
+    ['soft', 'Softness', 0, 1, 0.01, v => Math.round(v * 100) + ' %'],
+  ]
+  box.innerHTML = '<b>Wall lines</b>' + rows.map(([k, label, min, max, step]) =>
+    `<label style="display:block;margin-top:8px">${label} <span data-v="${k}" style="float:right"></span>
+     <input data-k="${k}" type="range" min="${min}" max="${max}" step="${step}" value="${WALL_SEAM[k]}" style="width:100%"></label>`).join('') +
+    '<button style="margin-top:10px;width:100%">copy settings</button>'
+  const show = () => rows.forEach(([k, , , , , f]) => { box.querySelector(`[data-v="${k}"]`).textContent = f(WALL_SEAM[k]) })
+  box.addEventListener('input', e => {
+    const k = e.target.dataset.k; if (!k) return
+    setWallSeams({ [k]: +e.target.value }); show()
+    try { localStorage.setItem('wallSeamTune', JSON.stringify(WALL_SEAM)) } catch (err) {}
+  })
+  // Keys typed into the sliders must not walk the camera.
+  for (const t of ['keydown', 'mousedown', 'pointerdown', 'touchstart', 'wheel', 'click']) box.addEventListener(t, e => e.stopPropagation())
+  box.querySelector('button').addEventListener('click', e => {
+    const text = JSON.stringify(WALL_SEAM)
+    navigator.clipboard?.writeText(text).catch(() => {})
+    e.target.textContent = 'copied: ' + text
+  })
+  show()
+  document.body.appendChild(box)
+}
+
 function updateHelpIcons(delta) {
   for (const h of helpIcons) {
     if (popAnims.some(a => a.parts.some(p => p.target === h.mesh))) continue
@@ -2652,6 +2759,7 @@ loadScene(
           }
           addCentreHelpPodium(gltf.scene, galleryWalls, probes)
           await capPodiumTops(gltf.scene, settings)
+          await drawWallSeams(gltf.scene)
           try {
             const saved = JSON.parse(sessionStorage.getItem(RETURN_STATE_KEY))
             if (saved && ['x','y','z','yaw','pitch'].every(k => Number.isFinite(saved[k]))) {

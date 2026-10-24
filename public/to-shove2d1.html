@@ -2703,12 +2703,6 @@
     .wf-home { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4cqw; }
     .wf-home span { aspect-ratio: 1; border-radius: 3cqw; background: rgba(26, 26, 26, 0.12); }
     /* Accessibility pair: same screen at the default size and at AX5. */
-    .wf.ax .wf-title { height: 9cqw; width: 52cqw; }
-    .wf.ax .wf-row { gap: 4cqw; }
-    .wf.ax .wf-row i { width: 12cqw; }
-    .wf.ax .wf-row b { height: 9cqw; }
-    .wf.ax .wf-s { gap: 9cqw; }
-    .wf.ax .wf-tabs span { height: 12cqw; }
 
     /* ── Charts ── */
     .chart {
@@ -2730,14 +2724,6 @@
     @media (max-width: 640px) { .line-chart text { font-size: 16px; } }
     .line-chart .t-us { fill: #475F7E; font-weight: 500; }
     .line-chart .t-old { fill: #6f6f76; }
-    .leg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    .leg-card { display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 14px; background: rgba(0, 0, 0, 0.03); }
-    .leg-px { font-family: 'W95FA', monospace; font-size: 22px; line-height: 1.25; font-size-adjust: none; color: var(--text-primary); -webkit-font-smoothing: none; }
-    .leg-sys { font-family: -apple-system, 'SF Pro Text', 'Roboto Flex', sans-serif; font-size: 16px; line-height: 1.35; font-size-adjust: none; color: var(--text-primary); }
-    .leg-nums { display: flex; gap: 22px; }
-    .leg-num b { display: block; font-size: 26px; font-weight: 300; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1.1; }
-    .leg-num span { font-size: 12px; color: var(--text-secondary); }
-    @media (max-width: 640px) { .leg { grid-template-columns: 1fr; } }
 
     /* Same screen, two builds. */
     .cmp { display: flex; justify-content: center; gap: clamp(16px, 4vw, 48px); align-items: flex-start; }
@@ -2792,35 +2778,10 @@
     .s-dash { fill: none; stroke: #2b2b30; stroke-width: 1.6; stroke-dasharray: 5 5; stroke-linecap: round; opacity: 0.6; }
     .s-thin { fill: none; stroke: #2b2b30; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: 0.8; }
     .paper svg text { font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size: 11px; fill: #4a4a4e; font-size-adjust: none; }
-    .shapes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; text-align: center; }
-    .shape { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .shape-demo { height: 84px; display: grid; place-items: center; }
-    .shape-bubble { width: 118px; height: 44px; border-radius: 99px; background: var(--bg-surface); box-shadow: var(--shadow-raised-sm); }
-    .shape-trough { width: 138px; height: 44px; border-radius: 99px; box-shadow: var(--shadow-pressed); }
-    .shape-toggle { position: relative; width: 150px; height: 46px; border-radius: 99px; box-shadow: var(--shadow-pressed); }
-    .shape-toggle::after { content: ''; position: absolute; left: 5px; top: 5px; width: 62px; height: 36px; border-radius: 99px; background: var(--bg-surface); box-shadow: var(--shadow-raised-sm); }
-    @media (max-width: 640px) { .shape-bubble { width: 84px; height: 36px; } .shape-trough { width: 92px; height: 36px; } .shape-toggle { width: 96px; height: 38px; } .shape-toggle::after { left: 4px; top: 4px; width: 40px; height: 30px; } .shapes { gap: 8px; } }
-    .shape b { font-size: 30px; font-weight: 300; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1.1; }
-    .shape span { font-size: 12.5px; color: var(--text-secondary); }
 
     /* ── Accessibility ── */
-    .contrast { width: 100%; border-collapse: collapse; font-size: 13.5px; color: var(--text-secondary); }
-    .contrast th { text-align: left; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 400; padding: 0 0 10px; }
-    .contrast td { padding: 9px 0; border-top: 1px solid var(--border-color); }
-    .contrast td:not(:first-child), .contrast th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
-    .contrast td:first-child { color: var(--text-primary); }
 
     /* ── Result ── */
-    .facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 24px; }
-    .fact b { display: block; font-size: clamp(28px, 4vw, 44px); font-weight: 300; letter-spacing: -0.03em; line-height: 1.05; color: var(--text-primary); }
-    .fact span { display: block; margin-top: 6px; font-size: 13px; line-height: 1.4; color: var(--text-secondary); }
-    @media (max-width: 640px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    .reviews { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-    .review { display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 16px; box-shadow: var(--shadow-raised-sm); }
-    .review .stars { font-size: 13px; letter-spacing: 0.12em; color: var(--text-primary); }
-    .review p { font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
-    .review small { font-size: 12px; color: var(--text-secondary); }
-    @media (max-width: 860px) { .reviews { grid-template-columns: 1fr; } }
     .next { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
     .next li { position: relative; padding-left: 22px; font-size: 14.4px; line-height: 1.6; color: var(--text-secondary); }
     .next li::before { content: ''; position: absolute; left: 2px; top: 0.62em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-orange); }
@@ -2918,7 +2879,6 @@
       <div class="ov">
         <p data-i18n-html="n-ov-1"><b>Was ist to.morrow?</b> Eine iOS-App mit drei Listen, Heute, Morgen und Bald, in der das Verschieben einer Aufgabe auf einen anderen Tag eine einzige Wischgeste ist.</p>
 <p data-i18n-html="n-ov-2"><b>Das Problem:</b> Wer sich zu viel vornimmt, füllt die Heute-Liste über das Machbare hinaus. Verschieben kostet in anderen Apps mehrere Schritte, also bleibt alles liegen, und die Liste stimmt am Vormittag nicht mehr.</p>
-<p data-i18n-html="n-ov-3"><b>Meine Rolle:</b> Solo. Konzept, Interaktions- und Visual Design, das Designsystem SkeuKit und die Umsetzung.</p>
 <p data-i18n-html="n-ov-4"><b>Was ich gestaltet habe:</b> Das Drei-Listen-Modell mit der Wischgeste, die Live-Aufgabe auf Sperrbildschirm und Dynamic Island, ein Designsystem aus drei Formen, Workspaces und Themes.</p>
 <p data-i18n-html="n-ov-5"><b>Ergebnis:</b> Im App Store verfügbar. Die erste Version wurde nach dem Feedback aus TestFlight vollständig ersetzt. Nutzungszahlen stehen im Abschnitt Ergebnis.</p>
       </div>
@@ -2969,7 +2929,6 @@
         </div>
         <figcaption class="chart-note" data-i18n="n-taps-cap">Dieselbe Aufgabe, vier Apps. to.morrow braucht einen Schritt, die anderen drei bis fünf.</figcaption>
       </figure>
-      <p class="guide-text" data-i18n-html="problem-4">Darauf antwortet to.morrow mit zwei Funktionen. Die eine hält die Aufgabe, an der du gerade arbeitest, dauerhaft im Blick. Die andere macht das <b class="kw">Verschieben zur Hauptgeste</b>. Den Rest erledigt die App: Sobald ein neuer Tag beginnt, rückt Morgen von selbst auf Heute.</p>
     </div>
     <!-- ══ 2. Die Idee ═══════════════════════════════════════════════ -->
     <div class="guide-section">
@@ -3178,23 +3137,6 @@
         </svg>
         <figcaption class="chart-note" data-i18n="n-ret-cap">Dieselben Funktionen, andere Oberfläche. Nach einer Woche öffnen mehr als doppelt so viele Tester die SkeuKit-Version noch.</figcaption>
       </figure>
-      <figure class="chart" style="margin:0;">
-        <div class="chart-head">
-          <p class="chart-title" data-i18n="n-leg-title">Dieselbe Liste in zwei Schriften</p>
-          <span class="mock-tag" data-i18n="n-tag-ex">Beispielwerte</span>
-        </div>
-        <div class="leg">
-          <div class="leg-card">
-            <p class="leg-px">Zahnarzt 14:30<br>Steuer bis 31.7.</p>
-            <div class="leg-nums"><div class="leg-num"><b>+38 %</b><span data-i18n="n-leg-time">Lesezeit</span></div><div class="leg-num"><b>3×</b><span data-i18n="n-leg-err">Lesefehler</span></div></div>
-          </div>
-          <div class="leg-card">
-            <p class="leg-sys">Zahnarzt 14:30<br>Steuer bis 31.7.</p>
-            <div class="leg-nums"><div class="leg-num"><b>±0</b><span data-i18n="n-leg-time">Lesezeit</span></div><div class="leg-num"><b>1×</b><span data-i18n="n-leg-err">Lesefehler</span></div></div>
-          </div>
-        </div>
-        <figcaption class="chart-note" data-i18n="n-leg-cap">Pixelschrift links, Systemschrift rechts, gleicher Inhalt. Die Pixelschrift liest sich langsamer und fehleranfälliger.</figcaption>
-      </figure>
       <p class="guide-text media-copy" data-i18n-html="pivot-3">Also habe ich sie gestrichen. An ihre Stelle kam <b class="kw">SkeuKit</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
       <!-- A labelled bubble stands still on each side; the icons expand out
            from behind it. The bubble carries its own face — W95FA on the
@@ -3337,7 +3279,6 @@
         <div class="dna-row">
           <h3 class="feature-title" data-i18n="dna-title">Drei Formen, drei Aufgaben</h3>
           <div class="dna-body">
-            <p class="stagger-copy dna-copy" data-i18n-html="dna-intro">SkeuKit besteht aus genau <b class="kw">drei Formen</b>, und jede beantwortet eine einzige Frage. Weil es nur drei sind, lernst du sie einmal — danach erklärt sich jede neue Ansicht der App von selbst.</p>
             <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die <b class="kw">Glasblase</b> liegt erhaben auf der Fläche: anklickbar, aber nicht änderbar. Die <b class="kw">Mulde</b> ist ihre Umkehrung — eine Vertiefung markiert jedes Feld, in das du selbst schreibst. Beides zusammen ergibt den <b class="kw">Umschalter</b>: eine Blase in einer Mulde. Du wählst aus, ohne zu tippen — die Mulde gruppiert, was zusammengehört, die Blase zeigt, was gerade gilt.</p>
           </div>
           <div class="dna-stack">
@@ -3387,110 +3328,7 @@
           </div>
         </div>
       </div>
-
-
-      <figure class="chart" style="margin:0;">
-        <div class="chart-head">
-          <p class="chart-title" data-i18n="n-shape-title">Lesen Erstnutzer die Formen richtig?</p>
-          <span class="mock-tag" data-i18n="n-tag-ex">Beispielwerte</span>
-        </div>
-        <div class="shapes">
-          <div class="shape"><div class="shape-demo"><div class="shape-bubble"></div></div><b>94 %</b><span data-i18n="n-sh-1">antippen</span></div>
-          <div class="shape"><div class="shape-demo"><div class="shape-trough"></div></div><b>89 %</b><span data-i18n="n-sh-2">schreiben</span></div>
-          <div class="shape"><div class="shape-demo"><div class="shape-toggle"></div></div><b>91 %</b><span data-i18n="n-sh-3">wählen</span></div>
-        </div>
-        <figcaption class="chart-note" data-i18n="n-shape-cap">Ohne Beschriftung, auf unbekannten Ansichten: Die Form zeigt, was sie tut.</figcaption>
-      </figure>
-    </div>
-    <!-- ══ 6. Barrierefreiheit ═══════════════════════════════════════ -->
-    <div class="guide-section">
-          <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="n-sec-a11y">Barrierefreiheit</h2>
-        <span class="step-badge">6</span>
-      </div>
-      <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n="n-a11y-1">Text skaliert mit Dynamic Type bis AX5. Die Bedienelemente wachsen nur halb so schnell wie der Text, damit sie den Bildschirm nicht füllen. Passt eine Tab-Beschriftung nicht mehr, wird sie abgekürzt statt kleiner gesetzt, sodass alle drei Beschriftungen gleich groß bleiben.</p>
-      <p class="guide-text" data-i18n="n-a11y-2">Eine Zeile ist für VoiceOver ein einziges Element. Bearbeiten, Sortieren und Fotos sind deshalb als eigene VoiceOver-Aktionen angelegt, sonst wären sie nicht erreichbar. Reduce Motion stoppt jede Dauer-Animation vollständig. Alle Touch-Ziele sind mindestens 44 pt groß.</p>
-      <div class="flow-band">
-        <div class="band-head"><p class="band-title" data-i18n="n-ax-band">Dieselbe Ansicht in Standardgröße und bei AX5</p><span class="mock-tag" data-i18n="n-tag-mock">Mockup</span></div>
-        <div class="flow-row" style="gap: clamp(24px, 6vw, 72px);">
-          <figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-title"></div><div class="wf-row"><i></i><b></b></div><div class="wf-row"><i></i><b></b></div><div class="wf-row"><i></i><b></b></div><div class="wf-row"><i></i><b></b></div><div class="wf-sp"></div><div class="wf-tabs"><span class=on></span><span></span><span></span></div></div></div><figcaption data-i18n="n-ax-1">Standard</figcaption></figure>
-          <figure class="wf-fig"><div class="wf ax" aria-hidden="true"><div class="wf-s"><div class="wf-title"></div><div class="wf-row"><i></i><b></b></div><div class="wf-row"><i></i><b></b></div><div class="wf-sp"></div><div class="wf-tabs"><span class=on></span><span></span><span></span></div></div></div><figcaption data-i18n="n-ax-2">AX5, die größte Stufe</figcaption></figure>
-        </div>
-      </div>
-      <figure class="chart" style="margin:0;">
-        <div class="chart-head">
-          <p class="chart-title" data-i18n="n-ct-title">Kontrast in allen Themes, hell und dunkel</p>
-          <span class="mock-tag" data-i18n="n-tag-ex">Beispielwerte</span>
-        </div>
-        <table class="contrast">
-          <thead><tr><th data-i18n="n-ct-h1">Textrolle</th><th data-i18n="n-ct-h2">Gemessen</th><th data-i18n="n-ct-h3">Ziel (AA)</th></tr></thead>
-          <tbody>
-            <tr><td data-i18n="n-ct-1">Aufgabentext</td><td>6,4 : 1</td><td>4,5 : 1</td></tr>
-            <tr><td data-i18n="n-ct-2">Sekundärtext</td><td>4,9 : 1</td><td>4,5 : 1</td></tr>
-            <tr><td data-i18n="n-ct-3">Tab-Beschriftung</td><td>5,2 : 1</td><td>4,5 : 1</td></tr>
-            <tr><td data-i18n="n-ct-4">Symbol auf Akzentfläche</td><td>3,4 : 1</td><td>3 : 1</td></tr>
-          </tbody>
-        </table>
-      </figure>
-    </div>
-    <!-- ══ 7. Der Rest ═══════════════════════════════════════════════ -->
-    <div class="guide-section">
-          <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="n-sec-rest">Der Rest in Kürze</h2>
-        <span class="step-badge">7</span>
-      </div>
-      <div class="dot-divider"></div>
-      <figure class="chart" style="margin:0;">
-        <div class="chart-head">
-          <p class="chart-title" data-i18n="n-share-title">Anteil an allen Aktionen auf Aufgaben</p>
-          <span class="mock-tag" data-i18n="n-tag-ex">Beispielwerte</span>
-        </div>
-        <div class="bars">
-          <div class="bar is-us"><span>Wischen</span><span class="bar-track"><i style="--v:58"></i></span><span class="bar-val" data-i18n="n-sh-v1">58 %</span></div>
-          <div class="bar "><span>Hinzufügen</span><span class="bar-track"><i style="--v:17"></i></span><span class="bar-val" data-i18n="n-sh-v2">17 %</span></div>
-          <div class="bar "><span>Abhaken</span><span class="bar-track"><i style="--v:14"></i></span><span class="bar-val" data-i18n="n-sh-v3">14 %</span></div>
-          <div class="bar "><span>Bearbeiten</span><span class="bar-track"><i style="--v:6"></i></span><span class="bar-val" data-i18n="n-sh-v4">6 %</span></div>
-          <div class="bar "><span>Sortieren</span><span class="bar-track"><i style="--v:3"></i></span><span class="bar-val" data-i18n="n-sh-v5">3 %</span></div>
-          <div class="bar "><span>Foto</span><span class="bar-track"><i style="--v:2"></i></span><span class="bar-val" data-i18n="n-sh-v6">2 %</span></div>
-        </div>
-        <figcaption class="chart-note" data-i18n="n-share-cap">Mehr als die Hälfte aller Aktionen ist ein Wisch. Alles andere bekommt entsprechend weniger Platz.</figcaption>
-      </figure>
-      <div class="stagger-list">
-        <!-- 2.3 Workspaces & Co: copy left, recording right -->
-        <div class="stagger-row right">
-          <div class="stagger-figure phone">
-            <div class="phone-shot">
-              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Workspaces wechseln, Aufgaben abhaken, löschen und neu anordnen">
-                <source src="/videos/to.morrow/restfeatures.mp4" type="video/mp4" />
-              </video>
-              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
-            </div>
-          </div>
-          <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="f3-title">Workspaces &amp; Co</h3>
-            <p class="stagger-copy" data-i18n-html="f3-text">Wer es braucht, legt <b class="kw">Workspaces</b> an — Privat, Arbeit, was auch immer — und die App zeigt nur den aktiven. Dazu der Rest, den eine Liste braucht und nicht mehr: verschieben, neu anordnen, löschen, Fotos anhängen, Stellen darauf markieren und Wichtiges <b class="kw">rot hervorheben</b>.</p>
-          </div>
-        </div>
-
-        <!-- 2.4 Einstellungen: recording left, copy right -->
-        <div class="stagger-row">
-          <div class="stagger-figure phone">
-            <div class="phone-shot">
-              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Die Einstellungen von to.morrow: Themes, Hell- und Dunkelmodus, Schrift und Tab-Namen">
-                <source src="/videos/to.morrow/settings.mp4" type="video/mp4" />
-              </video>
-              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
-            </div>
-          </div>
-          <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="f4-title">Einstellungen</h3>
-            <p class="stagger-copy" data-i18n-html="f4-text">Kurz gehalten: vier Themes in Hell und Dunkel, Retro- oder Systemschrift, umbenennbare Tabs. Und ein Schalter für die <b class="kw">Zeitsynchronisation</b> — wer nicht will, dass Morgen über Nacht zu Heute wird, schaltet sie hier ab.</p>
-          </div>
-        </div>
-
-      </div>
-      <h3 class="feature-title media-copy" style="margin-top: calc(var(--block-gap) + 50px);" data-i18n="color-title">Nicht nur Grau</h3>
+<h3 class="feature-title media-copy" style="margin-top: calc(var(--block-gap) + 50px);" data-i18n="color-title">Nicht nur Grau</h3>
       <p class="guide-text media-copy" data-i18n-html="color-text">Die meisten To-do-Apps sind grau, monoton und farblos. Ich wollte, dass du dir deine selbst einrichten kannst: vier <b class="kw">blasse Pastelltöne</b>, jeder in Hell und Dunkel. Bewusst zurückhaltend — die Farbe setzt einen Akzent, statt beim Lesen dazwischenzufunken.</p>
 
       <!-- Stacked dead centre, scattering into the arrangement Lucas
@@ -3533,32 +3371,16 @@
         </div>
       </div>
 
+      <p class="guide-text" data-i18n-html="n-a11y-short"><b class='kw'>Barrierefreiheit</b> ist Teil des Systems: Text skaliert mit Dynamic Type bis AX5, die Bedienelemente wachsen nur halb so schnell. Jede Zeile bietet VoiceOver-Aktionen für Bearbeiten, Sortieren und Fotos, Reduce Motion stoppt jede Dauer-Animation, und alle Touch-Ziele sind mindestens 44 pt groß.</p>
     </div>
-    <!-- ══ 8. Ergebnis und Ausblick ══════════════════════════════════ -->
+
+    <!-- ══ 6. Ergebnis und Ausblick ══════════════════════════════════ -->
     <div class="guide-section">
           <div class="section-heading-row">
         <h2 class="section-title" data-i18n="n-sec-result">Ergebnis und Ausblick</h2>
-        <span class="step-badge">8</span>
+        <span class="step-badge">6</span>
       </div>
       <div class="dot-divider"></div>
-      <div class="chart" style="box-shadow:none; padding:0;">
-        <div class="chart-head"><p class="chart-title" data-i18n="n-res-title">Nutzung im App Store</p><span class="mock-tag" data-i18n="n-tag-ex">Beispielwerte</span></div>
-        <div class="facts">
-          <div class="fact"><b>4,8 ★</b><span data-i18n="n-f1">Durchschnitt aus 63 Bewertungen</span></div>
-          <div class="fact"><b>58 %</b><span data-i18n="n-f2">aller Aktionen sind ein Wisch</span></div>
-          <div class="fact"><b>14 s</b><span data-i18n="n-f3">Median einer Sitzung</span></div>
-          <div class="fact"><b>31 %</b><span data-i18n="n-f4">öffnen die App nach 30 Tagen noch</span></div>
-        </div>
-        <p class="chart-note" data-i18n="n-f-src">Quelle: App Store Connect, Zeitraum &lt;Monat&gt; bis &lt;Monat&gt;.</p>
-      </div>
-      <div class="chart" style="box-shadow:none; padding:0;">
-        <div class="chart-head"><p class="chart-title" data-i18n="n-rv-title">Was Nutzer in den Rezensionen schreiben</p><span class="mock-tag" data-i18n="n-tag-mock">Mockup</span></div>
-        <div class="reviews">
-          <div class="review"><span class="stars">★★★★★</span><p data-i18n="n-rv1">[Rezension aus App Store Connect, unverändert: eine, die den Wisch nennt]</p><small data-i18n="n-rvm1">[Name] · [Land] · [Monat]</small></div>
-          <div class="review"><span class="stars">★★★★★</span><p data-i18n="n-rv2">[Rezension, die die Live-Aufgabe nennt]</p><small data-i18n="n-rvm2">[Name] · [Land] · [Monat]</small></div>
-          <div class="review"><span class="stars">★★★★★</span><p data-i18n="n-rv3">[Rezension, die einen Wunsch äußert, zum Beispiel Widgets]</p><small data-i18n="n-rvm3">[Name] · [Land] · [Monat]</small></div>
-        </div>
-      </div>
       <h3 class="feature-title cs-h3" data-i18n="n-learn">Was ich gelernt habe</h3>
       <p class="guide-text" data-i18n-html="conclusion-1">Das Wichtigste, was ich gelernt habe, war unangenehm: eine <b class="kw">fertige Idee wegzuwerfen</b>. Die Windows-Oberfläche war nicht halbgar, sie war komplett — und trotzdem falsch. Dass etwas als Screenshot funktioniert, heißt nicht, dass es morgens um sieben funktioniert.</p>
       <p class="guide-text" data-i18n-html="conclusion-2">Zweitens, dass es hilft, sich <b class="kw">eigene Regeln zu geben</b>. Drei Formen, jede mit genau einer Bedeutung — sobald das feststand, war jede weitere Ansicht keine Gestaltungsfrage mehr, sondern nur noch eine Anwendung derselben Entscheidung.</p>
@@ -3833,9 +3655,9 @@
       }
     };
     Object.assign(TRANSLATIONS.en, {
+  "n-a11y-short": "<b class='kw'>Accessibility</b> is part of the system: text scales with Dynamic Type up to AX5 while controls grow at half the rate. Every row offers VoiceOver actions for edit, reorder and photos, Reduce Motion stops every looping animation, and all touch targets are at least 44 pt.",
   "n-ov-1": "<b>What is to.morrow?</b> An iOS app with three lists, Today, Tomorrow and Soon, where moving a task to another day is a single swipe.",
   "n-ov-2": "<b>The problem:</b> People who over-plan fill the Today list past what is doable. Moving a task takes several steps in other apps, so everything stays put and the list is wrong by mid-morning.",
-  "n-ov-3": "<b>My role:</b> Solo. Concept, interaction and visual design, the SkeuKit design system and the build.",
   "n-ov-4": "<b>What I designed:</b> The three-list model with the swipe, the Live task on the Lock Screen and in the Dynamic Island, a design system built from three shapes, workspaces and themes.",
   "n-ov-5": "<b>Outcome:</b> Available on the App Store. The first version was replaced entirely after TestFlight feedback. Usage figures are in the Result section.",
   "n-ov-title": "Project overview",
@@ -3889,10 +3711,6 @@
   "n-ret-title": "Who still opens the app, by days since install",
   "n-ret-axis": "Days since install",
   "n-ret-cap": "Same features, different interface. After a week more than twice as many testers still open the SkeuKit build.",
-  "n-leg-title": "The same list in two typefaces",
-  "n-leg-time": "Reading time",
-  "n-leg-err": "Reading errors",
-  "n-leg-cap": "Pixel type on the left, system type on the right, same content. The pixel type reads slower and with more errors.",
   "n-sec-pivot": "The pivot",
   "n-r1": "One light",
   "n-r1t": "A single soft light sits at the top left. Top edges catch light, bottom edges sit in shade, shadows fall downward. Because this holds for every element, height can be read without a label.",
@@ -3918,49 +3736,8 @@
   "n-side-title": "Side view: height means action",
   "n-side-intro": "The side view cuts through the three shapes. The surface is the baseline. What sits above it can be operated, what sits below it takes something in.",
   "n-side-sheet": "Cross-section through the three shapes, light from the top left",
-  "n-shape-title": "Do first-time users read the shapes correctly?",
-  "n-sh-1": "tap",
-  "n-sh-2": "type",
-  "n-sh-3": "choose",
-  "n-shape-cap": "Without labels, on views they had never seen: the shape says what it does.",
   "n-sec-rules": "The rules of the design system",
   "n-rules-sub": "<b class='kw'>What I was thinking.</b> The design system is called SkeuKit and follows four rules. A touchscreen has no pointer to reveal what can be operated. The interface has to show it itself, and height is read fastest: what sticks out can be grabbed, what is sunk in takes something in.",
-  "n-ax-band": "The same view at the default size and at AX5",
-  "n-ax-1": "Default",
-  "n-ax-2": "AX5, the largest step",
-  "n-ct-title": "Contrast in every theme, light and dark",
-  "n-ct-h1": "Text role",
-  "n-ct-h2": "Measured",
-  "n-ct-h3": "Target (AA)",
-  "n-ct-1": "Task text",
-  "n-ct-2": "Secondary text",
-  "n-ct-3": "Tab label",
-  "n-ct-4": "Icon on accent",
-  "n-sec-a11y": "Accessibility",
-  "n-a11y-1": "Text scales with Dynamic Type up to AX5. Controls grow at half the rate of the text so they do not take over the screen. When a tab label stops fitting it is abbreviated instead of set smaller, so all three labels stay the same size.",
-  "n-a11y-2": "A row is a single element to VoiceOver. Edit, reorder and photos are therefore set up as their own VoiceOver actions, otherwise they would be unreachable. Reduce Motion stops every looping animation completely. All touch targets are at least 44 pt.",
-  "n-share-title": "Share of all task actions",
-  "n-sh-v1": "58 %",
-  "n-sh-v2": "17 %",
-  "n-sh-v3": "14 %",
-  "n-sh-v4": "6 %",
-  "n-sh-v5": "3 %",
-  "n-sh-v6": "2 %",
-  "n-share-cap": "More than half of all actions are a swipe. Everything else gets correspondingly less room.",
-  "n-sec-rest": "The rest, briefly",
-  "n-res-title": "Usage on the App Store",
-  "n-f1": "Average from 63 ratings",
-  "n-f2": "of all actions are a swipe",
-  "n-f3": "Median session length",
-  "n-f4": "still open the app after 30 days",
-  "n-f-src": "Source: App Store Connect, period <month> to <month>.",
-  "n-rv-title": "What users write in their reviews",
-  "n-rv1": "[Review from App Store Connect, unedited: one that names the swipe]",
-  "n-rvm1": "[Name] · [Country] · [Month]",
-  "n-rv2": "[Review that names the Live task]",
-  "n-rvm2": "[Name] · [Country] · [Month]",
-  "n-rv3": "[Review that makes a request, for example widgets]",
-  "n-rvm3": "[Name] · [Country] · [Month]",
   "n-c3": "Third, an app you want to spend little time in makes time the design variable: every feature has to <b class='kw'>save a step</b>, or it goes.",
   "n-sec-result": "Result and outlook",
   "n-learn": "What I learned",
@@ -3971,9 +3748,9 @@
   "n-tools": "Tools"
 });
     Object.assign(TRANSLATIONS.de, {
+  "n-a11y-short": "<b class='kw'>Barrierefreiheit</b> ist Teil des Systems: Text skaliert mit Dynamic Type bis AX5, die Bedienelemente wachsen nur halb so schnell. Jede Zeile bietet VoiceOver-Aktionen für Bearbeiten, Sortieren und Fotos, Reduce Motion stoppt jede Dauer-Animation, und alle Touch-Ziele sind mindestens 44 pt groß.",
   "n-ov-1": "<b>Was ist to.morrow?</b> Eine iOS-App mit drei Listen, Heute, Morgen und Bald, in der das Verschieben einer Aufgabe auf einen anderen Tag eine einzige Wischgeste ist.",
   "n-ov-2": "<b>Das Problem:</b> Wer sich zu viel vornimmt, füllt die Heute-Liste über das Machbare hinaus. Verschieben kostet in anderen Apps mehrere Schritte, also bleibt alles liegen, und die Liste stimmt am Vormittag nicht mehr.",
-  "n-ov-3": "<b>Meine Rolle:</b> Solo. Konzept, Interaktions- und Visual Design, das Designsystem SkeuKit und die Umsetzung.",
   "n-ov-4": "<b>Was ich gestaltet habe:</b> Das Drei-Listen-Modell mit der Wischgeste, die Live-Aufgabe auf Sperrbildschirm und Dynamic Island, ein Designsystem aus drei Formen, Workspaces und Themes.",
   "n-ov-5": "<b>Ergebnis:</b> Im App Store verfügbar. Die erste Version wurde nach dem Feedback aus TestFlight vollständig ersetzt. Nutzungszahlen stehen im Abschnitt Ergebnis.",
   "n-ov-title": "Projektüberblick",
@@ -4027,10 +3804,6 @@
   "n-ret-title": "Wer die App noch öffnet, nach Tagen seit der Installation",
   "n-ret-axis": "Tage seit der Installation",
   "n-ret-cap": "Dieselben Funktionen, andere Oberfläche. Nach einer Woche öffnen mehr als doppelt so viele Tester die SkeuKit-Version noch.",
-  "n-leg-title": "Dieselbe Liste in zwei Schriften",
-  "n-leg-time": "Lesezeit",
-  "n-leg-err": "Lesefehler",
-  "n-leg-cap": "Pixelschrift links, Systemschrift rechts, gleicher Inhalt. Die Pixelschrift liest sich langsamer und fehleranfälliger.",
   "n-sec-pivot": "Der Pivot",
   "n-r1": "Ein Licht",
   "n-r1t": "Eine einzige weiche Lichtquelle liegt oben links. Oberkanten fangen Licht, Unterkanten liegen im Schatten, Schatten fallen nach unten. Weil das für jedes Element gilt, lässt sich Höhe ohne Beschriftung lesen.",
@@ -4056,49 +3829,8 @@
   "n-side-title": "Seitenansicht: Höhe bedeutet Handlung",
   "n-side-intro": "Die Seitenansicht zeigt die drei Formen im Schnitt. Die Fläche ist die Grundlinie. Was darüber liegt, lässt sich bedienen, was darunter liegt, nimmt etwas auf.",
   "n-side-sheet": "Schnitt durch die drei Formen, Licht von oben links",
-  "n-shape-title": "Lesen Erstnutzer die Formen richtig?",
-  "n-sh-1": "antippen",
-  "n-sh-2": "schreiben",
-  "n-sh-3": "wählen",
-  "n-shape-cap": "Ohne Beschriftung, auf unbekannten Ansichten: Die Form zeigt, was sie tut.",
   "n-sec-rules": "Die Regeln des Designsystems",
   "n-rules-sub": "<b class='kw'>Was ich mir dabei gedacht habe.</b> Das Designsystem heißt SkeuKit und folgt vier Regeln. Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.",
-  "n-ax-band": "Dieselbe Ansicht in Standardgröße und bei AX5",
-  "n-ax-1": "Standard",
-  "n-ax-2": "AX5, die größte Stufe",
-  "n-ct-title": "Kontrast in allen Themes, hell und dunkel",
-  "n-ct-h1": "Textrolle",
-  "n-ct-h2": "Gemessen",
-  "n-ct-h3": "Ziel (AA)",
-  "n-ct-1": "Aufgabentext",
-  "n-ct-2": "Sekundärtext",
-  "n-ct-3": "Tab-Beschriftung",
-  "n-ct-4": "Symbol auf Akzentfläche",
-  "n-sec-a11y": "Barrierefreiheit",
-  "n-a11y-1": "Text skaliert mit Dynamic Type bis AX5. Die Bedienelemente wachsen nur halb so schnell wie der Text, damit sie den Bildschirm nicht füllen. Passt eine Tab-Beschriftung nicht mehr, wird sie abgekürzt statt kleiner gesetzt, sodass alle drei Beschriftungen gleich groß bleiben.",
-  "n-a11y-2": "Eine Zeile ist für VoiceOver ein einziges Element. Bearbeiten, Sortieren und Fotos sind deshalb als eigene VoiceOver-Aktionen angelegt, sonst wären sie nicht erreichbar. Reduce Motion stoppt jede Dauer-Animation vollständig. Alle Touch-Ziele sind mindestens 44 pt groß.",
-  "n-share-title": "Anteil an allen Aktionen auf Aufgaben",
-  "n-sh-v1": "58 %",
-  "n-sh-v2": "17 %",
-  "n-sh-v3": "14 %",
-  "n-sh-v4": "6 %",
-  "n-sh-v5": "3 %",
-  "n-sh-v6": "2 %",
-  "n-share-cap": "Mehr als die Hälfte aller Aktionen ist ein Wisch. Alles andere bekommt entsprechend weniger Platz.",
-  "n-sec-rest": "Der Rest in Kürze",
-  "n-res-title": "Nutzung im App Store",
-  "n-f1": "Durchschnitt aus 63 Bewertungen",
-  "n-f2": "aller Aktionen sind ein Wisch",
-  "n-f3": "Median einer Sitzung",
-  "n-f4": "öffnen die App nach 30 Tagen noch",
-  "n-f-src": "Quelle: App Store Connect, Zeitraum <Monat> bis <Monat>.",
-  "n-rv-title": "Was Nutzer in den Rezensionen schreiben",
-  "n-rv1": "[Rezension aus App Store Connect, unverändert: eine, die den Wisch nennt]",
-  "n-rvm1": "[Name] · [Land] · [Monat]",
-  "n-rv2": "[Rezension, die die Live-Aufgabe nennt]",
-  "n-rvm2": "[Name] · [Land] · [Monat]",
-  "n-rv3": "[Rezension, die einen Wunsch äußert, zum Beispiel Widgets]",
-  "n-rvm3": "[Name] · [Land] · [Monat]",
   "n-c3": "Drittens heißt eine App, in der man wenig Zeit verbringen will, dass Zeit die Entwurfsgröße ist: Jede Funktion muss einen <b class='kw'>Schritt sparen</b>, sonst fällt sie heraus.",
   "n-sec-result": "Ergebnis und Ausblick",
   "n-learn": "Was ich gelernt habe",
