@@ -9,7 +9,8 @@ professional voice**. Written 2026-09-18 from an interview with Lucas. Companion
 
 This file replaces the older content plan (`shove95casestudyplan.md`, 2026-09-03, now deleted —
 in git history) that the current page was built from. That plan's description of how the app
-works is kept as **Appendix A** at the end of this file.
+works, the research it was based on, the page structure it set and its list of things to avoid are kept as
+**Appendices A–D** at the end of this file.
 
 > **All numbers in this file are example values** showing the *shape* of a finding and
 > where it would go on the page. Replace every one with the real result before it ships.
@@ -426,5 +427,185 @@ session writing it should know what exists before deciding what to leave out.
 `-seedDemo YES` fills a clean install with presentable content,
 `-seedFillers YES` adds 40 rows for scroll testing, `-wipeAll YES` empties
 every workspace. Useful for producing screenshots.
+
+---
+
+---
+
+## Appendix B. Research on case-study length and scanning
+
+*From the retired shove.95 plan, 2026-09-03.*
+
+Sources: AppFollow, Screenhance, Design Decade, MyUX Academy, UX Playbook (2026).
+
+**The numbers that shape everything:**
+
+- Recruiters spend **30–60 seconds** on a first portfolio scan and **5–10
+  minutes** on a first case study. Everything essential must survive the
+  30-second version.
+- An **800-word case study where every sentence counts beats a 4,000-word one**
+  that buries its insights.
+- Hiring managers judge a portfolio by its **weakest** case study, not its best.
+  Three to five strong ones is the target.
+
+**What they are actually looking for:**
+
+They are not looking for prettier screens than the last candidate. They are
+looking for evidence you can **identify a problem, make defensible decisions,
+and move a product toward an outcome**. Process and rationale outrank final
+screens.
+
+**The canonical structure:** overview → problem → role → research and insights
+→ process → key decisions with rationale → final solution → outcomes.
+
+**Presenting a personal project with no metrics** (directly relevant here):
+substitute three things for numbers — a sharply defined problem, explicit
+decision rationale, and honest lessons learned. Answer "what problem, who
+benefits, what actually changed" clearly and the absence of a funnel chart
+stops mattering.
+
+---
+
+---
+
+## Appendix C. The page structure the current page was built from
+
+*From the retired shove.95 plan, 2026-09-03. This is how `to-shove2d.html` is laid out today; §4 of this file is the planned replacement.*
+
+Eight sections. Roughly 900–1100 words of prose total — every section should be
+cuttable to two paragraphs.
+
+### 1 — Hero + one-liner
+
+The 30-second version lives here. A single sentence that states the problem and
+the answer.
+
+> A to-do app where moving a task to tomorrow takes one swipe instead of six
+> taps.
+
+Plus the meta grid, matching Unify's:
+
+| Field | Value |
+|---|---|
+| **Timeline** | Aug 2026 – ongoing |
+| **Role** | Concept, product design, design system, build |
+| **Team** | Solo |
+| **Platform** | iOS 18+, SwiftUI, SwiftData + CloudKit |
+| **Status** | Submitted to the App Store |
+
+### 2 — The problem
+
+The strongest paragraph in the case study and the one that must survive the
+30-second scan. It is already written, in `docs/VISION.md`:
+
+> Task apps make *creating* a task cheap and *rescheduling* it expensive.
+> Moving an item from today to tomorrow means opening it, finding a date
+> picker, choosing a date, and saving — so people stop doing it. Every task
+> collapses into one undifferentiated "today" list that is mostly lies by 11am.
+
+Follow with the honest source: observed in his own workflow over years, across
+Reminders, Things, Todoist, Notes and paper. **Say that it is n=1** and say why
+that was enough to start.
+
+### 3 — The one idea
+
+The insight the whole app follows from: **rescheduling should be the primary
+gesture, and everything else should be deliberately ordinary.**
+
+Then the model, in three lines: three buckets, a task is always in exactly one,
+swipe right pushes it later and left pulls it back. Include the detail that the
+buckets are *filters over a real date* rather than folders — so nothing needs a
+rollover job and an unfinished task simply reappears with a day chip. That is a
+systems decision a reader can respect.
+
+### 4 — The pivot *(the centrepiece)*
+
+Give this the most room.
+
+- **What v1 was:** a complete Windows 95 interface at 2× pixel scale — taskbar
+  navigation, bevelled controls, status bar with persistent undo, W95FA type
+  throughout. Genuinely finished, not a mood board.
+- **Why it went:** the joke was louder than the app. A pixel-faithful 1995
+  interface is a costume; it made a daily tool tiring, fought every iOS
+  convention, and the retro-computing audience it flattered was not the
+  audience that would use it every morning.
+- **What replaced it:** SkeuKit — a soft-skeuomorphic system built from tokens,
+  four themes in light and dark, depth from light rather than texture.
+- **What survived:** the pixel typeface, kept as an optional "Retro" mode that
+  applies to chrome only while task text stays in the system face. The idea
+  did not have to die for the interface to.
+
+Show both. A side-by-side of the old Windows 95 build and the current one is
+the single most valuable image on the page.
+
+### 5 — Design system
+
+Short, evidenced, no lecture.
+
+- Four themes × light/dark, derived from one seed colour each rather than
+  hand-picked.
+- Depth comes from light: troughs for recesses, glass for controls, plain text
+  on the ground for content.
+- One press behaviour for every control in the app.
+- Named contrast floors: 6.4:1 body text, 3.4:1 for decorative, with one
+  documented exception taken deliberately.
+
+### 6 — Craft details
+
+Two or three, no more. Pick the ones that are hard and invisible:
+
+- **The swipe carries velocity.** Release position alone would make a flick and
+  a drag feel identical; the release velocity projects where the row is going.
+- **The three-bucket line is one-dimensional on purpose** — right is later,
+  left is earlier, no grid to learn.
+- **The live task** sits on the Lock Screen via a Live Activity, so the one
+  thing you are doing does not need the app open to be seen.
+
+### 7 — Accessibility
+
+A short, factual list. This section will do more for a hiring manager than
+another screenshot.
+
+- Verified at the largest Dynamic Type size; the tab that stopped fitting
+  abbreviates rather than shrinking, so all three labels stay one size.
+- VoiceOver: an audit found edit, reorder and photos unreachable because the
+  row collapses to a single element — added as custom actions.
+- Reduce Motion stops every looping animation dead rather than slowing it.
+- Contrast measured, not eyeballed, and one deliberate trade recorded in
+  writing.
+
+### 8 — Shipping it, and what it taught
+
+Where the honesty lands.
+
+- Submitted to the App Store; **rejected under Guideline 2.1 — Information
+  Needed.** Say plainly what that is: the App Review Information section was
+  left blank, so the reviewer could not complete a review. Not a quality
+  finding. Resubmitted with reviewer notes and a demonstration recording.
+- **Lessons, three at most.** Candidates:
+  - Finishing an interface is not the same as validating it — the Windows 95
+    build had to be complete before it was obvious it was wrong.
+  - Constraint beat capability: cutting the fourth bucket made the gesture
+    explainable in one sentence.
+  - Accessibility found real bugs, not just compliance items — three row
+    actions were genuinely unreachable and nobody had noticed.
+
+---
+
+---
+
+## Appendix D. What to avoid
+
+*From the retired shove.95 plan, 2026-09-03.*
+
+- **Do not open with the aesthetic.** The retro look is the hook on a design
+  community, not on a hiring manager. Problem first.
+- **Do not claim research that did not happen.** No personas, no invented user
+  interviews, no fabricated metrics. n=1 stated plainly is stronger than a
+  fake study, and reviewers spot the difference instantly.
+- **Do not bury the pivot** in a "challenges" section at the bottom. It is the
+  best evidence of judgement on the page.
+- **Do not explain SwiftUI.** The reader is hiring a designer.
+- **Do not pad.** If the page needs a scroll bar longer than Unify's, cut.
 
 ---
