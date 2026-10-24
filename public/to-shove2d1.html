@@ -2614,27 +2614,11 @@
        figure, or swap the wireframe for a screenshot, when the real asset lands.
        grep "mock-tag" to find every one. */
 
-    .cs-claim {
-      font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif;
-      font-weight: 300;
-      font-size: clamp(18px, 2.2vw, 24px);
-      line-height: 1.3;
-      letter-spacing: -0.01em;
-      color: var(--text-secondary);
-      margin-top: 8px;
-    }
 
     /* Overview block: five labelled lines, then the page map. */
     .ov { display: flex; flex-direction: column; gap: 10px; margin-top: clamp(20px, 3vw, 32px); }
     .ov p { font-size: 14.4px; line-height: 1.7; color: var(--text-secondary); }
     .ov b { color: var(--text-primary); font-weight: 500; }
-    .pagemap {
-      margin-top: clamp(20px, 3vw, 28px);
-      display: flex; flex-wrap: wrap; gap: 6px 10px;
-      font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-    .pagemap i { font-style: normal; color: var(--text-tertiary); }
 
     /* Try-it block: QR code for the desktop reader, the badge for everyone. */
     .try-it { display: flex; align-items: center; gap: clamp(20px, 4vw, 48px); flex-wrap: wrap; }
@@ -2926,7 +2910,6 @@
         <div class="title-row">
           <h1 class="project-title">to.morrow</h1>
         </div>
-        <p class="cs-claim" data-i18n="n-claim">Ein Wisch bis morgen.</p>
         <div class="dot-divider"></div>
       </div>
     </div>
@@ -2943,7 +2926,6 @@
 <p data-i18n-html="n-ov-4"><b>Was ich gestaltet habe:</b> Das Drei-Listen-Modell mit der Wischgeste, die Live-Aufgabe auf Sperrbildschirm und Dynamic Island, ein Designsystem aus drei Formen, Workspaces und Themes.</p>
 <p data-i18n-html="n-ov-5"><b>Ergebnis:</b> Im App Store verfügbar. Die erste Version wurde nach dem Feedback aus TestFlight vollständig ersetzt. Nutzungszahlen stehen im Abschnitt Ergebnis.</p>
       </div>
-      <p class="pagemap" data-i18n-html="n-map">Problem <i>→</i> Idee <i>→</i> Live <i>→</i> Pivot <i>→</i> Regeln <i>→</i> Barrierefreiheit <i>→</i> Ergebnis</p>
     </div>
     <!-- Meta grid — same position as every other project page: directly
          under At a Glance. -->
@@ -3872,14 +3854,12 @@
       }
     };
     Object.assign(TRANSLATIONS.en, {
-  "n-claim": "One swipe to tomorrow.",
   "n-ov-1": "<b>What is to.morrow?</b> An iOS app with three lists, Today, Tomorrow and Soon, where moving a task to another day is a single swipe.",
   "n-ov-2": "<b>The problem:</b> People who over-plan fill the Today list past what is doable. Moving a task takes several steps in other apps, so everything stays put and the list is wrong by mid-morning.",
   "n-ov-3": "<b>My role:</b> Solo. Concept, interaction and visual design, the SkeuKit design system and the build.",
   "n-ov-4": "<b>What I designed:</b> The three-list model with the swipe, the Live task on the Lock Screen and in the Dynamic Island, a design system built from three shapes, workspaces and themes.",
   "n-ov-5": "<b>Outcome:</b> Available on the App Store. The first version was replaced entirely after TestFlight feedback. Usage figures are in the Result section.",
   "n-ov-title": "Project overview",
-  "n-map": "Problem <i>→</i> Idea <i>→</i> Live <i>→</i> Pivot <i>→</i> Rules <i>→</i> Accessibility <i>→</i> Result",
   "n-try-title": "Try it on the App Store",
   "n-try-text": "Scan with your camera or tap the badge.",
   "n-taps-title": "Moving one task to tomorrow: steps and time",
@@ -4014,14 +3994,12 @@
   "n-tools": "Tools"
 });
     Object.assign(TRANSLATIONS.de, {
-  "n-claim": "Ein Wisch bis morgen.",
   "n-ov-1": "<b>Was ist to.morrow?</b> Eine iOS-App mit drei Listen, Heute, Morgen und Bald, in der das Verschieben einer Aufgabe auf einen anderen Tag eine einzige Wischgeste ist.",
   "n-ov-2": "<b>Das Problem:</b> Wer sich zu viel vornimmt, füllt die Heute-Liste über das Machbare hinaus. Verschieben kostet in anderen Apps mehrere Schritte, also bleibt alles liegen, und die Liste stimmt am Vormittag nicht mehr.",
   "n-ov-3": "<b>Meine Rolle:</b> Solo. Konzept, Interaktions- und Visual Design, das Designsystem SkeuKit und die Umsetzung.",
   "n-ov-4": "<b>Was ich gestaltet habe:</b> Das Drei-Listen-Modell mit der Wischgeste, die Live-Aufgabe auf Sperrbildschirm und Dynamic Island, ein Designsystem aus drei Formen, Workspaces und Themes.",
   "n-ov-5": "<b>Ergebnis:</b> Im App Store verfügbar. Die erste Version wurde nach dem Feedback aus TestFlight vollständig ersetzt. Nutzungszahlen stehen im Abschnitt Ergebnis.",
   "n-ov-title": "Projektüberblick",
-  "n-map": "Problem <i>→</i> Idee <i>→</i> Live <i>→</i> Pivot <i>→</i> Regeln <i>→</i> Barrierefreiheit <i>→</i> Ergebnis",
   "n-try-title": "Im App Store ausprobieren",
   "n-try-text": "Mit der Kamera scannen oder das Badge antippen.",
   "n-taps-title": "Eine Aufgabe auf morgen verschieben: Schritte und Zeit",

@@ -1739,8 +1739,8 @@ draft replaces it. Generated once by a script, so **edit the HTML directly from 
 `<style>` block before the last one (comment "Case-study rebuild"); new copy is in DE + EN through a
 `Object.assign(TRANSLATIONS.en/de, {...})` block (keys `n-…`) before `pick()`, which overrides old keys.
 
-Order: hero film + claim "Ein Wisch bis morgen." → **Projektüberblick** (five labelled lines, after
-Calmsphere/Asuo) + page map → meta grid → **Try-it block** (QR `images/to.morrow/appstore-qr.svg` + badge; QR
+Order: hero film → **Projektüberblick** (five labelled lines, after
+Calmsphere/Asuo; no claim line and no page map, removed 2026-10-24 at Lucas's request) → meta grid → **Try-it block** (QR `images/to.morrow/appstore-qr.svg` + badge; QR
 hidden ≤640px) → 1 Problem (+ taps chart) → 2 Idee (flow row, swipe video, rule card with a collapsible
 week diagram) → 3 Live (flow row, existing live rows) → 4 Pivot (sketch spread, Windows 95 strip,
 same-view side-by-side `windows8` vs `theme-grey`, retention curve, legibility pair, then the type/icons
