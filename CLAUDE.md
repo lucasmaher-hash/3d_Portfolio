@@ -1742,7 +1742,7 @@ draft replaces it. Generated once by a script, so **edit the HTML directly from 
 Order (cut to six sections on 2026-10-24, ~1,600 words, page height 17.3k → 13.3k px at 1440): hero film →
 App Store badge directly under the header (no QR/"try it" block, Lucas wanted the plain badge) →
 **Projektüberblick** (four labelled lines; the role line is gone because the **meta grid stays**, Lucas likes
-it; no claim line, no page map) → meta grid → 1 Problem (+ taps chart) → 2 Idee (flow row, swipe video,
+it; no claim line, no page map) → meta grid (right tile is "Skills", like the other project pages: SwiftUI / SwiftData + CloudKit / Design system) → 1 Problem (+ taps chart) → 2 Idee (flow row, swipe video,
 rule card with a collapsible week diagram) → 3 Live (flow row, existing live rows) → 4 Pivot (sketch spread,
 Windows 95 strip, same-view side-by-side `windows8` vs `theme-grey`, retention curve, then the type/icons
 block) → 5 **Regeln des Designsystems** (rules, Seitenansicht, live demos, colour fan, one accessibility

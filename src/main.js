@@ -1853,7 +1853,7 @@ function setWallSeams(s) {
   WALL_SEAM_U.uSeamWidth.value = WALL_SEAM.width
   WALL_SEAM_U.uSeamSoft.value = WALL_SEAM.soft
 }
-async function drawWallSeams(model) {
+async function drawWallSeams(model, settings) {
   const res = await fetch('/gallery-baked-assets/wall-seams.json')
   if (!res.ok) { console.warn('Wandfugen: wall-seams.json fehlt'); return }
   const planes = await res.json()
@@ -1861,56 +1861,83 @@ async function drawWallSeams(model) {
   let tune = null
   try { tune = JSON.parse(localStorage.getItem('wallSeamTune')) } catch (e) {}
   setWallSeams(new URLSearchParams(location.search).has('lines') && tune ? tune : {})
+  const walls = []
+  model.traverse(o => { if (o.isMesh && o.userData.galleryRole === 'wall' && planes[o.userData.galleryBakeLabel]?.length) walls.push(o) })
   let meshes = 0
-  model.traverse(o => {
-    if (!o.isMesh || o.userData.galleryRole !== 'wall') return
+  const kept = []
+  for (const o of walls) {
     const seams = planes[o.userData.galleryBakeLabel]
-    if (!seams?.length) return
     const grid = new Map()
     seams.forEach((s, i) => {
       const k = Math.floor(s[0] / CELL) + ',' + Math.floor(s[1] / CELL)
-      if (!grid.has(k)) grid.set(k, []); grid.get(k).push(s)
+      if (!grid.has(k)) grid.set(k, []); grid.get(k).push(i)
     })
     const pos = o.geometry.getAttribute('position'), v = new THREE.Vector3()
-    const dist = new Float32Array(pos.count)
+    const dist = new Float32Array(pos.count), which = new Int32Array(pos.count)
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
       const gx = Math.floor(v.x / CELL), gz = Math.floor(v.z / CELL)
-      let best = 10
+      let best = 10, bi = -1
       for (let x = gx - 1; x <= gx + 1; x++) for (let z = gz - 1; z <= gz + 1; z++)
-        for (const s of grid.get(x + ',' + z) || []) {
-          const dx = v.x - s[0], dz = v.z - s[1]
+        for (const j of grid.get(x + ',' + z) || []) {
+          const s = seams[j], dx = v.x - s[0], dz = v.z - s[1]
           if (Math.abs(dx * s[3] - dz * s[2]) > MAX_N) continue   // along the wall normal
           const d = Math.abs(dx * s[2] + dz * s[3])                // along the wall
-          if (d < best) best = d
+          if (d < best) { best = d; bi = j }
         }
-      dist[i] = best
+      dist[i] = best; which[i] = bi
     }
-    o.geometry.setAttribute('gallerySeamD', new THREE.BufferAttribute(dist, 1))
+    // A few seams kept their baked shading. Measure, per seam, how much darker the
+    // bake already is right at the groove than 8–25 cm beside it (mid-height only),
+    // so the shader only adds what is missing instead of darkening those twice.
+    const info = settings.lightmaps[o.userData.galleryBakeLabel], uvA = o.geometry.getAttribute('galleryBakeUV')
+    const near = new Float64Array(seams.length), nearN = new Uint32Array(seams.length)
+    const side = new Float64Array(seams.length), sideN = new Uint32Array(seams.length)
+    if (info && uvA) {
+      const lm = await readLightmap(info.file)
+      for (let i = 0; i < pos.count; i++) {
+        const j = which[i], d = dist[i]
+        if (j < 0 || (d > 0.015 && (d < 0.08 || d > 0.25))) continue
+        v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
+        if (v.y < 0.9 || v.y > 3.7) continue
+        const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
+        const py = Math.min(lm.h - 1, Math.max(0, Math.floor(uvA.getY(i) * lm.h)))
+        const k = (py * lm.w + px) * 4
+        const lum = (0.2126 * lm.data[k] + 0.7152 * lm.data[k + 1] + 0.0722 * lm.data[k + 2]) * lm.data[k + 3]
+        if (d <= 0.015) { near[j] += lum; nearN[j]++ } else { side[j] += lum; sideN[j]++ }
+      }
+    }
+    const baked = seams.map((_, j) => nearN[j] && sideN[j] && side[j] > 0
+      ? Math.min(1, Math.max(0.2, (near[j] / nearN[j]) / (side[j] / sideN[j]))) : 1)
+    kept.push(...baked.filter(e => e < 0.9).map(e => e.toFixed(2)))
+    const attr = new Float32Array(pos.count * 2)
+    for (let i = 0; i < pos.count; i++) { attr[i * 2] = dist[i]; attr[i * 2 + 1] = which[i] < 0 ? 1 : baked[which[i]] }
+    o.geometry.setAttribute('gallerySeam', new THREE.BufferAttribute(attr, 2))
     for (const m of [o.material].flat()) {
       const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey
       m.onBeforeCompile = (shader, r) => {
         prev.call(m, shader, r)
         Object.assign(shader.uniforms, WALL_SEAM_U)
-        shader.vertexShader = 'attribute float gallerySeamD;\nvarying float vSeamD;\n' + shader.vertexShader
-          .replace('#include <begin_vertex>', '#include <begin_vertex>\nvSeamD = gallerySeamD;')
+        shader.vertexShader = 'attribute vec2 gallerySeam;\nvarying vec2 vSeam;\n' + shader.vertexShader
+          .replace('#include <begin_vertex>', '#include <begin_vertex>\nvSeam = gallerySeam;')
         const bakeLine = 'totalEmissiveRadiance+=galleryRadiance.rgb*galleryRadiance.a*uBakedRange;'
         if (!shader.fragmentShader.includes(bakeLine)) throw Error('Wall seams: bake line not found')
-        shader.fragmentShader = 'varying float vSeamD;\nuniform float uSeamDark, uSeamWidth, uSeamSoft;\n' + shader.fragmentShader
+        // vSeam.x = distance to the seam (m), vSeam.y = how dark the bake already is there.
+        shader.fragmentShader = 'varying vec2 vSeam;\nuniform float uSeamDark, uSeamWidth, uSeamSoft;\n' + shader.fragmentShader
           .replace(bakeLine, bakeLine + `
           {
-            float sw = 0.5 * uSeamWidth, sf = max(fwidth(vSeamD), 1e-6);
+            float sw = 0.5 * uSeamWidth, sf = max(fwidth(vSeam.x), 1e-6);
             float se = max(sf, uSeamSoft * sw);
-            float sc = (1.0 - smoothstep(sw - se, sw + se, vSeamD)) * min(1.0, sw / sf);
-            totalEmissiveRadiance *= 1.0 - uSeamDark * sc;
+            float sc = (1.0 - smoothstep(sw - se, sw + se, vSeam.x)) * min(1.0, sw / sf);
+            totalEmissiveRadiance *= min(1.0, (1.0 - uSeamDark * sc) / mix(1.0, vSeam.y, sc));
           }`)
       }
       m.customProgramCacheKey = () => prevKey.call(m) + '-wallseams'
       m.needsUpdate = true
     }
     meshes++
-  })
-  console.log(`Wandfugen: ${meshes} Wände, ${Object.values(planes).reduce((a, s) => a + s.length, 0)} Fugen`)
+  }
+  console.log(`Wandfugen: ${meshes} Wände, ${Object.values(planes).reduce((a, s) => a + s.length, 0)} Fugen; schon gebacken (<0.9): ${kept.length} [${kept.join(' ')}]`)
   if (new URLSearchParams(location.search).has('lines')) wallSeamTuner()
 }
 function wallSeamTuner() {
@@ -2759,7 +2786,7 @@ loadScene(
           }
           addCentreHelpPodium(gltf.scene, galleryWalls, probes)
           await capPodiumTops(gltf.scene, settings)
-          await drawWallSeams(gltf.scene)
+          await drawWallSeams(gltf.scene, settings)
           try {
             const saved = JSON.parse(sessionStorage.getItem(RETURN_STATE_KEY))
             if (saved && ['x','y','z','yaw','pitch'].every(k => Number.isFinite(saved[k]))) {
