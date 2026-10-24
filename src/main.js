@@ -1624,6 +1624,7 @@ function addCentreHelpPodium(model) {
   if (!podium || !galleryArrowMat) { console.warn('Help-Podest: Podest fehlt'); return }
   const top = new THREE.Box3().setFromObject(podium).max.y
   const mesh = new THREE.Mesh(makeQuestionGeometry(), galleryArrowMat)
+  mesh.visible = false   // shown with the rest of the gallery once it is fully patched
   mesh.name = 'HelpIcon'
   const size = new THREE.Box3().setFromObject(mesh).getSize(new THREE.Vector3())
   const baseY = top + HELP_GAP + size.y / 2
@@ -2718,6 +2719,8 @@ loadScene(
         // Capped like the main path's 4s reveal timeout: the welcome screen cannot be closed
         // until _sceneReady() fires, so a compileAsync that never settles must not hold it.
         await Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 4000))])
+        gltf.scene.visible = true   // revealed only now: patched, compiled, no unpatched first frames
+        for (const h of helpIcons) h.mesh.visible = true
         loadProgress(0.97)
         roomAccent.ready = true
         updateRoomAccent(0, true)
@@ -2727,6 +2730,7 @@ loadScene(
         sceneReady()
       } catch (error) {
         console.error('Gallery setup failed:', error)
+        gltf.scene.visible = true; for (const h of helpIcons) h.mesh.visible = true   // never leave the scene hidden
         sceneReady()
       }
       return
