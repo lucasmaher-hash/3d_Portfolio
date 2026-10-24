@@ -92,7 +92,8 @@ if (PERF.bvh) {
 // event that separates "didn't care" from "couldn't run it".
 let renderer
 try {
-  renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'high-performance' })
+  // Antialiasing on phones too (was off): without it distant edges and the thin LED lines stair-step.
+  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
 } catch (err) {
   if (window.track) window.track('webgl_failed', { mobile: isMobile, error: String(err && err.message || err).slice(0, 120) })
   throw err
