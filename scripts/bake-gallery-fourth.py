@@ -18,6 +18,8 @@ except Exception as e:print(e,flush=True)
 # Geometry in this file is ALREADY at web height. No scaling, shifts or light changes.
 assert abs(next(o for o in s.objects if o.name.startswith('Ceiling |')).matrix_world.translation.z)>0
 BOTTLE={'bottle body_Podest','label_Podest','lid_Podest'}
+# Exported but not baked: glass and printed icon of the to.morrow button stay native PBR.
+NATIVE={'Tomorrow_GlassBubbleButton','Tomorrow_LiveIcon_Ring','Tomorrow_LiveIcon_Dot'}
 def slug(t):return re.sub(r'[^a-z0-9]+','-',t.lower()).strip('-')
 def label(o):
  if o.name.startswith('Outer Wall'):return 'outer'
@@ -70,7 +72,7 @@ def uv_for(o,key):
  return o.data.uv_layers['GalleryBake']
 receivers=[]
 for o in list(s.objects):
- if o.type!='MESH' or o.name in BOTTLE or o.name.startswith('Ceiling ') and 'diffuser' in o.name:continue
+ if o.type!='MESH' or o.name in BOTTLE or o.name in NATIVE or o.name.startswith('Ceiling ') and 'diffuser' in o.name:continue
  if o.get('galleryProject')=='Mac-Lamp' and o.get('galleryRole')=='project':continue
  key=label(o)
  if PILOT and key not in {'ring','podium-04','well-04','floor','ceiling'}:continue
@@ -83,7 +85,7 @@ for o,key in receivers:
  uv=uv_for(o,key)
  if old_render and o.data.uv_layers.get(old_render):o.data.uv_layers[old_render].active_render=True
  else:uv.active_render=True
- resolution=512 if PILOT else 3072 if key=='outer' else 2048 if key in {'ring','floor','ceiling'} else 1024 if key.startswith('podium') or o.get('galleryProject')=='Unify' and 'Body' in o.name else 512
+ resolution=512 if PILOT else 3072 if key=='outer' else 2048 if key in {'ring','floor','ceiling'} else 1024 if key.startswith('podium') or o.get('galleryProject')=='Unify' and 'Body' in o.name or o.name=='Tomorrow_ContinuousShell' else 512
  image=bpy.data.images.new('HDR diffuse '+key,width=resolution,height=resolution,float_buffer=True)
  image.colorspace_settings.name='Linear Rec.709'
  for i,mat in enumerate(o.data.materials):
@@ -133,6 +135,6 @@ for o in s.objects:
  if o.type=='CURVE' or 'luminous diffuser' in o.name:o['galleryRole']='emitter'
 report('export geometry')
 bpy.ops.export_scene.gltf(filepath=OUT+'/gallery.glb',export_format='GLB',use_selection=True,use_active_scene=True,export_apply=True,export_extras=True,export_cameras=False,export_lights=False,export_texcoords=True)
-manifest={'variant':'fourth','pilot':PILOT,'floorY':0,'eyeHeight':1.9386224159559822,'heightScale':1.6410608137401594,'ceilingHeight':4.904407981783152,'fov':90,'speed':3.45,'spawn':[0,1.9386224159559822,0],'yaw':math.pi,'pitch':.054,'exposureEV':s.view_settings.exposure,'viewTransform':s.view_settings.view_transform,'look':s.view_settings.look,'source':'gallery-review-v05.blend','receivers':[key for o,key in receivers],'quality':{'samples':256,'adaptiveThreshold':.01,'floatMasters':'OpenEXR half float ZIP','noRescale':True}}
+manifest={'variant':'fourth','pilot':PILOT,'floorY':0,'eyeHeight':1.9386224159559822,'heightScale':1.6410608137401594,'ceilingHeight':4.904407981783152,'fov':90,'speed':3.45,'spawn':[0,1.9386224159559822,0],'yaw':math.pi,'pitch':.054,'exposureEV':s.view_settings.exposure,'viewTransform':s.view_settings.view_transform,'look':s.view_settings.look,'source':os.path.basename(bpy.data.filepath),'receivers':[key for o,key in receivers],'quality':{'samples':256,'adaptiveThreshold':.01,'floatMasters':'OpenEXR half float ZIP','noRescale':True}}
 with open(OUT+'/scene.json','w') as f:json.dump(manifest,f,indent=2)
 report('complete')

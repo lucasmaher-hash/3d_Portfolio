@@ -4187,39 +4187,29 @@ horizontally of the exhibit centre (≈5× the 1.23 m podium) and shrinks away p
 guard on `userData.galleryExhibit.near`). The arrow material binds the Blender-view LUT uniform
 (`view` is now returned by `prepareBakedGallery`). Sway pauses while the group pops.
 
-## Gallery wall panel lines, redrawn at load (2026-10-24, Lucas)
+## Gallery v06: expanded corner, to.morrow bay, flat walls (2026-10-24, Lucas)
 
-The outer wall and inner ring have a V-groove every ~0.72 m running floor to ceiling through both
-coves, but the grooves are ~8 mm wide and the bake gave them too few lightmap texels, so most of
-their shading is gone. No rebake: `scripts/extract-wall-seams.mjs` reads the grooves out of
-`gallery.glb` into `public/gallery-baked-assets/wall-seams.json` (per wall, per height level in mm,
-every groove centre in that horizontal slice; re-run after any wall re-export), and
-`drawWallSeams()` in `src/main.js` gives every wall vertex its horizontal distance to the nearest
-groove centre **of its own level** and darkens the baked light in a band around it (fwidth-
-antialiased). **Not straight planes:** the coves flare, a groove drifts up to ~0.65 m sideways
-toward floor/ceiling, and planes drew a second line next to the real one there. **Uniform:** the bake's own
-groove shading (a few seams kept a dark line, some dark dashes/blots beside them, most nothing) is
-CLEANED OUT of `maps/outer.png` and `maps/ring.png` by `scripts/clean-wall-lightmaps.py` (helper
-`scripts/raster-wall-seams.mjs` rasterises each wall into its lightmap with the per-texel seam
-distance and world position): every texel within 6 cm of a seam gets the median of the 16 nearest
-clean plaster texels in WORLD space (so UV islands don't matter), and the island padding is refilled
-so bilinear filtering cannot pull old dark values back. Every seam is then plain plaster and the
-shader's band is the only line — no per-seam compensation (an earlier version divided the bake's
-darkness out per vertex; too coarse: it left dark blots and drew LIGHT lines where it
-over-corrected). Measured over 1626 seam views (each seam at 3 heights, 3 m, head-on): leftover
-bake artefacts p99 0.29 -> 0.04, line darkness spread p1-p99 0.04-0.29 -> 0.045-0.10. The script
-reads the original bake from git (`ORIGINAL_REV`); re-run both scripts after any wall re-export/rebake
-(and update `ORIGINAL_REV`). Defaults `WALL_SEAM = { dark 0.14, width 0.013, soft 0.45 }` (Lucas's
-dialled values; the `?lines` slider panel he used is removed, see commit 9a159e1). Bake noise
-(dark specks, grain) is filtered in the same script; neighbours must share the texel's normal,
-or the wall's dark BACK face 9 cm away bleeds in as black dots (that happened once).
+The bake source is now `gallery-review-v06.blend` (`new 3d scene 2/blender-lighting-review/
+iteration-06-expansion/`), built from the approved v05 by `scripts/gallery-v06/build_v06.py`.
+Full record: `scripts/gallery-v06/README.md`; pipeline: `GALLERY-BAKED.md`.
 
-## Gallery floor edge glow, cleaned in the lightmap (2026-10-24, Lucas)
-
-The LED strips' glow was baked onto the floor as a lumpy band along every floor edge (outer wall,
-inner ring, podium wells) and rendered as cyan splotches. `scripts/clean-floor-lightmap.py`
-post-processes `maps/floor.png` (no rebake): inside ~12 texels of the floor island's edge each
-texel becomes the average of the band texels at the same edge distance nearby, plus the 8 px of
-padding outside the island; everything else is byte-identical. It always reads the original bake
-from git (`ORIGINAL_REV`), so re-running it is safe; **if the floor is ever re-baked, update
-`ORIGINAL_REV` or the script will overwrite the new bake with a cleaned old one.**
+- **Room:** the lower-right corner follows Lucas's sketch (IMG_9714, red line): the wall bulges
+  out to x 19.4 and meets the old bottom wall flush. Floor area 1388 → 1478 m².
+- **Virtual Cooking** moved to (13.93, −9.13) native plan coords, turned −2.4° so that it
+  faces the centre at the same angle as before.
+- **to.morrow** is exhibit 06: a 1.05 m sphere with its button facing the room centre,
+  level, hovering 18 cm. Podium 06 follows the podium rule (top Ø = span / 0.85, base
+  radius = top radius + 0.48); LED ring 06 and well / diffuser / light 07 are copies of
+  bay 04's. Link: `/to-shove2d.html`. The glass button and the icon are not baked (native PBR).
+- **Panel lines:** the 8 mm V-grooves were flattened out of the outer wall and the ring
+  geometry. They baked as random lines and blots and needed lightmap clean-up. The bake is
+  plain plaster now, and the lines are ONLY drawn by `drawWallSeams()` from
+  `wall-seams.json`, which the Blender build writes (per profile row, line centres in web
+  coords; the web lookup tolerates ±2 mm of GLB quantisation). Same look values as before
+  (`WALL_SEAM` 0.14 / 0.013 / 0.45). `extract-wall-seams.mjs`, `raster-wall-seams.mjs` and
+  `clean-wall-lightmaps.py` are deleted.
+- **Kept on the web side** (Lucas's choice): the centre help podium (a copy of podium 04,
+  which now borrows the lightmap of the moved VR bay) and the podium-top centre smoothing.
+- **Floor edge glow** is still smoothed by `scripts/clean-floor-lightmap.py`, but it now
+  reads the encoder's untouched output, passed as an argument (`$W/final/web-maps/floor.png`),
+  not git. Its fallback `ORIGINAL_REV` is only for re-cleaning the old bake.
