@@ -1863,8 +1863,7 @@ async function drawWallSeams(model, settings) {
   const walls = []
   model.traverse(o => { if (o.isMesh && o.userData.galleryRole === 'wall' && planes[o.userData.galleryBakeLabel]) walls.push(o) })
   let meshes = 0
-  const kept = []
-  const CELL = 0.5, NEAR_D = 0.015, SIDE0 = 0.08, SIDE1 = 0.25, MAX_D = 0.9
+  const CELL = 0.5, MAX_D = 0.9
   for (const o of walls) {
     // Groove centres per height level (scripts/extract-wall-seams.mjs). A vertex's seam
     // distance is its horizontal distance to the nearest groove centre of its OWN level,
@@ -1881,68 +1880,40 @@ async function drawWallSeams(model, settings) {
       levels.set(+key, { pts, grid })
     }
     const pos = o.geometry.getAttribute('position'), v = new THREE.Vector3()
-    const dist = new Float32Array(pos.count).fill(10), lvl = new Int32Array(pos.count), which = new Int32Array(pos.count).fill(-1)
+    const dist = new Float32Array(pos.count).fill(10)
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
       const key = Math.round(v.y * 1000), L = levels.get(key)
-      lvl[i] = key
       if (!L) continue
       const gx = Math.floor(v.x / CELL), gz = Math.floor(v.z / CELL)
-      let best = MAX_D, bi = -1
+      let best = MAX_D, hit = false
       for (let x = gx - 1; x <= gx + 1; x++) for (let z = gz - 1; z <= gz + 1; z++)
         for (const j of L.grid.get(x + ',' + z) || []) {
           const d = Math.hypot(v.x - L.pts[2 * j], v.z - L.pts[2 * j + 1])
-          if (d < best) { best = d; bi = j }
+          if (d < best) { best = d; hit = true }
         }
-      dist[i] = bi < 0 ? 10 : best; which[i] = bi
+      dist[i] = hit ? best : 10
     }
-    // Some grooves kept part of their shading in the bake, and by different amounts at
-    // different heights. For every groove at every level: how dark is the bake at the
-    // groove vs 8-25 cm beside it? The shader divides that out, so every line ends up
-    // at exactly the same darkness (the slider's), whatever the bake did there.
-    const info = settings.lightmaps[o.userData.galleryBakeLabel], uvA = o.geometry.getAttribute('galleryBakeUV')
-    const acc = new Map()
-    const slot = (key, j) => { const k = key * 4096 + j; let a = acc.get(k); if (!a) acc.set(k, a = [0, 0, 0, 0]); return a }
-    if (info && uvA) {
-      const lm = await readLightmap(info.file)
-      for (let i = 0; i < pos.count; i++) {
-        const j = which[i], d = dist[i]
-        if (j < 0 || (d > NEAR_D && (d < SIDE0 || d > SIDE1))) continue
-        const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
-        const py = Math.min(lm.h - 1, Math.max(0, Math.floor(uvA.getY(i) * lm.h)))
-        const k = (py * lm.w + px) * 4
-        const lum = (0.2126 * lm.data[k] + 0.7152 * lm.data[k + 1] + 0.0722 * lm.data[k + 2]) * lm.data[k + 3]
-        const a = slot(lvl[i], j)
-        if (d <= NEAR_D) { a[0] += lum; a[1]++ } else { a[2] += lum; a[3]++ }
-      }
-    }
-    const baked = new Float32Array(pos.count).fill(1)
-    for (let i = 0; i < pos.count; i++) {
-      if (which[i] < 0) continue
-      const a = acc.get(lvl[i] * 4096 + which[i])
-      if (a && a[1] && a[3] && a[2] > 0) baked[i] = Math.min(1, Math.max(0.2, (a[0] / a[1]) / (a[2] / a[3])))
-    }
-    kept.push(baked.reduce((n, e) => n + (e < 0.9 ? 1 : 0), 0))
-    const attr = new Float32Array(pos.count * 2)
-    for (let i = 0; i < pos.count; i++) { attr[i * 2] = dist[i]; attr[i * 2 + 1] = baked[i] }
-    o.geometry.setAttribute('gallerySeam', new THREE.BufferAttribute(attr, 2))
+    // The bake's own groove shading (uneven: some lines, some blots, mostly nothing)
+    // is cleaned out of outer.png / ring.png (scripts/clean-wall-lightmaps.py), so every
+    // seam starts as plain plaster and this one band is the only line there is.
+    o.geometry.setAttribute('gallerySeamD', new THREE.BufferAttribute(dist, 1))
     for (const m of [o.material].flat()) {
       const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey
       m.onBeforeCompile = (shader, r) => {
         prev.call(m, shader, r)
         Object.assign(shader.uniforms, WALL_SEAM_U)
-        shader.vertexShader = 'attribute vec2 gallerySeam;\nvarying vec2 vSeam;\n' + shader.vertexShader
-          .replace('#include <begin_vertex>', '#include <begin_vertex>\nvSeam = gallerySeam;')
+        shader.vertexShader = 'attribute float gallerySeamD;\nvarying float vSeamD;\n' + shader.vertexShader
+          .replace('#include <begin_vertex>', '#include <begin_vertex>\nvSeamD = gallerySeamD;')
         const bakeLine = 'totalEmissiveRadiance+=galleryRadiance.rgb*galleryRadiance.a*uBakedRange;'
         if (!shader.fragmentShader.includes(bakeLine)) throw Error('Wall seams: bake line not found')
-        // vSeam.x = distance to the seam (m), vSeam.y = how dark the bake already is there.
-        shader.fragmentShader = 'varying vec2 vSeam;\nuniform float uSeamDark, uSeamWidth, uSeamSoft;\n' + shader.fragmentShader
+        shader.fragmentShader = 'varying float vSeamD;\nuniform float uSeamDark, uSeamWidth, uSeamSoft;\n' + shader.fragmentShader
           .replace(bakeLine, bakeLine + `
           {
-            float sw = 0.5 * uSeamWidth, sf = max(fwidth(vSeam.x), 1e-6);
+            float sw = 0.5 * uSeamWidth, sf = max(fwidth(vSeamD), 1e-6);
             float se = max(sf, uSeamSoft * sw);
-            float sc = (1.0 - smoothstep(sw - se, sw + se, vSeam.x)) * min(1.0, sw / sf);
-            totalEmissiveRadiance *= min(1.0, (1.0 - uSeamDark * sc) / mix(1.0, vSeam.y, sc));
+            float sc = (1.0 - smoothstep(sw - se, sw + se, vSeamD)) * min(1.0, sw / sf);
+            totalEmissiveRadiance *= 1.0 - uSeamDark * sc;
           }`)
       }
       m.customProgramCacheKey = () => prevKey.call(m) + '-wallseams'
@@ -1950,7 +1921,7 @@ async function drawWallSeams(model, settings) {
     }
     meshes++
   }
-  console.log(`Wandfugen: ${meshes} Wände; Vertices mit schon gebackener Fuge (<0.9): ${kept.join(' / ')}`)
+  console.log(`Wandfugen: ${meshes} Wände`)
   if (new URLSearchParams(location.search).has('lines')) wallSeamTuner()
 }
 function wallSeamTuner() {

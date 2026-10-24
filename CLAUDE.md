@@ -4197,10 +4197,19 @@ every groove centre in that horizontal slice; re-run after any wall re-export), 
 `drawWallSeams()` in `src/main.js` gives every wall vertex its horizontal distance to the nearest
 groove centre **of its own level** and darkens the baked light in a band around it (fwidth-
 antialiased). **Not straight planes:** the coves flare, a groove drifts up to ~0.65 m sideways
-toward floor/ceiling, and planes drew a second line next to the real one there. **Uniform:** for
-every groove at every level the bake's own darkness (groove vs 8-25 cm beside it) is measured from
-the lightmap and divided out in the shader (`vSeam.y`), so baked-in and missing lines end at the
-same darkness, the slider's. Defaults `WALL_SEAM = { dark 0.14, width 0.013, soft 0.45 }` (Lucas's
+toward floor/ceiling, and planes drew a second line next to the real one there. **Uniform:** the bake's own
+groove shading (a few seams kept a dark line, some dark dashes/blots beside them, most nothing) is
+CLEANED OUT of `maps/outer.png` and `maps/ring.png` by `scripts/clean-wall-lightmaps.py` (helper
+`scripts/raster-wall-seams.mjs` rasterises each wall into its lightmap with the per-texel seam
+distance and world position): every texel within 6 cm of a seam gets the median of the 16 nearest
+clean plaster texels in WORLD space (so UV islands don't matter), and the island padding is refilled
+so bilinear filtering cannot pull old dark values back. Every seam is then plain plaster and the
+shader's band is the only line — no per-seam compensation (an earlier version divided the bake's
+darkness out per vertex; too coarse: it left dark blots and drew LIGHT lines where it
+over-corrected). Measured over 1626 seam views (each seam at 3 heights, 3 m, head-on): leftover
+bake artefacts p99 0.29 -> 0.04, line darkness spread p1-p99 0.04-0.29 -> 0.045-0.10. The script
+reads the original bake from git (`ORIGINAL_REV`); re-run both scripts after any wall re-export/rebake
+(and update `ORIGINAL_REV`). Defaults `WALL_SEAM = { dark 0.14, width 0.013, soft 0.45 }` (Lucas's
 dialled values). **`/gallery-4.html?lines`** shows sliders (saved per browser in
 `localStorage.wallSeamTune`, "copy settings" for the numbers).
 
@@ -4213,13 +4222,3 @@ texel becomes the average of the band texels at the same edge distance nearby, p
 padding outside the island; everything else is byte-identical. It always reads the original bake
 from git (`ORIGINAL_REV`), so re-running it is safe; **if the floor is ever re-baked, update
 `ORIGINAL_REV` or the script will overwrite the new bake with a cleaned old one.**
-
-## HANDOFF — wall panel lines, in progress (2026-10-24)
-
-Another session is reworking the gallery wall lines on branch **`wall-lines`** (worktree
-`../3D_Portfolio-wall-lines`). Until it is merged, please do not edit: `drawWallSeams()` /
-`wallSeamTuner()` / `WALL_SEAM*` in `src/main.js`, `scripts/extract-wall-seams.mjs`,
-`public/gallery-baked-assets/wall-seams.json`, `maps/outer.png`, `maps/ring.png`. Everything
-else (floor, podiums, lights, other code) is free. Plan: clean the old baked groove shading out of
-`outer.png`/`ring.png` (same idea as the floor script) so every seam is plain plaster, then the
-shader draws one uniform line per seam with no per-seam compensation.
