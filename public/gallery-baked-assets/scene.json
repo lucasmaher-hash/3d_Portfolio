@@ -187,10 +187,10 @@
       "range": 2,
       "width": 1024,
       "height": 1024,
-      "maxHDR": 1.86328125,
+      "maxHDR": 1.865234375,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00028397442656569183,
-      "p99LinearError": 0.0022428035736083984
+      "meanLinearError": 0.00027818986563943326,
+      "p99LinearError": 0.002218782901763916
     },
     "ring": {
       "file": "ring.png",

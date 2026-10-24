@@ -39,12 +39,16 @@ for m in list(set(bpy.data.materials) - before):
     if keep is not None and keep is not m:
         m.user_remap(keep); bpy.data.materials.remove(m)
 
+def set_slots(me, mats):
+    # Assign in place: materials.clear() resets every face's material_index to 0
+    # (that dropped podium 06's seam material once).
+    while len(me.materials) < len(mats): me.materials.append(None)
+    for i, m in enumerate(mats): me.materials[i] = m
+
 def swap_data(dst_name, src_obj):
     o = ob[dst_name]; mats = list(o.data.materials)
     o.data = src_obj.data
-    if o.type == 'MESH':
-        o.data.materials.clear()
-        for m in mats: o.data.materials.append(m)
+    if o.type == 'MESH': set_slots(o.data, mats)
     return o
 
 # architecture: same local data convention as v05 (v05 only adds object z scale 1.6411)
@@ -77,15 +81,12 @@ def adopt(o, like, coll):
     o.location.z = like.location.z; o.scale = like.scale
     return o
 pod = adopt(new['Podium 06 | to.morrow'], p4, excol)
-pod.data.materials.clear()
-for m in p4.data.materials: pod.data.materials.append(m)
+set_slots(pod.data, list(p4.data.materials))
 ledn = adopt(new['LED | podium 06 | to.morrow'], ob['LED | podium 04 | Virtual Cooking'], excol)
-ledn.data.materials.clear()
-for m in ob['LED | podium 04 | Virtual Cooking'].data.materials: ledn.data.materials.append(m)
+set_slots(ledn.data, list(ob['LED | podium 04 | Virtual Cooking'].data.materials))
 for part in ['rounded recessed well', 'turquoise luminous diffuser']:
     o = adopt(new['Ceiling 07 | ' + part], ob['Ceiling 04 | ' + part], ceilcol)
-    o.data.materials.clear()
-    for m in ob['Ceiling 04 | ' + part].data.materials: o.data.materials.append(m)
+    set_slots(o.data, list(ob['Ceiling 04 | ' + part].data.materials))
     for k in ob['Ceiling 04 | ' + part].keys(): o[k] = ob['Ceiling 04 | ' + part][k]
 l4 = ob['Ceiling 04 | downward illumination']
 l7 = l4.copy(); l7.data = l4.data.copy(); l7.name = l7.data.name = 'Ceiling 07 | downward illumination'
