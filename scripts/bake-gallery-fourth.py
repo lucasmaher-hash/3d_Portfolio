@@ -20,6 +20,7 @@ assert abs(next(o for o in s.objects if o.name.startswith('Ceiling |')).matrix_w
 BOTTLE={'bottle body_Podest','label_Podest','lid_Podest'}
 # Exported but not baked: glass and printed icon of the to.morrow button stay native PBR.
 NATIVE={'Tomorrow_GlassBubbleButton','Tomorrow_LiveIcon_Ring','Tomorrow_LiveIcon_Dot'}
+SHADOW_ONLY=set()
 def slug(t):return re.sub(r'[^a-z0-9]+','-',t.lower()).strip('-')
 def label(o):
  if o.name.startswith('Outer Wall'):return 'outer'
@@ -72,7 +73,7 @@ def uv_for(o,key):
  return o.data.uv_layers['GalleryBake']
 receivers=[]
 for o in list(s.objects):
- if o.type!='MESH' or o.name in BOTTLE or o.name in NATIVE or o.name.startswith('Ceiling ') and 'diffuser' in o.name:continue
+ if o.type!='MESH' or o.name in BOTTLE or o.name in NATIVE or o.name in SHADOW_ONLY or o.name.startswith('Ceiling ') and 'diffuser' in o.name:continue
  if o.get('galleryProject')=='Mac-Lamp' and o.get('galleryRole')=='project':continue
  key=label(o)
  if PILOT and key not in {'ring','podium-04','well-04','floor','ceiling'}:continue
@@ -131,7 +132,7 @@ for o,key in receivers:
 # Preserve native emitters. Bottle is merged from immutable approved web asset later.
 bpy.ops.object.select_all(action='DESELECT')
 for o in s.objects:
- if o.type in {'MESH','CURVE'} and o.name not in BOTTLE:o.select_set(True)
+ if o.type in {'MESH','CURVE'} and o.name not in BOTTLE and o.name not in SHADOW_ONLY:o.select_set(True)
  if o.type=='CURVE' or 'luminous diffuser' in o.name:o['galleryRole']='emitter'
 report('export geometry')
 bpy.ops.export_scene.gltf(filepath=OUT+'/gallery.glb',export_format='GLB',use_selection=True,use_active_scene=True,export_apply=True,export_extras=True,export_cameras=False,export_lights=False,export_texcoords=True)

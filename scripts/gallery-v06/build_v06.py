@@ -111,6 +111,67 @@ ptop = max((pod.matrix_world @ v.co).z for v in pod.data.vertices)
 log['tomorrow'] = {'bottom': float(pts[:, 2].min()), 'podium_top': ptop, 'hover': float(pts[:, 2].min() - ptop),
                    'centre_xy': ((pts[:, :2].max(0) + pts[:, :2].min(0)) / 2).round(3).tolist()}
 
+# ---- centre help podium (podium 07), baked for real (2026-10-24) -----------------------
+# Was a web-side copy of podium 04 borrowing its lightmap. Now a real podium at the centre,
+# lit by the centre well: Podium 04's mesh (seam material and stripes kept) with the straight
+# band shortened by 15 cm, the floor cut at its LED ring, its own LED ring, and a shadow-only
+# (The faint shadow on its top is drawn by the web from to.morrow's baked shadow: a physical
+# half-size occluder under a 4 m area light casts almost nothing, so it cannot be baked.)
+import bmesh
+HELP_SHORTEN = 0.15; BAND = (0.32, 0.94); Z0 = p4.location.z; ZS = p4.scale.z
+pod7 = bpy.data.objects.new('Podium 07 | centre help', p4.data.copy()); pod7.data.name = 'Podium 07 | centre help'
+excol.objects.link(pod7); pod7.location = Vector((0, 0, Z0)); pod7.scale = p4.scale
+for k in p4.keys():
+    if k != 'galleryProject': pod7[k] = p4[k]
+me7 = pod7.data; co = np.empty(len(me7.vertices) * 3); me7.vertices.foreach_get('co', co); co = co.reshape(-1, 3)
+zw = Z0 + ZS * co[:, 2]; b0, b1 = BAND; kk = (b1 - b0 - HELP_SHORTEN) / (b1 - b0)
+zn = np.where(zw <= b0, zw, np.where(zw > b1, zw - HELP_SHORTEN, b0 + (zw - b0) * kk))
+co[:, 2] = (zn - Z0) / ZS; me7.vertices.foreach_set('co', co.ravel()); me7.update()
+led4 = ob['LED | podium 04 | Virtual Cooking']
+led7 = bpy.data.objects.new('LED | podium 07 | centre help', led4.data.copy()); led7.data.name = led7.name
+excol.objects.link(led7); led7.location = Vector((0, 0, led4.location.z)); led7.scale = led4.scale
+led7['galleryRole'] = 'emitter'
+top7 = Z0 + ZS * max(v.co.z for v in me7.vertices)
+bpy.context.view_layer.update()
+# floor: same slab fill as before, one more round hole at the centre (04's hole, recentred)
+fl = ob['Floor | fitted base footprint | 10.8 cm slab']
+bm = bmesh.new(); bm.from_mesh(fl.data)
+topf = {f for f in bm.faces if f.normal.z > 0.9}
+adj = {}
+for e in bm.edges:
+    if sum(1 for f in e.link_faces if f in topf) == 1:
+        a, b = e.verts; adj.setdefault(a, []).append(b); adj.setdefault(b, []).append(a)
+seen = set(); loops = []
+for v0 in adj:
+    if v0 in seen: continue
+    lp = [v0]; seen.add(v0); prev = None; cur = v0
+    while True:
+        nx = [w for w in adj[cur] if w != prev and w not in seen]
+        if not nx: break
+        prev, cur = cur, nx[0]; seen.add(cur); lp.append(cur)
+    loops.append(np.array([(x.co.x, x.co.y) for x in lp]))
+bm.free()
+outer = max(loops, key=lambda l: np.ptp(l[:, 0]))
+holes = [l for l in loops if l is not outer]
+h04 = next(l for l in holes if np.linalg.norm(l.mean(0) - VR_NEW.to_2d()) < 0.5)
+holes.append(h04 - np.array(VR_NEW.to_2d()))
+cu = bpy.data.curves.new('tmp_slab', 'CURVE'); cu.dimensions = '2D'; cu.fill_mode = 'BOTH'; cu.extrude = 0.054
+for l in [outer] + holes:
+    sp = cu.splines.new('POLY'); sp.points.add(len(l) - 1)
+    sp.points.foreach_set('co', np.c_[l, np.zeros(len(l)), np.ones(len(l))].ravel()); sp.use_cyclic_u = True
+tmp = bpy.data.objects.new('tmp_slab', cu); bpy.context.scene.collection.objects.link(tmp)
+fme = bpy.data.meshes.new_from_object(tmp.evaluated_get(bpy.context.evaluated_depsgraph_get()))
+bpy.data.objects.remove(tmp); bpy.data.curves.remove(cu)
+fco = np.empty(len(fme.vertices) * 3); fme.vertices.foreach_get('co', fco); fco = fco.reshape(-1, 3); fco[:, 2] += 0.006
+fme.vertices.foreach_set('co', fco.ravel())
+fmats = list(fl.data.materials); old_fl = fl.data
+set_slots(fme, fmats)
+fme.polygons.foreach_set('material_index', np.zeros(len(fme.polygons), int)); fme.polygons.foreach_set('use_smooth', np.zeros(len(fme.polygons), bool))
+fuv = fme.uv_layers.new(name='UVMap'); flv = np.empty(len(fme.loops), int); fme.loops.foreach_get('vertex_index', flv)
+fxy = fco[flv, :2]; fmn = fxy.min(0); fuv.data.foreach_set('uv', ((fxy - fmn) / (fxy.max(0) - fmn).max()).ravel()); fme.update()
+nm = old_fl.name; fl.data = fme; fme.name = nm
+log['help_podium'] = {'top': top7, 'floor_holes': len(holes)}
+
 # ---- flatten panel grooves, keep their centre lines -----------------------------------
 K = 122
 def flatten(o, label):

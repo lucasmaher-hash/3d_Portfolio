@@ -1573,28 +1573,19 @@ function updateGalleryExhibits(delta) {
   }
 }
 
-// ── Centre help podium (branch center-help-podium, 2026-10-22, Lucas) ──
-// A copy of the Virtual Cooking podium (and its floor LED ring) stands in the
-// middle of the centre room, under that room's own ceiling well. NO rebake: the
-// copy reuses podium-04's lightmap, so it carries the light it had in its bay —
-// that bay's well sits straight above it too, so the look carries over. On top
-// floats a chrome "?" (the arrows' material and bevel) with the floating
-// exhibits' sway; a click opens the controls ("?") overlay. The spawn moves back
-// (CENTRE_SPAWN_Z) so the podium stands in front of you, not in you.
-const HELP_PODIUM_LABEL = 'podium-04'      // Virtual Cooking
+// ── Centre help podium ──
+// A real, baked podium (podium 07) stands in the middle of the centre room under that room's
+// own ceiling well: the Virtual Cooking podium's shape with its straight band 15 cm shorter,
+// its own floor hole and LED ring, and a faint shadow on its top (half the radius and half
+// the opacity of to.morrow's) baked from a shadow-only stand-in. Built in Blender
+// (scripts/gallery-v06/build_v06.py); before 2026-10-24 it was a runtime copy of podium 04.
+// On top floats a chrome "?" (the arrows' material and bevel) with the floating exhibits'
+// sway; a click opens the controls ("?") overlay. The spawn sits back (CENTRE_SPAWN_Z) so
+// the podium stands in front of you, not in you.
+const HELP_PODIUM_LABEL = 'podium-07'
 const HELP_GAP     = 0.22   // m of air between podium top and the "?" (exhibits float 0.18)
 const HELP_ROCK    = 0.35   // rad, slow turn either way (a full spin would show it mirrored)
 const CENTRE_SPAWN_Z = -3.8 // ring's inner face is at r 5.97; spawn yaw π faces +Z
-// The bays' floor has a round hole per podium (r 1.067, measured off the GLB) that ends
-// at the inner edge of the LED ring; the podium's skirt flares down into it. The centre
-// floor has none, so it is cut here in the floor's own shader (discard inside the ring).
-const HELP_HOLE_R = 1.062
-// Shorter than the bays' 1.23 m podium (Lucas): only the straight cylinder between
-// y 0.32 and 0.94 (uniform radius, evenly spaced rings — measured off the GLB) is
-// squeezed, so the rounded top and the flared base keep their exact shape. The
-// lightmap on that band compresses with it; there it is a smooth vertical gradient.
-const HELP_SHORTEN = 0.15
-const HELP_BAND = [0.32, 0.94]
 const helpIcons = []
 
 function makeQuestionGeometry() {
@@ -1627,82 +1618,10 @@ function makeQuestionGeometry() {
   return geo
 }
 
-function addCentreHelpPodium(model, walls, probes) {
-  let src = null
-  model.traverse(o => { if (!src && o.userData.galleryBakeLabel === HELP_PODIUM_LABEL) src = o })
-  if (!src || !galleryArrowMat) { console.warn('Help-Podest: Quelle fehlt'); return }
-  const centreProbe = probes.find(p => /center/.test(p.file)) || probes[0]
-  const srcBox = new THREE.Box3().setFromObject(src)
-  const c = srcBox.getCenter(new THREE.Vector3())
-  const place = o => {
-    const copy = o.clone(true)
-    copy.position.x -= c.x
-    copy.position.z -= c.z
-    copy.traverse(m => {
-      if (!m.isMesh) return
-      // Same lightmap uniforms (onBeforeCompile), the centre room's reflections.
-      const one = mat => {
-        const k = mat.clone()
-        k.onBeforeCompile = mat.onBeforeCompile
-        k.customProgramCacheKey = mat.customProgramCacheKey
-        k.envMap = centreProbe.texture
-        return k
-      }
-      m.material = Array.isArray(m.material) ? m.material.map(one) : one(m.material)
-    })
-    o.parent.add(copy)
-    copy.updateMatrixWorld(true)
-    return copy
-  }
-  const podium = place(src)
-  podium.name = 'HelpPodium'
-  const [b0, b1] = HELP_BAND, k = (b1 - b0 - HELP_SHORTEN) / (b1 - b0)
-  const v = new THREE.Vector3(), inv = new THREE.Matrix4()
-  podium.traverse(m => {
-    if (!m.isMesh) return
-    m.geometry = m.geometry.clone()   // the bay's podium shares the original
-    inv.copy(m.matrixWorld).invert()
-    const pos = m.geometry.getAttribute('position')
-    for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld)
-      if (v.y <= b0) continue
-      v.y = v.y > b1 ? v.y - HELP_SHORTEN : b0 + (v.y - b0) * k
-      v.applyMatrix4(inv)
-      pos.setXYZ(i, v.x, v.y, v.z)
-    }
-    pos.needsUpdate = true
-    m.geometry.computeBoundingBox(); m.geometry.computeBoundingSphere()
-    if (PERF.bvh) m.geometry.computeBoundsTree({ indirect: true })
-  })
-  podium.traverse(m => { if (m.isMesh) { walls.push(m); lowCollidables.push(m) } })
-  // The podium's turquoise floor ring (emissive, not baked) comes along.
-  let led = null
-  model.traverse(o => { if (!led && o !== src && /LED/.test(o.name) && /podium_?04/i.test(o.name)) led = o })
-  if (led) place(led)
-  let floor = null
-  model.traverse(o => { if (!floor && o.isMesh && o.userData.galleryBakeLabel === 'floor') floor = o })
-  if (floor) for (const mat of [floor.material].flat()) {
-    const prev = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey
-    mat.onBeforeCompile = (shader, r) => {
-      prev.call(mat, shader, r)
-      shader.vertexShader = 'varying vec3 vHelpHoleW;\n' + shader.vertexShader.replace('#include <project_vertex>',
-        '#include <project_vertex>\nvHelpHoleW = (modelMatrix * vec4(transformed, 1.0)).xyz;')
-      shader.fragmentShader = 'varying vec3 vHelpHoleW;\n' + shader.fragmentShader.replace('void main() {',
-        'void main() {\nif (length(vHelpHoleW.xz) < ' + HELP_HOLE_R.toFixed(4) + ') discard;')
-    }
-    mat.customProgramCacheKey = () => prevKey.call(mat) + '-help-hole'
-    mat.needsUpdate = true
-  }
-  // The hole's inner edge: the bays' floor slab shows a dark teal face there; without
-  // one the void (scene background) shows between slab and skirt. Colour sampled off
-  // podium 04's gap in a screenshot, drawn untone-mapped so it lands on that value.
-  const wall = new THREE.Mesh(
-    new THREE.CylinderGeometry(HELP_HOLE_R, HELP_HOLE_R, 0.2, 96, 1, true),
-    new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(1 / 255, 30 / 255, 38 / 255, THREE.SRGBColorSpace),
-      side: THREE.BackSide, toneMapped: false }))
-  wall.position.y = -0.1
-  wall.name = 'HelpHoleWall'
-  scene.add(wall)
+function addCentreHelpPodium(model) {
+  let podium = null
+  model.traverse(o => { if (!podium && o.isMesh && o.userData.galleryBakeLabel === HELP_PODIUM_LABEL && o.userData.galleryRole === 'podium') podium = o })
+  if (!podium || !galleryArrowMat) { console.warn('Help-Podest: Podest fehlt'); return }
   const top = new THREE.Box3().setFromObject(podium).max.y
   const mesh = new THREE.Mesh(makeQuestionGeometry(), galleryArrowMat)
   mesh.name = 'HelpIcon'
@@ -1719,7 +1638,7 @@ function addCentreHelpPodium(model, walls, probes) {
   scene.add(mesh)
   clickables.push(mesh, hit)
   helpIcons.push({ mesh, baseY, t: 0, phase: 0.6 })
-  console.log(`Help-Podest: Kopie von ${HELP_PODIUM_LABEL} bei (0, 0), LED ${led ? 'ja' : 'nein'}, Bodenloch ${floor ? 'ja' : 'nein'}, "?" bei y ${baseY.toFixed(2)}`)
+  console.log(`Help-Podest: ${HELP_PODIUM_LABEL}, "?" bei y ${baseY.toFixed(2)}`)
 }
 
 // The podium tops carry 12 seam grooves that meet in the middle. Near the centre the
@@ -1732,9 +1651,15 @@ function addCentreHelpPodium(model, walls, probes) {
 // that podium's own lightmap (each cell = the 75th-percentile radiance of the top-
 // surface vertices around it, which drops the dark outliers), ×0.85 inside the
 // grooves, blended back into the real bake over the outer 10 cm. Geometry and bake
-// files are untouched. Runs on all podiums, the centre copy included.
+// files are untouched. Runs on all podiums, the centre one included (its faint "?"
+// shadow, baked, is wider than the slits' neighbourhood and survives the 75th percentile).
 const PODIUM_CAP_R = 0.5          // the top is flat out to r ≈ 0.6
 const PODIUM_CAP_GROOVE = 0.85
+// The help podium's faint shadow (Lucas, 2026-10-24): to.morrow's, at half the radius and half the depth.
+const SHADOW_SOURCE = 'podium-06', SHADOW_TARGET = 'podium-07'
+const SHADOW_BIN = 0.02, SHADOW_BINS = 31          // 2 cm rings out to 0.62 m (the flat top)
+const SHADOW_SCALE = 2                              // target radius r reads the source profile at 2r
+const SHADOW_OPACITY = 0.5
 const PODIUM_FIELD_N = 64         // field cells across 2R (≈1.6 cm each)
 async function readLightmap(file) {
   // RGBM PNG: rgb · a · range = linear radiance. Read through WebGL so nothing is
@@ -1758,9 +1683,14 @@ async function capPodiumTops(model, settings) {
   model.traverse(o => {
     if (o.isMesh && o.userData.galleryRole === 'podium' && !/seam/i.test([o.material].flat()[0].name)) mains.push(o)
   })
+  // to.morrow's podium (06) is processed first: its baked shadow (the sphere above it) gives the
+  // radial profile that the centre help podium (07) wears at half the radius and half the depth.
+  mains.sort((a, b) => (b.userData.galleryBakeLabel === SHADOW_SOURCE) - (a.userData.galleryBakeLabel === SHADOW_SOURCE))
+  let shadowDark = null   // darkness 0..1 per SHADOW_BIN metres of radius on the source top
   for (const o of mains) {
     const box = new THREE.Box3().setFromObject(o), c = box.getCenter(new THREE.Vector3())
     const top = box.max.y
+    const label = o.userData.galleryBakeLabel
     const info = settings.lightmaps[o.userData.galleryBakeLabel]
     const uvA = o.geometry.getAttribute('galleryBakeUV'), pos = o.geometry.getAttribute('position')
     if (!info || !uvA) continue
@@ -1770,9 +1700,19 @@ async function capPodiumTops(model, settings) {
     const R = PODIUM_CAP_R, N = PODIUM_FIELD_N, cell = 2 * R / N
     const buckets = Array.from({ length: N * N }, () => [])
     const v = new THREE.Vector3()
+    const profile = label === SHADOW_SOURCE ? Array.from({ length: SHADOW_BINS }, () => []) : null
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
       if (v.y < top - 0.0006) continue
+      if (profile) {
+        const bin = Math.floor(Math.hypot(v.x - c.x, v.z - c.z) / SHADOW_BIN)
+        if (bin < SHADOW_BINS) {
+          const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
+          const py = Math.min(lm.h - 1, Math.max(0, Math.floor(uvA.getY(i) * lm.h)))
+          const k = (py * lm.w + px) * 4, m = lm.data[k + 3] / 255 * info.range / 255
+          profile[bin].push(0.2126 * lm.data[k] * m + 0.7152 * lm.data[k + 1] * m + 0.0722 * lm.data[k + 2] * m)
+        }
+      }
       const gx = Math.floor((v.x - c.x + R) / cell), gz = Math.floor((v.z - c.z + R) / cell)
       if (gx < -1 || gz < -1 || gx > N || gz > N) continue
       const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
@@ -1784,6 +1724,14 @@ async function capPodiumTops(model, settings) {
         const x = gx + dx, z = gz + dz
         if (x >= 0 && z >= 0 && x < N && z < N) buckets[z * N + x].push(rad)
       }
+    }
+    if (profile) {
+      // 75th percentile per ring (drops the dark seam slits); the unshadowed level is the outer rings.
+      const lum = profile.map(b => b.length ? b.sort((p, q) => p - q)[Math.floor(b.length * 0.75)] : NaN)
+      const ref = lum.slice(-6).filter(Number.isFinite).reduce((p, q) => p + q, 0) / Math.max(1, lum.slice(-6).filter(Number.isFinite).length)
+      let last = 0
+      shadowDark = lum.map(l => { const d = Number.isFinite(l) ? Math.min(1, Math.max(0, 1 - l / ref)) : last; return (last = d) })
+      console.log('Podest-Schatten (to.morrow) Tiefe je 2 cm:', shadowDark.map(d => d.toFixed(2)).join(' '))
     }
     const field = new Float32Array(N * N * 4), have = new Uint8Array(N * N)
     buckets.forEach((b, i) => {
@@ -1799,6 +1747,13 @@ async function capPodiumTops(model, settings) {
         if (d < best) { best = d; bj = j }
       }
       if (bj >= 0) field.set(field.subarray(bj * 4, bj * 4 + 4), i * 4)
+    }
+    if (label === SHADOW_TARGET && shadowDark) {
+      for (let i = 0; i < N * N; i++) {
+        const r = Math.hypot(((i % N) + 0.5) * cell - R, (Math.floor(i / N) + 0.5) * cell - R) * SHADOW_SCALE
+        const d = shadowDark[Math.min(SHADOW_BINS - 1, Math.floor(r / SHADOW_BIN))] * SHADOW_OPACITY
+        for (let k = 0; k < 3; k++) field[i * 4 + k] *= 1 - d
+      }
     }
     const tex = new THREE.DataTexture(field, N, N, THREE.RGBAFormat, THREE.FloatType)
     tex.minFilter = tex.magFilter = THREE.LinearFilter
@@ -2619,8 +2574,8 @@ function addRoomTitles(model) {
 // ── Load model ───────────────────────────────────────────────────
 const loader = new GLTFLoader()
 loader.setMeshoptDecoder(MeshoptDecoder)
-const GLB_ORIGINAL  = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=3' : '/current🟢.glb'
-const GLB_OPTIMIZED = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=3' : '/scene-optimized.glb'
+const GLB_ORIGINAL  = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=5' : '/current🟢.glb'
+const GLB_OPTIMIZED = IS_BAKED_GALLERY ? '/gallery-baked-assets/gallery.glb?v=5' : '/scene-optimized.glb'
 // A missing or broken optimized file (the optimizer never fails the build, it just does not
 // write one) falls back to the original GLB instead of leaving the 3D page empty.
 function loadScene(url, onLoad, onProgress, onError) {
@@ -2739,7 +2694,7 @@ loadScene(
             }
             addGalleryExhibit(group, project, data, bounds, view)
           }
-          addCentreHelpPodium(gltf.scene, galleryWalls, probes)
+          addCentreHelpPodium(gltf.scene)
           await capPodiumTops(gltf.scene, settings)
           await drawWallSeams(gltf.scene, settings)
           try {

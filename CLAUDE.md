@@ -4208,8 +4208,11 @@ Full record: `scripts/gallery-v06/README.md`; pipeline: `GALLERY-BAKED.md`.
   coords; the web lookup tolerates ±2 mm of GLB quantisation). Same look values as before
   (`WALL_SEAM` 0.14 / 0.013 / 0.45). `extract-wall-seams.mjs`, `raster-wall-seams.mjs` and
   `clean-wall-lightmaps.py` are deleted.
-- **Kept on the web side** (Lucas's choice): the centre help podium (a copy of podium 04,
-  which now borrows the lightmap of the moved VR bay) and the podium-top centre smoothing.
+- **Centre help podium** is baked (podium 07, `addCentreHelpPodium` now only adds the chrome "?"):
+  podium 04's mesh with its straight band 15 cm shorter (stripes kept), floor hole + LED ring in
+  Blender, centre-well lighting. Its faint top shadow is derived on the web from to.morrow's
+  baked shadow profile (half radius, half depth; a physical half-size occluder under the 4 m
+  area light casts almost nothing). The podium-top centre smoothing stays on the web.
 - **Floor edge glow** is still smoothed by `scripts/clean-floor-lightmap.py`, but it now
   reads the encoder's untouched output, passed as an argument (`$W/final/web-maps/floor.png`),
   not git. Its fallback `ORIGINAL_REV` is only for re-cleaning the old bake.

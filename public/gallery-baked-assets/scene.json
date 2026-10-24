@@ -43,7 +43,8 @@
     "podium-04",
     "podium-05",
     "podium-06",
-    "tomorrow-continuousshell"
+    "tomorrow-continuousshell",
+    "podium-07"
   ],
   "quality": {
     "samples": 256,
@@ -67,10 +68,10 @@
       "range": 4,
       "width": 2048,
       "height": 2048,
-      "maxHDR": 2.990234375,
+      "maxHDR": 3.009765625,
       "encoding": "RGBM-linear",
-      "meanLinearError": 0.00007066054968163371,
-      "p99LinearError": 0.0006388723850250244
+      "meanLinearError": 0.00007049253326840699,
+      "p99LinearError": 0.0006456375122070312
     },
     "outer": {
       "file": "outer.png",
@@ -281,6 +282,16 @@
       "encoding": "RGBM-linear",
       "meanLinearError": 0.00006159392796689644,
       "p99LinearError": 0.0011655092239379883
+    },
+    "podium-07": {
+      "file": "podium-07.png",
+      "range": 4,
+      "width": 1024,
+      "height": 1024,
+      "maxHDR": 3.5234375,
+      "encoding": "RGBM-linear",
+      "meanLinearError": 0.0004374323470983654,
+      "p99LinearError": 0.003751397132873535
     }
   },
   "probes": [

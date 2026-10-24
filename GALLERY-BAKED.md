@@ -20,7 +20,7 @@ The native source is `gallery-review-v06.blend` in the local `new 3d scene 2/ble
 
 **Retired with v06:** `extract-wall-seams.mjs`, `raster-wall-seams.mjs` and `clean-wall-lightmaps.py`. They existed only because the 8 mm grooves baked as random lines and blots. The grooves are gone from the geometry, so the wall bake needs no cleaning.
 
-Still web-side by choice (Lucas, 2026-10-24): the centre help podium (a copy of podium 04, `addCentreHelpPodium`) and the podium-top centre smoothing (`capPodiumTops`, the seams still narrow to slits at the centre).
+The centre help podium (podium 07) is baked since 2026-10-24: Podium 04's mesh (seams kept) with the straight band 15 cm shorter, its own floor hole and LED ring, lit by the centre well. Its faint top shadow is NOT baked: a physical half-size occluder under the 4 m area light casts almost nothing. `capPodiumTops` reads to.morrow's baked shadow profile off podium 06 and applies it to podium 07 at half the radius and half the depth (`SHADOW_*` constants). The web also adds the chrome "?". The podium-top centre smoothing (`capPodiumTops`, the seams still narrow to slits at the centre) stays web-side by Lucas's choice and runs on podium 07 too.
 
 ## Colour and reflection limits
 

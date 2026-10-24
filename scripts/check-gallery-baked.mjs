@@ -12,7 +12,7 @@ assert.equal(settings.floorY,0);assert.equal(settings.eyeHeight,1.93862241595598
 assert.equal(settings.fov,90);assert.equal(settings.speed,3.45)
 assert.deepEqual(settings.spawn,[0,settings.eyeHeight,0]);assert.equal(settings.yaw,Math.PI)
 assert.equal(settings.runtimeRoomLights,0)
-assert.equal(Object.keys(settings.lightmaps).length,23);assert.equal(settings.probes.length,7)
+assert.equal(Object.keys(settings.lightmaps).length,24);assert.equal(settings.probes.length,7)
 await MeshoptDecoder.ready
 const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder})
 const doc=await io.read(new URL('gallery.glb',root).pathname)
@@ -29,7 +29,7 @@ for(const node of doc.getRoot().listNodes()) {
   for(let i=0;i<uv.getCount();i++)for(const x of uv.getElement(i,[]))assert(x>=-.0001&&x<=1.0001)
  }
 }
-assert.equal(baked,23);assert.equal(podiums.size,6);assert.equal(projects.size,6)
+assert.equal(baked,24);assert.equal(podiums.size,7);assert.equal(projects.size,6)
 const original=execFileSync('git',['show','gallery-third-preserved-2026-10-22:public/gallery-original-assets/gallery.glb'],{maxBuffer:100*1024*1024})
 assert.equal(crypto.createHash('sha256').update(original).digest('hex'),settings.bottleSourceSHA256)
 let bytes=0,pixels=0
@@ -39,7 +39,7 @@ for(const map of Object.values(settings.lightmaps)) {
 }
 for(const p of settings.probes)bytes+=(await fs.stat(new URL('probes/'+p.file,root))).size
 bytes+=(await fs.stat(new URL('gallery.glb',root))).size+(await fs.stat(new URL('blender-view.rgba16f',root))).size
-console.log(`PASS: 23 valid lightmap UV sets (egg + VR panel use the old scene asset), six podiums/projects, seven HDR probes, approved spawn and movement, zero runtime room lights, protected third GLB hash. Assets ${(bytes/1e6).toFixed(1)} MB; lightmap mip allocation about ${(pixels*4*4/3/1048576).toFixed(0)} MiB, excluding geometry/probes/LUT.`)
+console.log(`PASS: 24 valid lightmap UV sets (egg + VR panel use the old scene asset), seven podiums, six projects, seven HDR probes, approved spawn and movement, zero runtime room lights, protected third GLB hash. Assets ${(bytes/1e6).toFixed(1)} MB; lightmap mip allocation about ${(pixels*4*4/3/1048576).toFixed(0)} MiB, excluding geometry/probes/LUT.`)
 const main=await fs.readFile(new URL('../src/main.js',import.meta.url),'utf8')
 const flags=main.slice(main.indexOf('const IS_DEFAULT_GALLERY'),main.indexOf("import * as THREE"))
 for(const [pathname,expected]of [['/','default'],['/index.html','default'],['/gallery-1.html','gallery-1'],['/gallery-4.html','gallery-4']]) {
