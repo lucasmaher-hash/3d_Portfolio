@@ -283,6 +283,10 @@
     @media (max-width: 640px) {
       #top-bar { height: 140px; }
       #top-bar.hide { transform: translateY(-90px); }
+      /* The nav pill ends ~77px down. With a panel open the content is taller than the
+         screen, the wrapper stops centring it, and the title sat at 12px + 32px =
+         ~44px, under the pill, with nothing above it to scroll to. Clear the pill. */
+      .page-wrapper { padding-top: 64px; }
     }
 
     /* ── Mobile menu overlay ─────────────────────────────────── */
