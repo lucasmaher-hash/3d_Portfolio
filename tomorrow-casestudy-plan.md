@@ -7,9 +7,9 @@ professional voice**. Written 2026-09-18 from an interview with Lucas. Companion
 `unify-casestudy-plan.md`; general guidance lives in the vault at
 `04 Ressourcen/Design & Craft/Case Study Aufbau.md`.
 
-`shove95casestudyplan.md` (2026-09-03) is the older content plan the current page was built
-from. Its app description (§2) is still the reference for how the app works; this file
-replaces its structure (§4) and adds the evidence layer the page is missing.
+This file replaces the older content plan (`shove95casestudyplan.md`, 2026-09-03, now deleted —
+in git history) that the current page was built from. That plan's description of how the app
+works is kept as **Appendix A** at the end of this file.
 
 > **All numbers in this file are example values** showing the *shape* of a finding and
 > where it would go on the page. Replace every one with the real result before it ships.
@@ -267,3 +267,164 @@ Rules, from the vault guide:
 1. How many TestFlight testers used each build? The retention curve needs a stated n.
 2. Do tester messages about the Windows 95 build still exist? One real quote is worth more than the curve.
 3. Is in-app event counting in place, or does Study 6 have to rely on App Store Connect alone?
+
+---
+
+## Appendix A. The app, in full
+
+*Moved here from the retired `shove95casestudyplan.md` (written 2026-09-03, when the app was still called shove.95 and ran the Windows 95 look). Check details against the app source before quoting them.*
+
+Reference material. The case study will use a fraction of this — but the
+session writing it should know what exists before deciding what to leave out.
+
+### The model
+
+- **Three lists: Today, Tomorrow, Soon.** A task is in exactly one of them,
+  always. There is no inbox, no project, no tag, no folder.
+- **The lists are filters over a real date, not containers.** Each task holds a
+  date (or none); the tab is computed from it. This is the load-bearing
+  decision in the whole app — see below.
+- **Overdue roll-forward is free.** A past date resolves to Today, so an
+  unfinished task simply reappears there with a chip saying how late it is
+  ("1 Day", "2 Days"). There is **no rollover job**, no midnight task, nothing
+  to go wrong while the phone is asleep.
+- **Undated tasks live in Soon**, under a "General" heading.
+- Soon also groups dated tasks by day — "Sat 5 Sep", "Sat 31 Oct" — and those
+  headings fold shut.
+
+### The swipe — the core gesture
+
+- **Right moves it later** (Today → Tomorrow → Soon), **left pulls it back**.
+- The commit threshold is **0.22 of the row's width**, or a release velocity
+  over 300 pt/s — so a fast flick commits from a shorter distance than a slow
+  drag. The row carries the finger's velocity into the animation.
+- Rubber-banding resists at the ends of the line.
+- Every move is confirmed by an undo bar that retires itself.
+
+### What you can do to a task
+
+| Gesture | Result |
+|---|---|
+| Tap the circle | Tick it off — strikethrough, drops to the bottom |
+| Tap the text | Inline edit; Return commits |
+| Swipe L/R | Move a bucket |
+| Long press | Menu: **Delete**, **Go Live**, **Mark as Important**, and a jump to the non-adjacent bucket (`>> Soon` from Today, `<< Today` from Soon) |
+| Long press the grip, then drag | Reorder by hand |
+| Camera / photo button while editing | Attach a photo |
+| Calendar button (Soon only, while editing) | Pick a specific day |
+
+**Important** is red *and* semibold — colour is never the only signal.
+
+### Live — the Lock Screen feature
+
+- A dedicated section, reached by the ring at the bottom left.
+- **One live task at a time**, typed into its own large box.
+- It appears on the **Lock Screen and in the Dynamic Island** via a Live
+  Activity, and stays until ticked off.
+- A **Live / Off air** switch controls whether it is showing, without deleting
+  the text. A bin deletes it, and greys out when the box is empty.
+- Emptying the text ends the live note — the box and the Lock Screen cannot
+  disagree.
+- **The live task is shared across workspaces.** It is "the one thing you are
+  doing", not "the one thing in this list".
+- Implemented in a widget extension because that is the only place iOS allows
+  Live Activities. **There is no Home Screen widget** and none appears in the
+  widget gallery.
+
+### Workspaces
+
+- Separate lists — Personal and Work by default.
+- The pill at the top left opens and switches; add, rename and delete live in
+  Settings.
+- **Deleting a workspace does not delete its tasks** — they fold into the
+  default workspace.
+- Every query in the app is scoped to the active workspace, so switching swaps
+  the entire visible world in one assignment.
+
+### Archive
+
+- A completed **dated** task leaves its list at the **first midnight after
+  completion**; a completed **undated** task leaves after **24 hours**. So a
+  task you tick at 9am stays visible all day — you can see what you did.
+- Grouped by completion day, newest first.
+- **Unticking returns it to its bucket** (overdue if the date has passed —
+  correct and intended).
+- Deleting from the archive is permanent, by design.
+
+### Undo
+
+- Single-level, for **moves and deletes**.
+- A status panel reports what happened and retires itself on a timer — it is
+  news, not standing chrome.
+- The delete snapshot carries the photos, the workspace and the live state, so
+  undo restores the task exactly, in the list it came from.
+
+### Photos
+
+- **Several per task**, shown as thumbnails in the row.
+- Attached from the library or the camera; downscaled on import.
+- The viewer supports **pinch and double-tap zoom**, and **Live Text**
+  (VisionKit) — so you can select a phone number or address out of a
+  photographed label.
+- Swipe down to dismiss the viewer; swipe a photo away to delete it.
+
+### Settings
+
+| Panel | What it offers |
+|---|---|
+| **Theme** | Four — Slate, Cream, Moss, Rose. Each derived from a single seed colour rather than hand-picked. |
+| **Light & dark** | System / Light / Dark |
+| **Typeface** | **Retro** (W95FA pixel type on chrome, readable system face for task text) or **Modern** |
+| **Tab names** | Rename all three tabs, with a Default reset. Bounded length so the bar cannot break. |
+| **Workspaces** | Add, rename, delete |
+| **Data** | Archive, How to use, About |
+| — | A one-line iCloud status |
+
+### Sync and privacy
+
+- **SwiftData + CloudKit private database.** No account, no login, no email, no
+  server belonging to the developer.
+- Works fully offline; syncs when it can.
+- A remote-change observer means a task added on another device appears
+  without a manual refresh.
+- **Zero third-party dependencies.** No analytics, no crash reporter, no SDKs
+  of any kind.
+
+### Help, instead of onboarding
+
+- **There is no first-run walkthrough** — it was built, then deleted.
+- Instead, a **How to use** screen with three blocks: Go live, Swiping,
+  Workspaces. Two of the three illustrations are the **real controls, running**
+  — the Live switch toggling itself, the workspace pill opening and switching —
+  rather than drawings of them. The third animates two task rows being shoved
+  off the screen.
+
+### Accessibility
+
+- Dynamic Type through **AX5**; chrome scales at half the rate of text so
+  controls do not swallow the screen.
+- The tab that stops fitting **abbreviates** ("Tomorrow" → "Tmw") rather than
+  shrinking, so all three labels stay the same size.
+- **VoiceOver custom actions** for edit, reorder and photos — the row collapses
+  to a single element, so without them those three were unreachable.
+- **Reduce Motion** stops every looping animation dead rather than slowing it.
+- 44pt touch targets throughout.
+
+### Platform and stack
+
+- **iOS 18+**, portrait only.
+- SwiftUI, SwiftData, CloudKit, ActivityKit (Live Activities), VisionKit (Live
+  Text), WidgetKit.
+- `Shove95Kit` — a local Swift package holding the date engine, bucket model
+  and placement logic, with **56 unit tests** covering rollover, archive
+  visibility, timezone changes and non-Gregorian calendars.
+- `SkeuKit` — the in-app design system: tokens, palettes, depth primitives
+  (trough, glass, bloom), one press behaviour.
+
+### Debug affordances (not shipped behaviour)
+
+`-seedDemo YES` fills a clean install with presentable content,
+`-seedFillers YES` adds 40 rows for scroll testing, `-wipeAll YES` empties
+every workspace. Useful for producing screenshots.
+
+---
