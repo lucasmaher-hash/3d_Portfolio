@@ -1845,7 +1845,7 @@ async function capPodiumTops(model, settings) {
 // under interpolation: a plane distance is linear and no triangle crosses a seam), and
 // the shader darkens the baked light in a band around 0. Antialiased with fwidth, so a
 // far line fades out instead of shimmering. `?lines` shows sliders to dial it in.
-const WALL_SEAM = { dark: 0.15, width: 0.025, soft: 0.5 }   // dark = share of light removed at the line's centre
+const WALL_SEAM = { dark: 0.18, width: 0.025, soft: 0.5 }   // dark = share of light removed at the line's centre
 const WALL_SEAM_U = { uSeamDark: { value: 0 }, uSeamWidth: { value: 0 }, uSeamSoft: { value: 0 } }
 function setWallSeams(s) {
   Object.assign(WALL_SEAM, s)
@@ -1907,9 +1907,12 @@ async function drawWallSeams(model, settings) {
         if (d <= 0.015) { near[j] += lum; nearN[j]++ } else { side[j] += lum; sideN[j]++ }
       }
     }
+    // ^1.5 / 0.98: calibrated against renders — an untouched groove samples ~0.98 and
+    // shows no line; a baked line renders darker than its vertex samples say.
     const baked = seams.map((_, j) => nearN[j] && sideN[j] && side[j] > 0
-      ? Math.min(1, Math.max(0.2, (near[j] / nearN[j]) / (side[j] / sideN[j]))) : 1)
+      ? Math.min(1, Math.max(0.2, (near[j] / nearN[j]) / (side[j] / sideN[j]) / 0.98)) ** 1.5 : 1)
     kept.push(...baked.filter(e => e < 0.9).map(e => e.toFixed(2)))
+    if (new URLSearchParams(location.search).has('lines')) (window.__wallSeams ||= {})[o.userData.galleryBakeLabel] = { seams, baked }
     const attr = new Float32Array(pos.count * 2)
     for (let i = 0; i < pos.count; i++) { attr[i * 2] = dist[i]; attr[i * 2 + 1] = which[i] < 0 ? 1 : baked[which[i]] }
     o.geometry.setAttribute('gallerySeam', new THREE.BufferAttribute(attr, 2))
