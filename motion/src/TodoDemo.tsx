@@ -52,7 +52,7 @@ const Row: React.FC<{t: string; time: string; p: number}> = ({t, time, p: pu}) =
 const Shell: React.FC<{children: React.ReactNode}> = ({children}) => (
   <AbsoluteFill
     style={{
-      background: '#b3b8c3',
+      background: '#9aa0ad',
       fontFamily: FONT, color: INK, overflow: 'hidden',
     }}
   >
