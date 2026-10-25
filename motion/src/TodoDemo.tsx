@@ -38,7 +38,7 @@ const Row: React.FC<{t: string; p: number}> = ({t, p: pu}) => {
   const x = 620 * (1 - u * u), y = 300 * (1 - u) * (1 - u);
   return (
     <div style={{height: ROW, padding: '6px 0', boxSizing: 'border-box', opacity: clamp01(p * 2.5), transform: `translate(${x}px, ${y}px)`}}>
-      <div style={{height: '100%', background: bg, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, fontSize: 32, position: 'relative'}}>
+      <div style={{height: '100%', background: bg, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 32, gap: 22, fontSize: 32, position: 'relative'}}>
         <i style={{flex: 'none', width: 34, height: 34, borderRadius: '50%', border: '3px solid rgba(26,26,26,0.45)', boxSizing: 'border-box'}} />
         <span style={{whiteSpace: 'nowrap'}}>{t}</span>
         <div style={{position: 'absolute', left: '30%', right: '30%', bottom: 0, height: 1, background: 'rgba(26,26,26,0.12)'}} />
