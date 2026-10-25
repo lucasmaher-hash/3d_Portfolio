@@ -772,10 +772,8 @@
     .ph2--wide { aspect-ratio: 16 / 9; }
     .ph2--quote { align-items: flex-start; text-align: left; justify-content: center; }
     .win-frame { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-radius: 20px; overflow: hidden; margin-top: var(--block-gap); box-shadow: var(--shadow-pressed); }
+    .win-frame { background: #000080; }
     .win-cell { display: flex; justify-content: center; padding: clamp(14px, 3vw, 40px) clamp(8px, 2vw, 28px); }
-    .win-cell:nth-child(1) { background: rgba(122, 146, 176, 0.10); }
-    .win-cell:nth-child(2) { background: rgba(122, 146, 176, 0.17); }
-    .win-cell:nth-child(3) { background: rgba(122, 146, 176, 0.24); }
     .win-cell img { width: min(100%, 300px); height: auto; display: block; filter: drop-shadow(0 10px 16px rgba(40, 40, 90, 0.22)); }
     .win-quotes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 2vw, 24px); }
     .win-quotes blockquote { margin: 0; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: clamp(18px, 2.4vw, 32px) clamp(16px, 2.4vw, 32px); background: rgba(0, 0, 0, 0.06); border-left: 5px solid #111; font-family: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size-adjust: none; }
