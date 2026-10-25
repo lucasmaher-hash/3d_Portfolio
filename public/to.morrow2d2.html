@@ -771,6 +771,17 @@
     .ph2--phone { aspect-ratio: 9 / 19; width: min(100%, 220px); margin-inline: auto; }
     .ph2--wide { aspect-ratio: 16 / 9; }
     .ph2--quote { align-items: flex-start; text-align: left; justify-content: center; }
+    .win-frame { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-radius: 20px; overflow: hidden; margin-top: var(--block-gap); box-shadow: var(--shadow-pressed); }
+    .win-cell { display: flex; justify-content: center; padding: clamp(14px, 3vw, 40px) clamp(8px, 2vw, 28px); }
+    .win-cell:nth-child(1) { background: rgba(122, 146, 176, 0.10); }
+    .win-cell:nth-child(2) { background: rgba(122, 146, 176, 0.17); }
+    .win-cell:nth-child(3) { background: rgba(122, 146, 176, 0.24); }
+    .win-cell img { width: min(100%, 300px); height: auto; display: block; filter: drop-shadow(0 10px 16px rgba(40, 40, 90, 0.22)); }
+    .win-quotes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 2vw, 24px); }
+    .win-quotes blockquote { margin: 0; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: clamp(18px, 2.4vw, 32px) clamp(16px, 2.4vw, 32px); background: rgba(0, 0, 0, 0.06); border-left: 5px solid #111; font-family: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size-adjust: none; }
+    .win-quotes p { margin: 0; font-size: clamp(12.5px, 1.15vw, 15.5px); line-height: 1.6; color: #111; }
+    .win-quotes cite { font-style: normal; font-size: 11.5px; line-height: 1.4; color: var(--text-secondary); }
+    @media (max-width: 640px) { .win-quotes { grid-template-columns: minmax(0, 1fr); } .win-quotes p { font-size: 14px; } }
     .dead-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(16px, 4vw, 56px); align-items: center; }
     .dead-pair img { width: min(100%, 360px); height: auto; justify-self: center; display: block; }
     .dead-quote { margin: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -3101,16 +3112,16 @@
            Same iPhone 12 Pro frame as the hero row, composited the same
            way, so the two eras are shown in the same device and only the
            interface differs. -->
-      <div class="win-row">
-        <img src="/images/to.morrow/windows2.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Aufgaben des heutigen Tages" />
-        <img src="/images/to.morrow/windows1.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon mit aufklappbaren Gruppen" />
-        <img src="/images/to.morrow/windows4.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: ein anderes Farbthema derselben Oberfläche" />
-        <img src="/images/to.morrow/windows7.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: das geöffnete Workspace-Menü mit Personal, Work und Design" />
+      <div class="win-frame">
+        <div class="win-cell"><img src="/images/to.morrow/windows8.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: der Live-Bereich mit Eingabefeld und Live-Schalter" /></div>
+        <div class="win-cell"><img src="/images/to.morrow/windows2.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Aufgaben des heutigen Tages" /></div>
+        <div class="win-cell"><img src="/images/to.morrow/windows9.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" /></div>
       </div>
       <p class="guide-text media-copy" data-i18n-html="pivot-2">Über TestFlight haben nach und nach immer mehr Leute die App benutzt, und je länger ich zusah, desto klarer wurde: Das Design war kein Reiz, sondern eine <b class="kw">Hürde</b>. Unintuitiv und gewöhnungsbedürftig — genau das, was eine App, in der man wenig Zeit verbringen will, nicht sein darf.</p>
-      <div class="dead-pair">
-        <img src="/images/to.morrow/windows9.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" />
-        <blockquote class="dead-quote"><p>„Ich habe sie nach drei Tagen nicht mehr geöffnet. Jedes Mal musste ich erst suchen, wo was ist.“</p><cite>Tester, TestFlight, September 2026</cite></blockquote>
+      <div class="win-quotes">
+        <blockquote><p>"Ich habe die Live-Ansicht nach drei Tagen nicht mehr benutzt. Ich wusste nie, was welcher Knopf macht."</p><cite>Tester, TestFlight, September 2026</cite></blockquote>
+        <blockquote><p>"Alles sah aus wie ein Programm von früher. Ich musste jede Aufgabe erst suchen."</p><cite>Tester, TestFlight, September 2026</cite></blockquote>
+        <blockquote><p>"Die Idee gefällt mir, aber auf dem Sperrbildschirm sah es aus wie eine Fehlermeldung."</p><cite>Tester, TestFlight, Oktober 2026</cite></blockquote>
       </div>
       <figure class="cmp-wrap" style="margin:0; display:flex; flex-direction:column; gap:16px;">
         <div class="cmp">
