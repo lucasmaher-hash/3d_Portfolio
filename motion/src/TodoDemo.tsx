@@ -25,13 +25,18 @@ const SLIDE = Easing.bezier(0.22, 1, 0.36, 1);       // long, soft landing (side
 const RISE = Easing.bezier(0.16, 1, 0.3, 1);         // arrives earlier (from below), so the path bends in
 const FILL = Easing.bezier(0.45, 0, 0.55, 1);        // gentle in/out for the arrival pace
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-const PAGE = '#cdd0d9', PANEL = '#e3edfa', CARD = '#c9dcf3';
+const PAGE = '#cdd0d9', PANEL = '#dbe9fb', CARD = '#a3c3ec';
+const HEADT = 120;                                   // "Today" heading inside the zoom version's panel
+const mix = (a: number[], b: number[], t: number) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',')})`;
 
-const Row: React.FC<{t: string; p: number}> = ({t, p}) => {
+const Row: React.FC<{t: string; p: number}> = ({t, p: pu}) => {
+  const p = clamp01(pu);
+  const m = clamp01((pu - 0.85) / 1.5);                // once seated, the card melts into the panel colour
+  const bg = mix([163, 195, 236], [219, 233, 251], m * m * (3 - 2 * m));
   const x = (1 - SLIDE(p)) * 620, y = (1 - RISE(p)) * 300;
   return (
     <div style={{height: ROW, padding: '6px 0', boxSizing: 'border-box', opacity: clamp01(p * 2.5), transform: `translate(${x}px, ${y}px)`}}>
-      <div style={{height: '100%', background: CARD, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, fontSize: 32, position: 'relative'}}>
+      <div style={{height: '100%', background: bg, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, fontSize: 32, position: 'relative'}}>
         <i style={{flex: 'none', width: 34, height: 34, borderRadius: '50%', border: '3px solid rgba(26,26,26,0.45)', boxSizing: 'border-box'}} />
         <span style={{whiteSpace: 'nowrap'}}>{t}</span>
         <div style={{position: 'absolute', left: '30%', right: '30%', bottom: 0, height: 1, background: 'rgba(26,26,26,0.12)'}} />
@@ -64,7 +69,7 @@ export const TodoDemo: React.FC = () => {
       <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, width: COL + 60, top: HEAD - 20, height: VIEW + 20, background: PANEL, borderRadius: '32px 32px 0 0', opacity: out}} />
       <div style={{position: 'absolute', left: (TODO_W - COL) / 2, width: COL, top: HEAD, height: VIEW, clipPath: 'inset(0px -1000px 0px -1000px)', opacity: out}}>
         <div style={{transform: `translateY(${-off}px)`}}>
-          {TASKS.map((t, i) => <Row key={i} t={t} p={clamp01(count - i)} />)}
+          {TASKS.map((t, i) => <Row key={i} t={t} p={count - i} />)}
         </div>
       </div>
       <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, width: COL + 60, top: TODO_H - 110, height: 110, background: `linear-gradient(transparent, ${PAGE})`}} />
@@ -78,15 +83,16 @@ export const TodoDemoZoom: React.FC = () => {
   const count = N * FILL(clamp01(f / ADD));
   const out = interpolate(f, [ADD + HOLD, ADD + HOLD + FADE], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const PADV = 24;
-  const listH = ROW * Math.max(count, 2.2) + PADV * 2;     // grown height, at least a couple of rows
+  const listH = HEADT + ROW * Math.max(count, 2.2) + PADV * 2;     // grown height, at least a couple of rows
   const top = 40;
   const sc = Math.min(1.9, (TODO_H - top - 40) / listH);
-  const panelH = ROW * count + PADV * 2;
+  const panelH = HEADT + ROW * count + PADV * 2;
   return (
     <Shell>
       <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, top, width: COL + 60, transformOrigin: '50% 0', transform: `scale(${sc})`, opacity: out}}>
         <div style={{height: panelH, background: PANEL, borderRadius: 32, padding: `${PADV}px 30px`, boxSizing: 'border-box'}}>
-          {TASKS.map((t, i) => <Row key={i} t={t} p={clamp01(count - i)} />)}
+          <div style={{height: HEADT - PADV, margin: '0 -30px', fontSize: 64, fontWeight: 600, letterSpacing: '-0.02em', textAlign: 'center', lineHeight: '84px'}}>Today</div>
+          {TASKS.map((t, i) => <Row key={i} t={t} p={count - i} />)}
         </div>
       </div>
     </Shell>
