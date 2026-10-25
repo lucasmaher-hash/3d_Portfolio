@@ -1782,6 +1782,8 @@ and the four rules of section 5 (title is now "Das Designsystem"). Their CSS (`.
 
 **Copy 2 (`public/to.morrow2d2.html`, 2026-10-25):** copy of the draft with additions: a three-number fact bar (`.fact-bar`) with a short caveat at the top of Ergebnis, an interview paragraph opening the Problem, a landscape three-list frame (section 2), the Live screens 1-2-3 in one numbered frame (`.trio-band`, screen 3 is the Dynamic Island frame), and in the Pivot a large Windows-95 screen with a tester quote (`.dead-pair`) plus a retention sentence. Same rules as the draft: nothing links to it, `noindex`.
 
+**2d2, later 2026-10-25:** the Problem has a motion graphic (`.todo-demo`, a 402:874 phone; 28 tasks fill a "Today" list on an ease-in-out-quart curve over 6.5 s, the list scrolls with the count, rests 1.5 s, resets and loops; runs only on screen, still under reduced motion). Pivot and design system are ONE section, badge 4 "Das Designsystem": three Windows screens on `#000080`, three quotes, the big line `.big-statement` "Es hatte keinen Zweck.", then the pivot text, then the Seitenansicht sketches and the rest of the system. Ergebnis is badge 5.
+
 Facts used from the app (Appendix A of the plan, dated 2026-09-03, check against the source before shipping):
 three lists as filters over a date, overdue → Today with a chip, no rollover job, swipe commit ≈ a fifth of the
 row width, Dynamic Type to AX5, VoiceOver custom actions, Reduce Motion, 44 pt targets.

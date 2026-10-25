@@ -772,6 +772,18 @@
     .ph2--wide { aspect-ratio: 16 / 9; }
     .ph2--quote { align-items: flex-start; text-align: left; justify-content: center; }
     .win-frame { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-radius: 20px; overflow: hidden; margin-top: var(--block-gap); box-shadow: var(--shadow-pressed); }
+    /* Motion graphic in "Das Problem": 28 tasks fill a Today list (slow, fast, slow), then it scrolls and loops. */
+    .todo-demo { display: flex; justify-content: center; }
+    .todo-phone { container-type: inline-size; width: min(100%, 300px); aspect-ratio: 402 / 874; }
+    .todo-bezel { width: 100%; height: 100%; box-sizing: border-box; background: #111; border-radius: 15cqw; padding: 3cqw; box-shadow: 0 18px 34px rgba(40, 40, 90, 0.25); }
+    .todo-screen { width: 100%; height: 100%; background: #cdd0d9; border-radius: 12.5cqw; overflow: hidden; display: flex; flex-direction: column; padding: 15cqw 6cqw 0; box-sizing: border-box; }
+    .todo-title { font-size: 9cqw; font-weight: 600; letter-spacing: -0.02em; color: #1a1a1a; padding: 0 2cqw 4cqw; }
+    .todo-viewport { flex: 1; overflow: hidden; -webkit-mask: linear-gradient(#000 calc(100% - 9cqw), transparent); mask: linear-gradient(#000 calc(100% - 9cqw), transparent); }
+    .todo-list { list-style: none; margin: 0; padding: 0; will-change: transform; }
+    .todo-list li { display: flex; align-items: center; gap: 4cqw; height: 11.5cqw; padding: 0 2cqw; font-size: 4.3cqw; color: #1a1a1a; border-bottom: 1px solid rgba(26, 26, 26, 0.08); opacity: 0; }
+    .todo-list li i { flex: none; width: 5.2cqw; height: 5.2cqw; border-radius: 50%; border: 0.5cqw solid rgba(26, 26, 26, 0.45); }
+    .todo-list li span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .big-statement { margin: clamp(40px, 7vw, 96px) 0; font-weight: 800; font-size: clamp(34px, 6.4vw, 88px); line-height: 1.02; letter-spacing: -0.03em; color: var(--text-primary); }
     .win-frame { background: #000080; }
     .win-cell { display: flex; justify-content: center; padding: clamp(14px, 3vw, 40px) clamp(8px, 2vw, 28px); }
     .win-cell img { width: min(100%, 300px); height: auto; display: block; filter: drop-shadow(0 10px 16px rgba(40, 40, 90, 0.22)); }
@@ -2993,7 +3005,7 @@
       <p class="guide-text" data-i18n-html="n-study">Ich habe <b class="kw">zehn Menschen zwischen 21 und 34</b> gefragt, wie sie ihre To-dos verwalten. Sieben führen eine einzige Liste, in die alles wandert, und räumen sie nicht um. Drei haben nach ein paar Tagen aufgegeben. „Ich schreibe alles auf und schiebe es dann einfach vor mir her“, sagte eine Teilnehmerin. Nach drei Wochen mit to.morrow legten acht von zehn ihre Aufgaben bewusst auf Morgen oder Bald.</p>
       <p class="guide-text" data-i18n-html="problem-1">Eine To-do-App ist die App, in der man am wenigsten Zeit verbringen will. Sie soll nicht unterhalten, sondern den Kopf freiräumen und wieder verschwinden. Damit ist <b class="kw">Bediengeschwindigkeit</b> hier keine Politur, sondern das eigentliche Produkt.</p>
       <p class="guide-text" data-i18n-html="n-problem-user">Die Zielgruppe sind <b class='kw'>Menschen, die sich zu viel vornehmen</b>. Ihre Heute-Liste ist am Morgen länger, als der Tag zulässt, und was nicht geschafft wird, müsste verschoben werden.</p>
-      <div class="ph2 ph2--wide"><strong>Die Heute-Liste am Morgen</strong><p>Zwölf Aufgaben, fünf davon überfällig. Mehr, als der Tag zulässt.</p></div>
+      <figure class="todo-demo" style="margin:0;" aria-label="Animation: 28 Aufgaben füllen die Heute-Liste, bis sie über den Bildschirm hinauswächst"><div class="todo-phone"><div class="todo-bezel"><div class="todo-screen"><div class="todo-title">Today</div><div class="todo-viewport"><ul class="todo-list"><li><i></i><span>Mail an Frau Keller</span></li><li><i></i><span>Steuerunterlagen sortieren</span></li><li><i></i><span>Zahnarzt anrufen</span></li><li><i></i><span>Paket abholen</span></li><li><i></i><span>Wäsche waschen</span></li><li><i></i><span>Geschenk für Mama</span></li><li><i></i><span>Präsentation fertigstellen</span></li><li><i></i><span>Miete überweisen</span></li><li><i></i><span>Milch und Brot kaufen</span></li><li><i></i><span>Kabel bestellen</span></li><li><i></i><span>Fahrrad reparieren</span></li><li><i></i><span>Buch zurückbringen</span></li><li><i></i><span>Flug buchen</span></li><li><i></i><span>Stromrechnung prüfen</span></li><li><i></i><span>Lisa zurückrufen</span></li><li><i></i><span>Wohnung putzen</span></li><li><i></i><span>Pflanzen gießen</span></li><li><i></i><span>Rezept einlösen</span></li><li><i></i><span>Fotos drucken</span></li><li><i></i><span>Passwort ändern</span></li><li><i></i><span>Backup machen</span></li><li><i></i><span>Termin verschieben</span></li><li><i></i><span>Versicherung kündigen</span></li><li><i></i><span>Skript lesen</span></li><li><i></i><span>Sport einplanen</span></li><li><i></i><span>Blumen kaufen</span></li><li><i></i><span>Mittagessen planen</span></li><li><i></i><span>Reisepass verlängern</span></li></ul></div></div></div></div></figure>
       <p class="guide-text" data-i18n-html="problem-2">Jede To-do-App macht das Anlegen leicht. Beim Verschieben hört das auf: öffnen, Datumsauswahl suchen, Datum wählen, speichern — <b class="kw">vier Schritte für eine Entscheidung</b>, die im Kopf längst gefallen ist. Also verschiebt niemand, und die Heute-Liste stimmt schon am Vormittag nicht mehr.</p>
             <figure class="chart chart--taps" style="margin:0;">
         <div class="chart-head">
@@ -3093,15 +3105,13 @@
 
       </div>
     </div>
-    <!-- ══ 4. Pivot ══════════════════════════════════════════════════ -->
+    <!-- ══ 4. Das Designsystem (incl. the pivot) ══════════════════════ -->
     <div class="guide-section">
           <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="n-sec-pivot">Der Pivot</h2>
+        <h2 class="section-title" data-i18n="n-sec-rules">Das Designsystem</h2>
         <span class="step-badge">4</span>
       </div>
       <div class="dot-divider"></div>
-
-      <p class="guide-text media-copy" data-i18n-html="pivot-1">Die erste Version war komplett in Windows 95 gebaut: Taskleiste, abgeschrägte Ränder, Pixelschrift, doppelter Pixelmaßstab. Einen Grund dafür gab es nicht — ich fand es cool. Was mich gereizt hat, war der Widerspruch: ein <b class="kw">Interface von 1995 mit heutigen Animationen</b>, das sich völlig smooth anfühlt.</p>
       <!-- The version that was thrown away. Not in the layout brief, but
            the pivot is the strongest thing on this page and it does not
            land without the Windows-95 build actually visible — every other
@@ -3115,23 +3125,16 @@
         <div class="win-cell"><img src="/images/to.morrow/windows2.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Aufgaben des heutigen Tages" /></div>
         <div class="win-cell"><img src="/images/to.morrow/windows9.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" /></div>
       </div>
-      <p class="guide-text media-copy" data-i18n-html="pivot-2">Über TestFlight haben nach und nach immer mehr Leute die App benutzt, und je länger ich zusah, desto klarer wurde: Das Design war kein Reiz, sondern eine <b class="kw">Hürde</b>. Unintuitiv und gewöhnungsbedürftig — genau das, was eine App, in der man wenig Zeit verbringen will, nicht sein darf.</p>
       <div class="win-quotes">
         <blockquote><p>"Ich habe die Live-Ansicht nach drei Tagen nicht mehr benutzt. Ich wusste nie, was welcher Knopf macht."</p><cite>Tester, TestFlight, September 2026</cite></blockquote>
         <blockquote><p>"Alles sah aus wie ein Programm von früher. Ich musste jede Aufgabe erst suchen."</p><cite>Tester, TestFlight, September 2026</cite></blockquote>
         <blockquote><p>"Die Idee gefällt mir, aber auf dem Sperrbildschirm sah es aus wie eine Fehlermeldung."</p><cite>Tester, TestFlight, Oktober 2026</cite></blockquote>
       </div>
+      <p class="big-statement" data-i18n="n-nopurpose">Es hatte keinen Zweck.</p>
+      <p class="guide-text media-copy" data-i18n-html="pivot-1">Die erste Version war komplett in Windows 95 gebaut: Taskleiste, abgeschrägte Ränder, Pixelschrift, doppelter Pixelmaßstab. Einen Grund dafür gab es nicht — ich fand es cool. Was mich gereizt hat, war der Widerspruch: ein <b class="kw">Interface von 1995 mit heutigen Animationen</b>, das sich völlig smooth anfühlt.</p>
       <p class="guide-text media-copy" data-i18n-html="n-ret-text">Nach einer Woche öffneten <b class="kw">61 %</b> der Tester die neue Version noch, beim Windows-95-Build waren es 24 % (je 18 Tester).</p>
       <p class="guide-text media-copy" data-i18n-html="pivot-3">Also habe ich sie gestrichen. An ihre Stelle kam <b class="kw">SkeuKit</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
       <p class="guide-text media-copy" data-i18n-html="icons-text">Ein Schalter in den Einstellungen wechselt zwischen <b class="kw">Retro und Modern</b>. Etwas vom alten Look wollte ich behalten — nicht aus Nostalgie, sondern weil die App sonst aussieht wie jede andere.</p>
-    </div>
-    <!-- ══ 5. Regeln des Designsystems ══════════════════════════════ -->
-    <div class="guide-section">
-          <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="n-sec-rules">Das Designsystem</h2>
-        <span class="step-badge">5</span>
-      </div>
-      <div class="dot-divider"></div>
       <p class="guide-text" data-i18n-html="n-rules-sub"><b class='kw'>Was ich mir dabei gedacht habe.</b> Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.</p>
       <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="s-rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs></svg>
       <h3 class="feature-title cs-h3" data-i18n="n-side-title">Seitenansicht: Höhe bedeutet Handlung</h3>
@@ -3301,11 +3304,12 @@
       <p class="guide-text" data-i18n-html="n-a11y-short"><b class='kw'>Barrierefreiheit</b> ist Teil des Systems: Text skaliert mit Dynamic Type bis AX5, die Bedienelemente wachsen nur halb so schnell. Jede Zeile bietet VoiceOver-Aktionen für Bearbeiten, Sortieren und Fotos, Reduce Motion stoppt jede Dauer-Animation, und alle Touch-Ziele sind mindestens 44 pt groß.</p>
     </div>
 
-    <!-- ══ 6. Ergebnis und Ausblick ══════════════════════════════════ -->
+    
+<!-- ══ 6. Ergebnis und Ausblick ══════════════════════════════════ -->
     <div class="guide-section">
           <div class="section-heading-row">
         <h2 class="section-title" data-i18n="n-sec-result">Ergebnis und Ausblick</h2>
-        <span class="step-badge">6</span>
+        <span class="step-badge">5</span>
       </div>
       <div class="dot-divider"></div>
       <p class="guide-text" data-i18n-html="n-res-caveat">Zehn Interviews und 18 Tester pro Build sind eine kleine Gruppe. Die Zahlen sind ein Hinweis, kein Befund.</p>
@@ -3642,6 +3646,7 @@
   "n-side-intro": "The side view cuts through the three shapes. The surface is the baseline. What sits above it can be operated, what sits below it takes something in.",
   "n-side-sheet": "Cross-section through the three shapes. The light comes from the top left. It is the only one in the whole system and shows every element its height.",
   "n-sec-rules": "The design system",
+  "n-nopurpose": "It had no purpose.",
   "n-rules-sub": "<b class='kw'>What I was thinking.</b> A touchscreen has no pointer to reveal what can be operated. The interface has to show it itself, and height is read fastest: what sticks out can be grabbed, what is sunk in takes something in.",
   "n-c3": "Third, an app you want to spend little time in makes time the design variable: every feature has to <b class='kw'>save a step</b>, or it goes.",
   "n-sec-result": "Result and outlook",
@@ -3697,6 +3702,7 @@
   "n-side-intro": "Die Seitenansicht zeigt die drei Formen im Schnitt. Die Fläche ist die Grundlinie. Was darüber liegt, lässt sich bedienen, was darunter liegt, nimmt etwas auf.",
   "n-side-sheet": "Schnitt durch die drei Formen. Das Licht kommt von oben links: Es ist das einzige im ganzen System und zeigt jedem Element seine Höhe.",
   "n-sec-rules": "Das Designsystem",
+  "n-nopurpose": "Es hatte keinen Zweck.",
   "n-rules-sub": "<b class='kw'>Was ich mir dabei gedacht habe.</b> Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.",
   "n-c3": "Drittens heißt eine App, in der man wenig Zeit verbringen will, dass Zeit die Entwurfsgröße ist: Jede Funktion muss einen <b class='kw'>Schritt sparen</b>, sonst fällt sie heraus.",
   "n-sec-result": "Ergebnis und Ausblick",
@@ -4358,5 +4364,40 @@
       });
     })();
   </script>
+
+<script>
+(function () {
+  var demo = document.querySelector('.todo-demo');
+  if (!demo) return;
+  var list = demo.querySelector('.todo-list'), view = demo.querySelector('.todo-viewport');
+  var rows = Array.prototype.slice.call(list.children), N = rows.length;
+  var ADD = 6500, HOLD = 1500, GAP = 400;                      // ms: fill, rest at the bottom, then back to the start
+  var ease = function (t) { return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2; };   // slow, very fast, slow
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var start = 0, raf = 0, rowH = 0;
+  function draw(count) {
+    for (var i = 0; i < N; i++) {
+      var p = Math.max(0, Math.min(1, count - i));
+      rows[i].style.opacity = p;
+      rows[i].style.transform = 'translateY(' + ((1 - p) * 10) + 'px)';
+    }
+    var off = Math.max(0, rowH * count - view.clientHeight);
+    list.style.transform = 'translateY(' + (-off) + 'px)';
+  }
+  function frame(now) {
+    var t = now - start, total = ADD + HOLD + GAP;
+    if (t >= total) { start = now; t = 0; }
+    var count = t < ADD ? N * ease(t / ADD) : N;
+    rowH = rows[0].offsetHeight;
+    draw(t > ADD + HOLD ? 0 : count);
+    raf = requestAnimationFrame(frame);
+  }
+  if (reduce) { rowH = rows[0].offsetHeight; draw(N); return; }
+  new IntersectionObserver(function (e) {
+    if (e[0].isIntersecting) { if (!raf) { start = performance.now(); raf = requestAnimationFrame(frame); } }
+    else { cancelAnimationFrame(raf); raf = 0; }
+  }, { threshold: 0.2 }).observe(demo);
+})();
+</script>
 </body>
 </html>
