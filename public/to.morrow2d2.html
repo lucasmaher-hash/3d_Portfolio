@@ -768,10 +768,11 @@
     .ph2 strong { color: var(--text-primary); font-weight: 500; font-size: 14.4px; line-height: 1.4; }
     .ph2 p { margin: 0; max-width: 56ch; }
     .ph2--land { aspect-ratio: 16 / 7; }
-    .land-shot { margin: var(--block-gap) auto 0; width: min(100%, 760px); }
-    .land-shot img { display: block; width: 100%; height: auto; filter: drop-shadow(0 14px 24px rgba(40, 40, 90, 0.25)); }
-    .land-shot figcaption { margin-top: 18px; font-size: 14px; line-height: 1.5; color: var(--text-secondary); text-align: center; }
-    .land-shot figcaption strong { display: block; color: var(--text-primary); font-weight: 500; margin-bottom: 2px; }
+    /* Landscape phone: same frame as the portrait phone, turned; copy to its left. */
+    .land-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr); gap: clamp(20px, 3vw, 48px); align-items: center; margin-top: var(--block-gap); }
+    .land-shot { margin: 0; }
+    .land-shot img { display: block; width: 100%; height: auto; }
+    @media (max-width: 860px) { .land-row { grid-template-columns: minmax(0, 1fr); } }
     .ph2--phone { aspect-ratio: 9 / 19; width: min(100%, 220px); margin-inline: auto; }
     .ph2--wide { aspect-ratio: 16 / 9; }
     .ph2--quote { align-items: flex-start; text-align: left; justify-content: center; }
@@ -3116,7 +3117,7 @@
             <p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.</p>
           </div>
         </div>
-        <figure class="land-shot"><img src="/images/to.morrow/landscape-mockup.webp" width="1588" height="828" loading="lazy" alt="Die App im Querformat: Heute, Morgen und Bald nebeneinander" /><figcaption><strong>Querformat: alle drei Listen auf einmal</strong> Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</figcaption></figure>
+        <div class="land-row"><div class="land-body"><h3 class="feature-title">Querformat: alle drei Listen auf einmal</h3><p class="stagger-copy">Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div><figure class="land-shot"><img src="/images/to.morrow/landscape-mockup.webp" width="1600" height="792" loading="lazy" alt="Die App im Querformat: Heute, Morgen und Bald nebeneinander" /></figure></div>
 
 
 
