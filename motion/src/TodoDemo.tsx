@@ -53,10 +53,6 @@ const Shell: React.FC<{children: React.ReactNode}> = ({children}) => (
   </AbsoluteFill>
 );
 
-const Title: React.FC = () => (
-  <div style={{position: 'absolute', left: 0, right: 0, top: 56, textAlign: 'center', fontSize: 64, fontWeight: 600, letterSpacing: '-0.02em'}}>Today</div>
-);
-
 /* Version 1: the screen stays the same size and the list scrolls, keeping the newest row near the middle. */
 export const TodoDemo: React.FC = () => {
   const f = useCurrentFrame();
@@ -67,8 +63,9 @@ export const TodoDemo: React.FC = () => {
   const out = interpolate(f, [ADD + HOLD, ADD + HOLD + FADE], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   return (
     <Shell>
-      <Title />
-      <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, width: COL + 60, top: HEAD - 20, height: VIEW + 20, background: PANEL, borderRadius: '32px 32px 0 0', opacity: out}} />
+      <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, width: COL + 60, top: 40, height: TODO_H - 40, background: PANEL, borderRadius: '32px 32px 0 0', opacity: out}}>
+        <div style={{position: 'absolute', left: 62, top: 38, fontSize: 64, fontWeight: 600, letterSpacing: '-0.02em'}}>Today</div>
+      </div>
       <div style={{position: 'absolute', left: (TODO_W - COL) / 2, width: COL, top: HEAD, height: VIEW, clipPath: 'inset(0px -1000px 0px -1000px)', opacity: out}}>
         <div style={{transform: `translateY(${-off}px)`}}>
           {TASKS.slice(0, N).map((t, i) => <Row key={i} t={t} p={count - i} />)}
@@ -94,7 +91,7 @@ export const TodoDemoZoom: React.FC = () => {
     <Shell>
       <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, top, width: COL + 60, transformOrigin: '50% 0', transform: `scale(${sc})`, opacity: out}}>
         <div style={{height: panelH, background: PANEL, borderRadius: 32, padding: `${PADV}px 30px`, boxSizing: 'border-box'}}>
-          <div style={{height: HEADT - PADV, margin: '0 -30px', fontSize: 64, fontWeight: 600, letterSpacing: '-0.02em', textAlign: 'center', lineHeight: '84px'}}>Today</div>
+          <div style={{height: HEADT - PADV, paddingLeft: 32, fontSize: 64, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: '84px'}}>Today</div>
           {TASKS.slice(0, N).map((t, i) => <Row key={i} t={t} p={count - i} />)}
         </div>
       </div>
