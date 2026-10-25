@@ -772,17 +772,18 @@
     .ph2--wide { aspect-ratio: 16 / 9; }
     .ph2--quote { align-items: flex-start; text-align: left; justify-content: center; }
     .win-frame { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-radius: 20px; overflow: hidden; margin-top: var(--block-gap); box-shadow: var(--shadow-pressed); }
-    /* Motion graphic in "Das Problem": 28 tasks fill a Today list (slow, fast, slow), then it scrolls and loops. */
-    .todo-demo { display: flex; justify-content: center; }
-    .todo-phone { container-type: inline-size; width: min(100%, 300px); aspect-ratio: 402 / 874; }
-    .todo-bezel { width: 100%; height: 100%; box-sizing: border-box; background: #111; border-radius: 15cqw; padding: 3cqw; box-shadow: 0 18px 34px rgba(40, 40, 90, 0.25); }
-    .todo-screen { width: 100%; height: 100%; background: #cdd0d9; border-radius: 12.5cqw; overflow: hidden; display: flex; flex-direction: column; padding: 15cqw 6cqw 0; box-sizing: border-box; }
-    .todo-title { font-size: 9cqw; font-weight: 600; letter-spacing: -0.02em; color: #1a1a1a; padding: 0 2cqw 4cqw; }
-    .todo-viewport { flex: 1; overflow: hidden; -webkit-mask: linear-gradient(#000 calc(100% - 9cqw), transparent); mask: linear-gradient(#000 calc(100% - 9cqw), transparent); }
-    .todo-list { list-style: none; margin: 0; padding: 0; will-change: transform; }
-    .todo-list li { display: flex; align-items: center; gap: 4cqw; height: 11.5cqw; padding: 0 2cqw; font-size: 4.3cqw; color: #1a1a1a; border-bottom: 1px solid rgba(26, 26, 26, 0.08); opacity: 0; }
-    .todo-list li i { flex: none; width: 5.2cqw; height: 5.2cqw; border-radius: 50%; border: 0.5cqw solid rgba(26, 26, 26, 0.45); }
-    .todo-list li span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Motion graphic in "Das Problem": 30 tasks glide into a Today list (Remotion video, all widths). */
+    .todo-demo { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 14px; background: #cdd0d9; }
+    /* Four competitor cards: raised, flat inside. */
+    .taps-wrap { display: flex; flex-direction: column; gap: 16px; }
+    .taps-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 20px); }
+    .tap-card { display: flex; flex-direction: column; gap: 6px; padding: clamp(14px, 2vw, 22px); border-radius: 18px; box-shadow: var(--shadow-raised-sm); }
+    .tap-name { font-size: 13.5px; font-weight: 500; color: var(--text-primary); }
+    .tap-n { white-space: nowrap; font-size: clamp(18px, 1.9vw, 26px); line-height: 1.1; font-weight: 500; letter-spacing: -0.02em; color: var(--text-secondary); }
+    .tap-t { font-size: 13.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .tap-card.is-us .tap-n { color: var(--accent-orange); }
+    @media (min-width: 861px) { .taps-wrap { max-width: 66.67%; } }
+    @media (max-width: 640px) { .taps-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     .big-statement { margin: clamp(40px, 7vw, 96px) 0; font-weight: 800; font-size: clamp(34px, 6.4vw, 88px); line-height: 1.02; letter-spacing: -0.03em; color: var(--text-primary); }
     .win-frame { background: #000080; }
     .win-cell { display: flex; justify-content: center; padding: clamp(14px, 3vw, 40px) clamp(8px, 2vw, 28px); }
@@ -3005,19 +3006,9 @@
       <p class="guide-text" data-i18n-html="n-study">Ich habe <b class="kw">zehn Menschen zwischen 21 und 34</b> gefragt, wie sie ihre To-dos verwalten. Sieben führen eine einzige Liste, in die alles wandert, und räumen sie nicht um. Drei haben nach ein paar Tagen aufgegeben. „Ich schreibe alles auf und schiebe es dann einfach vor mir her“, sagte eine Teilnehmerin. Nach drei Wochen mit to.morrow legten acht von zehn ihre Aufgaben bewusst auf Morgen oder Bald.</p>
       <p class="guide-text" data-i18n-html="problem-1">Eine To-do-App ist die App, in der man am wenigsten Zeit verbringen will. Sie soll nicht unterhalten, sondern den Kopf freiräumen und wieder verschwinden. Damit ist <b class="kw">Bediengeschwindigkeit</b> hier keine Politur, sondern das eigentliche Produkt.</p>
       <p class="guide-text" data-i18n-html="n-problem-user">Die Zielgruppe sind <b class='kw'>Menschen, die sich zu viel vornehmen</b>. Ihre Heute-Liste ist am Morgen länger, als der Tag zulässt, und was nicht geschafft wird, müsste verschoben werden.</p>
-      <figure class="todo-demo" style="margin:0;" aria-label="Animation: 28 Aufgaben füllen die Heute-Liste, bis sie über den Bildschirm hinauswächst"><div class="todo-phone"><div class="todo-bezel"><div class="todo-screen"><div class="todo-title">Today</div><div class="todo-viewport"><ul class="todo-list"><li><i></i><span>Mail an Frau Keller</span></li><li><i></i><span>Steuerunterlagen sortieren</span></li><li><i></i><span>Zahnarzt anrufen</span></li><li><i></i><span>Paket abholen</span></li><li><i></i><span>Wäsche waschen</span></li><li><i></i><span>Geschenk für Mama</span></li><li><i></i><span>Präsentation fertigstellen</span></li><li><i></i><span>Miete überweisen</span></li><li><i></i><span>Milch und Brot kaufen</span></li><li><i></i><span>Kabel bestellen</span></li><li><i></i><span>Fahrrad reparieren</span></li><li><i></i><span>Buch zurückbringen</span></li><li><i></i><span>Flug buchen</span></li><li><i></i><span>Stromrechnung prüfen</span></li><li><i></i><span>Lisa zurückrufen</span></li><li><i></i><span>Wohnung putzen</span></li><li><i></i><span>Pflanzen gießen</span></li><li><i></i><span>Rezept einlösen</span></li><li><i></i><span>Fotos drucken</span></li><li><i></i><span>Passwort ändern</span></li><li><i></i><span>Backup machen</span></li><li><i></i><span>Termin verschieben</span></li><li><i></i><span>Versicherung kündigen</span></li><li><i></i><span>Skript lesen</span></li><li><i></i><span>Sport einplanen</span></li><li><i></i><span>Blumen kaufen</span></li><li><i></i><span>Mittagessen planen</span></li><li><i></i><span>Reisepass verlängern</span></li></ul></div></div></div></div></figure>
+      <video class="todo-demo" src="/videos/to.morrow/todo-demo.mp4?v=20261025" autoplay muted loop playsinline preload="metadata" aria-label="Animation: 30 Aufgaben gleiten in die Heute-Liste, bis sie über den Bildschirm hinauswächst"></video>
       <p class="guide-text" data-i18n-html="problem-2">Jede To-do-App macht das Anlegen leicht. Beim Verschieben hört das auf: öffnen, Datumsauswahl suchen, Datum wählen, speichern — <b class="kw">vier Schritte für eine Entscheidung</b>, die im Kopf längst gefallen ist. Also verschiebt niemand, und die Heute-Liste stimmt schon am Vormittag nicht mehr.</p>
-            <figure class="chart chart--taps" style="margin:0;">
-        <div class="chart-head">
-          <p class="chart-title" data-i18n="n-taps-title">Eine Aufgabe auf morgen verschieben: Schritte</p>
-        </div>
-        <div class="bars">
-          <div class="bar "><span>Reminders</span><span class="bar-track"><i style="--v:100"></i></span><span class="bar-val" data-i18n="n-taps-1">5 Taps</span></div>
-          <div class="bar "><span>Things</span><span class="bar-track"><i style="--v:80"></i></span><span class="bar-val" data-i18n="n-taps-2">4 Taps</span></div>
-          <div class="bar "><span>Todoist</span><span class="bar-track"><i style="--v:60"></i></span><span class="bar-val" data-i18n="n-taps-3">3 Taps</span></div>
-          <div class="bar is-us"><span>to.morrow</span><span class="bar-track"><i style="--v:20"></i></span><span class="bar-val" data-i18n="n-taps-4">1 Wisch</span></div>
-        </div>
-      </figure>
+            <div class="taps-wrap"><p class="chart-title" data-i18n="n-taps-title">Eine Aufgabe auf morgen verschieben: Schritte</p><div class="taps-cards"><div class="tap-card"><span class="tap-name">Reminders</span><span class="tap-n">5 Taps</span><span class="tap-t">6,8 s</span></div><div class="tap-card"><span class="tap-name">Things</span><span class="tap-n">4 Taps</span><span class="tap-t">5,1 s</span></div><div class="tap-card"><span class="tap-name">Todoist</span><span class="tap-n">3 Taps</span><span class="tap-t">3,9 s</span></div><div class="tap-card is-us"><span class="tap-name">to.morrow</span><span class="tap-n">1 Wisch</span><span class="tap-t">0,9 s</span></div></div></div>
     </div>
     <!-- ══ 2. Die Idee ═══════════════════════════════════════════════ -->
     <div class="guide-section">
@@ -4365,39 +4356,5 @@
     })();
   </script>
 
-<script>
-(function () {
-  var demo = document.querySelector('.todo-demo');
-  if (!demo) return;
-  var list = demo.querySelector('.todo-list'), view = demo.querySelector('.todo-viewport');
-  var rows = Array.prototype.slice.call(list.children), N = rows.length;
-  var ADD = 6500, HOLD = 1500, GAP = 400;                      // ms: fill, rest at the bottom, then back to the start
-  var ease = function (t) { return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2; };   // slow, very fast, slow
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var start = 0, raf = 0, rowH = 0;
-  function draw(count) {
-    for (var i = 0; i < N; i++) {
-      var p = Math.max(0, Math.min(1, count - i));
-      rows[i].style.opacity = p;
-      rows[i].style.transform = 'translateY(' + ((1 - p) * 10) + 'px)';
-    }
-    var off = Math.max(0, rowH * count - view.clientHeight);
-    list.style.transform = 'translateY(' + (-off) + 'px)';
-  }
-  function frame(now) {
-    var t = now - start, total = ADD + HOLD + GAP;
-    if (t >= total) { start = now; t = 0; }
-    var count = t < ADD ? N * ease(t / ADD) : N;
-    rowH = rows[0].offsetHeight;
-    draw(t > ADD + HOLD ? 0 : count);
-    raf = requestAnimationFrame(frame);
-  }
-  if (reduce) { rowH = rows[0].offsetHeight; draw(N); return; }
-  new IntersectionObserver(function (e) {
-    if (e[0].isIntersecting) { if (!raf) { start = performance.now(); raf = requestAnimationFrame(frame); } }
-    else { cancelAnimationFrame(raf); raf = 0; }
-  }, { threshold: 0.2 }).observe(demo);
-})();
-</script>
 </body>
 </html>
