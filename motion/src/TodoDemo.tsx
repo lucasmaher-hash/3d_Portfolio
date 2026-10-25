@@ -14,7 +14,8 @@ const TASKS = [
   'Blumen kaufen', 'Mittagessen planen', 'Reisepass verlängern', 'Auto zur Inspektion', 'Zeitung abbestellen',
 ];
 const N = 20;                                        // how many of TASKS are shown
-const ADD = 190, HOLD = 48, FADE = 18, GAP = 12;
+const SPAN = 2.6;                                    // a card is in flight while the list advances this many rows, so the next one is already on its way
+const ADD = 215, HOLD = 48, FADE = 18, GAP = 12;
 export const TODO_DURATION = ADD + HOLD + FADE + GAP;
 
 const ROW = 84, HEAD = 190;
@@ -31,8 +32,8 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const FONT = '"SF Pro Text", -apple-system, "Helvetica Neue", sans-serif';
 
 const Row: React.FC<{t: string; time: string; p: number}> = ({t, time, p: pu}) => {
-  const p = clamp01(pu);
-  const m0 = clamp01((pu - 0.85) / 1.5);                // once seated, the card melts into the panel
+  const p = clamp01(pu / SPAN);
+  const m0 = clamp01((pu - SPAN * 0.85) / 1.5);                // once seated, the card melts into the panel
   const m = m0 * m0 * (3 - 2 * m0);
   // incoming: saturated blue with a lifted shadow; seated: a soft, translucent white card
   const bg = `rgba(${Math.round(lerp(118, 255, m))},${Math.round(lerp(163, 255, m))},${Math.round(lerp(232, 255, m))},${lerp(1, 0.5, m)})`;
@@ -80,7 +81,8 @@ const Heading: React.FC<{count: number}> = ({count}) => (
 /* Version 1: the screen stays the same size and the list scrolls, keeping the newest row near the middle. */
 export const TodoDemo: React.FC = () => {
   const f = useCurrentFrame();
-  const count = N * FILL(clamp01(f / ADD));
+  const raw = (N + SPAN) * FILL(clamp01(f / ADD));   // rows are released at raw = i and land at raw = i + SPAN
+  const count = Math.min(raw, N);
   const w = ROW * 2.2;
   const y = ROW * count;
   const off = w * Math.log(1 + Math.exp((y - MID) / w)) - w * Math.log(1 + Math.exp((0 - MID) / w));
@@ -89,11 +91,11 @@ export const TodoDemo: React.FC = () => {
   return (
     <Shell>
       <div style={{position: 'absolute', left: PL, width: COL + 60, top: 40, height: TODO_H - 40, background: PANEL_BG, boxShadow: PANEL_SHADOW, borderRadius: '40px 40px 0 0', opacity: out}}>
-        <div style={{position: 'absolute', left: 30, right: 30, top: 38}}><Heading count={count} /></div>
+        <div style={{position: 'absolute', left: 30, right: 30, top: 38}}><Heading count={Math.min(N, raw + 1)} /></div>
       </div>
       <div style={{position: 'absolute', left: (TODO_W - COL) / 2, width: COL, top: HEAD, height: VIEW, clipPath: 'inset(0px -1000px 0px -1000px)', opacity: out}}>
         <div style={{transform: `translateY(${-off}px)`}}>
-          {TASKS.slice(0, N).map((t, i) => <Row key={i} t={t} time={TIMES[i]} p={count - i} />)}
+          {TASKS.slice(0, N).map((t, i) => <Row key={i} t={t} time={TIMES[i]} p={raw - i} />)}
         </div>
       </div>
     </Shell>
@@ -103,7 +105,8 @@ export const TodoDemo: React.FC = () => {
 /* Version 2: the list only grows; the view zooms out so the whole list always fits and ends as a tall, narrow strip. */
 export const TodoDemoZoom: React.FC = () => {
   const f = useCurrentFrame();
-  const count = N * FILL(clamp01(f / ADD));
+  const raw = (N + SPAN) * FILL(clamp01(f / ADD));   // rows are released at raw = i and land at raw = i + SPAN
+  const count = Math.min(raw, N);
   const out = interpolate(f, [ADD + HOLD, ADD + HOLD + FADE], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const PADV = 24;
   const listH = HEADT + ROW * Math.max(count, 2.2) + PADV * 2;     // grown height, at least a couple of rows
@@ -116,8 +119,8 @@ export const TodoDemoZoom: React.FC = () => {
     <Shell>
       <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, top, width: COL + 60, transformOrigin: '50% 0', transform: `scale(${sc})`, opacity: out}}>
         <div style={{height: panelH, background: PANEL_BG, boxShadow: PANEL_SHADOW, borderRadius: 40, padding: `${PADV}px 30px`, boxSizing: 'border-box'}}>
-          <div style={{height: HEADT - PADV + 14}}><Heading count={count} /></div>
-          {TASKS.slice(0, N).map((t, i) => <Row key={i} t={t} time={TIMES[i]} p={count - i} />)}
+          <div style={{height: HEADT - PADV + 14}}><Heading count={Math.min(N, raw + 1)} /></div>
+          {TASKS.slice(0, N).map((t, i) => <Row key={i} t={t} time={TIMES[i]} p={raw - i} />)}
         </div>
       </div>
     </Shell>
