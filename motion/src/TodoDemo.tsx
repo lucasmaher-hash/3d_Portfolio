@@ -109,7 +109,8 @@ export const TodoDemoZoom: React.FC = () => {
   const top = 40;
   const sc = Math.min(1.9, (TODO_H - top - 40) / listH);
   const content = HEADT + ROW * count + PADV * 2;
-  const reach = (TODO_H - top) / sc + 120 * (1 - clamp01(count / N));   // starts past the bottom edge, ends flush with the content
+  const prog = clamp01(count / N);
+  const reach = ((TODO_H - top) / sc) * (1 - prog) + content * prog;   // runs off the bottom edge at first, ends with the same gap below as above
   const panelH = Math.max(content, reach);
   return (
     <Shell>
