@@ -46,8 +46,7 @@ const Row: React.FC<{t: string; time: string; p: number}> = ({t, time, p: pu}) =
     <div style={{height: ROW, padding: '6px 0', boxSizing: 'border-box', opacity: clamp01(p * 2.5), transform: `translate(${x}px, ${y}px)`}}>
       <div style={{height: '100%', background: bg, boxShadow: shadow, borderRadius: 20, display: 'flex', alignItems: 'center', paddingLeft: 30, paddingRight: 30, gap: 22, fontSize: 31, color: INK}}>
         <i style={{flex: 'none', width: 32, height: 32, borderRadius: '50%', border: `2.5px solid ${m > 0.5 ? 'rgba(23,35,58,0.4)' : 'rgba(255,255,255,0.9)'}`, boxSizing: 'border-box'}} />
-        <span style={{whiteSpace: 'nowrap', flex: 1}}>{t}</span>
-        <span style={{fontSize: 22, color: m > 0.5 ? MUTED : 'rgba(255,255,255,0.85)', fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em'}}>{time}</span>
+        <span style={{whiteSpace: 'nowrap'}}>{t}</span>
       </div>
     </div>
   );
