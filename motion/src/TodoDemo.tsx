@@ -52,7 +52,7 @@ const Row: React.FC<{t: string; time: string; p: number}> = ({t, time, p: pu}) =
 const Shell: React.FC<{children: React.ReactNode}> = ({children}) => (
   <AbsoluteFill
     style={{
-      background: 'radial-gradient(900px 620px at 12% 8%, #dfe6f4 0%, transparent 62%), radial-gradient(900px 700px at 92% 104%, #a9bde2 0%, transparent 62%), #c3cde0',
+      background: '#b3b8c3',
       fontFamily: FONT, color: INK, overflow: 'hidden',
     }}
   >
