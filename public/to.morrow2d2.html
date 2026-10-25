@@ -3202,7 +3202,7 @@
           <div class="trio-wrap">
             <div class="trio-nums" aria-hidden="true"><span class="trio-num" style="--g: var(--A);"><b>1</b></span><span class="trio-num" style="--g: var(--A);"><b>2</b></span><span class="trio-num"><b>3</b></span></div>
             <div class="trio-shots">
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingetippt und mit Go Live aktiviert"><source src="/videos/to.morrow/live-1-type.mp4?v=2" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingetippt und mit Go Live aktiviert"><source src="/videos/to.morrow/live-1-type.mp4?v=6" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
               <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=4" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
               <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island.mp4?v=5" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
             </div>
@@ -4545,8 +4545,8 @@
 <script>
 // The three Live recordings run on one timeline:
 //  1 starts; when its keyboard folds away, 2 starts (the task appears on the lock screen);
-//  3 s later 3 starts (the app slides into the Dynamic Island); when the task is ticked off there,
-//  2 ticks it off and drops it away, and 1 switches Live off. Everything that has started stays sharp until the loop restarts.
+//  3 s later 3 starts (the app slides into the Dynamic Island); once the island has closed again,
+//  1 runs on from its breathing loop to switching Live off, and in the same moment 2 ticks the task off and drops it away. Everything that has started stays sharp until the loop restarts.
 (function () {
   var vids = Array.prototype.slice.call(document.querySelectorAll('video[data-seq]'));
   if (vids.length < 3) return;
@@ -4554,8 +4554,8 @@
   var shots = vids.map(function (v) { return v.closest('.ip-shot'); });
   var nums = Array.prototype.slice.call(document.querySelectorAll('.trio-nums:not(.trio-caps) .trio-num'));
   var KB_DOWN = 4.35, LOOP_A = 5.4, LOOP_B = 13.4, PERIOD = 2.0;   // video 1: keyboard folds away; breathing loop of the live button
-  var HOLD2 = 1.83, GAP23 = 3000, TICK3 = 2.6;                      // video 2 holds here; delay 2 -> 3; the tick inside video 3
-  var on = false, raf = 0, timer = 0, s2 = false, s3 = false, ticked = false, t2 = 0, restarting = false;
+  var HOLD2 = 1.83, GAP23 = 3000, TICK3 = 7.85, OFF1 = 13.35;      // video 2 holds here; delay 2 -> 3; the Dynamic Island has closed in video 3; video 1 is about to switch Live off
+  var on = false, raf = 0, timer = 0, s2 = false, s3 = false, closed = false, ticked = false, t2 = 0, restarting = false;
   function fill(k, f) { var el = nums[k]; if (!el) return; el.style.setProperty('--f', Math.max(0, Math.min(1, f)).toFixed(4)); el.classList.toggle('is-full', f >= 1); }
   function pop(k) { var el = nums[k]; if (!el) return; el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
   function play(v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
@@ -4564,7 +4564,7 @@
     vids.forEach(function (v) { try { v.pause(); v.currentTime = 0; } catch (e) {} });
     shots.forEach(function (s) { s.classList.remove('is-live'); });
     fill(0, 0); fill(1, 0); nums.forEach(function (e) { e.classList.remove('pulse'); });
-    s2 = s3 = ticked = restarting = false;
+    s2 = s3 = closed = ticked = restarting = false;
   }
   function begin() { reset(); live(0); play(v1); loop(); }
   function loop() {
@@ -4580,14 +4580,14 @@
         if (now - t2 >= GAP23) { s3 = true; fill(1, 1); live(2); play(v3); pop(2); }
       }
       if (!ticked) {
-        if (s2 && v2.currentTime >= HOLD2) v2.pause();                 // the task waits on the lock screen
-        if (t1 >= LOOP_B) v1.currentTime = LOOP_A + (t1 - LOOP_B);     // the live button keeps breathing
-        if (s3 && v3.currentTime >= TICK3) {                           // ticked off in the Dynamic Island
-          ticked = true; v2.currentTime = Math.max(v2.currentTime, HOLD2); play(v2);
-          var ph = ((v1.currentTime - LOOP_A) % PERIOD + PERIOD) % PERIOD;   // jump to the same phase right before the switch-off
-          if (v1.currentTime >= LOOP_A) v1.currentTime = LOOP_B - PERIOD + ph;
-          play(v1);
+        if (s3 && !closed && v3.currentTime >= TICK3) {                  // the island in video 3 has closed: the task is done
+          closed = true;
+          var ph = ((t1 - LOOP_A) % PERIOD + PERIOD) % PERIOD;           // jump to the same phase of the breathing loop's last cycle, right before the switch-off
+          if (t1 >= LOOP_A) v1.currentTime = LOOP_B - PERIOD + ph;
         }
+        if (s2 && v2.currentTime >= HOLD2 && !closed) v2.pause();        // until then the task waits on the lock screen
+        if (t1 >= LOOP_B && !closed) v1.currentTime = LOOP_A + (t1 - LOOP_B);   // the live button keeps breathing
+        if (closed && t1 >= OFF1) { ticked = true; v2.currentTime = Math.max(v2.currentTime, HOLD2); play(v2); }   // video 1 reaches its switch-off: 2 ticks off together with it
       } else if (!restarting && v1.ended && v2.ended && v3.ended) {
         restarting = true; clearTimeout(timer); timer = setTimeout(function () { if (on) begin(); }, 900);
       }
