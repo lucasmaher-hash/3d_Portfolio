@@ -772,6 +772,8 @@
     .land-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr); gap: clamp(20px, 3vw, 48px); align-items: center; margin-top: var(--block-gap); }
     .land-shot { margin: 0; }
     .land-shot img { display: block; width: 100%; height: auto; }
+    .land-box { position: relative; width: 100%; aspect-ratio: 1808 / 876; container-type: size; }
+    .land-box .ip-shot { position: absolute; left: 50%; top: 50%; width: 100cqh; transform: translate(-50%, -50%) rotate(90deg); }
     @media (max-width: 860px) { .land-row { grid-template-columns: minmax(0, 1fr); } }
     /* Scroll-driven stage: the portrait phone fades to a blank screen, turns, and the landscape screen fades in on the SAME frame. */
     .rot-scrolly { height: 220vh; margin-top: var(--block-gap); }
@@ -788,15 +790,12 @@
     .rot-ico { display: block; width: 27px; height: 27px; background: currentColor; -webkit-mask: url(/images/to.morrow/rotate-icon.png) center / contain no-repeat; mask: url(/images/to.morrow/rotate-icon.png) center / contain no-repeat; }
     .rot-btn:hover { background: rgba(48, 50, 56, 0.8); }
     .rot-phone { width: clamp(126px, 20.33vw, 232px); transform: rotate(calc(var(--rot, 0) * 1deg)); will-change: transform; }
-    .rot-phone .phone-shot { position: relative; }
-    .rot-phone .phone-shot > video, .rot-phone .phone-frame { width: 100%; height: auto; display: block; }
-    .rot-phone .phone-frame { position: relative; z-index: 2; }
-    .rot-hole { z-index: 1; position: absolute; left: 5.556%; top: 2.44%; width: 88.64%; height: 95.1%; }
-    .rot-blank { background: #c2c7ce; z-index: 0; }
-    .rot-phone .phone-shot > video { position: relative; z-index: 1; }
-    .rot-phone .phone-shot > video { opacity: var(--vid, 1); }
-    .rot-land { container-type: size; overflow: hidden; opacity: var(--land, 0); }
-    .rot-land img { position: absolute; left: 50%; top: 50%; width: 100cqh; height: 100cqw; max-width: none; transform: translate(-50%, -50%) rotate(90deg); object-fit: cover; }
+    .rot-ip { width: 100%; }
+    .rot-ip .ip-screen video { transition: none; z-index: 1; }
+    .rot-blank { position: absolute; inset: 0; background: #26272c; z-index: 0; }
+    .rot-blank-l { background: #c8ccd4; opacity: var(--lb, 0); }
+    .rot-ip .ip-screen video[data-rot="p"] { opacity: var(--vid, 1); }
+    .rot-ip .ip-screen video[data-rot="l"] { opacity: var(--land, 0); }
     .rot-copy { display: grid; align-items: center; }
     .rot-text { grid-area: 1 / 1; max-width: 520px; }
     .rot-text.is-a { opacity: var(--ta, 1); }
@@ -808,7 +807,8 @@
     .ph2--quote { align-items: flex-start; text-align: left; justify-content: center; }
     .win-frame { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-radius: 20px; overflow: hidden; margin-top: var(--block-gap); box-shadow: var(--shadow-pressed); }
     /* Motion graphic in "Das Problem": 30 tasks glide into a Today list (Remotion video, all widths). */
-    .todo-demo { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 14px; background: #9aa0ad; }
+    .todo-frame { border-radius: 14px; overflow: hidden; background: #9aa0ad; line-height: 0; }
+    .todo-demo { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; background: #9aa0ad; }
     /* Four competitor cards: raised, flat inside. */
     .taps-wrap { display: flex; flex-direction: column; gap: 16px; }
     .taps-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 20px); }
@@ -828,6 +828,8 @@
         linear-gradient(var(--g), var(--g)) 100% 0 / 4px 40px no-repeat,
         linear-gradient(var(--g), var(--g)) 0 36px / 100% 4px no-repeat,
         linear-gradient(var(--g), var(--g)) 50% 36px / 4px 48px no-repeat; }
+    .ds-copy { max-width: 60%; margin-left: 0; margin-right: auto; text-align: left; }
+    @media (max-width: 860px) { .ds-copy { max-width: 100%; } }
     .big-statement { text-align: center; margin: 0 0 clamp(40px, 7vw, 96px); font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-weight: 400; font-size: clamp(20px, 3.4vw, 48px); line-height: 1.1; letter-spacing: -0.02em; -webkit-text-stroke: 0.04em currentColor; color: var(--text-primary); }
     @media (max-width: 640px) { .win-quotes::after { display: none; } }
     .win-frame { background: #000080 url(/images/to.morrow/win-bg.webp) center 58% / cover no-repeat; box-shadow: none; grid-template-columns: repeat(3, auto); justify-content: center; column-gap: clamp(6px, 1.3vw, 19px); }
@@ -863,9 +865,7 @@
     .trio-num:nth-child(1), .trio-num:nth-child(2) { margin-right: var(--A); }
     .trio-num b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-weight: 500; font-size: 13px; color: var(--text-primary); box-shadow: var(--shadow-raised-sm); }
     /* arrow from each badge to the next, in the strip above the phones */
-    .trio-nums:not(.trio-caps) .trio-num:not(:last-child)::after { content: ''; position: absolute; top: 13.25px; left: calc(50% + 22px); width: calc(var(--P) + var(--g) - 44px); height: 1.5px; background: linear-gradient(90deg, var(--accent-orange) calc(var(--f, 0) * 100%), transparent calc(var(--f, 0) * 100%)); }
-    .trio-nums:not(.trio-caps) .trio-num:not(:last-child)::before { content: ''; position: absolute; top: 14px; left: calc(50% + 22px + var(--P) + var(--g) - 44px); width: 7px; height: 7px; border-top: 1.5px solid var(--text-secondary); border-right: 1.5px solid var(--text-secondary); transform: translate(-100%, -50%) rotate(45deg); border-color: var(--accent-orange); opacity: 0; transition: opacity 0.25s ease; }
-    .trio-nums:not(.trio-caps) .trio-num.is-full::before { opacity: 1; }
+    .trio-nums:not(.trio-caps) .trio-num:not(:last-child)::after { content: ''; position: absolute; top: 12.8px; left: calc(50% + 22px); width: calc(var(--P) + var(--g) - 44px); height: 2.4px; border-radius: 2px; background: linear-gradient(90deg, var(--accent-orange) calc(var(--f, 0) * 100%), transparent calc(var(--f, 0) * 100%)); }
     @keyframes trio-pop { 0% { transform: scale(1); } 32% { transform: scale(1.34); } 62% { transform: scale(0.93); } 82% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .trio-nums:not(.trio-caps) .trio-num.pulse b { animation: trio-pop 0.7s cubic-bezier(0.25, 0.9, 0.3, 1) both; }
     .trio-shots { align-items: flex-start; }
@@ -1228,8 +1228,8 @@
          Slightly tighter than the card is wide, so the scattered cards overlap
          the way they do in the reference instead of sitting apart; --step is
          scaled by the same 0.85 as --card-w so the overlap ratio holds. */
-      --card-w: clamp(107px, 17.28vw, 197px);
-      --step: clamp(100px, 15.98vw, 182px);
+      --card-w: clamp(96px, 15vw, 172px);
+      --step: clamp(78px, 12.4vw, 142px);
     }
 
     /* Kept as the centring wrapper only — the name is historical, it no
@@ -1245,7 +1245,7 @@
     .color-fan {
       position: relative;
       /* Room for the tallest card once it is scaled up and pushed down. */
-      height: calc(var(--card-w) * (1600 / 792) * 1.18);
+      height: calc(var(--card-w) * (1808 / 876) * 1.22);
       /* This is what gives the block its height now: .fan-scrolly is
          content-sized and .fan-sticky auto, so both take their height from
          here. The air above the block is .fan-scrolly's margin-top. */
@@ -1283,7 +1283,8 @@
     /* Fifth card: the phone cluster on mobile wants five screens, the desktop
        fan four. It is a decorative repeat of an existing theme (aria-hidden),
        so it only exists where that composition is used. */
-    .color-slot--extra { display: none; }
+    .color-card.ip-shot { width: 100%; }
+    .ip-screen > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: block; }
 
     .color-card {
       width: 100%;
@@ -1419,7 +1420,6 @@
       /* Tall enough for the whole cluster: the lowest card's centre sits
          3.355 card-widths down and its rotated half-height is 0.902. */
       .color-fan { height: calc(var(--card-w) * 4.26); }
-      .color-slot--extra { display: block; }
 
       /* Same interpolation as the desktop rule — one --pe drives all four
          properties — but the distances are card-widths rather than --step
@@ -1437,11 +1437,12 @@
          --m-y card-widths from its top, both to the card's own centre. The
          DOM order is the desktop fan's, so the themes land where their
          z-index already puts them: Slate stays the big front card. */
-      .color-slot:nth-child(1) { --m-x:  0.628; --m-y:  2.345; --m-rot:  23.3; --m-sc: 0.802; } /* Rose  — lower right */
-      .color-slot:nth-child(2) { --m-x:  0.808; --m-y:  0.313; --m-rot:  -5.1; --m-sc: 0.664; } /* Moss  — upper right */
-      .color-slot:nth-child(3) { --m-x: -0.074; --m-y:  1.114; --m-rot:   9.7; --m-sc: 1.000; } /* Slate — centre, front */
-      .color-slot:nth-child(4) { --m-x: -0.815; --m-y:  1.795; --m-rot: -10.2; --m-sc: 0.746; } /* Cream — lower left */
-      .color-slot:nth-child(5) { --m-x: -0.522; --m-y: -0.371; --m-rot:  -1.5; --m-sc: 0.626; } /* repeat — top left, hindmost */
+      .color-slot:nth-child(1) { --m-x: -0.815; --m-y:  1.795; --m-rot: -10.2; --m-sc: 0.746; } /* Anthrazit — lower left */
+      .color-slot:nth-child(2) { --m-x: -0.780; --m-y:  0.380; --m-rot:  -6.0; --m-sc: 0.660; } /* Sand      — upper left, hind */
+      .color-slot:nth-child(3) { --m-x: -0.074; --m-y:  1.114; --m-rot:   9.7; --m-sc: 1.000; } /* Slate     — centre, front */
+      .color-slot:nth-child(4) { --m-x:  0.628; --m-y:  2.345; --m-rot:  23.3; --m-sc: 0.802; } /* Rose      — lower right */
+      .color-slot:nth-child(5) { --m-x:  0.808; --m-y:  0.313; --m-rot:  -5.1; --m-sc: 0.664; } /* Moss      — upper right */
+      .color-slot:nth-child(6) { --m-x:  0.080; --m-y: -0.150; --m-rot:   3.0; --m-sc: 0.560; } /* Bordeaux  — top, hindmost */
       /* +30% would put the two open clusters at ~400px across a 350px
          column. They stack here (see the column rule further down), so the
          binding constraint is one cluster against the column width, not the
@@ -3009,6 +3010,8 @@
       .glance-lead { font-size: calc(clamp(18px, 2.2vw, 24px) * 0.8); }
       .feature-title { font-size: calc(clamp(20px, 2.6vw, 26px) * 0.8); }
     }
+      .stagger-figure.phone .ip-screen video { width: 100% !important; height: 100% !important; margin: 0 !important; }
+    .stagger-figure.phone .ip-frame { width: 100% !important; height: 100% !important; margin: 0 !important; }
   </style>
 </head>
 <body>
@@ -3047,7 +3050,7 @@
          play/pause-on-visibility script at the bottom of the file covers it
          like every other clip here. -->
     <div class="morrow-devices">
-      <video class="hero-promo" autoplay loop muted playsinline preload="auto" width="1920" height="1320"
+      <video class="hero-promo" loop muted playsinline preload="auto" width="1920" height="1320"
              poster="/images/to.morrow/promo-poster-hero.webp?v=20261008"
              aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Demnächst verschoben, dann wird eine Aufgabe live geschaltet und erscheint auf dem Sperrbildschirm">
         <!-- Picked once, at load: wider than a phone gets the landscape tall cut,
@@ -3120,9 +3123,9 @@
       <p class="guide-text" data-i18n-html="n-study">Ich habe <b class="kw">zehn Menschen zwischen 21 und 34</b> gefragt, wie sie ihre To-dos verwalten. Sieben führen eine einzige Liste, in die alles wandert, und räumen sie nicht um. Drei haben nach ein paar Tagen aufgegeben. „Ich schreibe alles auf und schiebe es dann einfach vor mir her“, sagte eine Teilnehmerin. Nach drei Wochen mit to.morrow legten acht von zehn ihre Aufgaben bewusst auf Morgen oder Bald.</p>
       <p class="guide-text" data-i18n-html="problem-1">Eine To-do-App ist die App, in der man am wenigsten Zeit verbringen will. Sie soll nicht unterhalten, sondern den Kopf freiräumen und wieder verschwinden. Damit ist <b class="kw">Bediengeschwindigkeit</b> hier keine Politur, sondern das eigentliche Produkt.</p>
       <p class="guide-text" data-i18n-html="n-problem-user">Die Zielgruppe sind <b class='kw'>Menschen, die sich zu viel vornehmen</b>. Ihre Heute-Liste ist am Morgen länger, als der Tag zulässt, und was nicht geschafft wird, müsste verschoben werden.</p>
-      <video class="todo-demo" src="/videos/to.morrow/todo-demo.mp4?v=20261025s" autoplay muted loop playsinline preload="metadata" aria-label="Animation: 30 Aufgaben gleiten in die Heute-Liste, bis sie über den Bildschirm hinauswächst"></video>
+      <div class="todo-frame"><video class="todo-demo" src="/videos/to.morrow/todo-demo.mp4?v=20261025s" muted loop playsinline preload="metadata" aria-label="Animation: 30 Aufgaben gleiten in die Heute-Liste, bis sie über den Bildschirm hinauswächst"></video></div>
       <p class="guide-text" data-i18n-html="problem-2">Jede To-do-App macht das Anlegen leicht. Beim Verschieben hört das auf: öffnen, Datumsauswahl suchen, Datum wählen, speichern — <b class="kw">vier Schritte für eine Entscheidung</b>, die im Kopf längst gefallen ist. Also verschiebt niemand, und die Heute-Liste stimmt schon am Vormittag nicht mehr.</p>
-            <div class="taps-wrap"><p class="chart-title" data-i18n="n-taps-title">Eine Aufgabe auf morgen verschieben: Schritte</p><div class="taps-cards"><div class="tap-card"><span class="tap-name">Reminders</span><span class="tap-n">5 Taps</span><span class="tap-t">6,8 s</span></div><div class="tap-card"><span class="tap-name">Things</span><span class="tap-n">4 Taps</span><span class="tap-t">5,1 s</span></div><div class="tap-card"><span class="tap-name">Todoist</span><span class="tap-n">3 Taps</span><span class="tap-t">3,9 s</span></div><div class="tap-card is-us"><span class="tap-name">to.morrow</span><span class="tap-n">1 Wisch</span><span class="tap-t">0,9 s</span></div></div></div>
+            <div class="taps-wrap"><p class="chart-title" data-i18n="n-taps-title">Competitors</p><div class="taps-cards"><div class="tap-card"><span class="tap-name">Reminders</span><span class="tap-n">5 Taps</span><span class="tap-t">6,8 s</span></div><div class="tap-card"><span class="tap-name">Things</span><span class="tap-n">4 Taps</span><span class="tap-t">5,1 s</span></div><div class="tap-card"><span class="tap-name">Todoist</span><span class="tap-n">3 Taps</span><span class="tap-t">3,9 s</span></div><div class="tap-card is-us"><span class="tap-name">to.morrow</span><span class="tap-n">1 Wisch</span><span class="tap-t">0,9 s</span></div></div></div>
     </div>
     <!-- ══ 2. Die Idee ═══════════════════════════════════════════════ -->
     <div class="guide-section">
@@ -3144,12 +3147,11 @@
         </div>
         <div class="rot-scrolly" id="rot-scrolly" aria-label="Das Hochformat-Handy dreht sich ins Querformat">
           <div class="rot-sticky">
-            <div class="rot-phonecol"><button type="button" class="rot-btn" id="rot-btn" aria-label="Orientierung wechseln"><i class="rot-ico" aria-hidden="true"></i></button><div class="rot-phone" id="rot-phone"><div class="phone-shot">
-              <div class="rot-hole rot-blank"></div>
-              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben"><source src="/videos/to.morrow/swipe.mp4" type="video/mp4" /></video>
-              <div class="rot-hole rot-land"><img src="/images/to.morrow/landscape-screen.webp" width="1522" height="702" alt="" loading="lazy" /></div>
-              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
-            </div></div></div>
+            <div class="rot-phonecol"><button type="button" class="rot-btn" id="rot-btn" aria-label="Orientierung wechseln"><i class="rot-ico" aria-hidden="true"></i></button><div class="rot-phone" id="rot-phone"><div class="ip-shot rot-ip"><div class="ip-screen">
+              <div class="rot-blank"></div><div class="rot-blank rot-blank-l"></div>
+              <video data-rot="p" loop muted playsinline preload="auto" width="600" height="1304" aria-label="Aufgaben werden per Wisch zwischen Heute, Morgen und Bald verschoben"><source src="/videos/to.morrow/list-portrait.mp4?v=1" type="video/mp4" /></video>
+              <video data-rot="l" loop muted playsinline preload="auto" width="600" height="1304" aria-label="Im Querformat sind Heute, Morgen und Bald gleichzeitig offen"><source src="/videos/to.morrow/list-landscape.mp4?v=1" type="video/mp4" /></video>
+            </div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div></div></div>
             <div class="rot-copy">
               <div class="rot-text is-a"><h3 class="feature-title" data-i18n="f2b-title">Drei Listen, eine Geste</h3><p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.</p></div>
               <div class="rot-text is-b"><h3 class="feature-title">Querformat: alle drei Listen auf einmal</h3><p class="stagger-copy">Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div>
@@ -3158,19 +3160,14 @@
         </div>
         <div class="stagger-row rot-fallback">
           <div class="stagger-figure phone">
-            <div class="phone-shot">
-              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben">
-                <source src="/videos/to.morrow/swipe.mp4" type="video/mp4" />
-              </video>
-              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
-            </div>
+            <div class="ip-shot"><div class="ip-screen"><video loop muted playsinline data-nopress width="600" height="1304" aria-label="Aufgaben werden per Wisch zwischen Heute, Morgen und Bald verschoben"><source src="/videos/to.morrow/list-portrait.mp4?v=1" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f2b-title">Drei Listen, eine Geste</h3>
             <p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.</p>
           </div>
         </div>
-        <div class="land-row rot-fallback"><div class="land-body"><h3 class="feature-title">Querformat: alle drei Listen auf einmal</h3><p class="stagger-copy">Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div><figure class="land-shot"><img src="/images/to.morrow/landscape-mockup.webp" width="1600" height="792" loading="lazy" alt="Die App im Querformat: Heute, Morgen und Bald nebeneinander" /></figure></div>
+        <div class="land-row rot-fallback"><div class="land-body"><h3 class="feature-title">Querformat: alle drei Listen auf einmal</h3><p class="stagger-copy">Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div><figure class="land-shot"><div class="land-box"><div class="ip-shot"><div class="ip-screen"><video loop muted playsinline data-nopress width="600" height="1304" aria-label="Im Querformat sind Heute, Morgen und Bald gleichzeitig offen"><source src="/videos/to.morrow/list-landscape.mp4?v=1" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div></div></figure></div>
 
 
 
@@ -3226,8 +3223,8 @@
         <span class="step-badge">4</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text media-copy" data-i18n-html="n-ds-1">Ein <b class="kw">Designsystem</b> legt fest, wie eine App aussieht und sich anfühlt: Formen, Farben, Tiefe, Schrift und Bewegung. Statt jeden Knopf einzeln zu entscheiden, gelten ein paar Regeln überall. Dann sieht ein Schalter im Live-Bereich aus wie einer in den Einstellungen, und neue Screens müssen nicht jedes Mal neu erfunden werden.</p>
-      <p class="guide-text media-copy" data-i18n-html="n-ds-2">Bei to.morrow ist dieses System über einen Umweg entstanden: Mein erstes Designsystem war ein ganz anderes, und es ist durchgefallen. Hier ist, was ich gebaut und getestet habe, und was die Tester dazu gesagt haben.</p>
+      <p class="guide-text ds-copy" data-i18n-html="n-ds-1">Ein <b class="kw">Designsystem</b> legt fest, wie eine App aussieht und sich anfühlt: Formen, Farben, Tiefe, Schrift und Bewegung. Statt jeden Knopf einzeln zu entscheiden, gelten ein paar Regeln überall. Dann sieht ein Schalter im Live-Bereich aus wie einer in den Einstellungen, und neue Screens müssen nicht jedes Mal neu erfunden werden.</p>
+      <p class="guide-text ds-copy" data-i18n-html="n-ds-2">Bei to.morrow ist dieses System über einen Umweg entstanden: Mein erstes Designsystem war ein ganz anderes, und es ist durchgefallen. Hier ist, was ich gebaut und getestet habe, und was die Tester dazu gesagt haben.</p>
       <!-- The version that was thrown away. Not in the layout brief, but
            the pivot is the strongest thing on this page and it does not
            land without the Windows-95 build actually visible — every other
@@ -3247,11 +3244,11 @@
         <blockquote><p>"Die Idee gefällt mir, aber auf dem Sperrbildschirm sah es aus wie eine Fehlermeldung."</p><cite>Tester, TestFlight, Oktober 2026</cite></blockquote>
       </div>
       <p class="big-statement" data-i18n="n-nopurpose">Es hatte keinen Zweck.</p>
-      <p class="guide-text media-copy" data-i18n-html="pivot-1">Die erste Version war komplett in Windows 95 gebaut: Taskleiste, abgeschrägte Ränder, Pixelschrift, doppelter Pixelmaßstab. Einen Grund dafür gab es nicht — ich fand es cool. Was mich gereizt hat, war der Widerspruch: ein <b class="kw">Interface von 1995 mit heutigen Animationen</b>, das sich völlig smooth anfühlt.</p>
-      <p class="guide-text media-copy" data-i18n-html="n-ret-text">Nach einer Woche öffneten <b class="kw">61 %</b> der Tester die neue Version noch, beim Windows-95-Build waren es 24 % (je 18 Tester).</p>
-      <p class="guide-text media-copy" data-i18n-html="pivot-3">Also habe ich sie gestrichen. An ihre Stelle kam <b class="kw">SkeuKit</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
-      <p class="guide-text media-copy" data-i18n-html="icons-text">Ein Schalter in den Einstellungen wechselt zwischen <b class="kw">Retro und Modern</b>. Etwas vom alten Look wollte ich behalten — nicht aus Nostalgie, sondern weil die App sonst aussieht wie jede andere.</p>
-      <p class="guide-text media-copy" data-i18n-html="n-rules-sub"><b class='kw'>Was ich mir dabei gedacht habe.</b> Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.</p>
+      <p class="guide-text ds-copy" data-i18n-html="pivot-1">Die erste Version war komplett in Windows 95 gebaut: Taskleiste, abgeschrägte Ränder, Pixelschrift, doppelter Pixelmaßstab. Einen Grund dafür gab es nicht — ich fand es cool. Was mich gereizt hat, war der Widerspruch: ein <b class="kw">Interface von 1995 mit heutigen Animationen</b>, das sich völlig smooth anfühlt.</p>
+      <p class="guide-text ds-copy" data-i18n-html="n-ret-text">Nach einer Woche öffneten <b class="kw">61 %</b> der Tester die neue Version noch, beim Windows-95-Build waren es 24 % (je 18 Tester).</p>
+      <p class="guide-text ds-copy" data-i18n-html="pivot-3">Also habe ich sie gestrichen. An ihre Stelle kam <b class="kw">SkeuKit</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
+      <p class="guide-text ds-copy" data-i18n-html="icons-text">Ein Schalter in den Einstellungen wechselt zwischen <b class="kw">Retro und Modern</b>. Etwas vom alten Look wollte ich behalten — nicht aus Nostalgie, sondern weil die App sonst aussieht wie jede andere.</p>
+      <p class="guide-text ds-copy" data-i18n-html="n-rules-sub"><b class='kw'>Was ich mir dabei gedacht habe.</b> Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.</p>
       <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="s-rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs></svg>
       <h3 class="feature-title cs-h3" data-i18n="n-side-title">Seitenansicht: Höhe bedeutet Handlung</h3>
       <p class="guide-text" data-i18n="n-side-intro">Die Seitenansicht zeigt die drei Formen im Schnitt. Die Fläche ist die Grundlinie. Was darüber liegt, lässt sich bedienen, was darunter liegt, nimmt etwas auf.</p>
@@ -3391,27 +3388,24 @@
            that arrives first. -->
       <div class="fan-scrolly">
         <div class="fan-sticky">
-          <div class="color-fan" aria-label="Die vier Farbthemen von to.morrow im Hellmodus: Slate, Cream, Moss und Rose">
-        <span class="color-slot" style="--slot: -1.5; --rot: -11; --sc: 0.80; --dy:  47px; --lag: 0.12; z-index: 1; --sw-d: 6.2s; --sw-l: -0.9s; --sw-a: 1.1deg; --sw-y: 5px;">
-          <img class="color-card" src="/images/to.morrow/theme-pink.webp"  width="792" height="1600" alt="to.morrow im Farbthema Rose" />
+          <div class="color-fan" aria-label="Sechs Farbthemen von to.morrow: Anthrazit, Sand, Slate, Rose, Moss und Bordeaux">
+        <span class="color-slot" style="--slot: -2.5; --rot: -13; --sc: 0.82; --dy: 34px; --lag: 0.14; z-index: 1; --sw-d: 6.2s; --sw-l: -0.9s; --sw-a: 1.1deg; --sw-y: 5px;">
+          <div class="color-card ip-shot"><div class="ip-screen"><img src="/images/to.morrow/color-2.webp" width="640" height="1392" alt="to.morrow: Dunkelmodus: Anthrazit" loading="lazy" /></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
         </span>
-        <span class="color-slot" style="--slot: -0.5; --rot:  -8; --sc: 0.97; --dy: -26px; --lag: 0.06; z-index: 2; --sw-d: 7.4s; --sw-l: -2.6s; --sw-a: -0.9deg; --sw-y: 7px;">
-          <img class="color-card" src="/images/to.morrow/theme-green.webp" width="792" height="1600" alt="to.morrow im Farbthema Moss" />
+        <span class="color-slot" style="--slot: -1.5; --rot: -8; --sc: 0.92; --dy: -22px; --lag: 0.08; z-index: 2; --sw-d: 7.4s; --sw-l: -2.6s; --sw-a: -0.9deg; --sw-y: 7px;">
+          <div class="color-card ip-shot"><div class="ip-screen"><img src="/images/to.morrow/color-4.webp" width="640" height="1392" alt="to.morrow: Farbthema Sand" loading="lazy" /></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
         </span>
-        <span class="color-slot" style="--slot:  0.5; --rot:   5; --sc: 1.05; --dy:  21px; --lag: 0.00; z-index: 4; --sw-d: 8.1s; --sw-l: -4.1s; --sw-a: 0.8deg; --sw-y: 6px;">
-          <img class="color-card" src="/images/to.morrow/theme-grey.webp"  width="792" height="1600" alt="to.morrow im Farbthema Slate" />
+        <span class="color-slot" style="--slot: -0.5; --rot: -2; --sc: 1.06; --dy: 18px; --lag: 0.0; z-index: 5; --sw-d: 8.1s; --sw-l: -4.1s; --sw-a: 0.8deg; --sw-y: 6px;">
+          <div class="color-card ip-shot"><div class="ip-screen"><img src="/images/to.morrow/color-3.webp" width="640" height="1392" alt="to.morrow: Farbthema Slate (hell)" loading="lazy" /></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
         </span>
-        <span class="color-slot" style="--slot:  1.62; --rot:   9; --sc: 0.78; --dy: -32px; --lag: 0.10; z-index: 3; --sw-d: 6.8s; --sw-l: -1.7s; --sw-a: -1.2deg; --sw-y: 8px;">
-          <img class="color-card" src="/images/to.morrow/theme-beige.webp" width="792" height="1600" alt="to.morrow im Farbthema Cream" />
+        <span class="color-slot" style="--slot: 0.5; --rot: 3; --sc: 1.06; --dy: -14px; --lag: 0.02; z-index: 6; --sw-d: 6.8s; --sw-l: -1.7s; --sw-a: -1.2deg; --sw-y: 8px;">
+          <div class="color-card ip-shot"><div class="ip-screen"><img src="/images/to.morrow/color-6.webp" width="640" height="1392" alt="to.morrow: Farbthema Rose" loading="lazy" /></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
         </span>
-        <!-- Mobile only (display:none above 640px): the cluster in the
-             reference is five screens, not four. It used to be a repeat of
-             Rose; it is the dark mode now, so it carries something the other
-             four don't and gets a real alt. No aria-hidden is needed to keep
-             desktop honest — display:none already takes it out of the tree
-             there, which is the width whose label names four themes. -->
-        <span class="color-slot color-slot--extra" style="--slot: -2.6; --rot: -14; --sc: 0.72; --dy: 8px; --lag: 0.14; z-index: 0; --sw-d: 7.9s; --sw-l: -3.3s; --sw-a: 1.0deg; --sw-y: 6px;">
-          <img class="color-card" src="/images/to.morrow/theme-dark.webp" width="792" height="1600" alt="to.morrow im Dunkelmodus" />
+        <span class="color-slot" style="--slot: 1.5; --rot: 8; --sc: 0.92; --dy: 26px; --lag: 0.08; z-index: 3; --sw-d: 7.0s; --sw-l: -3.3s; --sw-a: 1.0deg; --sw-y: 6px;">
+          <div class="color-card ip-shot"><div class="ip-screen"><img src="/images/to.morrow/color-5.webp" width="640" height="1392" alt="to.morrow: Farbthema Moss" loading="lazy" /></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+        </span>
+        <span class="color-slot" style="--slot: 2.5; --rot: 13; --sc: 0.82; --dy: -30px; --lag: 0.14; z-index: 2; --sw-d: 7.9s; --sw-l: -5.0s; --sw-a: -1.0deg; --sw-y: 5px;">
+          <div class="color-card ip-shot"><div class="ip-screen"><img src="/images/to.morrow/color-1.webp" width="640" height="1392" alt="to.morrow: Dunkelmodus: Bordeaux" loading="lazy" /></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
         </span>
       </div>
         </div>
@@ -3656,7 +3650,7 @@
         'dna-intro': "SkeuKit is made of <b class=\"kw\">three shapes</b>, and each one has a single meaning. Once you've learned the three, every new view of the app explains itself.",
         'dna-forms': "The <b class=\"kw\">glass bubble</b> sits raised on the surface: you can tap it but not edit it. The <b class=\"kw\">trough</b> is its inverse, a recess that marks every field you type into. Together they make the <b class=\"kw\">toggle</b>, a bubble in a trough, for choosing without typing. The trough groups the options and the bubble shows the current one.",
         'color-title': 'Not just grey',
-        'color-text': "Most to-do apps are grey. I wanted people to be able to pick their own colours: four <b class=\"kw\">pale pastel tones</b>, each in light and dark. They're kept soft, so the colour adds an accent without getting in the way of reading.",
+        'color-text': "Most to-do apps are grey. I wanted people to be able to pick their own colours: six themes, four <b class=\"kw\">pale pastel tones</b> in light and two dark variants. They're kept soft, so the colour adds an accent without getting in the way of reading.",
         'conclusion-1': "The most important lesson was an uncomfortable one: <b class=\"kw\">throwing away a finished idea</b>. The Windows interface was complete and still wrong. Something that looks good in a screenshot doesn't necessarily work at seven in the morning.",
         'conclusion-2': "Second, it helps to <b class=\"kw\">set yourself rules</b>. Once each of the three shapes had exactly one meaning, every new view was a matter of applying that decision instead of designing from scratch.",
         'conclusion-3': "Third, rethinking something as <b class=\"kw\">everyday as a to-do list</b> meant looking hard at what other apps take for granted, like opening a date picker every time you move a task.",
@@ -3708,7 +3702,7 @@
         'conclusion-1': "Die wichtigste Lektion war eine unangenehme: <b class=\"kw\">eine fertige Idee wegzuwerfen</b>. Die Windows-Oberfläche war vollständig und trotzdem falsch. Was im Screenshot gut aussieht, funktioniert nicht unbedingt morgens um sieben.",
         'conclusion-2': "Zweitens hilft es, <b class=\"kw\">sich Regeln zu geben</b>. Sobald jede der drei Formen genau eine Bedeutung hatte, war jede neue Ansicht eine Anwendung dieser Entscheidung statt einer neuen Designfrage.",
         'conclusion-3': "Drittens hieß es, bei etwas so <b class=\"kw\">Alltäglichem wie einer To-do-Liste</b> genau hinzuschauen, was andere Apps für selbstverständlich halten, etwa für jedes Verschieben eine Datumsauswahl zu öffnen.",
-        'color-text': "Die meisten To-do-Apps sind grau. Ich wollte, dass man sich die Farben selbst aussuchen kann: vier <b class=\"kw\">blasse Pastelltöne</b>, jeder in Hell und Dunkel. Sie bleiben zurückhaltend, damit die Farbe einen Akzent setzt, ohne beim Lesen zu stören.",
+        'color-text': "Die meisten To-do-Apps sind grau. Ich wollte, dass man sich die Farben selbst aussuchen kann: sechs Themen, vier <b class=\"kw\">blasse Pastelltöne</b> in Hell und zwei dunkle Varianten. Sie bleiben zurückhaltend, damit die Farbe einen Akzent setzt, ohne beim Lesen zu stören.",
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
         'pivot-3': "Also habe ich es gestrichen. An seine Stelle kam <b class=\"kw\">SkeuKit</b>, ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Retro-Idee blieb, nur die Oberfläche ging.",
         'conclusion-4': "Als Nächstes kommen <b class=\"kw\">Widgets</b>, damit die Heute-Liste auf dem Homescreen liegt und du Aufgaben abhaken und verschieben kannst, ohne die App zu öffnen. Danach eine <b class=\"kw\">Desktop-Version</b> mit Tastatur und Platz für eine Wochenansicht. Beides ist für Version zwei geplant.",
@@ -3721,7 +3715,7 @@
   "n-ds-2": "to.morrow's system came about through a detour: my first design system was a very different one, and it failed. Here is what I built and tested, and what the testers said about it.",
   "n-a11y-short": "<b class='kw'>Accessibility</b> is part of the system: text scales with Dynamic Type up to AX5 while controls grow at half the rate. Every row offers VoiceOver actions for edit, reorder and photos, Reduce Motion stops every looping animation, and all touch targets are at least 44 pt.",
   "n-ov-lead": "to.morrow is an iOS app with three lists: Today, Tomorrow, Soon. Moving a task is a single swipe, and the one thing you must not forget stays visible on the Lock Screen and in the Dynamic Island.",
-  "n-taps-title": "Moving one task to tomorrow: steps",
+  "n-taps-title": "Competitors",
   "n-tag-ex": "Example values",
   "n-taps-1": "5 taps",
   "n-taps-2": "4 taps",
@@ -3779,7 +3773,7 @@
   "n-ds-2": "Bei to.morrow ist dieses System über einen Umweg entstanden: Mein erstes Designsystem war ein ganz anderes, und es ist durchgefallen. Hier ist, was ich gebaut und getestet habe, und was die Tester dazu gesagt haben.",
   "n-a11y-short": "<b class='kw'>Barrierefreiheit</b> ist Teil des Systems: Text skaliert mit Dynamic Type bis AX5, die Bedienelemente wachsen nur halb so schnell. Jede Zeile bietet VoiceOver-Aktionen für Bearbeiten, Sortieren und Fotos, Reduce Motion stoppt jede Dauer-Animation, und alle Touch-Ziele sind mindestens 44 pt groß.",
   "n-ov-lead": "to.morrow ist eine iOS-App mit drei Listen: Heute, Morgen, Bald. Eine Aufgabe zu verschieben ist eine einzige Wischgeste, und die eine Sache, die du nicht vergessen darfst, bleibt auf Sperrbildschirm und Dynamic Island sichtbar.",
-  "n-taps-title": "Eine Aufgabe auf morgen verschieben: Schritte",
+  "n-taps-title": "Competitors",
   "n-tag-ex": "Beispielwerte",
   "n-taps-1": "5 Taps",
   "n-taps-2": "4 Taps",
@@ -4256,7 +4250,7 @@
     //     control responding.
     (function () {
       var vids = Array.prototype.slice.call(document.querySelectorAll('video'))
-        .filter(function (v) { return !v.closest('a') && !v.closest('.hero') && !v.hasAttribute('data-seq'); });   // the three Live recordings restart together (see their own script)
+        .filter(function (v) { return !v.closest('a') && !v.closest('.hero') && !v.hasAttribute('data-seq') && !v.hasAttribute('data-rot') && !v.hasAttribute('data-nopress'); });   // the three Live recordings restart together (see their own script)
 
       vids.forEach(function (v) {
         // See the .vid-press comment in the stylesheet for why this is the
@@ -4468,7 +4462,7 @@
     // before it resolves (scrolling quickly past), which is not an error worth
     // reporting — hence the empty catch.
     (function () {
-      var vids = document.querySelectorAll('video:not([data-seq])');
+      var vids = document.querySelectorAll('video:not([data-seq]):not([data-rot])');
       if (!vids.length || !('IntersectionObserver' in window)) return;
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
@@ -4493,20 +4487,22 @@
   var sec = document.getElementById('rot-scrolly');
   if (!sec) return;
   var phone = document.getElementById('rot-phone');
+  var vp = sec.querySelector('video[data-rot="p"]'), vl = sec.querySelector('video[data-rot="l"]'), inView = false, landOn = false;
   var DUR = 2200;                                   // ms for the whole portrait -> landscape sequence
   var ease = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
   var seg = function (p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); };
   var t = 0, target = 0, from = 0, start = 0, running = false;
   function paint() {
     var st = sec.style;
-    st.setProperty('--vid', (1 - ease(seg(t, 0.00, 0.28))).toFixed(4));   // portrait content eases out to the flat screen colour
-    st.setProperty('--rot', (-90 * ease(seg(t, 0.28, 0.72))).toFixed(3));  // the blank phone turns, notch to the left
+    st.setProperty('--vid', (1 - ease(seg(t, 0.00, 0.28))).toFixed(4));
+    st.setProperty('--lb', ease(seg(t, 0.30, 0.70)).toFixed(4));   // portrait content eases out to the flat screen colour
+    st.setProperty('--rot', (90 * ease(seg(t, 0.28, 0.72))).toFixed(3));  // the blank phone turns, notch to the left
     st.setProperty('--land', ease(seg(t, 0.72, 1.00)).toFixed(4));         // landscape content eases in
     st.setProperty('--ta', (1 - ease(seg(t, 0.00, 0.22))).toFixed(4));
     st.setProperty('--tb', ease(seg(t, 0.78, 1.00)).toFixed(4));
     // Rotate button: sits beside the phone's bottom-right at a CONSTANT clearance from the (turning) rounded frame.
-    var bp = ease(seg(t, 0.28, 0.72)), a = (-90 * bp) * Math.PI / 180;
-    var pw = phone.offsetWidth, hw = pw * 0.5, hh = pw * 1.0101, rc = pw * 0.13, R = 22, G = 18;
+    var bp = ease(seg(t, 0.28, 0.72)), a = (90 * bp) * Math.PI / 180;
+    var pw = phone.offsetWidth, hw = pw * 0.5, hh = pw * 1.032, rc = pw * 0.15, R = 22, G = 18;
     var phi = (52 + (19 - 52) * bp) * Math.PI / 180, ux = Math.cos(phi), uy = Math.sin(phi);
     var ca = Math.cos(a), sa = Math.sin(a);
     function sdf(x, y) {                              // rounded rectangle, rotated by a (CSS: positive = clockwise, y down)
@@ -4518,7 +4514,16 @@
     for (var i = 0; i < 30; i++) { var mid = (lo + hi) / 2; if (sdf(ux * mid, uy * mid) < R + G) lo = mid; else hi = mid; }
     st.setProperty('--bx', (ux * hi).toFixed(2) + 'px');
     st.setProperty('--by', (uy * hi).toFixed(2) + 'px');
+    media();
   }
+  function play(v) { var q = v.play(); if (q && q.catch) q.catch(function () {}); }
+  function media() {                                   // portrait clip while it is shown, landscape clip once it fades in
+    if (!vp || !vl) return;
+    var wantP = inView && t < 0.55, wantL = inView && t > 0.7;
+    if (wantP) { if (vp.paused) play(vp); } else if (!vp.paused) vp.pause();
+    if (wantL) { if (!landOn) { vl.currentTime = 0; landOn = true; } if (vl.paused) play(vl); } else { landOn = false; if (!vl.paused) vl.pause(); }
+  }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { inView = e[0].isIntersecting; media(); }, { threshold: 0.05 }).observe(sec);
   function frame(now) {
     var k = Math.min(1, (now - start) / DUR);
     t = from + (target - from) * k;
