@@ -13,16 +13,15 @@ const TASKS = [
   'Backup machen', 'Termin verschieben', 'Versicherung kündigen', 'Skript lesen', 'Sport einplanen',
   'Blumen kaufen', 'Mittagessen planen', 'Reisepass verlängern', 'Auto zur Inspektion', 'Zeitung abbestellen',
 ];
-const N = TASKS.length;
-const ADD = 270, HOLD = 48, FADE = 18, GAP = 12;
+const N = 20;                                        // how many of TASKS are shown
+const ADD = 190, HOLD = 48, FADE = 18, GAP = 12;
 export const TODO_DURATION = ADD + HOLD + FADE + GAP;
 
 const ROW = 84, HEAD = 190;
 const COL = 640;                                     // list column width
 const VIEW = TODO_H - HEAD;
 const MID = VIEW * 0.5;
-const SLIDE = Easing.bezier(0.22, 1, 0.36, 1);       // long, soft landing (sideways)
-const RISE = Easing.bezier(0.16, 1, 0.3, 1);         // arrives earlier (from below), so the path bends in
+const SLIDE = Easing.bezier(0.3, 0.55, 0.25, 1);     // long, soft landing along the curve
 const FILL = Easing.bezier(0.45, 0, 0.55, 1);        // gentle in/out for the arrival pace
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const PAGE = '#cdd0d9', PANEL = '#dbe9fb', CARD = '#a3c3ec';
@@ -33,7 +32,10 @@ const Row: React.FC<{t: string; p: number}> = ({t, p: pu}) => {
   const p = clamp01(pu);
   const m = clamp01((pu - 0.85) / 1.5);                // once seated, the card melts into the panel colour
   const bg = mix([163, 195, 236], [219, 233, 251], m * m * (3 - 2 * m));
-  const x = (1 - SLIDE(p)) * 620, y = (1 - RISE(p)) * 300;
+  // Quadratic Bezier (the envelope curve of the string-art picture): starts 300px below and 620px right,
+  // rises vertically, bends through the corner at (620, 0) and docks moving horizontally.
+  const u = SLIDE(p);
+  const x = 620 * (1 - u * u), y = 300 * (1 - u) * (1 - u);
   return (
     <div style={{height: ROW, padding: '6px 0', boxSizing: 'border-box', opacity: clamp01(p * 2.5), transform: `translate(${x}px, ${y}px)`}}>
       <div style={{height: '100%', background: bg, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, fontSize: 32, position: 'relative'}}>
@@ -69,7 +71,7 @@ export const TodoDemo: React.FC = () => {
       <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, width: COL + 60, top: HEAD - 20, height: VIEW + 20, background: PANEL, borderRadius: '32px 32px 0 0', opacity: out}} />
       <div style={{position: 'absolute', left: (TODO_W - COL) / 2, width: COL, top: HEAD, height: VIEW, clipPath: 'inset(0px -1000px 0px -1000px)', opacity: out}}>
         <div style={{transform: `translateY(${-off}px)`}}>
-          {TASKS.map((t, i) => <Row key={i} t={t} p={count - i} />)}
+          {TASKS.slice(0, N).map((t, i) => <Row key={i} t={t} p={count - i} />)}
         </div>
       </div>
       <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, width: COL + 60, top: TODO_H - 110, height: 110, background: `linear-gradient(transparent, ${PAGE})`}} />
@@ -92,7 +94,7 @@ export const TodoDemoZoom: React.FC = () => {
       <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, top, width: COL + 60, transformOrigin: '50% 0', transform: `scale(${sc})`, opacity: out}}>
         <div style={{height: panelH, background: PANEL, borderRadius: 32, padding: `${PADV}px 30px`, boxSizing: 'border-box'}}>
           <div style={{height: HEADT - PADV, margin: '0 -30px', fontSize: 64, fontWeight: 600, letterSpacing: '-0.02em', textAlign: 'center', lineHeight: '84px'}}>Today</div>
-          {TASKS.map((t, i) => <Row key={i} t={t} p={count - i} />)}
+          {TASKS.slice(0, N).map((t, i) => <Row key={i} t={t} p={count - i} />)}
         </div>
       </div>
     </Shell>
