@@ -768,11 +768,29 @@
     .ph2 strong { color: var(--text-primary); font-weight: 500; font-size: 14.4px; line-height: 1.4; }
     .ph2 p { margin: 0; max-width: 56ch; }
     .ph2--land { aspect-ratio: 16 / 7; }
-    /* Landscape phone: same frame as the portrait phone, turned; copy to its left. */
+    /* Landscape phone (fallback for phones / reduced motion): same frame as the portrait phone, turned; copy to its left. */
     .land-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr); gap: clamp(20px, 3vw, 48px); align-items: center; margin-top: var(--block-gap); }
     .land-shot { margin: 0; }
     .land-shot img { display: block; width: 100%; height: auto; }
     @media (max-width: 860px) { .land-row { grid-template-columns: minmax(0, 1fr); } }
+    /* Scroll-driven stage: the portrait phone fades to a blank screen, turns, and the landscape screen fades in on the SAME frame. */
+    .rot-scrolly { height: 220vh; margin-top: var(--block-gap); }
+    .rot-sticky { position: sticky; top: 0; height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(24px, 4vw, 64px); }
+    .rot-phonecol { display: flex; align-items: center; justify-content: center; }
+    .rot-phone { width: clamp(126px, 20.33vw, 232px); transform: rotate(calc(var(--rot, 0) * 1deg)); will-change: transform; }
+    .rot-phone .phone-shot { position: relative; }
+    .rot-phone .phone-shot > video, .rot-phone .phone-frame { width: 100%; height: auto; display: block; }
+    .rot-hole { position: absolute; left: 5.556%; top: 2.44%; width: 88.64%; height: 95.1%; }
+    .rot-blank { background: #c2c7ce; }
+    .rot-phone .phone-shot > video { opacity: var(--vid, 1); }
+    .rot-land { container-type: size; overflow: hidden; opacity: var(--land, 0); }
+    .rot-land img { position: absolute; left: 50%; top: 50%; width: 100cqh; height: 100cqw; max-width: none; transform: translate(-50%, -50%) rotate(90deg); object-fit: cover; }
+    .rot-copy { display: grid; align-items: center; }
+    .rot-text { grid-area: 1 / 1; max-width: 520px; }
+    .rot-text.is-a { opacity: var(--ta, 1); }
+    .rot-text.is-b { opacity: var(--tb, 0); }
+    @media (min-width: 861px) and (prefers-reduced-motion: no-preference) { .stagger-row.rot-fallback, .land-row.rot-fallback { display: none; } }
+    @media (max-width: 860px), (prefers-reduced-motion: reduce) { .rot-scrolly { display: none; } }
     .ph2--phone { aspect-ratio: 9 / 19; width: min(100%, 220px); margin-inline: auto; }
     .ph2--wide { aspect-ratio: 16 / 9; }
     .ph2--quote { align-items: flex-start; text-align: left; justify-content: center; }
@@ -3103,7 +3121,21 @@
           <div class="band-head"><p class="band-title" data-i18n="n-flow-swipe">Eine Aufgabe von Heute auf Morgen</p></div>
           <div class="flow-row"><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-tabbar"><span class=on><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-1">Heute: drei Aufgaben</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-swipe"><span class="wf-swipe-bg">→</span><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-tabbar"><span class=on><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-2">Wisch nach rechts</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row is-new"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-tabbar"><span><i></i><b></b></span><span class=on><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-3">Die Aufgabe liegt in Morgen</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-undo"><b></b><u></u></div><div class="wf-tabbar"><span><i></i><b></b></span><span class=on><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-4">Rückgängig, falls es ein Fehler war</figcaption></figure></div>
         </div>
-        <div class="stagger-row">
+        <div class="rot-scrolly" id="rot-scrolly" aria-label="Das Hochformat-Handy dreht sich ins Querformat">
+          <div class="rot-sticky">
+            <div class="rot-phonecol"><div class="rot-phone" id="rot-phone"><div class="phone-shot">
+              <div class="rot-hole rot-blank"></div>
+              <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben"><source src="/videos/to.morrow/swipe.mp4" type="video/mp4" /></video>
+              <div class="rot-hole rot-land"><img src="/images/to.morrow/landscape-screen.webp" width="1522" height="702" alt="" loading="lazy" /></div>
+              <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
+            </div></div></div>
+            <div class="rot-copy">
+              <div class="rot-text is-a"><h3 class="feature-title" data-i18n="f2b-title">Drei Listen, eine Geste</h3><p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.</p></div>
+              <div class="rot-text is-b"><h3 class="feature-title">Querformat: alle drei Listen auf einmal</h3><p class="stagger-copy">Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="stagger-row rot-fallback">
           <div class="stagger-figure phone">
             <div class="phone-shot">
               <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben">
@@ -3117,7 +3149,7 @@
             <p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.</p>
           </div>
         </div>
-        <div class="land-row"><div class="land-body"><h3 class="feature-title">Querformat: alle drei Listen auf einmal</h3><p class="stagger-copy">Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div><figure class="land-shot"><img src="/images/to.morrow/landscape-mockup.webp" width="1600" height="792" loading="lazy" alt="Die App im Querformat: Heute, Morgen und Bald nebeneinander" /></figure></div>
+        <div class="land-row rot-fallback"><div class="land-body"><h3 class="feature-title">Querformat: alle drei Listen auf einmal</h3><p class="stagger-copy">Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div><figure class="land-shot"><img src="/images/to.morrow/landscape-mockup.webp" width="1600" height="792" loading="lazy" alt="Die App im Querformat: Heute, Morgen und Bald nebeneinander" /></figure></div>
 
 
 
@@ -4431,5 +4463,47 @@
     })();
   </script>
 
+<script>
+// Portrait -> landscape stage. Scrolling only DECIDES the state (past the middle of the
+// pinned range = landscape, before it = portrait); the change itself is a timed animation
+// that always runs to the end and cannot be scrubbed or stopped halfway by the wheel.
+(function () {
+  var sec = document.getElementById('rot-scrolly');
+  if (!sec) return;
+  var DUR = 2200;                                   // ms for the whole portrait -> landscape sequence
+  var ease = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+  var seg = function (p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); };
+  var t = 0, target = 0, from = 0, start = 0, running = false;
+  function paint() {
+    var st = sec.style;
+    st.setProperty('--vid', (1 - ease(seg(t, 0.00, 0.28))).toFixed(4));   // portrait content eases out to the flat screen colour
+    st.setProperty('--rot', (-90 * ease(seg(t, 0.28, 0.72))).toFixed(3));  // the blank phone turns, notch to the left
+    st.setProperty('--land', ease(seg(t, 0.72, 1.00)).toFixed(4));         // landscape content eases in
+    st.setProperty('--ta', (1 - ease(seg(t, 0.00, 0.22))).toFixed(4));
+    st.setProperty('--tb', ease(seg(t, 0.78, 1.00)).toFixed(4));
+  }
+  function frame(now) {
+    var k = Math.min(1, (now - start) / DUR);
+    t = from + (target - from) * k;
+    paint();
+    if (k < 1) { requestAnimationFrame(frame); return; }
+    running = false;
+    check();                                        // the reader may have scrolled back meanwhile
+  }
+  function go(to) { from = t; target = to; start = performance.now(); running = true; requestAnimationFrame(frame); }
+  var want = 0;
+  function check() {
+    var r = sec.getBoundingClientRect(), span = sec.offsetHeight - window.innerHeight;
+    if (span > 0) {
+      var p = -r.top / span;
+      if (p > 0.45) want = 1; else if (p < 0.35) want = 0;   // hysteresis, so it cannot flicker at the line
+    }
+    if (!running && want !== t) go(want);
+  }
+  window.addEventListener('scroll', check, { passive: true });
+  window.addEventListener('resize', check);
+  paint(); check();
+})();
+</script>
 </body>
 </html>
