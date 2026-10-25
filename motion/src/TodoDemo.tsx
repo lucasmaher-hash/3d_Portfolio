@@ -110,7 +110,9 @@ export const TodoDemoZoom: React.FC = () => {
   const sc = Math.min(1.9, (TODO_H - top - 40) / listH);
   const content = HEADT + ROW * count + PADV * 2;
   const prog = clamp01(count / N);
-  const reach = ((TODO_H - top) / sc) * (1 - prog) + content * prog;   // runs off the bottom edge at first, ends with the same gap below as above
+  const settle = SLIDE(clamp01((raw - N) / SPAN));          // only once the last card is landing does the panel pull in to equal gaps
+  const edge = (TODO_H - top) / sc + 120 * (1 - prog);       // while the list grows it runs to / past the bottom edge
+  const reach = edge * (1 - settle) + content * settle;
   const panelH = Math.max(content, reach);
   return (
     <Shell>
