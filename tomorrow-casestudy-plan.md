@@ -40,7 +40,10 @@ on top of the plan:
 - [ ] **Re-shoot the two clips under "Live-Benachrichtigungen"** (`live-pair.mp4`, section 3, "Ein Feld, ein Schalter") on the new phone **with Dynamic Island**, so the task can really be ticked off *in* the Dynamic Island. The current clip only shows the Lock Screen.
 - [ ] **Add a landscape section to the swipe part (section 2):** in landscape all three panels (Heute, Morgen, Bald) are open at once and you see every to-do of the workspace together. Needs a landscape recording.
 - [ ] **Ideas, undecided:** (a) a real interview study with ~20 people on how they track to-dos, repeated with the app afterwards; (b) a three-number fact bar. Neither goes on the page without real data.
-- [ ] **Decisions pending:** drop the "Die Regel dahinter" card; replace the swipe sketch placeholder in section 4; restructure Pivot and Schrift/Icons; trim the four rules in section 5.
+- [x] **Done 2026-10-25:** "Die Regel dahinter" card cut (one sentence on date-computed lists moved into "Drei Listen, eine Geste"); section 4 sketch placeholder cut; Pivot cut to 4 Windows screens + same-view comparison + one closing line on the Retro/Modern switch (orbit block and invented retention chart removed); section 5 is now "Das Designsystem" without the four rules (light moved into the Seitenansicht caption).
+- [ ] **Pivot needs ONE real tester quote or number** (a TestFlight message, or retention with a stated n). Without it the sentence "es wurde klar, dass das Design eine Hürde war" has no source. The old retention chart used example values and is gone.
+- [ ] **Optional, section 2:** sketches of the rejected ways to move a task (long-press menu, button, drag), only if real ones exist. Do not draw them after the fact.
+- [ ] **Three-number fact bar for Ergebnis**, in the format of the Unify page (number, one line, source tag such as "PILOT · SELF-REPORTED"), plus its own caveat sentence on sample size. Only with real numbers.
 - [ ] **Taps chart:** the 5 / 4 / 3 / 1 tap counts are still unverified. The "Beispielwerte" tag and the seconds were removed on 2026-10-25, so count the taps yourself in each app before shipping.
 
 Work order from here: capture the real flow-row stills, draw the sketch, run Studies 6/9/4 and replace the

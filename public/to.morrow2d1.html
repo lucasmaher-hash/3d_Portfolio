@@ -321,6 +321,8 @@
        read as the phones sitting in a frame. At 0 10px 16px / 0.40 the gaps
        recover to 219 while the edges still shade to 215, so each phone is
        still seated. */
+    .win-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(8px, 2.2vw, 40px); margin-top: var(--block-gap); filter: drop-shadow(0 10px 16px rgba(174, 174, 192, 0.40)); }
+    .win-row img { width: 100%; height: auto; display: block; }
     .win-devices-inner {
       filter: drop-shadow(0 10px 16px rgba(174, 174, 192, 0.40));
     }
@@ -2976,32 +2978,12 @@
           </div>
           <div class="stagger-body">
             <h3 class="feature-title" data-i18n="f2b-title">Drei Listen, eine Geste</h3>
-            <p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe.</p>
+            <p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.</p>
           </div>
         </div>
 
 
-        <div class="rule-card">
-          <p class="rule-head" data-i18n="n-rule-head">Die Regel dahinter</p>
-          <p class="rule-eq" data-i18n="n-rule-eq">Jede Aufgabe trägt ein Datum. Die Liste wird daraus berechnet.</p>
-          <dl class="rule-lines">
-            <dt data-i18n="n-rt-1">Heute</dt><dd data-i18n="n-rd-1">Datum heute oder früher. Überfällige Aufgaben erscheinen hier mit einem Chip, der zeigt, wie spät sie sind.</dd>
-            <dt data-i18n="n-rt-2">Morgen</dt><dd data-i18n="n-rd-2">Datum morgen.</dd>
-            <dt data-i18n="n-rt-3">Bald</dt><dd data-i18n="n-rd-3">Datum später, oder gar kein Datum.</dd>
-          </dl>
-          <p class="rule-note" data-i18n="n-rule-note">Es gibt keinen nächtlichen Rollover. Weil die Liste aus dem Datum entsteht, stimmt sie auch nach einer Nacht ohne App. Ein Wisch gilt ab etwa einem Fünftel der Zeilenbreite oder bei schnellem Loslassen.</p>
-          <details class="more">
-            <summary data-i18n="n-more">So wandert eine Aufgabe durch die Woche</summary>
-            <div class="dates" role="table">
-              <span class="h" role="columnheader" data-i18n="n-dates-h0">Heute ist</span>
-              <span class="h" data-i18n="n-d-mo">Mo</span><span class="h" data-i18n="n-d-tu">Di</span><span class="h" data-i18n="n-d-we">Mi</span><span class="h" data-i18n="n-d-th">Do</span>
-              <span data-i18n="n-dates-r1">Aufgabe mit Datum Mittwoch</span>
-              <span class="chip" data-i18n="n-rt-3">Bald</span><span class="chip" data-i18n="n-rt-2">Morgen</span><span class="chip now" data-i18n="n-rt-1">Heute</span><span class="chip" data-i18n="n-dates-late">Heute, 1 Tag</span>
-              <span data-i18n="n-dates-r2">Aufgabe ohne Datum</span>
-              <span class="chip" data-i18n="n-rt-3">Bald</span><span class="chip" data-i18n="n-rt-3">Bald</span><span class="chip" data-i18n="n-rt-3">Bald</span><span class="chip" data-i18n="n-rt-3">Bald</span>
-            </div>
-          </details>
-        </div>
+
       </div>
     </div>
     <!-- ══ 3. Live ═══════════════════════════════════════════════════ -->
@@ -3059,27 +3041,7 @@
         <span class="step-badge">4</span>
       </div>
       <div class="dot-divider"></div>
-      <div class="paper">
-        <div class="band-head"><p class="band-title" style="color:#1d1d1f;" data-i18n="n-sketch-title">Frühe Skizzen der Wischgeste</p><span class="mock-tag" data-i18n="n-tag-sketch">Skizze · Platzhalter für den Scan</span></div>
-        <svg viewBox="0 0 720 230" aria-hidden="true">
-          <g filter="url(#s-rough)">
-            <rect class="s-ink" x="30" y="16" width="120" height="200" rx="18"/>
-            <path class="s-thin" d="M52 58h76M52 92h60M52 126h72M52 160h50"/>
-            <circle class="s-thin" cx="46" cy="58" r="4"/><circle class="s-thin" cx="46" cy="92" r="4"/><circle class="s-thin" cx="46" cy="126" r="4"/>
-            <path class="s-ink" d="M164 108c26-10 44-10 70 0M222 98l12 10-12 10"/>
-            <rect class="s-ink" x="250" y="16" width="120" height="200" rx="18"/>
-            <path class="s-thin" d="M272 58h76M272 126h72M272 160h50"/>
-            <path class="s-ink" d="M300 92h56M346 82l12 10-12 10"/>
-            <path class="s-dash" d="M262 80h96v24h-96z"/>
-            <path class="s-ink" d="M384 108c26-10 44-10 70 0M442 98l12 10-12 10"/>
-            <rect class="s-ink" x="470" y="16" width="120" height="200" rx="18"/>
-            <path class="s-thin" d="M492 58h76M492 92h60M492 126h72"/>
-            <path class="s-dash" d="M486 190h88v14h-88z"/>
-            <path class="s-thin" d="M620 70c20-18 52-14 60 8M676 70l4 12-12 2"/>
-          </g>
-        </svg>
-        <p class="paper-cap" data-i18n="n-sketch-cap">Heute, Wisch, Morgen, Rückgängig-Leiste. Der erste Entwurf der Geste auf Papier.</p>
-      </div>
+
       <p class="guide-text media-copy" data-i18n-html="pivot-1">Die erste Version war komplett in Windows 95 gebaut: Taskleiste, abgeschrägte Ränder, Pixelschrift, doppelter Pixelmaßstab. Einen Grund dafür gab es nicht — ich fand es cool. Was mich gereizt hat, war der Widerspruch: ein <b class="kw">Interface von 1995 mit heutigen Animationen</b>, das sich völlig smooth anfühlt.</p>
       <!-- The version that was thrown away. Not in the layout brief, but
            the pivot is the strongest thing on this page and it does not
@@ -3089,21 +3051,12 @@
            Same iPhone 12 Pro frame as the hero row, composited the same
            way, so the two eras are shown in the same device and only the
            interface differs. -->
-      <div class="win-devices">
-        <div class="win-devices-inner">
-          <img src="/images/to.morrow/windows1.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon mit aufklappbaren Gruppen" />
-          <img src="/images/to.morrow/windows2.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Aufgaben des heutigen Tages" />
-          <img src="/images/to.morrow/windows3.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Einstellungen mit Pixelrahmen" />
-          <img src="/images/to.morrow/windows4.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: ein anderes Farbthema derselben Oberfläche" />
-          <img src="/images/to.morrow/windows5.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon in einem violetten Farbthema" />
-          <img src="/images/to.morrow/windows6.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Heute-Liste in einem dunkelbraunen Farbthema" />
-          <img src="/images/to.morrow/windows7.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: das geöffnete Workspace-Menü mit Personal, Work und Design" />
-          <img src="/images/to.morrow/windows8.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: der Live-Bereich mit Eingabefeld und Live-Schalter" />
-          <img src="/images/to.morrow/windows9.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" />
-        </div>
+      <div class="win-row">
+        <img src="/images/to.morrow/windows2.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Aufgaben des heutigen Tages" />
+        <img src="/images/to.morrow/windows1.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die Liste Soon mit aufklappbaren Gruppen" />
+        <img src="/images/to.morrow/windows4.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: ein anderes Farbthema derselben Oberfläche" />
+        <img src="/images/to.morrow/windows7.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: das geöffnete Workspace-Menü mit Personal, Work und Design" />
       </div>
-
-
       <p class="guide-text media-copy" data-i18n-html="pivot-2">Über TestFlight haben nach und nach immer mehr Leute die App benutzt, und je länger ich zusah, desto klarer wurde: Das Design war kein Reiz, sondern eine <b class="kw">Hürde</b>. Unintuitiv und gewöhnungsbedürftig — genau das, was eine App, in der man wenig Zeit verbringen will, nicht sein darf.</p>
       <figure class="cmp-wrap" style="margin:0; display:flex; flex-direction:column; gap:16px;">
         <div class="cmp">
@@ -3112,101 +3065,24 @@
         </div>
         <p class="cmp-cap" data-i18n="n-cmp-cap">Dieselbe Ansicht in beiden Builds. Die Funktion ist gleich geblieben, die Oberfläche nicht.</p>
       </figure>
-      <figure class="chart" style="margin:0;">
-        <div class="chart-head">
-          <p class="chart-title" data-i18n="n-ret-title">Wer die App noch öffnet, nach Tagen seit der Installation</p>
-          <span class="mock-tag" data-i18n="n-tag-ex">Beispielwerte</span>
-        </div>
-        <svg class="line-chart" viewBox="0 0 520 226" role="img" aria-label="Retention curve">
-          <line x1="50" x2="400" y1="190.0" y2="190.0" stroke="rgba(40,40,90,.12)"/><text x="40" y="194.0" text-anchor="end">0</text><line x1="50" x2="400" y1="147.5" y2="147.5" stroke="rgba(40,40,90,.12)"/><text x="40" y="151.5" text-anchor="end">25</text><line x1="50" x2="400" y1="105.0" y2="105.0" stroke="rgba(40,40,90,.12)"/><text x="40" y="109.0" text-anchor="end">50</text><line x1="50" x2="400" y1="62.5" y2="62.5" stroke="rgba(40,40,90,.12)"/><text x="40" y="66.5" text-anchor="end">75</text><line x1="50" x2="400" y1="20.0" y2="20.0" stroke="rgba(40,40,90,.12)"/><text x="40" y="24.0" text-anchor="end">100</text><text x="50.0" y="208" text-anchor="middle">1</text><text x="103.8" y="208" text-anchor="middle">3</text><text x="211.5" y="208" text-anchor="middle">7</text><text x="400.0" y="208" text-anchor="middle">14</text>
-          <text x="225" y="223" text-anchor="middle" data-i18n="n-ret-axis">Tage seit der Installation</text>
-          <polyline points="50.0,84.6 103.8,120.3 211.5,149.2 400.0,164.5" fill="none" stroke="#9a9aa4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <polyline points="50.0,57.4 103.8,71.0 211.5,86.3 400.0,108.4" fill="none" stroke="#7A92B0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="50.0" cy="84.6" r="3.5" fill="#9a9aa4"/><circle cx="103.8" cy="120.3" r="3.5" fill="#9a9aa4"/><circle cx="211.5" cy="149.2" r="3.5" fill="#9a9aa4"/><circle cx="400.0" cy="164.5" r="3.5" fill="#9a9aa4"/>
-          <circle cx="50.0" cy="57.4" r="4" fill="#7A92B0"/><circle cx="103.8" cy="71.0" r="4" fill="#7A92B0"/><circle cx="211.5" cy="86.3" r="4" fill="#7A92B0"/><circle cx="400.0" cy="108.4" r="4" fill="#7A92B0"/>
-          <text class="t-old" x="408" y="168.5">Windows 95</text>
-          <text class="t-us" x="408" y="112.4">SkeuKit</text>
-          <text class="t-old" x="211.5" y="167.2" text-anchor="middle">24 %</text>
-          <text class="t-us" x="211.5" y="76.3" text-anchor="middle">61 %</text>
-        </svg>
-        <figcaption class="chart-note" data-i18n="n-ret-cap">Dieselben Funktionen, andere Oberfläche. Nach einer Woche öffnen mehr als doppelt so viele Tester die SkeuKit-Version noch.</figcaption>
-      </figure>
       <p class="guide-text media-copy" data-i18n-html="pivot-3">Also habe ich sie gestrichen. An ihre Stelle kam <b class="kw">SkeuKit</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
-      <!-- A labelled bubble stands still on each side; the icons expand out
-           from behind it. The bubble carries its own face — W95FA on the
-           left, the system face on the right — so the two type systems are
-           the thing being compared, not just the glyphs.
-
-           The vector icons are redrawn from scratch as plain SVG, not SF
-           Symbols: Apple licenses those for software running on Apple
-           platforms, which a portfolio site is not, and the licence does
-           not permit close redrawing either. Of the five pixel glyphs,
-           gear/close/check/live are transcribed cell-for-cell from the
-           app; the pencil was drawn for the web set, which is why the
-           sentence above no longer calls this "the" v1 icon set. -->
-      <div class="ic-scrolly">
-        <div class="ic-sticky">
-      <div class="icons-compare" data-retro="0" data-modern="0">
-        <div class="ic-side ic-side--left sk retro">
-          <div class="ic-orbitwrap"><div class="ic-orbit">
-            <span class="ic-item" style="--a: 0deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 12 12" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="2" width="8" height="2"/><rect x="2" y="8" width="8" height="2"/><rect x="2" y="2" width="2" height="8"/><rect x="8" y="2" width="2" height="8"/><rect x="5" y="0" width="2" height="2"/><rect x="5" y="10" width="2" height="2"/><rect x="0" y="5" width="2" height="2"/><rect x="10" y="5" width="2" height="2"/><rect x="1" y="1" width="1" height="1"/><rect x="10" y="1" width="1" height="1"/><rect x="1" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/></svg></span></span></span>
-            <span class="ic-item" style="--a: 72deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 8 8" fill="currentColor" shape-rendering="crispEdges"><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="5" y="2" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="4" y="3" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="3" y="4" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/></svg></span></span></span>
-            <span class="ic-item" style="--a: 144deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 12 12" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="5" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="4" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/><rect x="5" y="7" width="1" height="1"/><rect x="6" y="5" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="7" y="4" width="1" height="1"/><rect x="7" y="5" width="1" height="1"/><rect x="8" y="3" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/></svg></span></span></span>
-            <span class="ic-item" style="--a: 216deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 11 11" fill="currentColor" shape-rendering="crispEdges"><rect x="4" y="0" width="1" height="1"/><rect x="5" y="0" width="1" height="1"/><rect x="6" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="3" y="1" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="5" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="7" y="1" width="1" height="1"/><rect x="8" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="8" y="2" width="1" height="1"/><rect x="9" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="8" y="3" width="1" height="1"/><rect x="9" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="5" y="4" width="1" height="1"/><rect x="6" y="4" width="1" height="1"/><rect x="9" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="1" y="5" width="1" height="1"/><rect x="4" y="5" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/><rect x="6" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="10" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="1" y="7" width="1" height="1"/><rect x="2" y="7" width="1" height="1"/><rect x="8" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="1" y="8" width="1" height="1"/><rect x="2" y="8" width="1" height="1"/><rect x="3" y="8" width="1" height="1"/><rect x="7" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="9" y="8" width="1" height="1"/><rect x="2" y="9" width="1" height="1"/><rect x="3" y="9" width="1" height="1"/><rect x="4" y="9" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="6" y="9" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/><rect x="8" y="9" width="1" height="1"/><rect x="4" y="10" width="1" height="1"/><rect x="5" y="10" width="1" height="1"/><rect x="6" y="10" width="1" height="1"/></svg></span></span></span>
-            <span class="ic-item" style="--a: 288deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg class="px" viewBox="0 0 12 12" fill="currentColor" shape-rendering="crispEdges"><rect x="8" y="2" width="1" height="1"/><rect x="9" y="2" width="1" height="1"/><rect x="7" y="3" width="1" height="1"/><rect x="8" y="3" width="1" height="1"/><rect x="6" y="4" width="1" height="1"/><rect x="7" y="4" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/><rect x="6" y="5" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="4" y="7" width="1" height="1"/><rect x="2" y="8" width="1" height="1"/><rect x="3" y="8" width="1" height="1"/><rect x="2" y="9" width="1" height="1"/><rect x="3" y="9" width="1" height="1"/><rect x="2" y="10" width="1" height="1"/><rect x="3" y="10" width="1" height="1"/></svg></span></span></span>
-          </div></div>
-          <span class="ic-bubble sk-pill sk-glass sk-chrome">retro</span>
-        </div>
-        <!-- The section's own heading and copy, in the layout rather than
-             stacked above it. The paragraph is the original text split at its
-             own sentence boundary — the half that describes the pixel set
-             here, the half that describes today's beside the modern cluster
-             below. No new claims: the wording is the existing one rearranged. -->
-        <div class="ic-copy ic-copy--retro">
-          <h3 class="feature-title" data-i18n="icons-title">Schrift und Icons</h3>
-          <p class="guide-text" data-i18n-html="icons-text">Ein Schalter in den Einstellungen wechselt zwischen <b class="kw">Retro und Modern</b>. Etwas vom alten Look wollte ich behalten — nicht aus Nostalgie, sondern weil die App sonst aussieht wie jede andere.</p>
-        </div>
-        <div class="ic-side ic-side--right sk">
-          <div class="ic-orbitwrap"><div class="ic-orbit">
-            <span class="ic-item" style="--a: 0deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="6.3" stroke-width="1.8"/><circle cx="12" cy="12" r="2.5" stroke-width="1.5"/><path stroke-width="2.1" d="M18.3 12.0L20.6 12.0M16.5 16.5L18.1 18.1M12.0 18.3L12.0 20.6M7.5 16.5L5.9 18.1M5.7 12.0L3.4 12.0M7.5 7.5L5.9 5.9M12.0 5.7L12.0 3.4M16.5 7.5L18.1 5.9"/></svg></span></span></span>
-            <span class="ic-item" style="--a: 72deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></span></span>
-            <span class="ic-item" style="--a: 144deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.6l5 5 10-10.2"/></svg></span></span></span>
-            <span class="ic-item" style="--a: 216deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.1" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.8" fill="currentColor"/></svg></span></span></span>
-            <span class="ic-item" style="--a: 288deg"><span class="ic-spin"><span class="sk-round sk-glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10a2.4 2.4 0 0 0-3.4-3.4L4.6 16.6z"/><path d="M13.6 7.4l3 3"/></svg></span></span></span>
-          </div></div>
-          <span class="ic-bubble sk-pill sk-glass sk-chrome">modern</span>
-        </div>
-        <div class="ic-copy ic-copy--modern">
-          <p class="guide-text" data-i18n-html="icons-text-2">Was bleibt, ist ein Zusammenstoß zweier Welten: Wölbungen, Glasblasen, erhabene Kanten und vertiefte Flächen auf der einen Seite, <b class="kw">Pixelschrift und Pixel-Icons</b> auf der anderen. Die Schrift ist W95FA von Alina Sava (SIL Open Font License).</p>
-        </div>
-      </div>
-        </div>
-      </div>
-
-
-
+      <p class="guide-text media-copy" data-i18n-html="icons-text">Ein Schalter in den Einstellungen wechselt zwischen <b class="kw">Retro und Modern</b>. Etwas vom alten Look wollte ich behalten — nicht aus Nostalgie, sondern weil die App sonst aussieht wie jede andere.</p>
     </div>
     <!-- ══ 5. Regeln des Designsystems ══════════════════════════════ -->
     <div class="guide-section">
           <div class="section-heading-row">
-        <h2 class="section-title" data-i18n="n-sec-rules">Die Regeln des Designsystems</h2>
+        <h2 class="section-title" data-i18n="n-sec-rules">Das Designsystem</h2>
         <span class="step-badge">5</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n-html="n-rules-sub"><b class='kw'>Was ich mir dabei gedacht habe.</b> Das Designsystem folgt vier Regeln. Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.</p>
-      <div class="rules">
-        <div class="rule"><span class="rule-n">1</span><div><h4 data-i18n="n-r1">Ein Licht</h4><p data-i18n="n-r1t">Eine einzige weiche Lichtquelle liegt oben links. Oberkanten fangen Licht, Unterkanten liegen im Schatten, Schatten fallen nach unten. Weil das für jedes Element gilt, lässt sich Höhe ohne Beschriftung lesen.</p></div></div>
-<div class="rule"><span class="rule-n">2</span><div><h4 data-i18n="n-r2">Höhe ist eine Leiter</h4><p data-i18n="n-r2t">Es gibt feste Stufen und keinen Regler. Ein Element wählt eine Stufe, ein bisschen mehr Schatten gibt es nicht. Braucht ein Element eine Zwischenstufe, wird die Leiter überarbeitet.</p></div></div>
-<div class="rule"><span class="rule-n">3</span><div><h4 data-i18n="n-r3">Drücken kostet Höhe</h4><p data-i18n="n-r3t">Wer ein Element drückt, drückt es nach unten: Es schrumpft leicht, verliert den äußeren Schatten und bekommt einen inneren. Jedes Element nutzt dieselbe Feder, damit die Reaktion ohne Nachdenken lesbar ist.</p></div></div>
-<div class="rule"><span class="rule-n">4</span><div><h4 data-i18n="n-r4">Jede Fläche hat Dicke</h4><p data-i18n="n-r4t">Eine Fläche besteht aus mehreren Schichten: Verlauf, Kantenlicht, Kantenschatten und Kontaktschatten. So wirkt sie wie ein Stück mattes, leicht weiches Material.</p></div></div>
-      </div>
+      <p class="guide-text" data-i18n-html="n-rules-sub"><b class='kw'>Was ich mir dabei gedacht habe.</b> Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.</p>
       <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="s-rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs></svg>
       <h3 class="feature-title cs-h3" data-i18n="n-side-title">Seitenansicht: Höhe bedeutet Handlung</h3>
       <p class="guide-text" data-i18n="n-side-intro">Die Seitenansicht zeigt die drei Formen im Schnitt. Die Fläche ist die Grundlinie. Was darüber liegt, lässt sich bedienen, was darunter liegt, nimmt etwas auf.</p>
       <!-- Paper-sketch slot: swap the three SVGs for the scan
            (/images/to.morrow/seitenansicht-skizze.webp) once Lucas has drawn it. -->
       <div class="paper">
-        <div class="band-head"><p class="band-title" style="color:#1d1d1f;" data-i18n="n-side-sheet">Schnitt durch die drei Formen, Licht von oben links</p><span class="mock-tag" data-i18n="n-tag-sketch">Skizze · Platzhalter für den Scan</span></div>
+        <div class="band-head"><p class="band-title" style="color:#1d1d1f;" data-i18n="n-side-sheet">Schnitt durch die drei Formen. Das Licht kommt von oben links: Es ist das einzige im ganzen System und zeigt jedem Element seine Höhe.</p><span class="mock-tag" data-i18n="n-tag-sketch">Skizze · Platzhalter für den Scan</span></div>
         <div class="side-grid">
         <figure class="side" style="margin:0;">
           <svg viewBox="0 0 300 320" aria-hidden="true">
@@ -3570,7 +3446,7 @@
         'f2-title': 'Order that costs nothing',
         'f2-text': "A list only reflects your week while reordering it costs nothing. If it takes four steps, everything stays where it is, and the order you planned while adding tasks <b class=\"kw\">falls apart within a day</b>.",
         'f2b-title': 'Three lists, one gesture',
-        'f2b-text': "Swiping is the <b class=\"kw\">most natural gesture on a phone</b>, faster than any menu. Every task sits in one of three lists: Today, Tomorrow or Soon. One swipe moves it on and another moves it back, in any direction and even into the Live task.",
+        'f2b-text': "Swiping is the <b class=\"kw\">most natural gesture on a phone</b>, faster than any menu. Every task sits in one of three lists: Today, Tomorrow or Soon. One swipe moves it on and another moves it back, in any direction and even into the Live task. The lists are not folders: they are computed from each task's date, so there is no overnight rollover, and the list is right even after a night without the app.",
         'f3-title': 'Workspaces and the rest',
         'f3-text': "If you need them, you can create <b class=\"kw\">workspaces</b> such as personal or work, and the app only shows the active one. Beyond that there's what a list needs and nothing more: reordering, deleting, attaching photos and marking places on them, and flagging important tasks <b class=\"kw\">in red</b>.",
         'f4-title': 'Settings',
@@ -3578,7 +3454,6 @@
         'pivot-1': "I built the first version entirely in the style of Windows 95: task bar, bevelled edges and pixel type at double pixel scale. There was no reason for it; I thought it was cool. What drew me in was the contrast of a <b class=\"kw\">1995 interface running today's animations</b> and still feeling smooth.",
         'pivot-2': "As more people used the app through TestFlight, it became clear that the design was an <b class=\"kw\">obstacle</b>. It was unintuitive and took getting used to, which is the last thing an app you want to spend little time in can afford.",
         'pivot-3': "So I dropped it. <b class=\"kw\">SkeuKit</b> took its place, a softly skeuomorphic system where depth comes from light instead of texture. The retro idea stayed; only the interface went.",
-        'icons-title': 'Type and icons',
         'icons-text': "A switch in the settings toggles between <b class=\"kw\">retro and modern</b>. I wanted to keep some of the old look, because without it the app would look like every other one.",
         'icons-text-2': "What's left is two styles meeting: curves, glass bubbles, raised edges and recessed panels on one side, <b class=\"kw\">pixel type and pixel icons</b> on the other. The typeface is W95FA by Alina Sava (SIL Open Font License).",
         'dna-title': 'Three shapes, three jobs',
@@ -3618,7 +3493,7 @@
         'f2-title': 'Ordnung, die nichts kostet',
         'f2-text': "Eine Liste bildet deine Woche nur ab, solange das Umsortieren nichts kostet. Braucht es vier Schritte, bleibt alles, wo es ist, und die Ordnung, die du beim Anlegen geplant hast, <b class=\"kw\">zerfällt innerhalb eines Tages</b>.",
         'f2b-title': 'Drei Listen, eine Geste',
-        'f2b-text': "Wischen ist die <b class=\"kw\">natürlichste Geste am Handy</b> und schneller als jedes Menü. Jede Aufgabe liegt in einer von drei Listen: Heute, Morgen oder Bald. Ein Wisch schiebt sie weiter, ein anderer zurück, in jede Richtung und sogar in die Live-Aufgabe.",
+        'f2b-text': "Wischen ist die <b class=\"kw\">natürlichste Geste am Handy</b> und schneller als jedes Menü. Jede Aufgabe liegt in einer von drei Listen: Heute, Morgen oder Bald. Ein Wisch schiebt sie weiter, ein anderer zurück, in jede Richtung und sogar in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.",
         'f3-title': 'Workspaces & Co',
         'f3-text': "Wer sie braucht, legt <b class=\"kw\">Workspaces</b> an, etwa Privat oder Arbeit, und die App zeigt nur den aktiven. Darüber hinaus gibt es, was eine Liste braucht, und nicht mehr: umsortieren, löschen, Fotos anhängen und Stellen darauf markieren, Wichtiges <b class=\"kw\">rot hervorheben</b>.",
         'f4-title': 'Einstellungen',
@@ -3629,7 +3504,6 @@
         'pivot-2': "Als immer mehr Leute die App über TestFlight nutzten, wurde klar, dass das Design eine <b class=\"kw\">Hürde</b> war. Es war unintuitiv und gewöhnungsbedürftig, und genau das darf eine App, in der man wenig Zeit verbringen will, nicht sein.",
         'icons-text': "Ein Schalter in den Einstellungen wechselt zwischen <b class=\"kw\">Retro und Modern</b>. Etwas vom alten Look wollte ich behalten, weil die App sonst aussieht wie jede andere.",
         'icons-text-2': "Übrig bleiben zwei Stile, die aufeinandertreffen: Wölbungen, Glasblasen, erhabene Kanten und vertiefte Flächen auf der einen Seite, <b class=\"kw\">Pixelschrift und Pixel-Icons</b> auf der anderen. Die Schrift ist W95FA von Alina Sava (SIL Open Font License).",
-        'icons-title': 'Schrift und Icons',
         'dna-title': 'Drei Formen, drei Aufgaben',
         'color-title': 'Nicht nur Grau',
         'dna-forms': "Die <b class=\"kw\">Glasblase</b> liegt erhaben auf der Fläche: Du kannst sie antippen, aber nicht bearbeiten. Die <b class=\"kw\">Mulde</b> ist ihre Umkehrung, eine Vertiefung, die jedes Feld markiert, in das du schreibst. Zusammen ergeben sie den <b class=\"kw\">Umschalter</b>, eine Blase in einer Mulde, zum Auswählen ohne Tippen. Die Mulde gruppiert die Optionen, die Blase zeigt die aktuelle.",
@@ -3662,24 +3536,6 @@
   "n-fs-3": "The task is in Tomorrow",
   "n-fs-4": "Undo, in case it was a mistake",
   "n-flow-swipe": "One task from Today to Tomorrow",
-  "n-rule-head": "The rule behind it",
-  "n-rule-eq": "Every task carries a date. The list is computed from it.",
-  "n-rt-1": "Today",
-  "n-rd-1": "Date is today or earlier. Overdue tasks show up here with a chip saying how late they are.",
-  "n-rt-2": "Tomorrow",
-  "n-rd-2": "Date is tomorrow.",
-  "n-rt-3": "Soon",
-  "n-rd-3": "Date is later, or there is no date at all.",
-  "n-rule-note": "There is no overnight rollover. Because the list is derived from the date, it is correct after a night without the app. A swipe commits at about a fifth of the row width, or on a fast release.",
-  "n-more": "How a task moves through the week",
-  "n-dates-h0": "Today is",
-  "n-d-mo": "Mon",
-  "n-d-tu": "Tue",
-  "n-d-we": "Wed",
-  "n-d-th": "Thu",
-  "n-dates-r1": "Task dated Wednesday",
-  "n-dates-late": "Today, 1 day",
-  "n-dates-r2": "Task without a date",
   "n-sec-idea": "The idea",
   "n-fl-1": "Type, tap Go Live",
   "n-fl-3": "Lock Screen",
@@ -3688,24 +3544,11 @@
   "n-fl-reset": "Resets the screen",
   "n-flow-live": "From typing to ticking off",
   "n-sec-live": "One thing in view",
-  "n-sketch-title": "Early sketches of the swipe",
   "n-tag-sketch": "Sketch · placeholder for the scan",
-  "n-sketch-cap": "Today, swipe, Tomorrow, undo bar. The first draft of the gesture on paper.",
   "n-cmp-1": "Windows 95",
   "n-cmp-2": "SkeuKit",
   "n-cmp-cap": "The same view in both builds. The function stayed the same, the interface did not.",
-  "n-ret-title": "Who still opens the app, by days since install",
-  "n-ret-axis": "Days since install",
-  "n-ret-cap": "Same features, different interface. After a week more than twice as many testers still open the SkeuKit build.",
   "n-sec-pivot": "The pivot",
-  "n-r1": "One light",
-  "n-r1t": "A single soft light sits at the top left. Top edges catch light, bottom edges sit in shade, shadows fall downward. Because this holds for every element, height can be read without a label.",
-  "n-r2": "Height is a ladder",
-  "n-r2t": "There are fixed steps and no dial. An element picks a step; there is no \"a bit more shadow\". If an element needs an in-between step, the ladder gets revised.",
-  "n-r3": "Pressing costs height",
-  "n-r3t": "Pressing an element pushes it down: it shrinks slightly, loses its outer shadow and gains an inner one. Every element uses the same spring, so the response reads without thinking.",
-  "n-r4": "Every surface has thickness",
-  "n-r4t": "A surface is made of several layers: gradient, edge light, edge shade and contact shadow. That makes it read as a piece of matte, slightly soft material.",
   "n-s-light": "Light",
   "n-s-surface": "surface",
   "n-s-press": "press",
@@ -3721,9 +3564,9 @@
   "n-sd3t": "The trough groups the options and the bubble sits on the current one. Switching slides the bubble to the next option. Choosing needs no typing.",
   "n-side-title": "Side view: height means action",
   "n-side-intro": "The side view cuts through the three shapes. The surface is the baseline. What sits above it can be operated, what sits below it takes something in.",
-  "n-side-sheet": "Cross-section through the three shapes, light from the top left",
-  "n-sec-rules": "The rules of the design system",
-  "n-rules-sub": "<b class='kw'>What I was thinking.</b> The design system follows four rules. A touchscreen has no pointer to reveal what can be operated. The interface has to show it itself, and height is read fastest: what sticks out can be grabbed, what is sunk in takes something in.",
+  "n-side-sheet": "Cross-section through the three shapes. The light comes from the top left. It is the only one in the whole system and shows every element its height.",
+  "n-sec-rules": "The design system",
+  "n-rules-sub": "<b class='kw'>What I was thinking.</b> A touchscreen has no pointer to reveal what can be operated. The interface has to show it itself, and height is read fastest: what sticks out can be grabbed, what is sunk in takes something in.",
   "n-c3": "Third, an app you want to spend little time in makes time the design variable: every feature has to <b class='kw'>save a step</b>, or it goes.",
   "n-sec-result": "Result and outlook",
   "n-learn": "What I learned",
@@ -3748,24 +3591,6 @@
   "n-fs-3": "Die Aufgabe liegt in Morgen",
   "n-fs-4": "Rückgängig, falls es ein Fehler war",
   "n-flow-swipe": "Eine Aufgabe von Heute auf Morgen",
-  "n-rule-head": "Die Regel dahinter",
-  "n-rule-eq": "Jede Aufgabe trägt ein Datum. Die Liste wird daraus berechnet.",
-  "n-rt-1": "Heute",
-  "n-rd-1": "Datum heute oder früher. Überfällige Aufgaben erscheinen hier mit einem Chip, der zeigt, wie spät sie sind.",
-  "n-rt-2": "Morgen",
-  "n-rd-2": "Datum morgen.",
-  "n-rt-3": "Bald",
-  "n-rd-3": "Datum später, oder gar kein Datum.",
-  "n-rule-note": "Es gibt keinen nächtlichen Rollover. Weil die Liste aus dem Datum entsteht, stimmt sie auch nach einer Nacht ohne App. Ein Wisch gilt ab etwa einem Fünftel der Zeilenbreite oder bei schnellem Loslassen.",
-  "n-more": "So wandert eine Aufgabe durch die Woche",
-  "n-dates-h0": "Heute ist",
-  "n-d-mo": "Mo",
-  "n-d-tu": "Di",
-  "n-d-we": "Mi",
-  "n-d-th": "Do",
-  "n-dates-r1": "Aufgabe mit Datum Mittwoch",
-  "n-dates-late": "Heute, 1 Tag",
-  "n-dates-r2": "Aufgabe ohne Datum",
   "n-sec-idea": "Die Idee",
   "n-fl-1": "Eintippen, Go Live",
   "n-fl-3": "Sperrbildschirm",
@@ -3774,24 +3599,11 @@
   "n-fl-reset": "Setzt den Bildschirm zurück",
   "n-flow-live": "Von der Eingabe bis zum Abhaken",
   "n-sec-live": "Eine Sache im Blick",
-  "n-sketch-title": "Frühe Skizzen der Wischgeste",
   "n-tag-sketch": "Skizze · Platzhalter für den Scan",
-  "n-sketch-cap": "Heute, Wisch, Morgen, Rückgängig-Leiste. Der erste Entwurf der Geste auf Papier.",
   "n-cmp-1": "Windows 95",
   "n-cmp-2": "SkeuKit",
   "n-cmp-cap": "Dieselbe Ansicht in beiden Builds. Die Funktion ist gleich geblieben, die Oberfläche nicht.",
-  "n-ret-title": "Wer die App noch öffnet, nach Tagen seit der Installation",
-  "n-ret-axis": "Tage seit der Installation",
-  "n-ret-cap": "Dieselben Funktionen, andere Oberfläche. Nach einer Woche öffnen mehr als doppelt so viele Tester die SkeuKit-Version noch.",
   "n-sec-pivot": "Der Pivot",
-  "n-r1": "Ein Licht",
-  "n-r1t": "Eine einzige weiche Lichtquelle liegt oben links. Oberkanten fangen Licht, Unterkanten liegen im Schatten, Schatten fallen nach unten. Weil das für jedes Element gilt, lässt sich Höhe ohne Beschriftung lesen.",
-  "n-r2": "Höhe ist eine Leiter",
-  "n-r2t": "Es gibt feste Stufen und keinen Regler. Ein Element wählt eine Stufe, ein bisschen mehr Schatten gibt es nicht. Braucht ein Element eine Zwischenstufe, wird die Leiter überarbeitet.",
-  "n-r3": "Drücken kostet Höhe",
-  "n-r3t": "Wer ein Element drückt, drückt es nach unten: Es schrumpft leicht, verliert den äußeren Schatten und bekommt einen inneren. Jedes Element nutzt dieselbe Feder, damit die Reaktion ohne Nachdenken lesbar ist.",
-  "n-r4": "Jede Fläche hat Dicke",
-  "n-r4t": "Eine Fläche besteht aus mehreren Schichten: Verlauf, Kantenlicht, Kantenschatten und Kontaktschatten. So wirkt sie wie ein Stück mattes, leicht weiches Material.",
   "n-s-light": "Licht",
   "n-s-surface": "Fläche",
   "n-s-press": "drücken",
@@ -3807,9 +3619,9 @@
   "n-sd3t": "Die Mulde fasst die Optionen zusammen, die Blase sitzt auf der aktuellen. Beim Wechsel gleitet die Blase auf die nächste Option. Gewählt wird ohne Tippen.",
   "n-side-title": "Seitenansicht: Höhe bedeutet Handlung",
   "n-side-intro": "Die Seitenansicht zeigt die drei Formen im Schnitt. Die Fläche ist die Grundlinie. Was darüber liegt, lässt sich bedienen, was darunter liegt, nimmt etwas auf.",
-  "n-side-sheet": "Schnitt durch die drei Formen, Licht von oben links",
-  "n-sec-rules": "Die Regeln des Designsystems",
-  "n-rules-sub": "<b class='kw'>Was ich mir dabei gedacht habe.</b> Das Designsystem folgt vier Regeln. Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.",
+  "n-side-sheet": "Schnitt durch die drei Formen. Das Licht kommt von oben links: Es ist das einzige im ganzen System und zeigt jedem Element seine Höhe.",
+  "n-sec-rules": "Das Designsystem",
+  "n-rules-sub": "<b class='kw'>Was ich mir dabei gedacht habe.</b> Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.",
   "n-c3": "Drittens heißt eine App, in der man wenig Zeit verbringen will, dass Zeit die Entwurfsgröße ist: Jede Funktion muss einen <b class='kw'>Schritt sparen</b>, sonst fällt sie heraus.",
   "n-sec-result": "Ergebnis und Ausblick",
   "n-learn": "Was ich gelernt habe",

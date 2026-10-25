@@ -1776,6 +1776,10 @@ sketch and "Beispielwerte" tags on the retention chart stay. The Live-button ico
 are removed (Xcode + Remotion moved into the Skills tile); "SkeuKit" is no longer named in section 5's intro. Open items: see
 `tomorrow-casestudy-plan.md`, "Still open".
 
+**Cuts 2026-10-25 (Lucas):** "Die Regel dahinter" card and its week diagram, the section-4 sketch, the nine-screen Windows strip (now `.win-row`,
+four static screens: windows2/1/4/7), the retention chart, the Schrift-und-Icons orbit block (one closing paragraph `icons-text` is left),
+and the four rules of section 5 (title is now "Das Designsystem"). Their CSS (`.rule-card`, `.rules`, `.ic-*`, `.line-chart`, `.dates`) is inert, not deleted.
+
 Facts used from the app (Appendix A of the plan, dated 2026-09-03, check against the source before shipping):
 three lists as filters over a date, overdue → Today with a chip, no rollover job, swipe commit ≈ a fifth of the
 row width, Dynamic Type to AX5, VoiceOver custom actions, Reduce Motion, 44 pt targets.
