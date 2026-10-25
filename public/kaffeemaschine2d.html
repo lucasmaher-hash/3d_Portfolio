@@ -335,14 +335,12 @@
        (centered), then slides it center→right while the copy fades in.
        The end (pinned) state = machine right + text left. */
     .spin-scrolly {
-      position: relative;
-      height: 240vh;      /* scroll room for a full spin + the slide */
+      position: relative;   /* no pin any more: the machine turns on its own clock (5 s per turn) */
     }
 
     .spin-sticky {
-      position: sticky;
-      top: 0;
-      height: 100vh;
+      position: static;
+      padding: clamp(24px, 4vw, 56px) 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -362,7 +360,7 @@
       top: 50%;
       transform: translateY(-50%);
       width: min(42%, 440px);
-      opacity: 0;                       /* JS fades this in near the end */
+      opacity: 1;
       will-change: opacity, transform;
     }
 
@@ -488,12 +486,7 @@
          so this centres it in the viewport when it fits and simply grows if it doesn't,
          instead of overflowing a hard 100vh box on a short phone. svh (not vh) so the
          mobile browser's collapsing toolbar can't make it jump. */
-      .spin-sticky {
-        position: sticky; top: 0;
-        height: auto;
-        min-height: 100vh;
-        min-height: 100svh;
-      }
+      .spin-sticky { position: static; height: auto; min-height: 0; }
       .spin-stage {
         position: static; width: 100%; height: auto;
         display: flex; flex-direction: column; align-items: center; gap: 18px;
@@ -1317,76 +1310,30 @@
       lastScrollY = y;
     });
 
-    // ── Sticky scroll-spin (design-process render) ────────────────
-    // While the section is pinned, scroll progress p (0→1) drives three
-    // phases: [0 – SPIN_END] the machine spins a full turn, centred;
-    // [SLIDE_START – 1] it slides from centre to its right-hand rest spot;
-    // [TEXT_START – 1] the caption fades in on the left. Frames preloaded.
+    // ── Free-running spin (design-process render) ────────────────
+    // The 56 turntable frames play on their own clock, one full turn every
+    // TURN_MS, whether or not the page is scrolled. Runs only while on screen.
     (function initSpin() {
       const scrolly = document.getElementById('spin-scrolly');
-      const spinEl  = document.getElementById('spin');
       const spinImg = document.getElementById('spin-img');
-      const copy    = document.getElementById('spin-copy');
-      const stage   = scrolly ? scrolly.querySelector('.spin-stage') : null;
-      if (!scrolly || !spinEl || !spinImg || !copy || !stage) return;
+      if (!scrolly || !spinImg) return;
 
-      const COUNT = 56;
+      const COUNT = 56, TURN_MS = 5000;
       const src = i => `/images/cybercoffee/spin/frame_${String(i + 1).padStart(3, '0')}.webp`;
       for (let i = 0; i < COUNT; i++) { const im = new Image(); im.src = src(i); }
 
-      const SPIN_END = 0.55;    // spin completes by 55% of the pinned scroll
-      const SLIDE_START = 0.55; // then slide centre → right
-      const TEXT_START = 0.82;  // caption fades in only near the very end
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-      const smooth = t => t * t * (3 - 2 * t);
-
-      let current = -1, ticking = false;
-      function update() {
-        ticking = false;
-
-        // reduced motion: single static frame, no spin/slide/fade (CSS stacks it)
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          if (current !== 0) { current = 0; spinImg.src = src(0); }
-          spinEl.style.transform = ''; copy.style.opacity = ''; copy.style.transform = '';
-          return;
-        }
-
-        // frame from pinned progress
-        const range = scrolly.offsetHeight - window.innerHeight;
-        const p = clamp(-scrolly.getBoundingClientRect().top / (range > 0 ? range : 1), 0, 1);
-
-        // Small screens keep the pin but skip the slide/fade phases, so the spin gets the
-        // WHOLE pinned range (spinEnd = 1) instead of finishing at SPIN_END and leaving the
-        // remaining 45% of the scroll pinned on a motionless machine.
-        const narrow = window.innerWidth <= 860;
-        const spinEnd = narrow ? 1 : SPIN_END;
-        const idx = Math.min(COUNT - 1, Math.round(clamp(p / spinEnd, 0, 1) * (COUNT - 1)));
+      let raf = 0, t0 = 0, current = -1;
+      function frame(now) {
+        const idx = Math.floor((((now - t0) % TURN_MS) / TURN_MS) * COUNT);
         if (idx !== current) { current = idx; spinImg.src = src(idx); }
-
-        // small screens: stacked layout, no slide/fade (pin itself stays — see CSS)
-        if (narrow) {
-          spinEl.style.transform = '';
-          copy.style.opacity = '';
-          copy.style.transform = '';
-          return;
-        }
-
-        // slide the machine centre → right
-        const slideP = smooth(clamp((p - SLIDE_START) / (1 - SLIDE_START), 0, 1));
-        const centreOffset = (stage.clientWidth - spinEl.offsetWidth) / 2; // machine is right:0
-        const x = -centreOffset * (1 - slideP);
-        spinEl.style.transform = `translate(${x.toFixed(1)}px, -50%)`;
-
-        // caption fades + eases in from the left near the end
-        const textP = clamp((p - TEXT_START) / (1 - TEXT_START), 0, 1);
-        copy.style.opacity = textP.toFixed(3);
-        copy.style.transform = `translateY(-50%) translateX(${(-18 * (1 - textP)).toFixed(1)}px)`;
+        raf = requestAnimationFrame(frame);
       }
-      function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onScroll);
-      update();
+      new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) { if (!raf) { t0 = performance.now(); raf = requestAnimationFrame(frame); } }
+        else { cancelAnimationFrame(raf); raf = 0; }
+      }, { threshold: 0.05 }).observe(scrolly);
     })();
 
     // ── i18n ─────────────────────────────────────────────────────
