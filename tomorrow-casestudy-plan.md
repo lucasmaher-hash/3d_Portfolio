@@ -1,6 +1,6 @@
 # to.morrow — case study upgrade plan
 
-Plan for turning `public/to-shove2d.html` into a full case study. Written 2026-09-18 from an
+Plan for turning `public/to.morrow2d.html` into a full case study. Written 2026-09-18 from an
 interview with Lucas, **rebuilt 2026-10-24** after two reference case studies by Karen-Happuch:
 [Calmsphere](https://karenhappuch.com/calmsphere) and [Asuo](https://karenhappuch.com/asuo)
 (analysed in the vault under `04 Ressourcen/Design Referenzen/Einträge/`). The older structural
@@ -21,7 +21,7 @@ works, the research it was based on, the page structure it set and its list of t
 
 ## Status 2026-10-24: draft built
 
-`public/to-shove2d1.html` (same URL with a `1`, unlinked, noindex) implements §2 to §6 as a first pass. Details
+`public/to.morrow2d1.html` (same URL with a `1`, unlinked, noindex) implements §2 to §6 as a first pass. Details
 and the list of what is mock vs real are in CLAUDE.md, "to.morrow case-study rebuild draft". What Lucas added
 on top of the plan:
 
@@ -570,7 +570,7 @@ stops mattering.
 
 ## Appendix C. The page structure the current page was built from
 
-*From the retired shove.95 plan, 2026-09-03. This is how `to-shove2d.html` is laid out today; §4 of this file is the planned replacement.*
+*From the retired shove.95 plan, 2026-09-03. This is how `to.morrow2d.html` is laid out today; §4 of this file is the planned replacement.*
 
 Eight sections. Roughly 900–1100 words of prose total — every section should be
 cuttable to two paragraphs.

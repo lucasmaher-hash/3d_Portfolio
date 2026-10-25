@@ -2675,7 +2675,7 @@ loadScene(
             'Mac-Lamp': { title: 'Mac-Lamp', url: '/mac-lamp2d.html' },
             'Virtual Cooking': { title: 'Virtual Cooking', url: '/virtual_cooking2d.html' },
             'Cybercoffee': { title: 'Cybercoffee', url: '/kaffeemaschine2d.html' },
-            'to.morrow': { title: 'to.morrow', url: '/to-shove2d.html' },
+            'to.morrow': { title: 'to.morrow', url: '/to.morrow2d.html' },
           }
           const exhibits = []
           gltf.scene.traverse(mesh => { if (mesh.isMesh && mesh.userData.galleryRole === 'project') exhibits.push(mesh) })

@@ -117,7 +117,7 @@ The site accent is **#809BBC** (= oklch(0.68 0.058 254.2), dialled off the to.mo
 255,173,122 → 78,104,138 and 190,208,228) were replaced on every page, the 3D page and the 3D overlays; the
 token keeps its old name **`--accent-orange`**, so grep for that, not for "blue". The nav logo (`logo-lm.png`)
 and the favicons (svg, ico, 32, 180) were recoloured to the same blue. **Deliberately untouched:**
-`unify2d.html`, `unify2d1.html` (pink) and `to-shove2d.html` (its own #7A92B0). Comments elsewhere in this
+`unify2d.html`, `unify2d1.html` (pink) and `to.morrow2d.html` (its own #7A92B0). Comments elsewhere in this
 file that say "orange" describe the old state. The 3D About plaque (`WallIcon_Logo`) was removed too, next
 to the contact one (`removeContactPlaque`). Project order is now 01 Unify, 02 to.morrow, 03 Virtual Cooking,
 04 Cybercoffee, 05 Mac-Lamp, 06 Double Packaging (page map and older notes still show the old order).
@@ -262,7 +262,7 @@ pill, hamburger** use `--shadow-soft` (4px / 8px, phones 2.6px / 5.2px; was 5px 
 | `public/kaffeemaschine2d.html` | Project page — Cybercoffee (03) |
 | `public/mac-lamp2d.html` | Project page — Mac-Lamp (04) |
 | `public/vaccine2d.html` | Project page — Double Packaging (05) |
-| `public/to-shove2d.html` | Project page — morrow (the iOS app). See "morrow page" below. |
+| `public/to.morrow2d.html` | Project page — morrow (the iOS app). See "morrow page" below. |
 | `public/unify2d1.html` | **Unlinked draft** of the Unify case-study rebuild (see below) |
 | `public/top_row_permanent_V3.html` | Nav bar — loaded as an iframe on every 2D page |
 
@@ -937,7 +937,7 @@ NOT mirrored: videos left, text right, matching the live page's own alternation)
   The dev dial that set it is removed; `dev-tuner/save-server.mjs` (generic POST → `dev-tuner/<name>.json`,
   port 5175) stays for the next tuner.
   **The same format is on ALL six project pages** (2026-10-06, Lucas): unify2d, virtual_cooking2d,
-  kaffeemaschine2d, mac-lamp2d, vaccine2d, to-shove2d each carry the same `<head>` screen script and,
+  kaffeemaschine2d, mac-lamp2d, vaccine2d, to.morrow2d each carry the same `<head>` screen script and,
   last in `<style>`, `--page-pad` + `@media (min-width: 1280px) { .page-wrapper > :is(.section,
   .guide-section, .process-section, .hero-top) { padding-inline: var(--page-pad) } .page-wrapper >
   .scrolly .scrolly-sticky { … } }`. Heroes/films/project-nav untouched. Measured: titles at 271
@@ -1729,12 +1729,12 @@ Two things that will bite again:
   `delayRender`), so renders never depend on Google Fonts. Word widths for the map caption's
   "your" slide are Nunito 800 measured at 100 px in Chrome (in `MapScene.tsx`).
 
-## to.morrow case-study rebuild draft (`public/to-shove2d1.html`, 2026-10-24)
+## to.morrow case-study rebuild draft (`public/to.morrow2d1.html`, 2026-10-24)
 
 The rebuild from `tomorrow-casestudy-plan.md`, in a **separate, unlinked file** like the Unify draft
 (`<meta name="robots" content="noindex, nofollow">`; nothing may link to it; the nav recognises it because
-`to-shove2d` is a substring match). It is a copy of `to-shove2d.html` (same head, CSS, scripts, SkeuKit
-components, videos) with the body re-ordered; **the live `to-shove2d.html` is untouched** until Lucas says the
+`to.morrow2d` is a substring match). It is a copy of `to.morrow2d.html` (same head, CSS, scripts, SkeuKit
+components, videos) with the body re-ordered; **the live `to.morrow2d.html` is untouched** until Lucas says the
 draft replaces it. Generated once by a script, so **edit the HTML directly from now on**. New CSS is one
 `<style>` block before the last one (comment "Case-study rebuild"); new copy is in DE + EN through a
 `Object.assign(TRANSLATIONS.en/de, {...})` block (keys `n-…`) before `pick()`, which overrides old keys.
@@ -1780,7 +1780,7 @@ Facts used from the app (Appendix A of the plan, dated 2026-09-03, check against
 three lists as filters over a date, overdue → Today with a chip, no rollover job, swipe commit ≈ a fifth of the
 row width, Dynamic Type to AX5, VoiceOver custom actions, Reduce Motion, 44 pt targets.
 
-## to.morrow page (`public/to-shove2d.html`)
+## to.morrow page (`public/to.morrow2d.html`)
 
 **The project is called `to.morrow`, not `morrow` (2026-09-08).** Every user-visible name
 changed — the `<h1>`, `2D.html`'s landing tile, the Craft dropdown, the two neighbouring
@@ -4209,7 +4209,7 @@ Full record: `scripts/gallery-v06/README.md`; pipeline: `GALLERY-BAKED.md`.
 - **to.morrow** is exhibit 06: a 1.05 m sphere with its button facing the room centre,
   level, hovering 18 cm. Podium 06 follows the podium rule (top Ø = span / 0.85, base
   radius = top radius + 0.48); LED ring 06 and well / diffuser / light 07 are copies of
-  bay 04's. Link: `/to-shove2d.html`. The glass button and the icon are not baked (native PBR).
+  bay 04's. Link: `/to.morrow2d.html`. The glass button and the icon are not baked (native PBR).
 - **Panel lines:** the 8 mm V-grooves were flattened out of the outer wall and the ring
   geometry. They baked as random lines and blots and needed lightmap clean-up. The bake is
   plain plaster now, and the lines are ONLY drawn by `drawWallSeams()` from
