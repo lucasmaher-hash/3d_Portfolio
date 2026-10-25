@@ -33,11 +33,8 @@ const FONT = '"SF Pro Text", -apple-system, "Helvetica Neue", sans-serif';
 
 const Row: React.FC<{t: string; time: string; p: number}> = ({t, time, p: pu}) => {
   const p = clamp01(pu / SPAN);
-  const m0 = clamp01((pu - SPAN * 0.85) / 1.5);                // once seated, the card melts into the panel
-  const m = m0 * m0 * (3 - 2 * m0);
-  // incoming: saturated blue with a lifted shadow; seated: a soft, translucent white card
-  const bg = `rgba(${Math.round(lerp(118, 255, m))},${Math.round(lerp(163, 255, m))},${Math.round(lerp(232, 255, m))},${lerp(1, 0.5, m)})`;
-  const shadow = `0 ${lerp(14, 4, m)}px ${lerp(30, 14, m)}px rgba(40,75,140,${lerp(0.28, 0.07, m)}), inset 0 1px 0 rgba(255,255,255,${lerp(0.35, 0.8, m)})`;
+  const bg = 'linear-gradient(180deg, #d9e7fa, #cadcf6)';   // one card colour from takeoff to landing
+  const shadow = '0 8px 20px rgba(35,70,140,0.14), inset 0 1px 0 rgba(255,255,255,0.7)';
   // Quadratic Bezier with the control point in the lower-left corner (Lucas's curve): the card starts
   // 560px right and 400px below its place, travels left almost level, then bends up and docks moving vertically.
   const u = SLIDE(p);
@@ -45,7 +42,7 @@ const Row: React.FC<{t: string; time: string; p: number}> = ({t, time, p: pu}) =
   return (
     <div style={{height: ROW, padding: '6px 0', boxSizing: 'border-box', opacity: clamp01(p * 2.5), transform: `translate(${x}px, ${y}px)`}}>
       <div style={{height: '100%', background: bg, boxShadow: shadow, borderRadius: 20, display: 'flex', alignItems: 'center', paddingLeft: 30, paddingRight: 30, gap: 22, fontSize: 31, color: INK}}>
-        <i style={{flex: 'none', width: 32, height: 32, borderRadius: '50%', border: `2.5px solid ${m > 0.5 ? 'rgba(23,35,58,0.4)' : 'rgba(255,255,255,0.9)'}`, boxSizing: 'border-box'}} />
+        <i style={{flex: 'none', width: 32, height: 32, borderRadius: '50%', border: '2.5px solid rgba(23,35,58,0.4)', boxSizing: 'border-box'}} />
         <span style={{whiteSpace: 'nowrap'}}>{t}</span>
       </div>
     </div>
@@ -55,7 +52,7 @@ const Row: React.FC<{t: string; time: string; p: number}> = ({t, time, p: pu}) =
 const Shell: React.FC<{children: React.ReactNode}> = ({children}) => (
   <AbsoluteFill
     style={{
-      background: 'radial-gradient(900px 620px at 12% 8%, #e6ebf6 0%, transparent 62%), radial-gradient(900px 700px at 92% 104%, #b7c8e8 0%, transparent 62%), #ced5e3',
+      background: 'radial-gradient(900px 620px at 12% 8%, #dfe6f4 0%, transparent 62%), radial-gradient(900px 700px at 92% 104%, #a9bde2 0%, transparent 62%), #c3cde0',
       fontFamily: FONT, color: INK, overflow: 'hidden',
     }}
   >
@@ -63,7 +60,7 @@ const Shell: React.FC<{children: React.ReactNode}> = ({children}) => (
   </AbsoluteFill>
 );
 
-const PANEL_BG = 'linear-gradient(180deg, #d3e3f9 0%, #bcd3f2 100%)';
+const PANEL_BG = 'linear-gradient(180deg, #b4cdf0 0%, #9dbde8 100%)';
 const PANEL_SHADOW = '0 40px 90px rgba(45,80,150,0.22), 0 2px 0 rgba(255,255,255,0.6) inset';
 
 /* "Today" on the left, a live counter pill on the right */
