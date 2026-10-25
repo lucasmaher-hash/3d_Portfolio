@@ -1,4 +1,4 @@
-/* "Das Problem" motion graphic: 30 tasks glide into a Today list from the right.
+/* "Das Problem" motion graphic: tasks glide into a Today list from the right.
    Plain rounded frame (the page rounds the video's corners), no phone. */
 import React from 'react';
 import {AbsoluteFill, Easing, interpolate, useCurrentFrame} from 'remotion';
@@ -6,12 +6,12 @@ import {AbsoluteFill, Easing, interpolate, useCurrentFrame} from 'remotion';
 export const TODO_W = 1440;
 export const TODO_H = 900;
 const TASKS = [
-  'Mail an Frau Keller', 'Steuerunterlagen sortieren', 'Zahnarzt anrufen', 'Paket abholen', 'Wäsche waschen',
-  'Geschenk für Mama', 'Präsentation fertigstellen', 'Miete überweisen', 'Milch und Brot kaufen', 'Kabel bestellen',
-  'Fahrrad reparieren', 'Buch zurückbringen', 'Flug buchen', 'Stromrechnung prüfen', 'Lisa zurückrufen',
-  'Wohnung putzen', 'Pflanzen gießen', 'Rezept einlösen', 'Fotos drucken', 'Passwort ändern',
-  'Backup machen', 'Termin verschieben', 'Versicherung kündigen', 'Skript lesen', 'Sport einplanen',
-  'Blumen kaufen', 'Mittagessen planen', 'Reisepass verlängern', 'Auto zur Inspektion', 'Zeitung abbestellen',
+  'Email Ms. Keller', 'Sort tax documents', 'Call the dentist', 'Pick up parcel', 'Do laundry',
+  'Gift for Mom', 'Finish presentation', 'Pay rent', 'Buy milk and bread', 'Order cables',
+  'Fix bike', 'Return library book', 'Book flight', 'Check electricity bill', 'Call Lisa back',
+  'Clean apartment', 'Water plants', 'Pick up prescription', 'Print photos', 'Change password',
+  'Back up laptop', 'Reschedule appointment', 'Cancel insurance', 'Read script', 'Plan workout',
+  'Buy flowers', 'Plan lunch', 'Renew passport', 'Car inspection', 'Cancel newspaper',
 ];
 const N = 20;                                        // how many of TASKS are shown
 const SPAN = 2.6;                                    // a card is in flight while the list advances this many rows, so the next one is already on its way
