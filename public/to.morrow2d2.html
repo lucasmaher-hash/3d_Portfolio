@@ -780,8 +780,10 @@
     .rot-phone { width: clamp(126px, 20.33vw, 232px); transform: rotate(calc(var(--rot, 0) * 1deg)); will-change: transform; }
     .rot-phone .phone-shot { position: relative; }
     .rot-phone .phone-shot > video, .rot-phone .phone-frame { width: 100%; height: auto; display: block; }
-    .rot-hole { position: absolute; left: 5.556%; top: 2.44%; width: 88.64%; height: 95.1%; }
-    .rot-blank { background: #c2c7ce; }
+    .rot-phone .phone-frame { position: relative; z-index: 2; }
+    .rot-hole { z-index: 1; position: absolute; left: 5.556%; top: 2.44%; width: 88.64%; height: 95.1%; }
+    .rot-blank { background: #c2c7ce; z-index: 0; }
+    .rot-phone .phone-shot > video { position: relative; z-index: 1; }
     .rot-phone .phone-shot > video { opacity: var(--vid, 1); }
     .rot-land { container-type: size; overflow: hidden; opacity: var(--land, 0); }
     .rot-land img { position: absolute; left: 50%; top: 50%; width: 100cqh; height: 100cqw; max-width: none; transform: translate(-50%, -50%) rotate(90deg); object-fit: cover; }
