@@ -781,11 +781,11 @@
     .rot-btn { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
       display: grid; place-items: center; color: #fff; background: rgba(48, 50, 56, 0.62); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
       box-shadow: 0 4px 14px rgba(40, 40, 90, 0.25);
-      transform: translate(calc(var(--pw) * 1.01 - 44px), calc(var(--pw) * 0.5 + 16px));
-      opacity: var(--tb, 0); pointer-events: none; transition: background 0.2s ease; z-index: 3; }
+      /* Hochformat: right of the phone, bottom-aligned. Querformat: under the phone, right-aligned. --bp (0..1) is the turn's own progress, so it travels with the phone. */
+      transform: translate(calc(var(--pw) * (0.5 + 0.51 * var(--bp, 0)) + 16px - 60px * var(--bp, 0)), calc(var(--pw) * (1.0101 - 0.5101 * var(--bp, 0)) - 44px + 60px * var(--bp, 0)));
+      transition: background 0.2s ease; z-index: 3; }
     .rot-btn svg { width: 26px; height: 26px; }
     .rot-btn:hover { background: rgba(48, 50, 56, 0.8); }
-    .rot-scrolly.is-land .rot-btn { pointer-events: auto; }
     .rot-phone { width: clamp(126px, 20.33vw, 232px); transform: rotate(calc(var(--rot, 0) * 1deg)); will-change: transform; }
     .rot-phone .phone-shot { position: relative; }
     .rot-phone .phone-shot > video, .rot-phone .phone-frame { width: 100%; height: auto; display: block; }
@@ -4489,6 +4489,7 @@
     var st = sec.style;
     st.setProperty('--vid', (1 - ease(seg(t, 0.00, 0.28))).toFixed(4));   // portrait content eases out to the flat screen colour
     st.setProperty('--rot', (-90 * ease(seg(t, 0.28, 0.72))).toFixed(3));  // the blank phone turns, notch to the left
+    st.setProperty('--bp', ease(seg(t, 0.28, 0.72)).toFixed(4));            // rotate button travels with the turn
     st.setProperty('--land', ease(seg(t, 0.72, 1.00)).toFixed(4));         // landscape content eases in
     st.setProperty('--ta', (1 - ease(seg(t, 0.00, 0.22))).toFixed(4));
     st.setProperty('--tb', ease(seg(t, 0.78, 1.00)).toFixed(4));
@@ -4511,13 +4512,11 @@
       if (!lock) { if (p > 0.45) want = 1; else if (p < 0.35) want = 0; }   // hysteresis, so it cannot flicker at the line
     }
     if (!running && want !== t) go(want);
-    sec.classList.toggle('is-land', want === 1 && t > 0.9);
   }
   var btn = document.getElementById('rot-btn');
   if (btn) btn.addEventListener('click', function () {
     if (running) return;                            // never interrupt a turn in progress
     lock = true; want = want ? 0 : 1; go(want);
-    sec.classList.remove('is-land');
   });
   window.addEventListener('scroll', check, { passive: true });
   window.addEventListener('resize', check);
