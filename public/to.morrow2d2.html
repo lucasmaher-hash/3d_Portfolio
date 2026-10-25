@@ -781,8 +781,8 @@
     .rot-btn { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
       display: grid; place-items: center; color: #fff; background: rgba(48, 50, 56, 0.62); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
       box-shadow: 0 4px 14px rgba(40, 40, 90, 0.25);
-      /* Hochformat: right of the phone, bottom-aligned. Querformat: under the phone, right-aligned. --bp (0..1) is the turn's own progress, so it travels with the phone. */
-      transform: translate(calc(var(--pw) * (0.5 + 0.51 * var(--bp, 0)) + 16px - 60px * var(--bp, 0)), calc(var(--pw) * (1.0101 - 0.5101 * var(--bp, 0)) - 44px + 60px * var(--bp, 0)));
+      /* Always beside the phone's bottom-right corner: it rides along with that corner while the phone turns (--bp = the turn's progress, 0..1). */
+      transform: translate(calc(var(--pw) * (0.5 + 0.5101 * var(--bp, 0)) + 16px), calc(var(--pw) * (1.0101 - 0.5101 * var(--bp, 0)) - 44px));
       transition: background 0.2s ease; z-index: 3; }
     .rot-btn svg { width: 26px; height: 26px; }
     .rot-btn:hover { background: rgba(48, 50, 56, 0.8); }
