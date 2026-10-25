@@ -782,6 +782,28 @@
     .fact-src { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); opacity: 0.8; }
     @media (max-width: 640px) { .fact-bar { grid-template-columns: minmax(0, 1fr); gap: 28px; } .fact-label { font-size: 16px; line-height: 1.45; } }
 
+    /* Three screens in one frame, numbered 1 -> 2 -> 3. The duo video holds screens 1 and 2 (one file, so they cannot drift);
+       --P is one phone's width, derived from the band's width so all three stay on one line at every size. */
+    .trio-wrap { --A: clamp(20px, 4cqw, 56px); --P: min(230px, calc((100cqw - var(--A)) / 3.0657)); display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .trio-nums, .trio-shots { display: flex; width: calc(var(--P) * 3.0657 + var(--A)); }
+    .trio-num { position: relative; flex: none; width: var(--P); display: flex; justify-content: center; text-align: center; font-size: clamp(9.5px, 0.6vw + 6.4px, 12.5px); line-height: 1.35; color: var(--text-secondary); }
+    .trio-num:nth-child(1) { margin-right: calc(var(--P) * 0.0657); }
+    .trio-num:nth-child(2) { margin-right: var(--A); }
+    .trio-num b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-weight: 500; font-size: 13px; color: var(--text-primary); box-shadow: var(--shadow-raised-sm); }
+    /* arrow from each badge to the next, in the strip above the phones */
+    .trio-nums:not(.trio-caps) .trio-num:not(:last-child)::after { content: ''; position: absolute; top: 14px; left: calc(50% + 22px); width: calc(var(--P) + var(--g) - 44px); border-top: 1.5px solid var(--text-secondary); }
+    .trio-nums:not(.trio-caps) .trio-num:not(:last-child)::before { content: ''; position: absolute; top: 14px; left: calc(50% + 22px + var(--P) + var(--g) - 44px); width: 7px; height: 7px; border-top: 1.5px solid var(--text-secondary); border-right: 1.5px solid var(--text-secondary); transform: translate(-100%, -50%) rotate(45deg); }
+    .trio-shots { align-items: flex-start; }
+    .trio-duo { flex: none; width: calc(var(--P) / 0.48411); margin-right: var(--A); }
+    .trio-duo .phone-shot { width: 100%; }
+    .trio-duo .phone-frame { height: auto; }
+    .trio-duo .phone-shot > video { width: 100%; height: auto; display: block; min-width: 0; }
+    .trio-ph { flex: none; width: var(--P); min-height: 0; padding: 8px; gap: 6px; font-size: clamp(9px, 0.5vw + 6px, 12px); border-radius: clamp(12px, 3vw, 28px); }
+    .trio-ph strong { font-size: clamp(10px, 0.6vw + 6.5px, 13.5px); }
+    .trio-ph .mock-tag { font-size: clamp(7px, 0.4vw + 4.5px, 10px); padding: 2px 6px; }
+    .trio-caps .trio-num:nth-child(1) { margin-right: calc(var(--P) * 0.0657); }
+    .trio-caps .trio-num:nth-child(2) { margin-right: var(--A); }
+
     /* Full-width, flush-left variant (to.morrow draft, 2026-10-25). */
     .centered-note.note-wide { max-width: none; margin-inline: 0; text-align: left; }
     /* The note introduces the band under it, so it sits close instead of one full list gap away. */
@@ -3033,27 +3055,27 @@
              the only thing separating these rows and both later mobile blocks
              restate .stagger-row, so a stylesheet rule of equal specificity
              placed before them would lose on source order. -->
-        <div class="stagger-row right" style="margin-top: 15px;">
-          <div class="stagger-figure duo">
-            <!-- Both phones are ONE file, not two <video> elements side by
-                 side: the right-hand screen has to stay exactly 5.24s behind
-                 the left, and two independently looping videos drift apart
-                 within a few cycles. Baked together, the offset can never
-                 slip. -->
-            <div class="phone-shot phone-shot--duo">
+        <div class="centered-note note-wide">
+          <h3 class="feature-title" data-i18n="f1b-title">Ein Feld, ein Schalter</h3>
+          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f1b-text">Du tippst die Aufgabe ein und schließt die Tastatur — mehr passiert nicht: Die Anzeige erscheint <b class="kw">von selbst</b>. Der Live-Knopf darunter schaltet sie ab und wieder an, ohne den Text zu löschen.</p>
+        </div>
+        <div class="flow-band trio-band" style="margin-top: calc(clamp(24px, 3vw, 40px) - clamp(56px, 8vw, 120px));">
+          <div class="band-head"><p class="band-title">Vom Eingabefeld zur Dynamic Island</p></div>
+          <div class="trio-wrap">
+            <div class="trio-nums" aria-hidden="true"><span class="trio-num" style="--g: calc(var(--P) * 0.0657);"><b>1</b></span><span class="trio-num" style="--g: var(--A);"><b>2</b></span><span class="trio-num"><b>3</b></span></div>
+            <div class="trio-shots">
+              <div class="trio-duo"><div class="phone-shot phone-shot--duo">
               <video autoplay loop muted playsinline data-loop-end="13.3" width="1636" height="1600" aria-label="Links wird in to.morrow eine Aufgabe als Live Activity aktiviert, rechts erscheint sie daraufhin auf dem Sperrbildschirm">
                 <source src="/videos/to.morrow/live-pair.mp4" type="video/mp4" />
               </video>
               <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
               <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
+            </div></div>
+              <div class="ph2 ph2--phone trio-ph"><div><span class="mock-tag">Platzhalter</span></div><strong>Neu aufnehmen</strong><p>Abhaken direkt in der Dynamic Island, mit dem neuen iPhone.</p></div>
             </div>
-          </div>
-          <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="f1b-title">Ein Feld, ein Schalter</h3>
-            <p class="stagger-copy" data-i18n-html="f1b-text">Du tippst die Aufgabe ein und schließt die Tastatur — mehr passiert nicht: Die Anzeige erscheint <b class="kw">von selbst</b>. Der Live-Knopf darunter schaltet sie ab und wieder an, ohne den Text zu löschen.</p>
+            <div class="trio-nums trio-caps"><span class="trio-num" style="--g: calc(var(--P) * 0.0657);">Eintippen, Live schalten</span><span class="trio-num"><span class="trio-cap-wide">Sperrbildschirm</span></span><span class="trio-num">Dynamic Island</span></div>
           </div>
         </div>
-        <div class="ph2 ph2--wide"><div><span class="mock-tag">Platzhalter</span></div><strong>Neu aufnehmen: abhaken in der Dynamic Island</strong><p>Die zwei Clips darüber mit dem neuen iPhone mit Dynamic Island neu drehen. Die Aufgabe wird direkt in der Dynamic Island abgehakt. Ersetzt den Clip mit dem Sperrbildschirm.</p></div>
 
 
       </div>
