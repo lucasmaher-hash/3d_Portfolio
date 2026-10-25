@@ -786,7 +786,15 @@
     .tap-card { align-items: center; }
     @media (min-width: 861px) { .taps-wrap { max-width: 66.67%; } }
     @media (max-width: 640px) { .taps-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    .big-statement { margin: clamp(40px, 7vw, 96px) 0; font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-weight: 400; font-size: clamp(26px, 5.2vw, 72px); line-height: 1.1; letter-spacing: -0.02em; -webkit-text-stroke: 0.04em currentColor; color: var(--text-primary); }
+    /* Bracket under the three quotes (grey), a stem down from its middle, and the statement centred under it. */
+    .win-quotes::after { content: ''; grid-column: 1 / -1; justify-self: center; width: 66.667%; height: 84px; margin-top: 4px; --g: #8e8e93;
+      background:
+        linear-gradient(var(--g), var(--g)) 0 0 / 4px 40px no-repeat,
+        linear-gradient(var(--g), var(--g)) 100% 0 / 4px 40px no-repeat,
+        linear-gradient(var(--g), var(--g)) 0 36px / 100% 4px no-repeat,
+        linear-gradient(var(--g), var(--g)) 50% 36px / 4px 48px no-repeat; }
+    .big-statement { text-align: center; margin: 0 0 clamp(40px, 7vw, 96px); font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-weight: 400; font-size: clamp(20px, 3.4vw, 48px); line-height: 1.1; letter-spacing: -0.02em; -webkit-text-stroke: 0.04em currentColor; color: var(--text-primary); }
+    @media (max-width: 640px) { .win-quotes::after { display: none; } }
     .win-frame { background: #000080; box-shadow: none; }
     .win-cell { display: flex; justify-content: center; padding: clamp(14px, 3vw, 40px) clamp(8px, 2vw, 28px); }
     .win-cell img { width: min(78%, 234px); height: auto; display: block; filter: drop-shadow(0 10px 16px rgba(40, 40, 90, 0.22)); }
