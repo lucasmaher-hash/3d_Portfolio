@@ -24,14 +24,14 @@ const MID = VIEW * 0.5;
 const SLIDE = Easing.bezier(0.3, 0.55, 0.25, 1);     // long, soft landing along the curve
 const FILL = Easing.bezier(0.45, 0, 0.55, 1);        // gentle in/out for the arrival pace
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-const PAGE = '#cdd0d9', PANEL = '#dbe9fb', CARD = '#a3c3ec';
+const PAGE = '#cdd0d9', PANEL = '#c5daf5', CARD = '#a3c3ec';
 const HEADT = 120;                                   // "Today" heading inside the zoom version's panel
 const mix = (a: number[], b: number[], t: number) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',')})`;
 
 const Row: React.FC<{t: string; p: number}> = ({t, p: pu}) => {
   const p = clamp01(pu);
   const m = clamp01((pu - 0.85) / 1.5);                // once seated, the card melts into the panel colour
-  const bg = mix([163, 195, 236], [219, 233, 251], m * m * (3 - 2 * m));
+  const bg = mix([140, 178, 230], [197, 218, 245], m * m * (3 - 2 * m));
   // Quadratic Bezier (the envelope curve of the string-art picture): starts 300px below and 620px right,
   // rises vertically, bends through the corner at (620, 0) and docks moving horizontally.
   const u = SLIDE(p);
@@ -74,7 +74,6 @@ export const TodoDemo: React.FC = () => {
           {TASKS.slice(0, N).map((t, i) => <Row key={i} t={t} p={count - i} />)}
         </div>
       </div>
-      <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, width: COL + 60, top: TODO_H - 110, height: 110, background: `linear-gradient(transparent, ${PAGE})`}} />
     </Shell>
   );
 };
@@ -88,7 +87,9 @@ export const TodoDemoZoom: React.FC = () => {
   const listH = HEADT + ROW * Math.max(count, 2.2) + PADV * 2;     // grown height, at least a couple of rows
   const top = 40;
   const sc = Math.min(1.9, (TODO_H - top - 40) / listH);
-  const panelH = HEADT + ROW * count + PADV * 2;
+  const content = HEADT + ROW * count + PADV * 2;
+  const reach = (TODO_H - top) / sc + 120 * (1 - clamp01(count / N));   // starts past the bottom edge, ends flush with the content
+  const panelH = Math.max(content, reach);
   return (
     <Shell>
       <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, top, width: COL + 60, transformOrigin: '50% 0', transform: `scale(${sc})`, opacity: out}}>
