@@ -2634,30 +2634,47 @@
     .band-head, .chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px 12px; flex-wrap: wrap; }
     .band-head > :first-child, .chart-head > :first-child { flex: 1 1 200px; }
 
-    /* ── Flow rows: wireframe phones on a pressed grey band ── */
+    /* ── Flow rows: wireframe phones on a pressed grey band ──
+       Always ONE line of four at every width: the band is a size container and
+       every length below is derived from its inner width, so the phones scale
+       down instead of wrapping into the section underneath. */
     .flow-band {
+      container-type: inline-size;
       display: flex; flex-direction: column; gap: clamp(16px, 2.4vw, 24px);
-      padding: clamp(18px, 3vw, 32px); border-radius: 20px;
+      padding: clamp(14px, 3vw, 32px); border-radius: 20px;
       background: rgba(0, 0, 0, 0.03); box-shadow: var(--shadow-pressed);
     }
     .band-title { font-size: 14.4px; line-height: 1.4; font-weight: 500; color: var(--text-primary); }
-    .flow-row { display: flex; align-items: flex-start; justify-content: center; gap: clamp(6px, 1vw, 12px); flex-wrap: wrap; }
-    .wf-fig { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 0; text-align: center; }
-    .wf-fig figcaption { font-size: 12.5px; line-height: 1.4; color: var(--text-secondary); max-width: 15ch; }
-    .flow-arrow { align-self: flex-start; margin-top: calc(clamp(88px, 9.2vw, 120px) * 1.055 - 6px); color: var(--text-tertiary); flex: none; }
-    .flow-arrow svg { display: block; width: 22px; height: 12px; }
-    @media (max-width: 900px) { .flow-arrow { display: none; } }
-    @media (max-width: 640px) {
-      .flow-arrow { display: none; }
-      .flow-row { gap: 18px 10px; }
-      .flow-row .wf-fig { flex: 0 0 calc(33.3% - 8px); }
-      .flow-row .wf { width: min(100%, 112px); }
+    .flow-row, .flow-loop {
+      --arrow: clamp(8px, 2.4cqw, 22px);
+      --gap: clamp(3px, 1cqw, 12px);
+      --fig-w: min(146px, calc((100cqw - 3 * var(--arrow) - 6 * var(--gap)) / 4));
+      --wf-w: calc(var(--fig-w) * 0.82);
     }
+    .flow-row { display: flex; flex-wrap: nowrap; align-items: flex-start; justify-content: center; gap: var(--gap); }
+    .wf-fig { flex: none; width: var(--fig-w); display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 0; text-align: center; }
+    .wf-fig figcaption { width: calc(100% + 2 * var(--gap) + var(--arrow)); margin-inline: calc(-1 * (var(--gap) + var(--arrow) / 2)); font-size: clamp(9.5px, 0.6vw + 6.4px, 12.5px); line-height: 1.35; color: var(--text-secondary); }
+    .flow-arrow { flex: none; width: var(--arrow); align-self: flex-start; margin-top: calc(var(--wf-w) * 1.055 - 6px); color: var(--text-secondary); }
+    .flow-arrow svg { display: block; width: 100%; height: auto; }
+    /* The arrow that leaves the circled Go Live pill sits at the pill's height (80.5% of the phone width from its top). */
+    .flow-arrow.is-go { margin-top: calc(var(--wf-w) * 0.805 - 6px); }
+    /* Return path under the last frame: down from frame 4, along, up into frame 1. */
+    .flow-loop {
+      position: relative; height: clamp(16px, 3.4cqw, 28px); margin-bottom: 22px;
+      margin-inline: calc((100cqw - 4 * var(--fig-w) - 3 * var(--arrow) - 6 * var(--gap)) / 2 + var(--fig-w) / 2);
+      border: 1.5px solid var(--text-secondary); border-top: 0; border-radius: 0 0 14px 14px;
+    }
+    .flow-loop::before {
+      content: ''; position: absolute; left: 0; top: 0; width: 7px; height: 7px;
+      border-left: 1.5px solid var(--text-secondary); border-top: 1.5px solid var(--text-secondary);
+      transform: translate(-50%, -2px) rotate(45deg);
+    }
+    .flow-loop span { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: clamp(9.5px, 0.6vw + 6.4px, 12.5px); color: var(--text-secondary); }
 
     /* The wireframe phone. .wf is only the sized container; every length inside
        it (padding and radius included) is in cqw, which resolves against a
        container's ANCESTOR, so the styled screen is its child. */
-    .wf { container-type: inline-size; position: relative; width: clamp(88px, 9.2vw, 120px); aspect-ratio: 9 / 19; flex: none; }
+    .wf { container-type: inline-size; position: relative; width: var(--wf-w); aspect-ratio: 9 / 19; flex: none; }
     .wf-s {
       --ink: rgba(26, 26, 26, 0.55);
       position: absolute; inset: 0; padding: 15cqw 8cqw 6cqw; display: flex; flex-direction: column; gap: 6cqw;
@@ -2688,6 +2705,7 @@
     .wf-box b.s { width: 60%; }
     .wf-pill { align-self: center; width: 36cqw; height: 9cqw; border-radius: 99px; border: 1.5px solid var(--ink); }
     .wf-pill.on { background: var(--accent-orange); border-color: var(--accent-orange); }
+    .wf-pill.is-ringed { outline: 1.6px solid var(--accent-orange); outline-offset: 2.4cqw; }
     .wf.lock .wf-s { background: linear-gradient(#e9e9ee, #d5d5de); }
     .wf-time { height: 14cqw; width: 58cqw; margin: 4cqw auto 0; border-radius: 3cqw; background: rgba(26, 26, 26, 0.3); }
     .wf-card { display: flex; align-items: center; gap: 4cqw; padding: 4cqw; border-radius: 4cqw; background: rgba(26, 26, 26, 0.78); }
@@ -2718,6 +2736,7 @@
     .bar.is-us { color: var(--text-primary); font-weight: 500; }
     .bar.is-us .bar-track i { background: var(--accent-orange); }
     .bar-val { text-align: right; font-variant-numeric: tabular-nums; }
+    @media (min-width: 861px) { .chart--taps { max-width: 66.67%; } .chart--taps .bar { grid-template-columns: minmax(78px, 120px) minmax(0, 1fr) 64px; } }
     @media (max-width: 640px) { .bar { grid-template-columns: minmax(70px, 96px) minmax(0, 1fr) 84px; gap: 8px; font-size: 12.5px; } }
     .line-chart { width: 100%; height: auto; display: block; }
     .line-chart text { font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size: 11px; fill: var(--text-secondary); font-size-adjust: none; }
@@ -2875,13 +2894,8 @@
                alt="Im App Store laden" />
         </a>
       </div>
-      <h2 class="section-title" data-i18n="n-ov-title">Projektüberblick</h2>
-      <div class="ov">
-        <p data-i18n-html="n-ov-1"><b>Was ist to.morrow?</b> Eine iOS-App mit drei Listen, Heute, Morgen und Bald, in der das Verschieben einer Aufgabe auf einen anderen Tag eine einzige Wischgeste ist.</p>
-<p data-i18n-html="n-ov-2"><b>Das Problem:</b> Wer sich zu viel vornimmt, füllt die Heute-Liste über das Machbare hinaus. Verschieben kostet in anderen Apps mehrere Schritte, also bleibt alles liegen, und die Liste stimmt am Vormittag nicht mehr.</p>
-<p data-i18n-html="n-ov-4"><b>Was ich gestaltet habe:</b> Das Drei-Listen-Modell mit der Wischgeste, die Live-Aufgabe auf Sperrbildschirm und Dynamic Island, ein Designsystem aus drei Formen, Workspaces und Themes.</p>
-<p data-i18n-html="n-ov-5"><b>Ergebnis:</b> Im App Store verfügbar. Die erste Version wurde nach dem Feedback aus TestFlight vollständig ersetzt. Nutzungszahlen stehen im Abschnitt Ergebnis.</p>
-      </div>
+      <h2 class="section-title" data-i18n="section-glance">Auf einen Blick</h2>
+      <p class="glance-lead" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n="n-ov-lead">to.morrow ist eine iOS-App mit drei Listen: Heute, Morgen, Bald. Eine Aufgabe zu verschieben ist eine einzige Wischgeste, und die eine Sache, die du nicht vergessen darfst, bleibt auf Sperrbildschirm und Dynamic Island sichtbar.</p>
     </div>
     <!-- Meta grid — same position as every other project page: directly
          under At a Glance. -->
@@ -2901,7 +2915,7 @@
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-skills">Skills</div>
-          <div class="meta-inset" data-i18n-html="val-skills">SwiftUI<br>SwiftData + CloudKit<br>Design-System</div>
+          <div class="meta-inset" data-i18n-html="val-skills">SwiftUI, Xcode<br>SwiftData + CloudKit<br>Design-System, Remotion</div>
         </div>
       </div>
     </div>
@@ -2916,18 +2930,16 @@
       <p class="guide-text" data-i18n-html="problem-1">Eine To-do-App ist die App, in der man am wenigsten Zeit verbringen will. Sie soll nicht unterhalten, sondern den Kopf freiräumen und wieder verschwinden. Damit ist <b class="kw">Bediengeschwindigkeit</b> hier keine Politur, sondern das eigentliche Produkt.</p>
       <p class="guide-text" data-i18n-html="n-problem-user">Die Zielgruppe sind <b class='kw'>Menschen, die sich zu viel vornehmen</b>. Ihre Heute-Liste ist am Morgen länger, als der Tag zulässt, und was nicht geschafft wird, müsste verschoben werden.</p>
       <p class="guide-text" data-i18n-html="problem-2">Jede To-do-App macht das Anlegen leicht. Beim Verschieben hört das auf: öffnen, Datumsauswahl suchen, Datum wählen, speichern — <b class="kw">vier Schritte für eine Entscheidung</b>, die im Kopf längst gefallen ist. Also verschiebt niemand, und die Heute-Liste stimmt schon am Vormittag nicht mehr.</p>
-            <figure class="chart" style="margin:0;">
+            <figure class="chart chart--taps" style="margin:0;">
         <div class="chart-head">
-          <p class="chart-title" data-i18n="n-taps-title">Eine Aufgabe auf morgen verschieben: Schritte und Zeit</p>
-          <span class="mock-tag" data-i18n="n-tag-ex">Beispielwerte</span>
+          <p class="chart-title" data-i18n="n-taps-title">Eine Aufgabe auf morgen verschieben: Schritte</p>
         </div>
         <div class="bars">
-          <div class="bar "><span>Reminders</span><span class="bar-track"><i style="--v:100"></i></span><span class="bar-val" data-i18n="n-taps-1">5 Taps · 6,8 s</span></div>
-          <div class="bar "><span>Things</span><span class="bar-track"><i style="--v:80"></i></span><span class="bar-val" data-i18n="n-taps-2">4 Taps · 5,1 s</span></div>
-          <div class="bar "><span>Todoist</span><span class="bar-track"><i style="--v:60"></i></span><span class="bar-val" data-i18n="n-taps-3">3 Taps · 3,9 s</span></div>
-          <div class="bar is-us"><span>to.morrow</span><span class="bar-track"><i style="--v:20"></i></span><span class="bar-val" data-i18n="n-taps-4">1 Wisch · 0,9 s</span></div>
+          <div class="bar "><span>Reminders</span><span class="bar-track"><i style="--v:100"></i></span><span class="bar-val" data-i18n="n-taps-1">5 Taps</span></div>
+          <div class="bar "><span>Things</span><span class="bar-track"><i style="--v:80"></i></span><span class="bar-val" data-i18n="n-taps-2">4 Taps</span></div>
+          <div class="bar "><span>Todoist</span><span class="bar-track"><i style="--v:60"></i></span><span class="bar-val" data-i18n="n-taps-3">3 Taps</span></div>
+          <div class="bar is-us"><span>to.morrow</span><span class="bar-track"><i style="--v:20"></i></span><span class="bar-val" data-i18n="n-taps-4">1 Wisch</span></div>
         </div>
-        <figcaption class="chart-note" data-i18n="n-taps-cap">Dieselbe Aufgabe, vier Apps. to.morrow braucht einen Schritt, die anderen drei bis fünf.</figcaption>
       </figure>
     </div>
     <!-- ══ 2. Die Idee ═══════════════════════════════════════════════ -->
@@ -2945,7 +2957,7 @@
 
 
         <div class="flow-band">
-          <div class="band-head"><p class="band-title" data-i18n="n-flow-swipe">Eine Aufgabe von Heute auf Morgen</p><span class="mock-tag" data-i18n="n-tag-mock">Mockup</span></div>
+          <div class="band-head"><p class="band-title" data-i18n="n-flow-swipe">Eine Aufgabe von Heute auf Morgen</p></div>
           <div class="flow-row"><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-title"></div><div class="wf-row"><i></i><b></b></div><div class="wf-row"><i></i><b></b></div><div class="wf-row"><i></i><b></b></div><div class="wf-sp"></div><div class="wf-tabs"><span class=on></span><span></span><span></span></div></div></div><figcaption data-i18n="n-fs-1">Heute: drei Aufgaben</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-title"></div><div class="wf-row"><i></i><b></b></div><div class="wf-swipe"><span class="wf-swipe-bg">→</span><div class="wf-row"><i></i><b></b></div></div><div class="wf-row"><i></i><b></b></div><div class="wf-sp"></div><div class="wf-tabs"><span class=on></span><span></span><span></span></div></div></div><figcaption data-i18n="n-fs-2">Wisch nach rechts</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-title"></div><div class="wf-row is-new"><i></i><b></b></div><div class="wf-row"><i></i><b></b></div><div class="wf-sp"></div><div class="wf-tabs"><span></span><span class=on></span><span></span></div></div></div><figcaption data-i18n="n-fs-3">Die Aufgabe liegt in Morgen</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-title"></div><div class="wf-row"><i></i><b></b></div><div class="wf-row"><i></i><b></b></div><div class="wf-sp"></div><div class="wf-undo"><b></b><u></u></div><div class="wf-tabs"><span></span><span class=on></span><span></span></div></div></div><figcaption data-i18n="n-fs-4">Rückgängig, falls es ein Fehler war</figcaption></figure></div>
         </div>
         <div class="stagger-row">
@@ -2996,37 +3008,14 @@
       <div class="dot-divider"></div>
       <div class="stagger-list">
         <div class="flow-band">
-          <div class="band-head"><p class="band-title" data-i18n="n-flow-live">Von der Eingabe bis zum Abhaken</p><span class="mock-tag" data-i18n="n-tag-mock">Mockup</span></div>
-          <div class="flow-row"><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-title"></div><div class="wf-box"><b></b><b class="s"></b></div><div class="wf-pill"></div><div class="wf-sp"></div><div class="wf-tabs"><span class=on></span><span></span><span></span></div></div></div><figcaption data-i18n="n-fl-1">Aufgabe eintippen</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-title"></div><div class="wf-box"><b></b><b class="s"></b></div><div class="wf-pill on"></div><div class="wf-sp"></div><div class="wf-tabs"><span class=on></span><span></span><span></span></div></div></div><figcaption data-i18n="n-fl-2">Go Live</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf lock" aria-hidden="true"><div class="wf-s"><div class="wf-time"></div><div class="wf-sp"></div><div class="wf-card"><i></i><b></b></div></div></div><figcaption data-i18n="n-fl-3">Sperrbildschirm</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf is-island" aria-hidden="true"><div class="wf-s"><span class="wf-island-in"><i></i><b></b></span><div class="wf-home"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div><figcaption data-i18n="n-fl-4">Dynamic Island</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf lock" aria-hidden="true"><div class="wf-s"><div class="wf-time"></div><div class="wf-sp"></div><div class="wf-card is-faded"><i class="on"></i><b></b></div></div></div><figcaption data-i18n="n-fl-5">Abhaken</figcaption></figure></div>
+          <div class="band-head"><p class="band-title" data-i18n="n-flow-live">Von der Eingabe bis zum Abhaken</p></div>
+          <div class="flow-row"><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-title"></div><div class="wf-box"><b></b><b></b><b></b><b></b><b class="s"></b></div><div class="wf-pill on is-ringed"></div><div class="wf-sp"></div><div class="wf-tabs"><span class=on></span><span></span><span></span></div></div></div><figcaption data-i18n="n-fl-1">Eintippen, Go Live</figcaption></figure><span class="flow-arrow is-go" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf lock" aria-hidden="true"><div class="wf-s"><div class="wf-time"></div><div class="wf-sp"></div><div class="wf-card"><i></i><b></b></div></div></div><figcaption data-i18n="n-fl-3">Sperrbildschirm</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf is-island" aria-hidden="true"><div class="wf-s"><span class="wf-island-in"><i></i><b></b></span><div class="wf-home"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div><figcaption data-i18n="n-fl-4">Dynamic Island</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf lock" aria-hidden="true"><div class="wf-s"><div class="wf-time"></div><div class="wf-sp"></div><div class="wf-card is-faded"><i class="on"></i><b></b></div></div></div><figcaption data-i18n="n-fl-5">Abhaken</figcaption></figure></div>
+          <div class="flow-loop" aria-hidden="true"><span data-i18n="n-fl-reset">Zurück zum Anfang</span></div>
         </div>
-        <!-- 2.1 Live-Benachrichtigungen: pulsing mark left, copy right -->
-        <div class="stagger-row">
-          <div class="stagger-figure">
-            <!-- CSS stand-in for the real Live mark; three spans = two
-                 the app's Live button, rebuilt layer for layer from
-                 shove95-live-button.md (see .live in the stylesheet). -->
-            <!-- role="img", not <button>: on this page the control is an
-                 illustration of the app's Live button, and a focusable
-                 control that does nothing would be worse for keyboard and
-                 screen-reader users than an image that says what it is. -->
-            <div class="live" role="img" aria-selected="true" data-onair="true"
-                 aria-label="Der Live-Knopf aus to.morrow: ausgewählt und auf Sendung">
-              <span class="live__bloom"></span>
-              <span class="live__trough"></span>
-              <span class="live__contour"></span>
-              <span class="live__glass">
-                <span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span>
-                <span class="live__relief"></span>
-                <span class="live__glow"></span>
-                <span class="live__rim"></span>
-              </span>
-              <span class="live__mark"></span>
-            </div>
-          </div>
-          <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="f1-title">Live-Benachrichtigungen</h3>
-            <p class="stagger-copy" data-i18n-html="f1-text">Live hat ein <b class="kw">einziges großes Eingabefeld</b> statt einer Liste — genau eine Aufgabe, und keine zweite daneben. Was darin steht, bleibt sichtbar, wo du ohnehin hinschaust: Sperrbildschirm, Dynamic Island, Homescreen. Die Beschränkung ist der Punkt — <b class="kw">eine Sache zur Zeit</b>.</p>
-          </div>
+        <!-- 2.1 Live-Benachrichtigungen: centred note, as in section 2 (the Live-button illustration was removed 2026-10-25) -->
+        <div class="centered-note">
+          <h3 class="feature-title" data-i18n="f1-title">Live-Benachrichtigungen</h3>
+          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f1-text">Live hat ein <b class="kw">einziges großes Eingabefeld</b> statt einer Liste — genau eine Aufgabe, und keine zweite daneben. Was darin steht, bleibt sichtbar, wo du ohnehin hinschaust: Sperrbildschirm, Dynamic Island, Homescreen. Die Beschränkung ist der Punkt — <b class="kw">eine Sache zur Zeit</b>.</p>
         </div>
 
         <!-- 2.1b the same feature in the app: copy left, two screens right.
@@ -3137,7 +3126,7 @@
         </svg>
         <figcaption class="chart-note" data-i18n="n-ret-cap">Dieselben Funktionen, andere Oberfläche. Nach einer Woche öffnen mehr als doppelt so viele Tester die SkeuKit-Version noch.</figcaption>
       </figure>
-      <p class="guide-text media-copy" data-i18n-html="pivot-3">Also habe ich sie gestrichen. An ihre Stelle kam <b class="kw">SkeuKit</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
+      <p class="guide-text media-copy" data-i18n-html="pivot-3">Also habe ich sie gestrichen. An ihre Stelle kam <b class="kw">SkeuKit</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
       <!-- A labelled bubble stands still on each side; the icons expand out
            from behind it. The bubble carries its own face — W95FA on the
            left, the system face on the right — so the two type systems are
@@ -3199,7 +3188,7 @@
         <span class="step-badge">5</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n-html="n-rules-sub"><b class='kw'>Was ich mir dabei gedacht habe.</b> Das Designsystem heißt SkeuKit und folgt vier Regeln. Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.</p>
+      <p class="guide-text" data-i18n-html="n-rules-sub"><b class='kw'>Was ich mir dabei gedacht habe.</b> Das Designsystem folgt vier Regeln. Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.</p>
       <div class="rules">
         <div class="rule"><span class="rule-n">1</span><div><h4 data-i18n="n-r1">Ein Licht</h4><p data-i18n="n-r1t">Eine einzige weiche Lichtquelle liegt oben links. Oberkanten fangen Licht, Unterkanten liegen im Schatten, Schatten fallen nach unten. Weil das für jedes Element gilt, lässt sich Höhe ohne Beschriftung lesen.</p></div></div>
 <div class="rule"><span class="rule-n">2</span><div><h4 data-i18n="n-r2">Höhe ist eine Leiter</h4><p data-i18n="n-r2t">Es gibt feste Stufen und keinen Regler. Ein Element wählt eine Stufe, ein bisschen mehr Schatten gibt es nicht. Braucht ein Element eine Zwischenstufe, wird die Leiter überarbeitet.</p></div></div>
@@ -3391,8 +3380,6 @@
         <li data-i18n-html="n-next-2"><b class='kw'>Desktop-Version</b> mit Tastatur und Platz für eine Wochenansicht.</li>
         <li data-i18n="n-next-3">Die App-Store-Rezensionen auswerten und die häufigsten Wünsche einplanen.</li>
       </ul>
-      <h3 class="feature-title cs-h3" data-i18n="n-tools">Werkzeuge</h3>
-      <div class="tools"><span>Xcode</span><span>SwiftUI</span><span>SwiftData + CloudKit</span><span>Remotion</span></div>
     </div>
     <!-- The app is live, so the badge is a real link now. Apple's guidelines
          forbid altering the artwork, so it is only scaled; the bounce lives on
@@ -3565,7 +3552,7 @@
         'label-team': 'Team',
         'val-team': 'Solo',
         'label-skills': 'Skills',
-        'val-skills': 'SwiftUI<br>SwiftData + CloudKit<br>Design system',
+        'val-skills': 'SwiftUI, Xcode<br>SwiftData + CloudKit<br>Design system, Remotion',
         'glance-lead': "Adding a task is easy in any app. Moving it takes work, so whatever is on the list tends to stay there. to.morrow makes rescheduling a single swipe, and keeps the one thing you must not forget on your lock and home screen.",
         'problem-1': "A to-do app is the app you want to spend the least time in. It should clear your head and then get out of the way, so here <b class=\"kw\">speed of use</b> is the product itself.",
         'problem-2': "Every to-do app makes adding easy. Moving is where that stops: open it, find the date picker, pick a date, save. That's <b class=\"kw\">four steps for a decision</b> you made long ago, so nobody moves anything, and by mid-morning the Today list is already wrong.",
@@ -3610,7 +3597,7 @@
         'val-timeline': "Seit August 2026",
         'val-role': 'Konzept, Design,<br>Design-System,<br>Umsetzung',
         'val-team': 'Solo',
-        'val-skills': 'SwiftUI<br>SwiftData + CloudKit<br>Design-System',
+        'val-skills': 'SwiftUI, Xcode<br>SwiftData + CloudKit<br>Design-System, Remotion',
 
         'section-problem': "Das Problem",
         'problem-1': "Eine To-do-App ist die App, in der man am wenigsten Zeit verbringen will. Sie soll den Kopf freiräumen und dann aus dem Weg gehen. Deshalb ist die <b class=\"kw\">Bediengeschwindigkeit</b> hier das eigentliche Produkt.",
@@ -3656,18 +3643,13 @@
     };
     Object.assign(TRANSLATIONS.en, {
   "n-a11y-short": "<b class='kw'>Accessibility</b> is part of the system: text scales with Dynamic Type up to AX5 while controls grow at half the rate. Every row offers VoiceOver actions for edit, reorder and photos, Reduce Motion stops every looping animation, and all touch targets are at least 44 pt.",
-  "n-ov-1": "<b>What is to.morrow?</b> An iOS app with three lists, Today, Tomorrow and Soon, where moving a task to another day is a single swipe.",
-  "n-ov-2": "<b>The problem:</b> People who over-plan fill the Today list past what is doable. Moving a task takes several steps in other apps, so everything stays put and the list is wrong by mid-morning.",
-  "n-ov-4": "<b>What I designed:</b> The three-list model with the swipe, the Live task on the Lock Screen and in the Dynamic Island, a design system built from three shapes, workspaces and themes.",
-  "n-ov-5": "<b>Outcome:</b> Available on the App Store. The first version was replaced entirely after TestFlight feedback. Usage figures are in the Result section.",
-  "n-ov-title": "Project overview",
-  "n-taps-title": "Moving one task to tomorrow: steps and time",
+  "n-ov-lead": "to.morrow is an iOS app with three lists: Today, Tomorrow, Soon. Moving a task is a single swipe, and the one thing you must not forget stays visible on the Lock Screen and in the Dynamic Island.",
+  "n-taps-title": "Moving one task to tomorrow: steps",
   "n-tag-ex": "Example values",
-  "n-taps-1": "5 taps · 6.8 s",
-  "n-taps-2": "4 taps · 5.1 s",
-  "n-taps-3": "3 taps · 3.9 s",
-  "n-taps-4": "1 swipe · 0.9 s",
-  "n-taps-cap": "The same task in four apps. to.morrow takes one step, the others three to five.",
+  "n-taps-1": "5 taps",
+  "n-taps-2": "4 taps",
+  "n-taps-3": "3 taps",
+  "n-taps-4": "1 swipe",
   "n-problem-user": "The target group is <b class='kw'>people who over-plan</b>. Their Today list is longer than the day allows by morning, and whatever does not get done would need to be moved.",
   "section-problem": "The problem",
   "n-fs-1": "Today: three tasks",
@@ -3675,7 +3657,6 @@
   "n-fs-3": "The task is in Tomorrow",
   "n-fs-4": "Undo, in case it was a mistake",
   "n-flow-swipe": "One task from Today to Tomorrow",
-  "n-tag-mock": "Mockup",
   "n-rule-head": "The rule behind it",
   "n-rule-eq": "Every task carries a date. The list is computed from it.",
   "n-rt-1": "Today",
@@ -3695,11 +3676,11 @@
   "n-dates-late": "Today, 1 day",
   "n-dates-r2": "Task without a date",
   "n-sec-idea": "The idea",
-  "n-fl-1": "Type the task",
-  "n-fl-2": "Go Live",
+  "n-fl-1": "Type, tap Go Live",
   "n-fl-3": "Lock Screen",
   "n-fl-4": "Dynamic Island",
   "n-fl-5": "Tick it off",
+  "n-fl-reset": "Back to the start",
   "n-flow-live": "From typing to ticking off",
   "n-sec-live": "One thing in view",
   "n-sketch-title": "Early sketches of the swipe",
@@ -3737,30 +3718,24 @@
   "n-side-intro": "The side view cuts through the three shapes. The surface is the baseline. What sits above it can be operated, what sits below it takes something in.",
   "n-side-sheet": "Cross-section through the three shapes, light from the top left",
   "n-sec-rules": "The rules of the design system",
-  "n-rules-sub": "<b class='kw'>What I was thinking.</b> The design system is called SkeuKit and follows four rules. A touchscreen has no pointer to reveal what can be operated. The interface has to show it itself, and height is read fastest: what sticks out can be grabbed, what is sunk in takes something in.",
+  "n-rules-sub": "<b class='kw'>What I was thinking.</b> The design system follows four rules. A touchscreen has no pointer to reveal what can be operated. The interface has to show it itself, and height is read fastest: what sticks out can be grabbed, what is sunk in takes something in.",
   "n-c3": "Third, an app you want to spend little time in makes time the design variable: every feature has to <b class='kw'>save a step</b>, or it goes.",
   "n-sec-result": "Result and outlook",
   "n-learn": "What I learned",
   "n-next": "What comes next",
   "n-next-1": "<b class='kw'>Widgets</b>: the Today list on the home screen, so tasks can be ticked off and moved without opening the app.",
   "n-next-2": "<b class='kw'>Desktop version</b> with a keyboard and room for a week view.",
-  "n-next-3": "Analyse the App Store reviews and plan the most frequent requests.",
-  "n-tools": "Tools"
+  "n-next-3": "Analyse the App Store reviews and plan the most frequent requests."
 });
     Object.assign(TRANSLATIONS.de, {
   "n-a11y-short": "<b class='kw'>Barrierefreiheit</b> ist Teil des Systems: Text skaliert mit Dynamic Type bis AX5, die Bedienelemente wachsen nur halb so schnell. Jede Zeile bietet VoiceOver-Aktionen für Bearbeiten, Sortieren und Fotos, Reduce Motion stoppt jede Dauer-Animation, und alle Touch-Ziele sind mindestens 44 pt groß.",
-  "n-ov-1": "<b>Was ist to.morrow?</b> Eine iOS-App mit drei Listen, Heute, Morgen und Bald, in der das Verschieben einer Aufgabe auf einen anderen Tag eine einzige Wischgeste ist.",
-  "n-ov-2": "<b>Das Problem:</b> Wer sich zu viel vornimmt, füllt die Heute-Liste über das Machbare hinaus. Verschieben kostet in anderen Apps mehrere Schritte, also bleibt alles liegen, und die Liste stimmt am Vormittag nicht mehr.",
-  "n-ov-4": "<b>Was ich gestaltet habe:</b> Das Drei-Listen-Modell mit der Wischgeste, die Live-Aufgabe auf Sperrbildschirm und Dynamic Island, ein Designsystem aus drei Formen, Workspaces und Themes.",
-  "n-ov-5": "<b>Ergebnis:</b> Im App Store verfügbar. Die erste Version wurde nach dem Feedback aus TestFlight vollständig ersetzt. Nutzungszahlen stehen im Abschnitt Ergebnis.",
-  "n-ov-title": "Projektüberblick",
-  "n-taps-title": "Eine Aufgabe auf morgen verschieben: Schritte und Zeit",
+  "n-ov-lead": "to.morrow ist eine iOS-App mit drei Listen: Heute, Morgen, Bald. Eine Aufgabe zu verschieben ist eine einzige Wischgeste, und die eine Sache, die du nicht vergessen darfst, bleibt auf Sperrbildschirm und Dynamic Island sichtbar.",
+  "n-taps-title": "Eine Aufgabe auf morgen verschieben: Schritte",
   "n-tag-ex": "Beispielwerte",
-  "n-taps-1": "5 Taps · 6,8 s",
-  "n-taps-2": "4 Taps · 5,1 s",
-  "n-taps-3": "3 Taps · 3,9 s",
-  "n-taps-4": "1 Wisch · 0,9 s",
-  "n-taps-cap": "Dieselbe Aufgabe, vier Apps. to.morrow braucht einen Schritt, die anderen drei bis fünf.",
+  "n-taps-1": "5 Taps",
+  "n-taps-2": "4 Taps",
+  "n-taps-3": "3 Taps",
+  "n-taps-4": "1 Wisch",
   "n-problem-user": "Die Zielgruppe sind <b class='kw'>Menschen, die sich zu viel vornehmen</b>. Ihre Heute-Liste ist am Morgen länger, als der Tag zulässt, und was nicht geschafft wird, müsste verschoben werden.",
   "section-problem": "Das Problem",
   "n-fs-1": "Heute: drei Aufgaben",
@@ -3768,7 +3743,6 @@
   "n-fs-3": "Die Aufgabe liegt in Morgen",
   "n-fs-4": "Rückgängig, falls es ein Fehler war",
   "n-flow-swipe": "Eine Aufgabe von Heute auf Morgen",
-  "n-tag-mock": "Mockup",
   "n-rule-head": "Die Regel dahinter",
   "n-rule-eq": "Jede Aufgabe trägt ein Datum. Die Liste wird daraus berechnet.",
   "n-rt-1": "Heute",
@@ -3788,11 +3762,11 @@
   "n-dates-late": "Heute, 1 Tag",
   "n-dates-r2": "Aufgabe ohne Datum",
   "n-sec-idea": "Die Idee",
-  "n-fl-1": "Aufgabe eintippen",
-  "n-fl-2": "Go Live",
+  "n-fl-1": "Eintippen, Go Live",
   "n-fl-3": "Sperrbildschirm",
   "n-fl-4": "Dynamic Island",
   "n-fl-5": "Abhaken",
+  "n-fl-reset": "Zurück zum Anfang",
   "n-flow-live": "Von der Eingabe bis zum Abhaken",
   "n-sec-live": "Eine Sache im Blick",
   "n-sketch-title": "Frühe Skizzen der Wischgeste",
@@ -3830,15 +3804,14 @@
   "n-side-intro": "Die Seitenansicht zeigt die drei Formen im Schnitt. Die Fläche ist die Grundlinie. Was darüber liegt, lässt sich bedienen, was darunter liegt, nimmt etwas auf.",
   "n-side-sheet": "Schnitt durch die drei Formen, Licht von oben links",
   "n-sec-rules": "Die Regeln des Designsystems",
-  "n-rules-sub": "<b class='kw'>Was ich mir dabei gedacht habe.</b> Das Designsystem heißt SkeuKit und folgt vier Regeln. Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.",
+  "n-rules-sub": "<b class='kw'>Was ich mir dabei gedacht habe.</b> Das Designsystem folgt vier Regeln. Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.",
   "n-c3": "Drittens heißt eine App, in der man wenig Zeit verbringen will, dass Zeit die Entwurfsgröße ist: Jede Funktion muss einen <b class='kw'>Schritt sparen</b>, sonst fällt sie heraus.",
   "n-sec-result": "Ergebnis und Ausblick",
   "n-learn": "Was ich gelernt habe",
   "n-next": "Wie es weitergeht",
   "n-next-1": "<b class='kw'>Widgets</b>: die Heute-Liste auf dem Homescreen, damit sich Aufgaben ohne die App abhaken und verschieben lassen.",
   "n-next-2": "<b class='kw'>Desktop-Version</b> mit Tastatur und Platz für eine Wochenansicht.",
-  "n-next-3": "Die App-Store-Rezensionen auswerten und die häufigsten Wünsche einplanen.",
-  "n-tools": "Werkzeuge"
+  "n-next-3": "Die App-Store-Rezensionen auswerten und die häufigsten Wünsche einplanen."
 });
     // Below 640px a key may be answered by a slightly shorter '<key>@m' twin.
     // Most keys have none and read identically at every width — two variants

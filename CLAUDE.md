@@ -1767,6 +1767,15 @@ figure; do not remove the tag while the number is still an example. Wireframes (
 units, so the styled screen is the container's CHILD (`.wf-s`): `cqw` on the container itself resolves
 against an ancestor and blew the phones up to 3x.
 
+**Edits 2026-10-25 (Lucas):** the overview is one `.glance-lead` under "Auf einen Blick" (key `n-ov-lead`); the taps chart shows
+taps only (no seconds, no caption, no tag) and is `max-width: 66.67%` on desktop; **both flow rows are always ONE line of four**,
+at every width: `.flow-band` is a size container and the phone/arrow/gap sizes come from its `cqw`, so nothing wraps (phones are ~57px
+at 390). The Live row is four frames (type + circled Go Live → Lock Screen → Dynamic Island → tick) with `.flow-loop` drawing the
+return path under it ("Zurück zum Anfang"); `.flow-arrow.is-go` sits at the pill's height. All "Mockup" tags are gone (`n-tag-mock`);
+sketch and "Beispielwerte" tags on the retention chart stay. The Live-button icon above "Live-Benachrichtigungen" and the Tools block
+are removed (Xcode + Remotion moved into the Skills tile); "SkeuKit" is no longer named in section 5's intro. Open items: see
+`tomorrow-casestudy-plan.md`, "Still open".
+
 Facts used from the app (Appendix A of the plan, dated 2026-09-03, check against the source before shipping):
 three lists as filters over a date, overdue → Today with a chip, no rollover job, swipe commit ≈ a fifth of the
 row width, Dynamic Type to AX5, VoiceOver custom actions, Reduce Motion, 44 pt targets.
