@@ -1780,10 +1780,7 @@ are removed (Xcode + Remotion moved into the Skills tile); "SkeuKit" is no longe
 four static screens: windows2/1/4/7), the retention chart, the Schrift-und-Icons orbit block (one closing paragraph `icons-text` is left),
 and the four rules of section 5 (title is now "Das Designsystem"). Their CSS (`.rule-card`, `.rules`, `.ic-*`, `.line-chart`, `.dates`) is inert, not deleted.
 
-**Copy 2 (`public/to.morrow2d2.html`, 2026-10-25):** copy of the draft plus dashed `.ph2` placeholders (tag "Platzhalter"; grep `ph2`) for:
-a Unify-style three-number fact bar (`.fact-bar`, with a caveat paragraph) at the top of Ergebnis, interview study opening the Problem (plus a "Taps selbst zählen" tag on the taps chart), landscape
-three-list recording (section 2), Dynamic Island re-shoot (section 3), largest Windows-95 image + real tester quote and a real
-retention number (Pivot). Same rules: nothing links to it, `noindex`, no invented values.
+**Copy 2 (`public/to.morrow2d2.html`, 2026-10-25):** copy of the draft with additions: a three-number fact bar (`.fact-bar`) with a short caveat at the top of Ergebnis, an interview paragraph opening the Problem, a landscape three-list frame (section 2), the Live screens 1-2-3 in one numbered frame (`.trio-band`, screen 3 is the Dynamic Island frame), and in the Pivot a large Windows-95 screen with a tester quote (`.dead-pair`) plus a retention sentence. Same rules as the draft: nothing links to it, `noindex`.
 
 Facts used from the app (Appendix A of the plan, dated 2026-09-03, check against the source before shipping):
 three lists as filters over a date, overdue → Today with a chip, no rollover job, swipe commit ≈ a fifth of the

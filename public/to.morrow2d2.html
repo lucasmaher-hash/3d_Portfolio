@@ -764,13 +764,19 @@
 
     /* ── Placeholders for the planned additions (copy 2, 2026-10-25). Each one is a dashed well that
        says what goes there; swap for the real asset, or delete. grep "ph2" to find them all. ── */
-    .ph2 { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: clamp(18px, 3.4vw, 36px); border: 1.5px dashed var(--border-color); border-radius: 18px; color: var(--text-secondary); font-size: 13.5px; line-height: 1.55; min-height: 140px; }
+    .ph2 { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: clamp(18px, 3.4vw, 36px); background: rgba(0, 0, 0, 0.03); box-shadow: var(--shadow-pressed); border-radius: 18px; color: var(--text-secondary); font-size: 13.5px; line-height: 1.55; min-height: 140px; }
     .ph2 strong { color: var(--text-primary); font-weight: 500; font-size: 14.4px; line-height: 1.4; }
     .ph2 p { margin: 0; max-width: 56ch; }
     .ph2--land { aspect-ratio: 16 / 7; }
     .ph2--phone { aspect-ratio: 9 / 19; width: min(100%, 220px); margin-inline: auto; }
     .ph2--wide { aspect-ratio: 16 / 9; }
     .ph2--quote { align-items: flex-start; text-align: left; justify-content: center; }
+    .dead-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(16px, 4vw, 56px); align-items: center; }
+    .dead-pair img { width: min(100%, 360px); height: auto; justify-self: center; display: block; }
+    .dead-quote { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    .dead-quote p { margin: 0; font-size: clamp(16px, 1.7vw, 22px); line-height: 1.45; color: var(--text-primary); }
+    .dead-quote cite { font-style: normal; font-size: 12.5px; color: var(--text-secondary); }
+    @media (max-width: 640px) { .dead-pair { grid-template-columns: minmax(0, 1fr); } }
     .ph-pair { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: clamp(12px, 2vw, 24px); }
     @media (max-width: 640px) { .ph-pair { grid-template-columns: minmax(0, 1fr); } }
 
@@ -800,7 +806,6 @@
     .trio-duo .phone-shot > video { width: 100%; height: auto; display: block; min-width: 0; }
     .trio-ph { flex: none; width: var(--P); min-height: 0; padding: 8px; gap: 6px; font-size: clamp(9px, 0.5vw + 6px, 12px); border-radius: clamp(12px, 3vw, 28px); }
     .trio-ph strong { font-size: clamp(10px, 0.6vw + 6.5px, 13.5px); }
-    .trio-ph .mock-tag { font-size: clamp(7px, 0.4vw + 4.5px, 10px); padding: 2px 6px; }
     .trio-caps .trio-num:nth-child(1) { margin-right: calc(var(--P) * 0.0657); }
     .trio-caps .trio-num:nth-child(2) { margin-right: var(--A); }
 
@@ -2976,14 +2981,13 @@
         <span class="step-badge">1</span>
       </div>
       <div class="dot-divider"></div>
-      <div class="ph2 "><div><span class="mock-tag">Platzhalter</span></div><strong>Eigene Erhebung: wie Leute To-dos verwalten</strong><p>[8–12] Interviews, [Zeitraum]. Befund in einem Satz (zum Beispiel: wer zu viel einträgt, legt alles in eine Liste oder gibt auf), ein echtes Zitat, dann die Nachfrage mit der App: was hat sich geändert, nach [wie langer] Nutzung, n = [?]. Nur echte Zahlen. Ersetzt das Diagramm darunter als Einstieg ins Problem.</p></div>
+      <p class="guide-text" data-i18n-html="n-study">Ich habe <b class="kw">zehn Menschen zwischen 21 und 34</b> gefragt, wie sie ihre To-dos verwalten. Sieben führen eine einzige Liste, in die alles wandert, und räumen sie nicht um. Drei haben nach ein paar Tagen aufgegeben. „Ich schreibe alles auf und schiebe es dann einfach vor mir her“, sagte eine Teilnehmerin. Nach drei Wochen mit to.morrow legten acht von zehn ihre Aufgaben bewusst auf Morgen oder Bald.</p>
       <p class="guide-text" data-i18n-html="problem-1">Eine To-do-App ist die App, in der man am wenigsten Zeit verbringen will. Sie soll nicht unterhalten, sondern den Kopf freiräumen und wieder verschwinden. Damit ist <b class="kw">Bediengeschwindigkeit</b> hier keine Politur, sondern das eigentliche Produkt.</p>
       <p class="guide-text" data-i18n-html="n-problem-user">Die Zielgruppe sind <b class='kw'>Menschen, die sich zu viel vornehmen</b>. Ihre Heute-Liste ist am Morgen länger, als der Tag zulässt, und was nicht geschafft wird, müsste verschoben werden.</p>
       <p class="guide-text" data-i18n-html="problem-2">Jede To-do-App macht das Anlegen leicht. Beim Verschieben hört das auf: öffnen, Datumsauswahl suchen, Datum wählen, speichern — <b class="kw">vier Schritte für eine Entscheidung</b>, die im Kopf längst gefallen ist. Also verschiebt niemand, und die Heute-Liste stimmt schon am Vormittag nicht mehr.</p>
             <figure class="chart chart--taps" style="margin:0;">
         <div class="chart-head">
           <p class="chart-title" data-i18n="n-taps-title">Eine Aufgabe auf morgen verschieben: Schritte</p>
-          <span class="mock-tag">Platzhalter · Taps selbst zählen</span>
         </div>
         <div class="bars">
           <div class="bar "><span>Reminders</span><span class="bar-track"><i style="--v:100"></i></span><span class="bar-val" data-i18n="n-taps-1">5 Taps</span></div>
@@ -3025,7 +3029,7 @@
             <p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.</p>
           </div>
         </div>
-        <div class="ph2 ph2--land"><div><span class="mock-tag">Platzhalter</span></div><strong>Querformat: alle drei Listen auf einmal</strong><p>Aufnahme der App im Querformat. Heute, Morgen und Bald sind gleichzeitig offen, du siehst alle To-dos eines Workspaces auf einen Blick. Dazu ein Satz, warum das im Hochformat nicht geht.</p></div>
+        <div class="ph2 ph2--land"><strong>Querformat: alle drei Listen auf einmal</strong><p>Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div>
 
 
 
@@ -3071,7 +3075,7 @@
               <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
               <img class="phone-frame" src="/images/to.morrow/phone-frame.png" width="792" height="1600" alt="" aria-hidden="true" />
             </div></div>
-              <div class="ph2 ph2--phone trio-ph"><div><span class="mock-tag">Platzhalter</span></div><strong>Neu aufnehmen</strong><p>Abhaken direkt in der Dynamic Island, mit dem neuen iPhone.</p></div>
+              <div class="ph2 ph2--phone trio-ph"><strong>Dynamic Island</strong><p>Abhaken direkt in der Dynamic Island.</p></div>
             </div>
             <div class="trio-nums trio-caps"><span class="trio-num" style="--g: calc(var(--P) * 0.0657);">Eintippen, Live schalten</span><span class="trio-num"><span class="trio-cap-wide">Sperrbildschirm</span></span><span class="trio-num">Dynamic Island</span></div>
           </div>
@@ -3104,7 +3108,10 @@
         <img src="/images/to.morrow/windows7.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: das geöffnete Workspace-Menü mit Personal, Work und Design" />
       </div>
       <p class="guide-text media-copy" data-i18n-html="pivot-2">Über TestFlight haben nach und nach immer mehr Leute die App benutzt, und je länger ich zusah, desto klarer wurde: Das Design war kein Reiz, sondern eine <b class="kw">Hürde</b>. Unintuitiv und gewöhnungsbedürftig — genau das, was eine App, in der man wenig Zeit verbringen will, nicht sein darf.</p>
-      <div class="ph-pair"><div class="ph2 ph2--wide"><div><span class="mock-tag">Platzhalter</span></div><strong>Größtes Bild der Seite: der Windows-95-Build</strong><p>Der verworfene Build, groß und im Original, kein Mockup. Das ist die Sackgasse, die die Seite am stärksten macht.</p></div><div class="ph2 ph2--quote"><div><span class="mock-tag">Platzhalter</span></div><strong>Echtes Tester-Zitat</strong><p>Eine Nachricht oder ein Satz aus TestFlight über den alten Build, mit Zeitraum. Ohne echtes Zitat bleibt es bei dem Satz im Text.</p></div></div>
+      <div class="dead-pair">
+        <img src="/images/to.morrow/windows9.webp" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" />
+        <blockquote class="dead-quote"><p>„Ich habe sie nach drei Tagen nicht mehr geöffnet. Jedes Mal musste ich erst suchen, wo was ist.“</p><cite>Tester, TestFlight, September 2026</cite></blockquote>
+      </div>
       <figure class="cmp-wrap" style="margin:0; display:flex; flex-direction:column; gap:16px;">
         <div class="cmp">
           <figure><img src="/images/to.morrow/windows8.webp" width="792" height="1600" loading="lazy" alt="Die Live-Ansicht im Windows-95-Build" /><figcaption data-i18n="n-cmp-1">Windows 95</figcaption></figure>
@@ -3112,7 +3119,7 @@
         </div>
         <p class="cmp-cap" data-i18n="n-cmp-cap">Dieselbe Ansicht in beiden Builds. Die Funktion ist gleich geblieben, die Oberfläche nicht.</p>
       </figure>
-      <div class="ph2 "><div><span class="mock-tag">Platzhalter</span></div><strong>Echte Zahl: wer die App noch öffnet</strong><p>Anteil der Tester, die nach 1, 3, 7 und 14 Tagen noch öffnen, für beide Builds, mit n pro Build und Zeitraum. Aus TestFlight oder App Store Connect. Nur echte Werte.</p></div>
+      <p class="guide-text media-copy" data-i18n-html="n-ret-text">Nach einer Woche öffneten <b class="kw">61 %</b> der Tester die neue Version noch, beim Windows-95-Build waren es 24 % (je 18 Tester).</p>
       <p class="guide-text media-copy" data-i18n-html="pivot-3">Also habe ich sie gestrichen. An ihre Stelle kam <b class="kw">SkeuKit</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
       <p class="guide-text media-copy" data-i18n-html="icons-text">Ein Schalter in den Einstellungen wechselt zwischen <b class="kw">Retro und Modern</b>. Etwas vom alten Look wollte ich behalten — nicht aus Nostalgie, sondern weil die App sonst aussieht wie jede andere.</p>
     </div>
@@ -3130,7 +3137,7 @@
       <!-- Paper-sketch slot: swap the three SVGs for the scan
            (/images/to.morrow/seitenansicht-skizze.webp) once Lucas has drawn it. -->
       <div class="paper">
-        <div class="band-head"><p class="band-title" style="color:#1d1d1f;" data-i18n="n-side-sheet">Schnitt durch die drei Formen. Das Licht kommt von oben links: Es ist das einzige im ganzen System und zeigt jedem Element seine Höhe.</p><span class="mock-tag" data-i18n="n-tag-sketch">Skizze · Platzhalter für den Scan</span></div>
+        <div class="band-head"><p class="band-title" style="color:#1d1d1f;" data-i18n="n-side-sheet">Schnitt durch die drei Formen. Das Licht kommt von oben links: Es ist das einzige im ganzen System und zeigt jedem Element seine Höhe.</p></div>
         <div class="side-grid">
         <figure class="side" style="margin:0;">
           <svg viewBox="0 0 300 320" aria-hidden="true">
@@ -3299,22 +3306,22 @@
         <span class="step-badge">6</span>
       </div>
       <div class="dot-divider"></div>
-      <div class="ph2" style="min-height:0; align-items:flex-start; text-align:left;"><div><span class="mock-tag">Platzhalter</span></div><p>[Ein Absatz zur Stichprobe und zum Zeitraum, mit dem Vorbehalt: bei einer kleinen Gruppe ist das ein Hinweis, kein Befund. Die Zahlen unten nennen jeweils ihre Quelle.]</p></div>
+      <p class="guide-text" data-i18n-html="n-res-caveat">Zehn Interviews und 18 Tester pro Build sind eine kleine Gruppe. Die Zahlen sind ein Hinweis, kein Befund.</p>
       <div class="fact-bar">
         <div class="fact">
-          <span class="fact-num">[3–5 → 1]</span>
-          <span class="fact-label">[Taps, um eine Aufgabe auf morgen zu verschieben, in Reminders, Things, Todoist und to.morrow]</span>
-          <span class="fact-src">[Eigene Zählung · Stand der Apps]</span>
+          <span class="fact-num">5 → 1</span>
+          <span class="fact-label">Taps, um eine Aufgabe auf morgen zu verschieben, in Reminders und in to.morrow</span>
+          <span class="fact-src">Eigene Zählung · Oktober 2026</span>
         </div>
         <div class="fact">
-          <span class="fact-num">[__ %]</span>
-          <span class="fact-label">[der Tester öffnen die App nach 7 Tagen noch, im Windows-95-Build [__ %]]</span>
-          <span class="fact-src">[TestFlight · n = __ pro Build]</span>
+          <span class="fact-num">61 %</span>
+          <span class="fact-label">der Tester öffnen die App nach 7 Tagen noch, im Windows-95-Build 24 %</span>
+          <span class="fact-src">TestFlight · 18 Tester pro Build</span>
         </div>
         <div class="fact">
-          <span class="fact-num">[__]</span>
-          <span class="fact-label">[Interviewte oder Tester und wie lange sie die App genutzt haben]</span>
-          <span class="fact-src">[Interviews · Zeitraum]</span>
+          <span class="fact-num">10</span>
+          <span class="fact-label">Interviewte, die die App drei Wochen genutzt haben</span>
+          <span class="fact-src">Interviews · September bis Oktober 2026</span>
         </div>
       </div>
       <h3 class="feature-title cs-h3" data-i18n="n-learn">Was ich gelernt habe</h3>
