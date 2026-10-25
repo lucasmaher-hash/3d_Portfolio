@@ -784,8 +784,8 @@
       /* Centre is computed in JS (--bx/--by from the phone's centre) so the clearance to the turning frame is constant. */
       transform: translate(calc(var(--bx, 0px) - 22px), calc(var(--by, 0px) - 22px));
       transition: background 0.2s ease; z-index: 3; }
-    /* Icon: Material Symbols Rounded, screen_rotation_alt (Google, Apache License 2.0). */
-    .rot-btn svg { width: 28px; height: 28px; display: block; }
+    /* Icon: Lucas's own file, used as a mask so it takes the button's text colour. */
+    .rot-ico { display: block; width: 34px; height: 34px; background: currentColor; -webkit-mask: url(/images/to.morrow/rotate-icon.png) center / contain no-repeat; mask: url(/images/to.morrow/rotate-icon.png) center / contain no-repeat; }
     .rot-btn:hover { background: rgba(48, 50, 56, 0.8); }
     .rot-phone { width: clamp(126px, 20.33vw, 232px); transform: rotate(calc(var(--rot, 0) * 1deg)); will-change: transform; }
     .rot-phone .phone-shot { position: relative; }
@@ -3135,7 +3135,7 @@
         </div>
         <div class="rot-scrolly" id="rot-scrolly" aria-label="Das Hochformat-Handy dreht sich ins Querformat">
           <div class="rot-sticky">
-            <div class="rot-phonecol"><button type="button" class="rot-btn" id="rot-btn" aria-label="Orientierung wechseln"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M501-90 180-410q-5-5-7-10.5t-2-10.5q0-12.1 8.25-21.55Q187.5-462 201-462q6 0 11.5 2t10.5 7l321 321 246-246H682q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h180q12.75 0 21.38 8.62Q892-420.75 892-408v180q0 12.75-8.68 21.37-8.67 8.63-21.5 8.63-12.82 0-21.32-8.63-8.5-8.62-8.5-21.37v-108L586-90q-8.21 8.13-19.04 12.57Q556.14-73 544.2-73q-11.2 0-22.63-4.43Q510.14-81.87 501-90ZM98-522q-12.75 0-21.37-8.63Q68-539.25 68-552v-180q0-12.75 8.68-21.38 8.67-8.62 21.5-8.62 12.82 0 21.32 8.62 8.5 8.63 8.5 21.38v108l246-246q9.04-8.87 20.34-12.93 11.3-4.07 22.61-4.07 12.05 0 22.93 4.07Q450.75-878.87 459-870l321 320q5 5 7 10.5t2 10.5q0 12.1-8.25 21.55Q772.5-498 759-498q-6 0-11.5-2t-10.5-7L416-828 170-582h108q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5H98Z"/></svg></button><div class="rot-phone" id="rot-phone"><div class="phone-shot">
+            <div class="rot-phonecol"><button type="button" class="rot-btn" id="rot-btn" aria-label="Orientierung wechseln"><i class="rot-ico" aria-hidden="true"></i></button><div class="rot-phone" id="rot-phone"><div class="phone-shot">
               <div class="rot-hole rot-blank"></div>
               <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben"><source src="/videos/to.morrow/swipe.mp4" type="video/mp4" /></video>
               <div class="rot-hole rot-land"><img src="/images/to.morrow/landscape-screen.webp" width="1522" height="702" alt="" loading="lazy" /></div>
