@@ -772,10 +772,15 @@
     .ph2--wide { aspect-ratio: 16 / 9; }
     .ph2--quote { align-items: flex-start; text-align: left; justify-content: center; }
     .ph-pair { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: clamp(12px, 2vw, 24px); }
-    .ph-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 20px); }
-    .ph-facts .ph2 { min-height: 0; padding: clamp(14px, 2vw, 22px); }
-    .ph-facts .ph2 strong { font-size: clamp(18px, 2.2vw, 26px); }
-    @media (max-width: 640px) { .ph-pair { grid-template-columns: minmax(0, 1fr); } .ph-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .ph-pair { grid-template-columns: minmax(0, 1fr); } }
+
+    /* Three big numbers with a source line each, as on unify2d.html (.fact-bar). */
+    .fact-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); margin-top: clamp(32px, 5vw, 60px); }
+    .fact { display: flex; flex-direction: column; gap: 8px; }
+    .fact-num { font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: clamp(28px, 3.4vw, 44px); line-height: 1; letter-spacing: -0.04em; color: var(--accent-orange); }
+    .fact-label { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+    .fact-src { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); opacity: 0.8; }
+    @media (max-width: 640px) { .fact-bar { grid-template-columns: minmax(0, 1fr); gap: 28px; } .fact-label { font-size: 16px; line-height: 1.45; } }
 
     /* Full-width, flush-left variant (to.morrow draft, 2026-10-25). */
     .centered-note.note-wide { max-width: none; margin-inline: 0; text-align: left; }
@@ -2942,16 +2947,6 @@
       </div>
     </div>
 
-    <!-- Placeholder: checkable facts, not metrics. Replace each with the real value (and its source). -->
-    <div class="section" style="border-bottom: none; padding-top: 0;">
-      <div class="ph-facts">
-        <div class="ph2"><span class="mock-tag">Platzhalter</span><strong>Im App Store</strong><p>seit [Datum]</p></div>
-        <div class="ph2"><span class="mock-tag">Platzhalter</span><strong>Solo</strong><p>Konzept, Design, Umsetzung</p></div>
-        <div class="ph2"><span class="mock-tag">Platzhalter</span><strong>[3] Monate</strong><p>von Aug. 2026 bis [heute]</p></div>
-        <div class="ph2"><span class="mock-tag">Platzhalter</span><strong>[2] Builds</strong><p>Windows 95, dann das Designsystem</p></div>
-      </div>
-    </div>
-
     <!-- ══ 1. Problem ═══════════════════════════════════════════════ -->
     <div class="guide-section">
           <div class="section-heading-row">
@@ -3282,6 +3277,24 @@
         <span class="step-badge">6</span>
       </div>
       <div class="dot-divider"></div>
+      <div class="ph2" style="min-height:0; align-items:flex-start; text-align:left;"><div><span class="mock-tag">Platzhalter</span></div><p>[Ein Absatz zur Stichprobe und zum Zeitraum, mit dem Vorbehalt: bei einer kleinen Gruppe ist das ein Hinweis, kein Befund. Die Zahlen unten nennen jeweils ihre Quelle.]</p></div>
+      <div class="fact-bar">
+        <div class="fact">
+          <span class="fact-num">[3–5 → 1]</span>
+          <span class="fact-label">[Taps, um eine Aufgabe auf morgen zu verschieben, in Reminders, Things, Todoist und to.morrow]</span>
+          <span class="fact-src">[Eigene Zählung · Stand der Apps]</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">[__ %]</span>
+          <span class="fact-label">[der Tester öffnen die App nach 7 Tagen noch, im Windows-95-Build [__ %]]</span>
+          <span class="fact-src">[TestFlight · n = __ pro Build]</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">[__]</span>
+          <span class="fact-label">[Interviewte oder Tester und wie lange sie die App genutzt haben]</span>
+          <span class="fact-src">[Interviews · Zeitraum]</span>
+        </div>
+      </div>
       <h3 class="feature-title cs-h3" data-i18n="n-learn">Was ich gelernt habe</h3>
       <p class="guide-text" data-i18n-html="conclusion-1">Das Wichtigste, was ich gelernt habe, war unangenehm: eine <b class="kw">fertige Idee wegzuwerfen</b>. Die Windows-Oberfläche war nicht halbgar, sie war komplett — und trotzdem falsch. Dass etwas als Screenshot funktioniert, heißt nicht, dass es morgens um sieben funktioniert.</p>
       <p class="guide-text" data-i18n-html="conclusion-2">Zweitens, dass es hilft, sich <b class="kw">eigene Regeln zu geben</b>. Drei Formen, jede mit genau einer Bedeutung — sobald das feststand, war jede weitere Ansicht keine Gestaltungsfrage mehr, sondern nur noch eine Anwendung derselben Entscheidung.</p>
