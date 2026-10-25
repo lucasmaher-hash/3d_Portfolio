@@ -863,9 +863,9 @@
     .trio-num:nth-child(1), .trio-num:nth-child(2) { margin-right: var(--A); }
     .trio-num b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-weight: 500; font-size: 13px; color: var(--text-primary); box-shadow: var(--shadow-raised-sm); }
     /* arrow from each badge to the next, in the strip above the phones */
-    .trio-nums:not(.trio-caps) .trio-num:not(:last-child)::after { content: ''; position: absolute; top: 13.25px; left: calc(50% + 22px); width: calc(var(--P) + var(--g) - 44px); height: 1.5px; background: linear-gradient(90deg, var(--accent-orange) calc(var(--f, 0) * 100%), rgba(110, 110, 122, 0.45) calc(var(--f, 0) * 100%)); }
-    .trio-nums:not(.trio-caps) .trio-num:not(:last-child)::before { content: ''; position: absolute; top: 14px; left: calc(50% + 22px + var(--P) + var(--g) - 44px); width: 7px; height: 7px; border-top: 1.5px solid var(--text-secondary); border-right: 1.5px solid var(--text-secondary); transform: translate(-100%, -50%) rotate(45deg); transition: border-color 0.3s ease; }
-    .trio-nums:not(.trio-caps) .trio-num.is-full::before { border-color: var(--accent-orange); }
+    .trio-nums:not(.trio-caps) .trio-num:not(:last-child)::after { content: ''; position: absolute; top: 13.25px; left: calc(50% + 22px); width: calc(var(--P) + var(--g) - 44px); height: 1.5px; background: linear-gradient(90deg, var(--accent-orange) calc(var(--f, 0) * 100%), transparent calc(var(--f, 0) * 100%)); }
+    .trio-nums:not(.trio-caps) .trio-num:not(:last-child)::before { content: ''; position: absolute; top: 14px; left: calc(50% + 22px + var(--P) + var(--g) - 44px); width: 7px; height: 7px; border-top: 1.5px solid var(--text-secondary); border-right: 1.5px solid var(--text-secondary); transform: translate(-100%, -50%) rotate(45deg); border-color: var(--accent-orange); opacity: 0; transition: opacity 0.25s ease; }
+    .trio-nums:not(.trio-caps) .trio-num.is-full::before { opacity: 1; }
     @keyframes trio-pop { 0% { transform: scale(1); } 32% { transform: scale(1.34); } 62% { transform: scale(0.93); } 82% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .trio-nums:not(.trio-caps) .trio-num.pulse b { animation: trio-pop 0.7s cubic-bezier(0.25, 0.9, 0.3, 1) both; }
     .trio-shots { align-items: flex-start; }
@@ -875,7 +875,7 @@
     .ip-screen { position: absolute; left: 3.8813%; top: 1.5487%; width: 92.2374%; height: 96.9027%; overflow: hidden; border-radius: 16.0891% / 7.4201%; background: #000; }
     .ip-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: block; }
     .ip-shot:nth-child(n+2) .ip-screen video { filter: blur(9px); transform: scale(1.07); transition: filter 0.7s ease, transform 0.7s ease; }
-    .ip-shot.is-playing .ip-screen video { filter: none; transform: none; }
+    .ip-shot.is-live .ip-screen video { filter: none; transform: none; }
     .ip-frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
     .trio-caps .trio-num:nth-child(1), .trio-caps .trio-num:nth-child(2) { margin-right: var(--A); }
 
@@ -3204,7 +3204,7 @@
             <div class="trio-shots">
               <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingetippt und mit Go Live aktiviert"><source src="/videos/to.morrow/live-1-type.mp4?v=2" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
               <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=4" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island.mp4?v=3" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island.mp4?v=5" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
             </div>
             <div class="trio-nums trio-caps"><span class="trio-num">Eintippen, Live schalten</span><span class="trio-num"><span class="trio-cap-wide">Sperrbildschirm</span></span><span class="trio-num">Dynamic Island</span></div>
           </div>
@@ -4543,52 +4543,65 @@
 })();
 </script>
 <script>
-// The three Live recordings are linked: 1 (type, go live) -> 2 (the task appears on the lock screen) -> 3 (Dynamic Island, task ticked off)
-// -> 2 again (the task drops away) -> 1 again (Live switched off), then start over. Videos 1 and 2 are split: they hold until the later step is done.
+// The three Live recordings run on one timeline:
+//  1 starts; when its keyboard folds away, 2 starts (the task appears on the lock screen);
+//  3 s later 3 starts (the app slides into the Dynamic Island); when the task is ticked off there,
+//  2 ticks it off and drops it away, and 1 switches Live off. Everything that has started stays sharp until the loop restarts.
 (function () {
   var vids = Array.prototype.slice.call(document.querySelectorAll('video[data-seq]'));
   if (vids.length < 3) return;
+  var v1 = vids[0], v2 = vids[1], v3 = vids[2];
   var shots = vids.map(function (v) { return v.closest('.ip-shot'); });
-  var steps = [{ v: 0, until: 13.0 }, { v: 1, until: 1.83 }, { v: 2 }, { v: 1 }, { v: 0 }];
-  // progress line between the numbered badges: it fills while 1 -> 2 and 2 -> 3 are being set up, the badge it reaches pops
   var nums = Array.prototype.slice.call(document.querySelectorAll('.trio-nums:not(.trio-caps) .trio-num'));
-  function fill(k, f) { if (!nums[k]) return; nums[k].style.setProperty('--f', Math.max(0, Math.min(1, f)).toFixed(4)); nums[k].classList.toggle('is-full', f >= 1); }
+  var KB_DOWN = 4.35, LOOP_A = 5.4, LOOP_B = 13.4, PERIOD = 2.0;   // video 1: keyboard folds away; breathing loop of the live button
+  var HOLD2 = 1.83, GAP23 = 3000, TICK3 = 2.6;                      // video 2 holds here; delay 2 -> 3; the tick inside video 3
+  var on = false, raf = 0, timer = 0, s2 = false, s3 = false, ticked = false, t2 = 0, restarting = false;
+  function fill(k, f) { var el = nums[k]; if (!el) return; el.style.setProperty('--f', Math.max(0, Math.min(1, f)).toFixed(4)); el.classList.toggle('is-full', f >= 1); }
   function pop(k) { var el = nums[k]; if (!el) return; el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
-  var n = 0, on = false, raf = 0, timer = 0, cur = null;
-  function mark(k) { shots.forEach(function (s, j) { s.classList.toggle('is-playing', j === k); }); }
-  function reset() { vids.forEach(function (v) { try { v.pause(); v.currentTime = 0; } catch (e) {} }); n = 0; mark(-1); fill(0, 0); fill(1, 0); nums.forEach(function (e) { e.classList.remove('pulse'); }); }
-  function stop() { cancelAnimationFrame(raf); raf = 0; }
-  function next() {
-    stop(); n++;
-    if (n >= steps.length) { mark(-1); clearTimeout(timer); timer = setTimeout(function () { reset(); run(); }, 900); return; }
-    run();
+  function play(v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+  function live(k) { shots[k].classList.add('is-live'); }
+  function reset() {
+    vids.forEach(function (v) { try { v.pause(); v.currentTime = 0; } catch (e) {} });
+    shots.forEach(function (s) { s.classList.remove('is-live'); });
+    fill(0, 0); fill(1, 0); nums.forEach(function (e) { e.classList.remove('pulse'); });
+    s2 = s3 = ticked = restarting = false;
   }
-  function run() {
-    if (!on) return;
-    var st = steps[n], v = vids[st.v]; cur = v;
-    mark(st.v);
-    if (n === 1) { fill(0, 1); pop(1); }      // video 2 starts: the line has reached badge 2
-    if (n === 2) { fill(1, 1); pop(2); }      // video 3 starts: the line has reached badge 3
-    var p = v.play(); if (p && p.catch) p.catch(function () {});
-    stop();
-    (function watch() {
-      if (!on || cur !== v || steps[n] !== st) return;
-      if (n === 0) fill(0, v.currentTime / st.until);
-      if (n === 1) fill(1, v.currentTime / st.until);
-      if (st.until && v.currentTime >= st.until) { v.pause(); next(); return; }
-      raf = requestAnimationFrame(watch);
-    })();
+  function begin() { reset(); live(0); play(v1); loop(); }
+  function loop() {
+    cancelAnimationFrame(raf);
+    (function frame(now) {
+      if (!on) return;
+      var t1 = v1.currentTime;
+      if (!s2) {
+        fill(0, t1 / KB_DOWN);
+        if (t1 >= KB_DOWN) { s2 = true; t2 = now; fill(0, 1); live(1); play(v2); pop(1); }
+      } else if (!s3) {
+        fill(1, (now - t2) / GAP23);
+        if (now - t2 >= GAP23) { s3 = true; fill(1, 1); live(2); play(v3); pop(2); }
+      }
+      if (!ticked) {
+        if (s2 && v2.currentTime >= HOLD2) v2.pause();                 // the task waits on the lock screen
+        if (t1 >= LOOP_B) v1.currentTime = LOOP_A + (t1 - LOOP_B);     // the live button keeps breathing
+        if (s3 && v3.currentTime >= TICK3) {                           // ticked off in the Dynamic Island
+          ticked = true; v2.currentTime = Math.max(v2.currentTime, HOLD2); play(v2);
+          var ph = ((v1.currentTime - LOOP_A) % PERIOD + PERIOD) % PERIOD;   // jump to the same phase right before the switch-off
+          if (v1.currentTime >= LOOP_A) v1.currentTime = LOOP_B - PERIOD + ph;
+          play(v1);
+        }
+      } else if (!restarting && v1.ended && v2.ended && v3.ended) {
+        restarting = true; clearTimeout(timer); timer = setTimeout(function () { if (on) begin(); }, 900);
+      }
+      raf = requestAnimationFrame(frame);
+    })(performance.now());
   }
-  vids.forEach(function (v, k) {
-    v.loop = false; v.autoplay = false;
-    v.addEventListener('ended', function () { if (steps[n] && steps[n].v === k && !steps[n].until) next(); });
-  });
-  var band = vids[0].closest('.trio-band') || vids[0];
+  vids.forEach(function (v) { v.loop = false; v.autoplay = false; });
+  var band = v1.closest('.trio-band') || v1;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduce || !('IntersectionObserver' in window)) return;
   new IntersectionObserver(function (e) {
-    on = e[0].isIntersecting;
-    if (on) run(); else { clearTimeout(timer); stop(); if (cur) cur.pause(); }
+    var vis = e[0].isIntersecting;
+    if (vis && !on) { on = true; begin(); }
+    else if (!vis && on) { on = false; clearTimeout(timer); cancelAnimationFrame(raf); vids.forEach(function (v) { v.pause(); }); }
   }, { threshold: 0.4 }).observe(band);
 })();
 </script>
