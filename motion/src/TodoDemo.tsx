@@ -17,51 +17,78 @@ const N = TASKS.length;
 const ADD = 270, HOLD = 48, FADE = 18, GAP = 12;
 export const TODO_DURATION = ADD + HOLD + FADE + GAP;
 
-const ROW = 76, HEAD = 190, PAD = 90;
+const ROW = 84, HEAD = 190;
+const COL = 640;                                     // list column width
 const VIEW = TODO_H - HEAD;
 const MID = VIEW * 0.5;
-const SLIDE = Easing.bezier(0.22, 1, 0.36, 1);       // long, soft landing
+const SLIDE = Easing.bezier(0.22, 1, 0.36, 1);       // long, soft landing (sideways)
+const RISE = Easing.bezier(0.16, 1, 0.3, 1);         // arrives earlier (from below), so the path bends in
 const FILL = Easing.bezier(0.45, 0, 0.55, 1);        // gentle in/out for the arrival pace
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+const PAGE = '#cdd0d9', PANEL = '#e3edfa', CARD = '#c9dcf3';
 
+const Row: React.FC<{t: string; p: number}> = ({t, p}) => {
+  const x = (1 - SLIDE(p)) * 620, y = (1 - RISE(p)) * 300;
+  return (
+    <div style={{height: ROW, padding: '6px 0', boxSizing: 'border-box', opacity: clamp01(p * 2.5), transform: `translate(${x}px, ${y}px)`}}>
+      <div style={{height: '100%', background: CARD, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, fontSize: 32, position: 'relative'}}>
+        <i style={{flex: 'none', width: 34, height: 34, borderRadius: '50%', border: '3px solid rgba(26,26,26,0.45)', boxSizing: 'border-box'}} />
+        <span style={{whiteSpace: 'nowrap'}}>{t}</span>
+        <div style={{position: 'absolute', left: '30%', right: '30%', bottom: 0, height: 1, background: 'rgba(26,26,26,0.12)'}} />
+      </div>
+    </div>
+  );
+};
+
+const Shell: React.FC<{children: React.ReactNode}> = ({children}) => (
+  <AbsoluteFill style={{background: PAGE, fontFamily: '"SF Pro Text", -apple-system, "Helvetica Neue", sans-serif', color: '#1a1a1a', overflow: 'hidden'}}>
+    {children}
+  </AbsoluteFill>
+);
+
+const Title: React.FC = () => (
+  <div style={{position: 'absolute', left: 0, right: 0, top: 56, textAlign: 'center', fontSize: 64, fontWeight: 600, letterSpacing: '-0.02em'}}>Today</div>
+);
+
+/* Version 1: the screen stays the same size and the list scrolls, keeping the newest row near the middle. */
 export const TodoDemo: React.FC = () => {
   const f = useCurrentFrame();
   const count = N * FILL(clamp01(f / ADD));
-  // The newest row sits at y = ROW*count. The list starts to scroll well before that
-  // reaches the middle (softplus), then keeps the newest row at about half the screen.
   const w = ROW * 2.2;
   const y = ROW * count;
   const off = w * Math.log(1 + Math.exp((y - MID) / w)) - w * Math.log(1 + Math.exp((0 - MID) / w));
   const out = interpolate(f, [ADD + HOLD, ADD + HOLD + FADE], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   return (
-    <AbsoluteFill style={{background: '#cdd0d9', fontFamily: '"SF Pro Text", -apple-system, "Helvetica Neue", sans-serif', color: '#1a1a1a', overflow: 'hidden'}}>
-      <div style={{position: 'absolute', left: PAD, top: 64, fontSize: 72, fontWeight: 600, letterSpacing: '-0.02em'}}>Today</div>
-      <div
-        style={{
-          position: 'absolute', left: 0, right: 0, top: HEAD, height: VIEW, overflow: 'hidden', opacity: out,
-          WebkitMaskImage: 'linear-gradient(#000 calc(100% - 90px), transparent)',
-        }}
-      >
+    <Shell>
+      <Title />
+      <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, width: COL + 60, top: HEAD - 20, height: VIEW + 20, background: PANEL, borderRadius: '32px 32px 0 0', opacity: out}} />
+      <div style={{position: 'absolute', left: (TODO_W - COL) / 2, width: COL, top: HEAD, height: VIEW, clipPath: 'inset(0px -1000px 0px -1000px)', opacity: out}}>
         <div style={{transform: `translateY(${-off}px)`}}>
-          {TASKS.map((t, i) => {
-            const p = clamp01(count - i);
-            const e = SLIDE(p);
-            return (
-              <div
-                key={i}
-                style={{
-                  height: ROW, margin: `0 ${PAD}px`, display: 'flex', alignItems: 'center', gap: 28, fontSize: 32,
-                  borderBottom: '1px solid rgba(26,26,26,0.09)',
-                  opacity: clamp01(p * 2.5), transform: `translateX(${(1 - e) * 520}px)`,
-                }}
-              >
-                <i style={{flex: 'none', width: 34, height: 34, borderRadius: '50%', border: '3px solid rgba(26,26,26,0.45)', boxSizing: 'border-box'}} />
-                <span style={{whiteSpace: 'nowrap'}}>{t}</span>
-              </div>
-            );
-          })}
+          {TASKS.map((t, i) => <Row key={i} t={t} p={clamp01(count - i)} />)}
         </div>
       </div>
-    </AbsoluteFill>
+      <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, width: COL + 60, top: TODO_H - 110, height: 110, background: `linear-gradient(transparent, ${PAGE})`}} />
+    </Shell>
+  );
+};
+
+/* Version 2: the list only grows; the view zooms out so the whole list always fits and ends as a tall, narrow strip. */
+export const TodoDemoZoom: React.FC = () => {
+  const f = useCurrentFrame();
+  const count = N * FILL(clamp01(f / ADD));
+  const out = interpolate(f, [ADD + HOLD, ADD + HOLD + FADE], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const PADV = 24;
+  const listH = ROW * Math.max(count, 2.2) + PADV * 2;     // grown height, at least a couple of rows
+  const top = 40;
+  const sc = Math.min(1.9, (TODO_H - top - 40) / listH);
+  const panelH = ROW * count + PADV * 2;
+  return (
+    <Shell>
+      <div style={{position: 'absolute', left: (TODO_W - COL - 60) / 2, top, width: COL + 60, transformOrigin: '50% 0', transform: `scale(${sc})`, opacity: out}}>
+        <div style={{height: panelH, background: PANEL, borderRadius: 32, padding: `${PADV}px 30px`, boxSizing: 'border-box'}}>
+          {TASKS.map((t, i) => <Row key={i} t={t} p={clamp01(count - i)} />)}
+        </div>
+      </div>
+    </Shell>
   );
 };
