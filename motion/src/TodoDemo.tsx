@@ -20,7 +20,7 @@ export const TODO_DURATION = ADD + HOLD + FADE + GAP;
 const ROW = 84, HEAD = 190;
 const COL = 640;                                     // list column width
 const VIEW = TODO_H - HEAD;
-const MID = VIEW * 0.5;
+const MID = VIEW * 0.58;                       // the newest row docks around the lower third of the frame
 const SLIDE = Easing.bezier(0.3, 0.55, 0.25, 1);     // long, soft landing along the curve
 const FILL = Easing.bezier(0.45, 0, 0.55, 1);        // gentle in/out for the arrival pace
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
@@ -37,10 +37,10 @@ const Row: React.FC<{t: string; time: string; p: number}> = ({t, time, p: pu}) =
   // incoming: saturated blue with a lifted shadow; seated: a soft, translucent white card
   const bg = `rgba(${Math.round(lerp(118, 255, m))},${Math.round(lerp(163, 255, m))},${Math.round(lerp(232, 255, m))},${lerp(1, 0.5, m)})`;
   const shadow = `0 ${lerp(14, 4, m)}px ${lerp(30, 14, m)}px rgba(40,75,140,${lerp(0.28, 0.07, m)}), inset 0 1px 0 rgba(255,255,255,${lerp(0.35, 0.8, m)})`;
-  // Quadratic Bezier (the envelope curve of the string-art picture): starts 300px below and 620px right,
-  // rises vertically, bends through the corner at (620, 0) and docks moving horizontally.
+  // Quadratic Bezier with the control point in the lower-left corner (Lucas's curve): the card starts
+  // 560px right and 400px below its place, travels left almost level, then bends up and docks moving vertically.
   const u = SLIDE(p);
-  const x = 620 * (1 - u * u), y = 300 * (1 - u) * (1 - u);
+  const x = 500 * (1 - u) * (1 - u), y = 260 * (1 - u * u);
   return (
     <div style={{height: ROW, padding: '6px 0', boxSizing: 'border-box', opacity: clamp01(p * 2.5), transform: `translate(${x}px, ${y}px)`}}>
       <div style={{height: '100%', background: bg, boxShadow: shadow, borderRadius: 20, display: 'flex', alignItems: 'center', paddingLeft: 30, paddingRight: 30, gap: 22, fontSize: 31, color: INK}}>
