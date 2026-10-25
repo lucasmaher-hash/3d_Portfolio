@@ -2566,7 +2566,7 @@ render's own top row `(20,27,48)`, so it covers the frame with the right tone wh
 loads instead of flashing white. The mobile `.hero img` override is gone entirely: the base rule's
 `-1px` / `calc(100% + 2px)` overscan and centre-centre cover are already exactly right.
 
-> **2026-10-25: no longer scroll-driven.** The 56 frames now play on a clock, one turn per 5 s (`TURN_MS` in `initSpin`), only while on screen; the section is not pinned any more (`.spin-scrolly` has no tall spacer), the machine sits right with the caption left at every scroll position, and reduced motion shows one still. The scroll/pin notes below are history.
+> **2026-10-25: no longer scroll-driven.** The 56 frames now play on a clock, one turn per 3.5 s (`TURN_MS` in `initSpin`), only while on screen; the section is not pinned any more (`.spin-scrolly` has no tall spacer), the machine sits right with the caption left at every scroll position, and reduced motion shows one still. The scroll/pin notes below are history.
 
 ### Sticky scroll-spin (`#spin-scrolly`, in the Design-process section)
 

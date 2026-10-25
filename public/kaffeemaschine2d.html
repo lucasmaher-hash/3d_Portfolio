@@ -1318,7 +1318,7 @@
       const spinImg = document.getElementById('spin-img');
       if (!scrolly || !spinImg) return;
 
-      const COUNT = 56, TURN_MS = 5000;
+      const COUNT = 56, TURN_MS = 3500;
       const src = i => `/images/cybercoffee/spin/frame_${String(i + 1).padStart(3, '0')}.webp`;
       for (let i = 0; i < COUNT; i++) { const im = new Image(); im.src = src(i); }
 
