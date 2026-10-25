@@ -781,10 +781,10 @@
     .rot-btn { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
       display: grid; place-items: center; color: #fff; background: rgba(48, 50, 56, 0.62); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
       box-shadow: 0 4px 14px rgba(40, 40, 90, 0.25);
-      /* Always beside the phone's bottom-right corner: it rides along with that corner while the phone turns (--bp = the turn's progress, 0..1). */
-      transform: translate(calc(var(--pw) * (0.5 + 0.5101 * var(--bp, 0)) + 16px), calc(var(--pw) * (1.0101 - 0.5101 * var(--bp, 0)) - 44px));
+      /* Centre is computed in JS (--bx/--by from the phone's centre) so the clearance to the turning frame is constant. */
+      transform: translate(calc(var(--bx, 0px) - 22px), calc(var(--by, 0px) - 22px));
       transition: background 0.2s ease; z-index: 3; }
-    /* Icon: Material Symbols Rounded, screen_rotation (Google, Apache License 2.0). */
+    /* Icon: Material Symbols Rounded, screen_rotation_alt (Google, Apache License 2.0). */
     .rot-btn svg { width: 28px; height: 28px; display: block; }
     .rot-btn:hover { background: rgba(48, 50, 56, 0.8); }
     .rot-phone { width: clamp(126px, 20.33vw, 232px); transform: rotate(calc(var(--rot, 0) * 1deg)); will-change: transform; }
@@ -3135,7 +3135,7 @@
         </div>
         <div class="rot-scrolly" id="rot-scrolly" aria-label="Das Hochformat-Handy dreht sich ins Querformat">
           <div class="rot-sticky">
-            <div class="rot-phonecol"><button type="button" class="rot-btn" id="rot-btn" aria-label="Orientierung wechseln"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M516-191 191-516q-18-20-18-46t18-46l166-165q18-20 44.99-20 26.99 0 47.01 20l325 325q19 19 19 46t-19 46L608-191q-18 20-44.99 20-26.99 0-47.01-20Zm46-39 172-172-331-332-172 172 331 332Zm-79-252Zm47-410 107 107q9 9 9 21t-9 21q-9 9-21.5 9t-21.5-9L419-917q-11-11-6-24t18.71-16q11.29-2 23.29-2.5t23-.5q100 0 187.5 38t153 103.5Q884-753 922-665.5T960-478q0 12.75-8.68 21.37-8.67 8.63-21.5 8.63-12.82 0-21.32-8.63-8.5-8.62-8.5-21.37 0-80-28-151.5T794.5-757Q745-813 677-848.5T530-892ZM433-66 324-175q-9-9-8.5-21t9.5-21q9-9 21.5-9t21.5 9L540-45q11 11 6 25.5T526-2q-12.44 2-24 2.5T478 1q-98.51 0-185.58-37.5-87.07-37.5-152.24-103Q75-205 37.5-292.18T0-478q0-12.75 8.68-21.38 8.67-8.62 21.5-8.62 12.82 0 21.32 8.62Q60-490.75 60-478q0 80 28.5 151.5t78.5 127Q217-144 285.5-109T433-66Z"/></svg></button><div class="rot-phone" id="rot-phone"><div class="phone-shot">
+            <div class="rot-phonecol"><button type="button" class="rot-btn" id="rot-btn" aria-label="Orientierung wechseln"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M501-90 180-410q-5-5-7-10.5t-2-10.5q0-12.1 8.25-21.55Q187.5-462 201-462q6 0 11.5 2t10.5 7l321 321 246-246H682q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h180q12.75 0 21.38 8.62Q892-420.75 892-408v180q0 12.75-8.68 21.37-8.67 8.63-21.5 8.63-12.82 0-21.32-8.63-8.5-8.62-8.5-21.37v-108L586-90q-8.21 8.13-19.04 12.57Q556.14-73 544.2-73q-11.2 0-22.63-4.43Q510.14-81.87 501-90ZM98-522q-12.75 0-21.37-8.63Q68-539.25 68-552v-180q0-12.75 8.68-21.38 8.67-8.62 21.5-8.62 12.82 0 21.32 8.62 8.5 8.63 8.5 21.38v108l246-246q9.04-8.87 20.34-12.93 11.3-4.07 22.61-4.07 12.05 0 22.93 4.07Q450.75-878.87 459-870l321 320q5 5 7 10.5t2 10.5q0 12.1-8.25 21.55Q772.5-498 759-498q-6 0-11.5-2t-10.5-7L416-828 170-582h108q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5H98Z"/></svg></button><div class="rot-phone" id="rot-phone"><div class="phone-shot">
               <div class="rot-hole rot-blank"></div>
               <video autoplay loop muted playsinline width="792" height="1600" aria-label="Eine Aufgabe wird per Wischgeste auf morgen verschoben"><source src="/videos/to.morrow/swipe.mp4" type="video/mp4" /></video>
               <div class="rot-hole rot-land"><img src="/images/to.morrow/landscape-screen.webp" width="1522" height="702" alt="" loading="lazy" /></div>
@@ -4482,6 +4482,7 @@
 (function () {
   var sec = document.getElementById('rot-scrolly');
   if (!sec) return;
+  var phone = document.getElementById('rot-phone');
   var DUR = 2200;                                   // ms for the whole portrait -> landscape sequence
   var ease = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
   var seg = function (p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); };
@@ -4490,10 +4491,23 @@
     var st = sec.style;
     st.setProperty('--vid', (1 - ease(seg(t, 0.00, 0.28))).toFixed(4));   // portrait content eases out to the flat screen colour
     st.setProperty('--rot', (-90 * ease(seg(t, 0.28, 0.72))).toFixed(3));  // the blank phone turns, notch to the left
-    st.setProperty('--bp', ease(seg(t, 0.28, 0.72)).toFixed(4));            // rotate button travels with the turn
     st.setProperty('--land', ease(seg(t, 0.72, 1.00)).toFixed(4));         // landscape content eases in
     st.setProperty('--ta', (1 - ease(seg(t, 0.00, 0.22))).toFixed(4));
     st.setProperty('--tb', ease(seg(t, 0.78, 1.00)).toFixed(4));
+    // Rotate button: sits beside the phone's bottom-right at a CONSTANT clearance from the (turning) rounded frame.
+    var bp = ease(seg(t, 0.28, 0.72)), a = (-90 * bp) * Math.PI / 180;
+    var pw = phone.offsetWidth, hw = pw * 0.5, hh = pw * 1.0101, rc = pw * 0.13, R = 22, G = 18;
+    var phi = (52 + (19 - 52) * bp) * Math.PI / 180, ux = Math.cos(phi), uy = Math.sin(phi);
+    var ca = Math.cos(a), sa = Math.sin(a);
+    function sdf(x, y) {                              // rounded rectangle, rotated by a (CSS: positive = clockwise, y down)
+      var px = ca * x + sa * y, py = -sa * x + ca * y;
+      var qx = Math.abs(px) - (hw - rc), qy = Math.abs(py) - (hh - rc);
+      return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - rc;
+    }
+    var lo = 0, hi = pw * 3;
+    for (var i = 0; i < 30; i++) { var mid = (lo + hi) / 2; if (sdf(ux * mid, uy * mid) < R + G) lo = mid; else hi = mid; }
+    st.setProperty('--bx', (ux * hi).toFixed(2) + 'px');
+    st.setProperty('--by', (uy * hi).toFixed(2) + 'px');
   }
   function frame(now) {
     var k = Math.min(1, (now - start) / DUR);
@@ -4520,7 +4534,7 @@
     lock = true; want = want ? 0 : 1; go(want);
   });
   window.addEventListener('scroll', check, { passive: true });
-  window.addEventListener('resize', check);
+  window.addEventListener('resize', function () { paint(); check(); });
   paint(); check();
 })();
 </script>
