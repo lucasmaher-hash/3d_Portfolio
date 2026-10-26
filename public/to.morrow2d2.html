@@ -2681,6 +2681,9 @@
        Only mobile receives a minimum track width and horizontal scrolling. */
     @media (max-width: 860px) {
       .wireflow.flow-band { --wire-gap: 56px; overflow: hidden; }
+      /* The dragged card extends 86/280 of a phone beyond its right edge.
+         Reserve that overflow plus 48px for the action-to-result connector. */
+      .wireflow.flow-band.wireflow--reschedule { --wire-gap: calc(var(--wire-phone-min) * 0.31 + 48px); }
       .wireflow.flow-band.wireflow--live { --wire-phone-min: 148px; }
       .wireflow-track { min-width: calc(4 * var(--wire-phone-min) + 3 * var(--wire-gap)); }
       .wireflow-scroll { overflow-x: auto; scroll-snap-type: x proximity; margin-inline: calc(-1 * var(--wireflow-pad)); padding-inline: var(--wireflow-pad); scroll-padding-inline: var(--wireflow-pad); }
