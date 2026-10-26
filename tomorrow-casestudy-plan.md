@@ -94,11 +94,22 @@ bei diesem Review nicht bereinigt.
 ### Dynamic-Island-Video
 
 Nur diese Seite verwendet nun `public/videos/to.morrow/live-3-island-delayed.mp4`.
-Die ersten sechs Frames bei 60 fps zeigen die leere schwarze Island. Nach 0,1 Sekunden erscheint
-die kompakte to.morrow-Anzeige; erst anschließend klappt sie zum ursprünglichen Zeitpunkt auf.
+In den ersten sechs Frames bei 60 fps ist die eingebrannte Island durch den umliegenden
+Bildschirmhintergrund ersetzt. Die leere schwarze Notch kommt aus dem separaten iPhone-Rahmen.
+Nach 0,1 Sekunden erscheint die kompakte to.morrow-Anzeige; erst anschließend klappt sie zum ursprünglichen Zeitpunkt auf.
 Ab Frame 6 bleibt der Ablauf zeitlich identisch mit dem Original. Gesamtlänge 7,5 Sekunden,
 450 Frames und der spätere Abhak-Moment bleiben erhalten. Die Originaldatei bleibt für die
 Unison-Variante bestehen.
+
+**Blur-Korrektur, 2026-10-26:** Die schwarze, im Video enthaltene Island wurde zusammen mit
+dem Bildschirm unscharf und ragte dadurch als dunkler Hof unter der scharfen Rahmen-Notch hervor.
+Nur den kleinen Live-Indikator zu entfernen ließ diese schwarze Fläche bestehen. Jetzt wird in
+den ersten 0,1 Sekunden die ganze eingebrannte Island mit `ffmpeg delogo` entfernt; die Rahmen-Notch
+bleibt sichtbar und scharf. Blur, Zoom und Abspielsteuerung der Seite wurden nicht verändert.
+Der Vergleich derselben Startframes mit 9 px Blur und dem tatsächlichen Rahmen reproduzierte
+den Fehler: Helligkeit neben der rechten Notch 78,1/255 gegenüber 201,3/255 beim mittleren Clip.
+Nach der Korrektur liegt der rechte Clip bei 193,1/255. Die verbleibende Differenz entspricht
+den unterschiedlichen Bildschirmhintergründen. Video-Cacheversion: `v=3`.
 
 ### Prüfung
 
@@ -111,7 +122,7 @@ Unison-Variante bestehen.
 - Die Anfangsframes des neuen Videos wurden visuell geprüft. Keine Browserprüfung der
   Gesamtdarstellung: Es war kein steuerbarer Browser verbunden.
 - Produktionsbuild und `git diff --check` bestanden. Nach Frame 6 folgt das Video dem
-  Original mit unverändertem Timing; SSIM nach erneuter Kodierung: 0,999459.
+  Original mit unverändertem Timing; SSIM nach erneuter Kodierung: 0,999462.
 
 ## 0. What the interview established
 
