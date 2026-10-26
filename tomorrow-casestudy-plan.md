@@ -892,3 +892,7 @@ They independently adjust line darkness, ink color, paper tint strength and pape
 color, save preview values in localStorage, expose the current JSON for sharing,
 and provide Reset. The normal public page uses the fixed defaults, not the local
 preview settings. Controls can be removed after Lucas supplies final values.
+
+Sketch top margin tightened at Lucas’s request: PDF crop now starts at y=405
+instead of y=300; final image 2406×809 px. This removes 105 px of upper whitespace
+while preserving the complete press arrow, drawings, alignment and appearance controls.
