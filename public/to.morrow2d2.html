@@ -2766,13 +2766,12 @@
     @media (max-width: 860px) { .rules { grid-template-columns: 1fr; } }
     .side-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.5vw, 32px); }
     .side { display: flex; flex-direction: column; gap: 6px; }
-    /* Keep the desktop 300×320 drawing proportions in stacked mobile cards;
-       intrinsic dimensions and flex:none prevent the SVG viewport shrinking. */
+    /* Keep the same three-panel landscape composition at every viewport;
+       each drawing retains its original 300×320 proportions. */
     .side > svg { aspect-ratio: 15 / 16; flex: none; }
     .side h4 { font-size: 15px; font-weight: 500; color: #1d1d1f; margin-top: 4px; }
     .side .tag { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5b5b5e; }
     .side p { font-size: 13.5px; line-height: 1.6; color: #4a4a4e; }
-    @media (max-width: 640px) { .side-grid { grid-template-columns: 1fr; max-width: 420px; margin-inline: auto; } }
     .s-ink { fill: none; stroke: #2b2b30; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .s-slab { fill: #ecebe6; }
     .s-body { fill: #f7f6f2; }
