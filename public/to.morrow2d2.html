@@ -804,15 +804,23 @@
     @media (max-width: 860px) {
       .rot-scrolly { height: 240svh; }
       .rot-sticky {
-        height: 100svh; padding-block: 110px 24px;
-        grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto;
-        gap: 24px;
+        height: auto; min-height: 100svh; padding-block: 110px 24px;
+        grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto;
+        gap: 72px;
       }
-      .rot-phonecol { align-self: stretch; min-height: 0; container-type: size; }
-      /* The rotated frame keeps the full column width. Portrait is 35% larger,
-         with a height cap only when the available screen cannot fit it. */
+      .rot-phonecol {
+        align-self: center; width: calc(100% + 32px); margin-inline: -16px;
+        aspect-ratio: 1 / 1.35; container-type: inline-size;
+      }
+      /* Reserve portrait height in the layout; the button uses the space below
+         the frame, so both orientations can fill the wider mobile column. */
+      .rot-btn {
+        left: auto; right: 16px;
+        top: calc(50% + var(--phone-half-height, 0px) + 12px);
+        transform: none;
+      }
       .rot-phone {
-        width: min(calc(100cqw / 2.064), calc(100cqh / 2.7864));
+        width: calc(100cqw / 2.064);
         transform: rotate(calc(var(--rot, 0) * 1deg)) scale(var(--phone-scale, 1.35));
       }
       .rot-copy { min-width: 0; }
@@ -4381,6 +4389,7 @@
     var phoneScale = window.innerWidth <= 860 ? 1 + 0.35 * (1 - bp) : 1;
     st.setProperty('--phone-scale', phoneScale.toFixed(4));
     var pw = phone.offsetWidth * phoneScale, hw = pw * 0.5, hh = pw * 1.032, rc = pw * 0.15, R = 22, G = 18;
+    st.setProperty('--phone-half-height', (Math.abs(Math.sin(a)) * hw + Math.abs(Math.cos(a)) * hh).toFixed(2) + 'px');
     var phi = (52 + (19 - 52) * bp) * Math.PI / 180, ux = Math.cos(phi), uy = Math.sin(phi);
     var ca = Math.cos(a), sa = Math.sin(a);
     function sdf(x, y) {                              // rounded rectangle, rotated by a (CSS: positive = clockwise, y down)
