@@ -883,7 +883,7 @@
 
     /* Three big numbers with a source line each, as on unify2d.html (.fact-bar). */
     .fact-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); margin-top: clamp(32px, 5vw, 60px); }
-    .fact { display: flex; flex-direction: column; gap: 8px; }
+    .fact { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
     .fact-num { font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: clamp(28px, 3.4vw, 44px); line-height: 1; letter-spacing: -0.04em; color: var(--accent-orange); }
     .fact-label { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
     .fact-src { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); opacity: 0.8; }
@@ -3173,7 +3173,6 @@
         <div class="fact">
           <span class="fact-num">5 → 1</span>
           <span class="fact-label" data-i18n="n-fact-actions">Aktionen zum Verschieben auf morgen: Antippen in Reminders, Wischen in to.morrow</span>
-          <span class="fact-src" data-i18n="n-fact-actions-src">Eigene Zählung · Oktober 2026</span>
         </div>
         <div class="fact">
           <span class="fact-num" data-i18n="n-fact-live-value">9 von 15</span>
@@ -3507,7 +3506,7 @@
   "n-quote-src-oct": "Feedback from the participant group · paraphrased",
   "n-res-caveat": "The feedback and Go Live usage figure come from the <b class=\"kw\">15 people</b> I followed as users and interviewed. The 30 active users refer to the app as a whole. The participant group’s experiences cannot be generalised to all users.",
   "n-fact-actions": "Actions to move a task to tomorrow: taps in Reminders, a swipe in to.morrow",
-  "n-fact-actions-src": "My own count · October 2026"
+
 
 });
     Object.assign(TRANSLATIONS.de, {
@@ -3574,7 +3573,7 @@
   "n-quote-src-oct": "Feedback aus der Begleitgruppe · sinngemäß",
   "n-res-caveat": "Das Nutzerfeedback und die Angabe zur Nutzung von Go Live stammen aus der begleiteten Gruppe von <b class=\"kw\">15 Personen</b>. Die 30 aktiven Nutzer beziehen sich auf die App insgesamt. Die Erfahrungen der Begleitgruppe lassen sich nicht auf alle Nutzer übertragen.",
   "n-fact-actions": "Aktionen zum Verschieben auf morgen: Antippen in Reminders, Wischen in to.morrow",
-  "n-fact-actions-src": "Eigene Zählung · Oktober 2026"
+
 
 });
     // Wireflow labels share the page’s language switch, including SVG accessible titles.
