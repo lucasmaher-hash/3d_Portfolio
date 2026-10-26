@@ -46,14 +46,13 @@ def reschedule(n):
     else:
         b+=task(174,'Skizzen sortieren','Sort sketches','sketches')
         if n==2:
-            b+=box(20,207,240,50,8,'#bdbdbd')+text(32,237,'→',size=22)+text(60,237,'Morgen','Tomorrow',12,key='tomorrow')
             # Intentional overflow: the dragged task leaves the phone, without a nested clip.
-            b+=box(126,207,240,50,8,'#fff',anchor='task-dragged',active=True)+circle(143,232,8)+text(160,237,'Portfolio senden','Send portfolio',key='portfolio')
+            b+=box(126,207,240,50,8,'#62676F',anchor='task-dragged',active=True)+circle(143,232,8,'#fff')+text(160,237,'Portfolio senden','Send portfolio',fill='#fff',key='portfolio')
         else:
             b+=task(232,'Portfolio senden','Send portfolio','portfolio','task-start' if n==1 else 'task-restored',True)
         b+=task(290,'Einkaufen','Buy groceries','groceries')
     if n==3:
-        b+=box(20,386,240,52,9,'#e4e4e4',anchor='undo',active=True)+text(32,406,'Verschoben','Moved',11,fill='#666',key='moved')+text(32,425,'Rückgängig','Undo',14,weight=600,key='undo')+text(229,422,'↶',size=23)
+        b+=box(20,386,240,52,9,'#e4e4e4')+text(32,406,'Verschoben','Moved',11,fill='#666',key='moved')+text(32,425,'Rückgängig','Undo',14,weight=600,key='undo')+circle(237,412,14,anchor='undo',active=True)+'<path d="M243 411a7 7 0 1 0 -1 7 M243 411h-5 M243 411v-5" fill="none" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
     if n==4: b+=box(20,390,240,40,8,'#ededed')+text(140,415,'Wieder unter Heute','Back in Today',13,center=True,key='restored')
     b+=nav(2 if tomorrow else 1,ident)
     return phone(b,ident,["Heute mit drei Aufgaben, darunter Portfolio senden.","Portfolio senden wird aus dem Bildschirm nach rechts gezogen.","Portfolio senden steht unter Morgen. Rückgängig ist verfügbar.","Optional: Rückgängig stellt Portfolio senden unter Heute wieder her."][n-1],["Today contains three tasks, including Send portfolio.","Send portfolio is dragged right, out of the screen.","Send portfolio is in Tomorrow. Undo is available.","Optional: Undo returns Send portfolio to Today."][n-1])
@@ -80,13 +79,13 @@ def live(n):
             for col,c in enumerate(chars):b+=box(start+col*25,420+row*36,23,29,4,'#fafafa')+text(start+col*25+11.5,439+row*36,c,size=11,center=True)
         b+=box(73,530,134,27,5,'#fafafa')+'</g>'
     elif n==2:
-        b=lockbase()+box(19,352,242,84,16,'#fff','#b8b8b8',anchor='live-card')+text(34,375,'to.morrow',size=11,fill='#666')+text(34,403,'Reisepass mitnehmen','Bring passport',15,weight=600,key='passport')+circle(237,399,10,'#333')
+        b=lockbase()+box(19,352,242,84,16,'#fff','#b8b8b8',anchor='live-card')+text(34,375,'to.morrow',size=11,fill='#666')+text(34,403,'Reisepass mitnehmen','Bring passport',15,weight=600,key='passport')+circle(237,399,14,'#333')+'<path d="M230 399l5 5 9-11" fill="none" stroke="#333" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round"/>'
     elif n==3:
-        b=home()+box(90,16,116,29,14,'#242424',anchor='island-compact')+circle(193,30,7,'#ddd')+circle(193,30,2,'#ddd')
+        b=home()+box(90,16,116,29,14,'#242424',anchor='island-compact')+circle(193,30,7,'#ddd')+circle(193,30,2,'#ddd')+circle(193,30,9.8,active=True)
     else:
         b=home()+box(15,16,250,108,28,'#242424',anchor='island-expanded')+box(99,23,82,19,10,'#111')
-        b+=text(31,84,'Reisepass mitnehmen','Bring passport',15,fill='#fff',weight=600,key='passport')+circle(244,79,10,anchor='island-tick',active=True)
-    titles=[('Live: Aufgabe eingeben und die Tastatur schließen.','Live: enter a task and close the keyboard.'),('Die Aufgabe bleibt auf dem Sperrbildschirm sichtbar.','The task stays visible on the Lock Screen.'),('Geschlossene Dynamic Island mit Live-Ring.','Compact Dynamic Island with the Live ring.'),('Geöffnete Dynamic Island mit der Aufgabe und blauem Kreis zum Abhaken.','Expanded Dynamic Island with the task and an accent outline on the completion circle.')]
+        b+=text(31,84,'Reisepass mitnehmen','Bring passport',15,fill='#fff',weight=600,key='passport')+circle(244,79,14,anchor='island-tick',active=True)+f'<path d="M237 79l5 5 9-11" fill="none" stroke="{ACC}" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round"/>'
+    titles=[('Live: Aufgabe eingeben und die Tastatur schließen.','Live: enter a task and close the keyboard.'),('Die Aufgabe bleibt auf dem Sperrbildschirm sichtbar.','The task stays visible on the Lock Screen.'),('Geschlossene Dynamic Island mit blau markiertem Live-Ring.','Compact Dynamic Island with an accent ring around its Live icon.'),('Geöffnete Dynamic Island mit der Aufgabe und vergrößertem Abhak-Kreis mit Haken.','Expanded Dynamic Island with the task and an enlarged checked completion circle.')]
     return phone(b,ident,*titles[n-1],bg='#f3f3f3' if n>1 else '#fff',island=n<3)
 NOTES={
 'reschedule': [('Ausgangsliste','Starting list','Drei Aufgaben für heute.','Three tasks for today.'),('Nach rechts wischen','Swipe right','Die Aufgabe auf später verschieben.','Move the task to a later day.'),('Unter Morgen','In Tomorrow','Die Aufgabe ist verschoben.','The task has moved.'),('Optional: Rückgängig','Optional: Undo','Die Aufgabe kehrt zu Heute zurück.','The task returns to Today.')],
@@ -96,7 +95,7 @@ def band(kind):
     title=('Von Heute nach Morgen','From Today to Tomorrow') if kind=='reschedule' else ('Von der Eingabe bis zum Abhaken','From entering a task to ticking it off')
     desc=('Ein Wisch verschiebt die Aufgabe. Rückgängig bleibt ein optionaler Schritt.','A swipe moves the task. Undo is an optional step.') if kind=='reschedule' else ('Eine Aufgabe auf dem Sperrbildschirm und in der Dynamic Island.','One task on the Lock Screen and in the Dynamic Island.')
     out=f'<div class="flow-band no-shade wireflow wireflow--{kind}" data-wireflow="{kind}">\n          <div class="band-head"><p class="band-title" data-i18n="n-flow-{"swipe" if kind=="reschedule" else "live"}">{title[0]}</p><span class="wireflow-kind">WIREFLOW</span></div>\n'
-    out+=f'          <p class="wireflow-intro" data-i18n="{bind(kind+"-intro",*desc)}">{desc[0]}</p>\n          <div class="wireflow-scroll" tabindex="0" role="group" aria-labelledby="{kind}-flow-label"><span class="wireflow-sr" id="{kind}-flow-label" data-i18n="{bind("scroll-label","Vier Schritte; horizontal scrollbar.","Four steps; scroll horizontally.")}">Vier Schritte; horizontal scrollbar.</span><div class="wireflow-track"><ol class="wireflow-steps">\n'
+    out+=f'          <p class="wireflow-intro" data-i18n="{bind(kind+"-intro",*desc)}">{desc[0]}</p>\n          <div class="wireflow-scroll" tabindex="0" role="group" aria-labelledby="{kind}-flow-label"><span class="wireflow-sr" id="{kind}-flow-label" data-i18n="{bind("scroll-label","Vier Schritte. Auf Mobile horizontal wischen.","Four steps. Swipe horizontally on mobile.")}">Vier Schritte. Auf Mobile horizontal wischen.</span><div class="wireflow-track"><ol class="wireflow-steps">\n'
     for i,(de,en,note,english_note) in enumerate(NOTES[kind],1):
         out+=f'            <li class="wireflow-step"><figure>{(reschedule if kind=="reschedule" else live)(i)}<figcaption><span class="wireflow-step-no">0{i}</span><strong data-i18n="{bind(kind+str(i)+"-caption",de,en)}">{de}</strong><span data-i18n="{bind(kind+str(i)+"-note",note,english_note)}">{note}</span></figcaption></figure></li>\n'
     return out+'          </ol><svg class="wireflow-connectors" aria-hidden="true"></svg></div></div>\n        </div>'

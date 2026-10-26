@@ -20,7 +20,7 @@
         const a = source.getBoundingClientRect(), b = destination.getBoundingClientRect();
         const x1 = a.right - origin.left + 2, y1 = a.top + a.height / 2 - origin.top;
         const x2 = b.left - origin.left - 3, y2 = b.top + b.height / 2 - origin.top;
-        const reach = Math.max(28, Math.min(100, (x2 - x1) * .58));
+        const reach = Math.max(8, Math.min(100, (x2 - x1) * .58));
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', `M${x1} ${y1} C${x1 + reach} ${y1}, ${x2 - reach} ${y2}, ${x2} ${y2}`);
         path.setAttribute('fill', 'none'); path.setAttribute('stroke', 'currentColor');

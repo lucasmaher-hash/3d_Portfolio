@@ -225,6 +225,21 @@ Der neue persönliche Skill `wireframes` hält Aufbau, Aktionskonturen, S-Verbin
 Mobilverhalten und Prüfregeln fest. Er liegt im bestehenden Skills-Repository und ist
 unter `~/.codex/skills/wireframes` für die automatische Auswahl verknüpft.
 
+## Wireframe-Feinschliff · 2026-10-26
+
+- Desktop: beide Abläufe passen mit vier gleich breiten, flüssigen Spalten und
+  proportionalen Abständen vollständig ins Band. Mindestbreiten und horizontales
+  Scrollen gelten ausschließlich bis 860 px. Doppelte Mobil-Regeln sind bereinigt.
+- Verschieben: dunkelgraue gezogene Portfolio-Karte mit weißem Inhalt; die alte
+  graue Morgen-Aktionsfläche dahinter entfällt. Der Undo-Pfeil startet am runden,
+  blau markierten Symbolknopf, nicht mehr an der ganzen Undo-Karte.
+- Live: blauer Ring um das kompakte Island-Symbol mit 40 % größerem Durchmesser.
+  Die Abhak-Kreise auf Screen 2 und 4 sind ebenfalls 40 % größer und enthalten Haken.
+- Vergleichskarten: quadratische Bildflächen; Außenabstände auf die Hälfte reduziert
+  (7–11 statt 14–22 px). Vergleichswerte bleiben unverändert.
+- Generierte SVG-Flüsse visuell geprüft; Elementverbindungen und Sprachwechsel geprüft.
+  Der persönliche Wireframe-Skill hält statisches Desktop-Layout als Standard fest.
+
 ## 0. What the interview established
 
 | Topic | Answer |
