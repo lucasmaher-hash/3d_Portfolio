@@ -22,7 +22,7 @@ fictional or placeholder data. The sole exception is the opening competitor comp
 its app-by-app tap counts and timings are illustrative and must not be described as a
 verified user benchmark.
 
-Current results: **5 → 1 actions** to reschedule; **9 of the 15 accompanied/interviewed
+Current results: **3 → 1 actions** to reschedule; **9 of the 15 accompanied/interviewed
 participants use Go Live**; **90 total app downloads as of October 2026**. Downloads are
 not active users. The 15 participants form one shared user/interview group.
 
@@ -48,7 +48,7 @@ Do not invent additional findings or relabel old draft examples as actual result
 
 There is one group of 15 people, accompanied as users and interviewed along their journey.
 Nine use Go Live. The app has 90 total downloads as of October 2026; this is a download
-count, not an active-user count. The result bar has three cards: 5 → 1 actions, 9 of 15,
+count, not an active-user count. The result bar has three cards: 3 → 1 actions, 9 of 15,
 and 90 downloads. User research/results are real, as confirmed by Lucas. The opening
 competitor comparison is the sole illustrative-data exception.
 
@@ -837,3 +837,16 @@ Where the honesty lands.
 - **Do not pad.** If the page needs a scroll bar longer than Unify's, cut.
 
 ---
+
+## Competitor screenshots and supplied counts · 2026-10-26
+
+The selected comparison is Google Tasks (3 taps, IMG_9771), Apple Reminders
+(3 taps, IMG_9772), Todoist (3 taps, IMG_9773), Microsoft To Do (4 taps, IMG_9764),
+and to.morrow (1 swipe). Lucas supplied the app names/counts in a Notes screenshot.
+IMG_9775 is excluded following his choice of four competitors plus to.morrow.
+The four competitor screenshots are format-converted to WebP without altering their UI;
+CSS crops retain approximately 80% of the screen height and prioritise date controls.
+Desktop uses five equal columns; mobile uses a 2×2 competitor grid with to.morrow
+centered below at the same card width. Old timing values and Things imagery are removed
+from the current comparison. The Reminders result summary is now 3 → 1 to match the supplied
+count. This records Lucas’s comparison, not an independently verified timed user study.

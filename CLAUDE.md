@@ -8,7 +8,7 @@ fictional or placeholder data. The sole exception is the opening competitor comp
 its app-by-app tap counts and timings are illustrative and must not be described as a
 verified user benchmark.
 
-Current results: **5 → 1 actions** to reschedule; **9 of the 15 accompanied/interviewed
+Current results: **3 → 1 actions** to reschedule; **9 of the 15 accompanied/interviewed
 participants use Go Live**; **90 total app downloads as of October 2026**. Downloads are
 not active users. The 15 participants form one shared user/interview group.
 
