@@ -249,6 +249,17 @@ Einstellpanel die geerbte Textgröße. Quadratische Bilder, 7–11 px Kartenpols
 18 px Rundung und bestehende Text-/Zwischenabstände bleiben erhalten.
 Das temporäre Einstellpanel samt CSS und JavaScript wurde vollständig entfernt.
 
+## Vollständiger Prompt-Abgleich · 2026-10-26
+
+Der nachgereichte ursprüngliche Auftrag ist in `tomorrow-request-audit.md` Punkt
+für Punkt mit dem aktuellen Stand verglichen. Die bereits aktiven fünf
+Textänderungen sind nun direkt in den DE/EN-Wörterbüchern hinterlegt; der spätere
+Überschreibungsblock und die alten Grundtexte sind entfernt. Die Timer-/Kalender-
+Begründung folgt dem Brief enger. Der Nutzer hat den am Ende ohne Ersatztext
+stehenden Auftrag mit „just leave it out“ geklärt: die beiden einleitenden
+Designsystem-Absätze samt Sprachschlüsseln entfallen. 127 aktive Sprachschlüssel,
+Skriptprüfung und Build bestanden; keine Browser-Gesamtprüfung in diesem Abgleich.
+
 ## 0. What the interview established
 
 | Topic | Answer |
