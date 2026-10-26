@@ -19,6 +19,15 @@ works, the research it was based on, the page structure it set and its list of t
 
 ---
 
+## Mobile review 2026-10-26: version 2
+
+`public/to.morrow2d2.html`: reviewed the whole page at 320/390/430/744/768/844/859 px with touch emulation, plus 861/1440 px desktop controls. This pass follows the separate rotation, wireflow-edge and sketch-control fixes in `c834a78`.
+
+- Mobile body-copy contrast increased from 2.39:1 to 5.27:1; blue text labels use a darker shade of the existing accent. Reading copy is 16 px, compact explanatory copy 15 px, and Live-sequence labels wrap at 12 px instead of staying at 9.5 px. Source labels retain full opacity.
+- The lower Live recordings initially request metadata; a 600 px prefetch margin warms the full sequence before it appears. Desktop retains automatic preloading. Checked hero playback, all three sequence stages, and pausing after scrolling away.
+- The document language now follows the existing EN/DE control. Checked both buttons through the nav iframe's existing message path.
+- No document-wide horizontal overflow or browser errors in the checks. Desktop section geometry and control dimensions match the baseline. Production build passes. Measurements use headless Chromium with mobile device metrics/touch enabled; no physical-device Safari check was performed.
+
 ## Status 2026-10-24: draft built
 
 `public/to.morrow2d1.html` (same URL with a `1`, unlinked, noindex) implements §2 to §6 as a first pass. Details
@@ -168,6 +177,53 @@ Bildschirmzustände mit Aktionen und Feedback; [Figma: What is wireframing?](htt
 beschreibt abgestufte Detailgrade, Inhaltshierarchie und funktionale Struktur vor der
 visuellen Ausgestaltung. Hier passt mittlere Detailtiefe: genug echte Beschriftungen zum
 Verstehen des Ablaufs, ohne die Materialeffekte des fertigen Produkts nachzubauen.
+
+## Wireframes, Text und Live-Sequenz · 2026-10-26
+
+Aktueller Stand der unverlinkten Version `public/to.morrow2d2.html`:
+
+- Die Wireframes verwenden blaue Konturen direkt an den aktiven Elementkanten
+  und S-Kurven zwischen den betreffenden Elementen. Die gezogene Portfolio-Karte
+  verlässt den zweiten Screen. Hinzufügen-Felder, detached gesture arrow und
+  Home-Indikatoren entfallen; die graue Navigation reicht bis an den unteren Rand.
+- Live zeigt Eingabe → Sperrbildschirm → kompakte Island mit Ring → geöffnete Island
+  mit markiertem Abhak-Kreis. In der geöffneten Island steht kein App-Name.
+- Auf Mobile stehen die Live-Schrittlabels über den Screens. Der Einführungssatz und
+  Zusatznotizen entfallen dort. Die Mindestbreiten betragen 176 statt 220 px auf
+  Phones und 148 statt 185 px im 641–860-px-Band; dadurch sinkt auch die Layouthöhe.
+- Vier Vergleichskarten zeigen Screenshots vor App-Name und vorhandenen Werten.
+  Überschrift und Einleitung stehen linksbündig im selben Breitenmaß wie die Karten.
+- Das zentrale Entwurfsprinzip ist jetzt ausdrücklich die möglichst geringe Zeit und
+  Reibung beim Verwalten von To-dos. Zielgruppe, Live-Begründung und automatische
+  Aktivierung nach Tastaturschluss sind in DE und EN überarbeitet. Home Screen wird
+  konkret als Dynamic Island auf dem Home-Bildschirm beschrieben. Die Überschrift
+  „Die Anzeige steuern“ ist entfernt; der Einleitungstitel lautet „Immer im Blick“.
+- Der rotierende Handyblock hat mehr Abstand zwischen Titel und Text. Die Aussage
+  „Der Look erschwerte die Bedienung.“ verwendet W95FA bei den bestehenden Maßen.
+- Die beiden oberen Fortschrittslinien laufen nach der Videozeit, unabhängig vom
+  Pixelpunkt. Linie 1 endet beim Start des mittleren Handys, Linie 2 am Ende seiner
+  ersten Abspielphase. Die Clip-Enden wurden auf Bewegung geprüft: konservative
+  Stopppunkte 15,10 / 2,50 / 4,25 s. Nach allen Bewegungen inklusive Ankunftseffekten
+  steht die Gesamtsequenz noch eine Sekunde und beginnt erneut.
+
+`generate-tomorrow-wireflows.py` erzeugt die zwei Grafiken und ihre Übersetzungen;
+`tomorrow-wireflow-connectors.js` verbindet die tatsächlichen Elementkanten nach
+Layoutänderungen neu. Die acht Screens und die Gesamtflüsse wurden als SVG gerendert
+und visuell geprüft. Laufzeitprüfungen decken Federn, Sprachwechsel, Elementverbindungen
+bei Größen-/Scrolländerungen und Sequenz-Timing ab. 129 aktive Sprachschlüssel,
+Produktionsbuild und `git diff --check` bestanden. Eine Browserprüfung der gesamten
+Darstellung steht aus. Forschungszahlen und Originalzitate wurden unverändert geprüft.
+
+Screenshot-Quellen: Herstellerdarstellungen aus den App-Store-Einträgen
+[Reminders](https://apps.apple.com/us/app/reminders/id1108187841),
+[Things](https://apps.apple.com/us/app/things-3/id904237743),
+[Todoist](https://apps.apple.com/us/app/todoist-to-do-list-calendar/id572688855).
+Der to.morrow-Screenshot stammt aus dem vorhandenen öffentlichen Hochformatclip.
+Die Hersteller-Screenshots belegen die Vergleichszeiten nicht neu.
+
+Der neue persönliche Skill `wireframes` hält Aufbau, Aktionskonturen, S-Verbindungen,
+Mobilverhalten und Prüfregeln fest. Er liegt im bestehenden Skills-Repository und ist
+unter `~/.codex/skills/wireframes` für die automatische Auswahl verknüpft.
 
 ## 0. What the interview established
 
