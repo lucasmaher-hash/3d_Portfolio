@@ -48,7 +48,7 @@ def reschedule(n):
         b+=task(174,'Skizzen sortieren','Sort sketches','sketches')
         if n==2:
             # Intentional overflow: the dragged task leaves the phone, without a nested clip.
-            b+=box(126,207,240,50,8,'#62676F',anchor='task-dragged',active=True)+circle(143,232,8,'#fff')+text(160,237,'Portfolio senden','Send portfolio',fill='#fff',key='portfolio')
+            b+='<g class="wireflow-dragged">'+box(126,207,240,50,8,'#62676F',anchor='task-dragged',active=True)+circle(143,232,8,'#fff')+text(160,237,'Portfolio senden','Send portfolio',fill='#fff',key='portfolio')+'</g>'
         else:
             b+=task(232,'Portfolio senden','Send portfolio','portfolio','task-start' if n==1 else 'task-restored',True)
         b+=task(290,'Einkaufen','Buy groceries','groceries')

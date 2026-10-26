@@ -1,7 +1,7 @@
 // Connect the actual element edges, including on resized or scrolled phones.
 (() => {
   const graphs = {
-    reschedule: [['task-dragged', 'task-arrived'], ['undo', 'task-restored']],
+    reschedule: [['task-start', 'task-dragged'], ['task-dragged', 'task-arrived'], ['undo', 'task-restored']],
     live: [['live-switch', 'live-card'], ['live-card', 'island-compact'], ['island-compact', 'island-expanded']]
   };
   document.querySelectorAll('[data-wireflow]').forEach((band, index) => {
@@ -18,8 +18,16 @@
         const source = band.querySelector(`[data-flow-anchor="${from}"]`), destination = band.querySelector(`[data-flow-anchor="${to}"]`);
         if (!source || !destination) continue;
         const a = source.getBoundingClientRect(), b = destination.getBoundingClientRect();
-        const x1 = a.right - origin.left + 2, y1 = a.top + a.height / 2 - origin.top;
-        const x2 = b.left - origin.left - 3, y2 = b.top + b.height / 2 - origin.top;
+        let x1 = a.right - origin.left + 2, y1 = a.top + a.height / 2 - origin.top;
+        let x2 = b.left - origin.left - 3, y2 = b.top + b.height / 2 - origin.top;
+        if (from === 'task-start') {
+          // A small direction cue in the gap between the first two phones.
+          const first = source.closest('.wireflow-phone').getBoundingClientRect();
+          const second = destination.closest('.wireflow-phone').getBoundingClientRect();
+          const center = (first.right + second.left) / 2 - origin.left;
+          const length = Math.min(22, (second.left - first.right) * .45);
+          x1 = center - length / 2; x2 = center + length / 2; y2 = y1;
+        }
         const reach = Math.max(8, Math.min(100, (x2 - x1) * .58));
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', `M${x1} ${y1} C${x1 + reach} ${y1}, ${x2 - reach} ${y2}, ${x2} ${y2}`);
