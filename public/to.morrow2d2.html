@@ -4530,10 +4530,10 @@
   var nums = Array.prototype.slice.call(document.querySelectorAll('.trio-nums:not(.trio-caps) .trio-num'));
   var KB_DOWN = 4.35;              // video 1: the keyboard folds away
   var V2_AT = 3.95;                // video 1 clock: video 2 starts here, so that its task appears (0.5 s into the clip) just as the keyboard folds
-  var GAP23 = 1.31;                // video 1 clock: from the keyboard to the start of video 3 (the island then rests closed for 1.4 s before it opens)
+  var GAP23 = 1.78;                // video 1 clock: from the keyboard to the start of video 3 (the island then rests closed for 1.4 s before it opens; all three clicks start at 3.30 s of video 3)
   var SKIP1 = 4.0;                 // two breaths of the live button skipped at video 3's start, so that its switch-off meets the island closing
   var CLOSE3 = 3.74;               // video 3: the island starts to close (closed rest 1.4 s, opening slowed by 20 %, tick click before the close)
-  var HOLD2 = 1.60, LEAD2 = 0.50;  // video 2 waits here; its press-and-drop starts LEAD2 s before the island closes (press 0.47 s, then the drop)
+  var HOLD2 = 1.60, LEAD2 = 0.44;  // video 2 waits here; its press starts LEAD2 s before the island closes, i.e. together with the tick click in video 3 and Live's switch-off in video 1
   var on = false, raf = 0, timer = 0, s2 = false, s3 = false, ticked = false, restarting = false;
   function fill(k, f) { var el = nums[k]; if (!el) return; el.style.setProperty('--f', Math.max(0, Math.min(1, f)).toFixed(4)); el.classList.toggle('is-full', f >= 1); }
   function pop(k) { var el = nums[k]; if (!el) return; el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
