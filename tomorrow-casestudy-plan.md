@@ -850,3 +850,11 @@ Desktop uses five equal columns; mobile uses a 2×2 competitor grid with to.morr
 centered below at the same card width. Old timing values and Things imagery are removed
 from the current comparison. The Reminders result summary is now 3 → 1 to match the supplied
 count. This records Lucas’s comparison, not an independently verified timed user study.
+
+### Mobile comparison crops · 2026-10-26
+
+At ≤640 px, image frames use 40:49 instead of 4:7, exactly 70% of their prior
+height at the same width. Per-app crop positions retain the date controls. For
+to.morrow, two clipped views of the same screenshot remove unused space between
+the task list and navigation, preserving the swipe gesture and full bottom nav.
+The source screenshot and desktop crop are unchanged.

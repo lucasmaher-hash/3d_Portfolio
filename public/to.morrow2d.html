@@ -855,6 +855,20 @@
     .tap-shot--todoist img { object-position: center 65%; }
     .tap-shot--microsoft img { object-position: center bottom; }
     .tap-shot--tomorrow img { object-position: center bottom; }
+    .tap-shot__nav { display: none !important; }
+    @media (max-width: 640px) {
+      /* 70% of the desktop frame height at the same image width. */
+      .tap-shot { aspect-ratio: 40 / 49; }
+      .tap-shot--google img { object-position: center 72%; }
+      .tap-shot--reminders img { object-position: center 68%; }
+      .tap-shot--todoist img { object-position: center 52%; }
+      .tap-shot--microsoft img { object-position: center bottom; }
+      /* Crop the unused gap between the task list and bottom navigation,
+         keeping both the swipe gesture and the complete nav from the same screenshot. */
+      .tap-shot--tomorrow { position: relative; }
+      .tap-shot--tomorrow > img:first-child { height: 78%; object-position: center 45%; }
+      .tap-shot--tomorrow .tap-shot__nav { display: block !important; position: absolute; bottom: 0; left: 0; width: 100%; height: 22%; object-position: center bottom; }
+    }
     .tap-name { text-decoration: none; }
     .tap-name:hover { text-decoration: underline; }
     .taps-wrap { text-align: left; }
@@ -2954,7 +2968,7 @@
             <span class="tap-n" data-i18n="n-taps-4">4 Taps</span>
           </div>
           <div class="tap-card is-us">
-            <div class="tap-shot tap-shot--tomorrow"><img src="/images/to.morrow/competitors/tomorrow-reschedule.webp" width="720" height="1565" loading="lazy" alt="to.morrow" /></div>
+            <div class="tap-shot tap-shot--tomorrow"><img src="/images/to.morrow/competitors/tomorrow-reschedule.webp" width="720" height="1565" loading="lazy" alt="to.morrow" /><img class="tap-shot__nav" src="/images/to.morrow/competitors/tomorrow-reschedule.webp" width="720" height="1565" loading="lazy" alt="" aria-hidden="true" /></div>
             <span class="tap-name">to.morrow</span>
             <span class="tap-n" data-i18n="n-taps-5">1 Wisch</span>
           </div>
