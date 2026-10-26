@@ -3207,7 +3207,7 @@
             <div class="trio-shots">
               <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingetippt und mit Go Live aktiviert"><source src="/videos/to.morrow/live-1-type.mp4?v=6" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
               <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=4" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island.mp4?v=8" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island.mp4?v=9" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
             </div>
             <div class="trio-nums trio-caps"><span class="trio-num">Eintippen, Live schalten</span><span class="trio-num"><span class="trio-cap-wide">Sperrbildschirm</span></span><span class="trio-num">Dynamic Island</span></div>
           </div>
@@ -4531,8 +4531,8 @@
   var KB_DOWN = 4.35;              // video 1: the keyboard folds away
   var V2_AT = 3.85;                // video 1 clock: video 2 starts here, so that its task appears (0.5 s into the clip) just as the keyboard folds
   var GAP23 = 2.31;                // video 1 clock: from the keyboard to the start of video 3
-  var SKIP1 = 2.0;                 // one breath of the live button skipped at video 3's start, so that its switch-off meets the island closing
-  var CLOSE3 = 4.74;               // video 3: the island starts to close (its opening animation is slowed by 20 %)
+  var SKIP1 = 4.0;                 // two breaths of the live button skipped at video 3's start, so that its switch-off meets the island closing
+  var CLOSE3 = 2.74;               // video 3: the island starts to close (its opening animation is slowed by 20 %)
   var HOLD2 = 1.83, LEAD2 = 0.10;  // video 2 waits here; its drop-away starts LEAD2 s after being released
   var on = false, raf = 0, timer = 0, s2 = false, s3 = false, ticked = false, restarting = false;
   function fill(k, f) { var el = nums[k]; if (!el) return; el.style.setProperty('--f', Math.max(0, Math.min(1, f)).toFixed(4)); el.classList.toggle('is-full', f >= 1); }
