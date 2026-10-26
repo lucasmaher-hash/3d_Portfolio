@@ -118,6 +118,9 @@ Die drei animierten Designsystem-Beispiele stehen in separaten Zeilen: Eingabefe
 Live-Schalter rechts, Umschalter links. Jeder Erklärungssatz steht direkt daneben, auch auf
 schmalen Ansichten. Die bestehenden Animationen und ihre Reduced-Motion-Steuerung bleiben erhalten.
 Die aufgeteilten Texte sind in Deutsch und Englisch angebunden; aktuell 98 aktive Übersetzungsschlüssel.
+Der Zeilenabstand beträgt jetzt `clamp(72px, 10vw, 140px)`. Der Live-Schalter ist über seinen
+Größenfaktor von 0,764 auf 1,528 in allen Dimensionen verdoppelt; auf schmalen Ansichten bekommt
+seine Spalte die benötigte Inhaltsbreite, während der Erklärungstext daneben bleibt.
 
 ### Prüfung
 

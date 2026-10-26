@@ -2263,7 +2263,7 @@
       width: min(860px, 100%);
       margin-inline: auto;
     }
-    .dna-stack { display: flex; flex-direction: column; gap: clamp(40px, 6vw, 80px); width: 100%; }
+    .dna-stack { display: flex; flex-direction: column; gap: clamp(72px, 10vw, 140px); width: 100%; }
     .dna-demo {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -2523,6 +2523,8 @@
 
     @media (max-width: 640px) {
       .dna-stage { --z: var(--z0, 1); }
+      .dna-demo:nth-child(even) { grid-template-columns: minmax(0, 1fr) auto; }
+      .dna-demo:nth-child(even) .dna-stage { width: auto; }
       .dna-ws { --h: 60; --ws-pad-x: 16px; --ws-gap: 6px; }
       .dna-seg { --seg-pad: 3px; }
       .dna-seg .sk-seg__opt { --opt-pad-x: 1px; }
@@ -3197,7 +3199,7 @@
             <div class="dna-body"><p class="stagger-copy dna-copy" data-i18n-html="dna-input-text">In der <b class="kw">Mulde</b> erscheint der eingegebene Text.</p></div>
           </div>
           <div class="dna-demo">
-            <div class="dna-stage sk" style="--z0: 0.764;">
+            <div class="dna-stage sk" style="--z0: 1.528;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
                 <span class="dna-ws__mark"></span><span class="dna-ws__label"><span class="dna-ws__off">Off air</span><span class="dna-ws__on">On air</span></span>
               </button>
