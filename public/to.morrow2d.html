@@ -847,17 +847,19 @@
       .taps-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .tap-card.is-us { grid-column: 1 / -1; justify-self: center; width: calc((100% - clamp(10px, 1.6vw, 20px)) / 2); }
     }
-    .tap-shot { width: 100%; aspect-ratio: 4 / 7; overflow: hidden; border-radius: 10px; background: #fff; margin-bottom: 8px; }
+    .tap-shot { width: 100%; aspect-ratio: 400 / 539; overflow: hidden; border-radius: 10px; background: #fff; margin-bottom: 8px; }
     .tap-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-    /* Show about 80% of each screen, prioritising the date controls over status chrome. */
+    /* Vertically crop the frames to 77% of their former 4:7 height at unchanged width. */
     .tap-shot--google img { object-position: center 85%; }
     .tap-shot--reminders img { object-position: center 68%; }
     .tap-shot--todoist img { object-position: center 65%; }
     .tap-shot--microsoft img { object-position: center bottom; }
-    .tap-shot--tomorrow img { object-position: center bottom; }
+    .tap-shot--tomorrow { position: relative; }
+    .tap-shot--tomorrow img { object-position: center 96%; }
+    .tap-shot--tomorrow::after { content: ''; position: absolute; inset: 0; background: rgba(39, 69, 111, 0.08); pointer-events: none; }
     .tap-shot__nav { display: none !important; }
     @media (max-width: 640px) {
-      /* 70% of the desktop frame height at the same image width. */
+      /* Mobile keeps its compact frame height independently of the desktop crop. */
       .tap-shot { aspect-ratio: 40 / 49; }
       .tap-shot--google img { object-position: center 72%; }
       .tap-shot--reminders img { object-position: center 68%; }
@@ -865,8 +867,7 @@
       .tap-shot--microsoft img { object-position: center bottom; }
       /* Crop the unused gap between the task list and bottom navigation,
          keeping both the swipe gesture and the complete nav from the same screenshot. */
-      .tap-shot--tomorrow { position: relative; }
-      .tap-shot--tomorrow > img:first-child { height: 78%; object-position: center 45%; }
+      .tap-shot--tomorrow > img:first-child { height: 78%; object-position: center 51%; }
       .tap-shot--tomorrow .tap-shot__nav { display: block !important; position: absolute; bottom: 0; left: 0; width: 100%; height: 22%; object-position: center bottom; }
     }
     .tap-name { text-decoration: none; }

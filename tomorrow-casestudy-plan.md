@@ -858,3 +858,11 @@ height at the same width. Per-app crop positions retain the date controls. For
 to.morrow, two clipped views of the same screenshot remove unused space between
 the task list and navigation, preserving the swipe gesture and full bottom nav.
 The source screenshot and desktop crop are unchanged.
+
+### Final comparison crop refinement · 2026-10-26
+
+Desktop frames now use 400:539, 77% of the previous 4:7 height with widths unchanged.
+Mobile retains 40:49. The mobile to.morrow list crop is anchored at 51% to remove
+the clipped circle at its top edge; the separate bottom-nav crop remains intact.
+An 8% blue-gray overlay slightly darkens and tints only the to.morrow screenshot
+on both layouts, without changing the source asset.
