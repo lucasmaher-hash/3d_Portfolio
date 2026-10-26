@@ -882,3 +882,13 @@ Nach Lucas’ Sichtprüfung: beim Rendern aus dem Original-PDF zusätzlich um 0,
 gegen den Uhrzeigersinn ausgerichtet, damit die rechte Seite nicht absinkt.
 Finales Webasset: 2407×914 px, ca. 2,63:1. Keine Linien nachgezeichnet, keine
 Perspektivkorrektur einzelner Formen; nur die leichte globale Neigung korrigiert.
+
+## Sketch appearance controls · 2026-10-26
+
+The source scan remains unchanged. An SVG luminance-to-alpha filter separates ink
+from paper: default ink #34343a, darkness 150%; cream paper #f6f5f0 at 100% tint.
+Inline controls below the sketch are enabled on localhost or with `?sketch-tuner`.
+They independently adjust line darkness, ink color, paper tint strength and paper
+color, save preview values in localStorage, expose the current JSON for sharing,
+and provide Reset. The normal public page uses the fixed defaults, not the local
+preview settings. Controls can be removed after Lucas supplies final values.

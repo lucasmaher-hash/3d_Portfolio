@@ -2751,6 +2751,18 @@
     /* Sketch spread: only two short annotations; explanations live above it. */
     .paper { margin: 0; padding: 0; border-radius: 6px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(40, 40, 90, 0.18), 0 8px 22px rgba(40, 40, 90, 0.1); }
     .paper > img { display: block; width: 100%; height: auto; }
+    .paper--scan { background: var(--sketch-paper, #f6f5f0); }
+    .paper--scan > img { filter: url(#sketch-ink-filter); }
+    .sketch-tuner { padding: 18px; border-radius: 14px; box-shadow: var(--shadow-pressed); font-size: 14px; color: var(--text-primary); }
+    .sketch-tuner[hidden] { display: none; }
+    .sketch-tuner summary { cursor: pointer; font-weight: 500; }
+    .sketch-tuner__controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; margin-top: 18px; }
+    .sketch-tuner label { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+    .sketch-tuner input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent-orange); }
+    .sketch-tuner input[type="color"] { width: 46px; height: 30px; padding: 2px; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; }
+    .sketch-tuner__settings { display: block; margin-top: 18px; white-space: pre-wrap; font: 12px/1.6 monospace; user-select: all; }
+    .sketch-tuner button { margin-top: 12px; border: 0; border-radius: 99px; padding: 8px 14px; background: var(--bg-surface); color: inherit; font: inherit; box-shadow: var(--shadow-raised-sm); cursor: pointer; }
+    @media (max-width: 640px) { .sketch-tuner__controls { grid-template-columns: 1fr; } }
 
     /* ── Rule card and the week diagram ── */
     .rule-card { display: flex; flex-direction: column; gap: 14px; padding: clamp(18px, 3vw, 28px); border-radius: 18px; box-shadow: var(--shadow-pressed); }
@@ -3090,10 +3102,29 @@
         <li data-i18n-html="n-form-toggle"><b class="kw">Umschalter verbinden beide Formen.</b> Eine erhabene Blase sitzt in einer Mulde. Drückst du die andere Option, wechselt der Zustand und die Blase wandert dorthin.</li>
       </ul>
       <h3 class="feature-title cs-h3" data-i18n="n-side-title">Die Formen im Querschnitt</h3>
+      <svg width="1" height="1" style="position:absolute; overflow:hidden;" aria-hidden="true" focusable="false">
+        <defs><filter id="sketch-ink-filter" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.2126 -0.7152 -0.0722 0 1" />
+          <feComponentTransfer result="ink-mask"><feFuncA id="sketch-ink-strength" type="linear" slope="1.5" /></feComponentTransfer>
+          <feFlood id="sketch-ink-color" flood-color="#34343a" />
+          <feComposite in2="ink-mask" operator="in" />
+        </filter></defs>
+      </svg>
       <figure class="paper paper--scan">
         <img src="/images/to.morrow/seitenansicht-skizze.webp?v=2" width="2407" height="914" loading="lazy" alt="" />
         <figcaption class="wireflow-sr" data-i18n="n-side-description">Handgezeichnete Querschnitte: links eine vertiefte Texteingabe, in der Mitte ein erhabener Knopf mit Druckpfeil, rechts eine Blase, die sich in einer Mulde zwischen zwei Zuständen bewegt.</figcaption>
       </figure>
+      <details class="sketch-tuner" id="sketch-tuner" hidden open>
+        <summary data-i18n="sketch-controls">Skizze einstellen</summary>
+        <div class="sketch-tuner__controls">
+          <label><span data-i18n="sketch-lines">Linienstärke / Dunkelheit</span><output id="sketch-lines-value" for="sketch-lines">150%</output><input id="sketch-lines" type="range" min="0" max="300" step="5" value="150" /></label>
+          <label><span data-i18n="sketch-tint">Papier-Tönung</span><output id="sketch-tint-value" for="sketch-tint">100%</output><input id="sketch-tint" type="range" min="0" max="100" step="1" value="100" /></label>
+          <label><span data-i18n="sketch-ink">Linienfarbe</span><input id="sketch-ink" type="color" value="#34343a" /></label>
+          <label><span data-i18n="sketch-paper">Papierfarbe</span><input id="sketch-paper" type="color" value="#f6f5f0" /></label>
+        </div>
+        <output class="sketch-tuner__settings" id="sketch-settings"></output>
+        <button type="button" id="sketch-reset" data-i18n="sketch-reset">Zurücksetzen</button>
+      </details>
       <!-- Skill implementation note followed by three equal-size primitives across the full content width.
 
            Each animation shows the primitive's OWN job and nothing else —
@@ -3433,6 +3464,12 @@
       }
     };
     Object.assign(TRANSLATIONS.en, {
+      "sketch-controls": "Sketch controls",
+      "sketch-lines": "Line darkness",
+      "sketch-tint": "Paper tint strength",
+      "sketch-ink": "Ink color",
+      "sketch-paper": "Paper color",
+      "sketch-reset": "Reset",
       "n-side-description": "Hand-drawn cross-sections: a recessed text input on the left, a raised button with a press arrow in the middle, and a bubble moving between two states within a recess on the right.",
       "n-taps-5": "1 swipe",
       "n-fact-downloads": "total downloads",
@@ -3497,6 +3534,12 @@
 
 });
     Object.assign(TRANSLATIONS.de, {
+      "sketch-controls": "Skizze einstellen",
+      "sketch-lines": "Linien-Dunkelheit",
+      "sketch-tint": "Papier-Tönung",
+      "sketch-ink": "Linienfarbe",
+      "sketch-paper": "Papierfarbe",
+      "sketch-reset": "Zurücksetzen",
       "n-side-description": "Handgezeichnete Querschnitte: links eine vertiefte Texteingabe, in der Mitte ein erhabener Knopf mit Druckpfeil, rechts eine Blase, die sich in einer Mulde zwischen zwei Zuständen bewegt.",
       "n-taps-5": "1 Wisch",
       "n-fact-downloads": "Downloads insgesamt",
@@ -4647,5 +4690,6 @@
 })();
 </script>
   <script src="/scripts/tomorrow-wireflow-connectors.js" defer></script>
+  <script src="/scripts/tomorrow-sketch-tuner.js" defer></script>
 </body>
 </html>
