@@ -14,9 +14,24 @@ in git history) that the current page was built from. That plan's description of
 works, the research it was based on, the page structure it set and its list of things to avoid are kept as
 **Appendices A–D** at the end of this file.
 
-> **Unless explicitly confirmed below, numbers in this file are example values** showing the
-> *shape* of a finding and where it would go on the page. Older participant counts are superseded
-> by the confirmed cohort below; historical entries remain as a record of earlier drafts.
+## to.morrow data status · confirmed by Lucas, 2026-10-26
+
+The published case study is `public/to.morrow2d.html`. Lucas explicitly confirms that its
+user research, feedback and result statistics are actual findings from real users, not
+fictional or placeholder data. The sole exception is the opening competitor comparison:
+its app-by-app tap counts and timings are illustrative and must not be described as a
+verified user benchmark.
+
+Current results: **5 → 1 actions** to reschedule; **9 of the 15 accompanied/interviewed
+participants use Go Live**; **90 total app downloads as of October 2026**. Downloads are
+not active users. The 15 participants form one shared user/interview group.
+
+Keep the distinction between user-confirmed facts and independent verification: this
+confirmation comes from Lucas. Keep feedback paraphrases labelled as paraphrases and
+retain the small-group limitation. Neither implies that the research is fictional.
+Do not restore retired draft quantities, retention rates or the replaced active-user count.
+Do not invent additional findings or relabel old draft examples as actual results.
+
 
 ---
 
@@ -29,25 +44,23 @@ works, the research it was based on, the page structure it set and its list of t
 - The document language now follows the existing EN/DE control. Checked both buttons through the nav iframe's existing message path.
 - No document-wide horizontal overflow or browser errors in the checks. Desktop section geometry and control dimensions match the baseline. Production build passes. Measurements use headless Chromium with mobile device metrics/touch enabled; no physical-device Safari check was performed.
 
-## Confirmed participant group · 2026-10-26
+## Confirmed participant group and current results · 2026-10-26
 
-Lucas confirmed a single group of **15 people**, followed as users and also interviewed
-about their experience. They are the same participants, not separate user and interview
-samples. Do not revert to ten interviewees or 18 testers per build. No age range,
-subgroup totals, retention rates, or fixed follow-up duration was confirmed with this
-correction. The older quantities elsewhere in this plan are historical draft values.
+There is one group of 15 people, accompanied as users and interviewed along their journey.
+Nine use Go Live. The app has 90 total downloads as of October 2026; this is a download
+count, not an active-user count. The result bar has three cards: 5 → 1 actions, 9 of 15,
+and 90 downloads. User research/results are real, as confirmed by Lucas. The opening
+competitor comparison is the sole illustrative-data exception.
 
-Lucas explicitly requested removal of the old outcome rates: 61 % vs. 24 % and
-“eight out of ten” are not retained or recalculated. The draft page now gives only
-the confirmed 15-person research cohort; the unrelated task-action comparison is
-unchanged. The result area uses two fact cards rather than leaving an empty third
-column. The keyboard-dismissal text now ends at “Dynamic Island”, without the
-additional Home Screen phrase.
+Retired interview/tester counts and retention rates were removed at Lucas's request and
+must not be restored. The keyboard-dismissal text ends at “Dynamic Island”. The current
+published page is `public/to.morrow2d.html`; older file-specific entries below are a
+historical change record.
 
 ## Status 2026-10-24: draft built
 
 `public/to.morrow2d1.html` (same URL with a `1`, unlinked, noindex) implements §2 to §6 as a first pass. Details
-and the list of what is mock vs real are in CLAUDE.md, "to.morrow case-study rebuild draft". What Lucas added
+and historical layout notes are in CLAUDE.md, "to.morrow case-study rebuild draft". What Lucas added
 on top of the plan:
 
 - **A section on the rules of the design system ("what I was thinking")**, section 5 of the page: four rules
@@ -57,19 +70,17 @@ on top of the plan:
   and the combination, explaining what each does."* Built as three cross-section SVGs (bubble · trough ·
   toggle) on a paper-coloured sheet, each with its explanation. **Lucas will draw the paper version; the SVGs
   are the placeholder** and get replaced by the scan.
-- **Mockups instead of empty frames.** Wherever an asset or a measurement is missing, the draft shows a basic
-  wireframe or a chart with example values, each tagged (`.mock-tag`), so the layout can be judged now.
+- **Artwork placeholders:** wireframes and a sketch slot explain the layout until final artwork is available. These visual placeholders do not make user research or results fictional; see the current data status above.
 
 ### Still open (Lucas, 2026-10-25)
 
 - [ ] **Re-shoot the two clips under "Live-Benachrichtigungen"** (`live-pair.mp4`, section 3, "Ein Feld, ein Schalter") on the new phone **with Dynamic Island**, so the task can really be ticked off *in* the Dynamic Island. The current clip only shows the Lock Screen.
 - [ ] **Add a landscape section to the swipe part (section 2):** in landscape all three panels (Heute, Morgen, Bald) are open at once and you see every to-do of the workspace together. Needs a landscape recording.
 - [ ] **Ideas, undecided:** (a) a real interview study with ~20 people on how they track to-dos, repeated with the app afterwards; (b) a three-number fact bar. Neither goes on the page without real data.
-- [x] **Done 2026-10-25:** "Die Regel dahinter" card cut (one sentence on date-computed lists moved into "Drei Listen, eine Geste"); section 4 sketch placeholder cut; Pivot cut to 4 Windows screens + same-view comparison + one closing line on the Retro/Modern switch (orbit block and invented retention chart removed); section 5 is now "Das Designsystem" without the four rules (light moved into the Seitenansicht caption).
+- [x] **Done 2026-10-25:** "Die Regel dahinter" card cut (one sentence on date-computed lists moved into "Drei Listen, eine Geste"); section 4 sketch placeholder cut; Pivot cut to 4 Windows screens + same-view comparison + one closing line on the Retro/Modern switch (orbit block and retired retention chart removed); section 5 is now "Das Designsystem" without the four rules (light moved into the Seitenansicht caption).
 - [ ] **Optional, section 2:** sketches of the rejected ways to move a task (long-press menu, button, drag), only if real ones exist. Do not draw them after the fact.
 
-Work order from here: capture the real flow-row stills, draw the sketch, run Studies 6/9/4 and replace the
-tagged example values one by one.
+The historical work order below is superseded by the current page and confirmed data status above.
 
 ---
 
@@ -78,8 +89,8 @@ tagged example values one by one.
 Überarbeitet wurde ausschließlich `public/to.morrow2d2.html`, einschließlich der englischen
 Fassung und der deutschen HTML-Fallbacks. Die verlinkte Case Study und die Unison-Variante
 bleiben unverändert. Die bestehenden Zahlen, Zeitmessungen, Quellenzeilen und deutschen
-Originalzitate wurden beibehalten. Ihre Beleglage ist damit weiterhin offen; dieses Review
-bestätigt keine Forschungsdaten. Die Beispielwerte-Warnung am Anfang dieses Plans gilt weiter.
+Originalzitate wurden beibehalten. Lucas hat die Nutzerforschung und Ergebniszahlen inzwischen als reale Daten bestätigt.
+Nur der einleitende Wettbewerbsvergleich bleibt illustrativ; siehe aktuellen Datenstand oben.
 
 ### Befunde und Änderungen nach Position
 
@@ -87,7 +98,7 @@ bestätigt keine Forschungsdaten. Die Beispielwerte-Warnung am Anfang dieses Pla
 |---|---|---|
 | Auf einen Blick | Allgemeine Aussagen über andere Apps und die Formulierung „die eine Sache, die du nicht vergessen darfst“ verdeckten das konkrete Produktmodell. | Drei Listen, Wischgeste und die ausgewählte Live-Aufgabe direkt benannt. |
 | Meta | „Skills“ enthielt vor allem Technologien; das Designsystem stand zusätzlich schon bei der Rolle. Der HTML-Fallback behauptete „laufend“, während die Übersetzung nur den Start nannte. | Rolle als Produktdesign präzisiert, Liste als Tools bezeichnet, Designsystem dort nicht wiederholt. Startdatum in beiden Fassungen angeglichen. |
-| Interview-Einstieg | Der letzte Satz berichtete bereits vom Test der fertigen Lösung, bevor die Idee erklärt wurde. | Den Satz mit acht von zehn nach drei Wochen in den Ergebnisabschnitt verschoben. Alle Angaben erhalten. |
+| Interview-Einstieg | Der letzte Satz berichtete bereits vom Test der fertigen Lösung, bevor die Idee erklärt wurde. | Historische Textverschiebung; diese frühere Ergebnisangabe wurde später auf Lucas’ Wunsch entfernt. Es gelten die aktuellen bestätigten Kennzahlen oben. |
 | Problem | „Jede To-do-App“ und „niemand verschiebt“ verallgemeinerten über das beschriebene Material hinaus. „Bediengeschwindigkeit ist das Produkt“ wiederholte später die gleiche These. | Den konkreten Weg über die Datumsauswahl beschrieben und die schnelle Bedienung als Entwurfsziel formuliert. |
 | Vergleich | „Competitors“ erklärte weder Aufgabe noch Messgröße. Im Ergebnis wurden fünf Taps mit einem Wisch unter dem gemeinsamen Wort „Taps“ verglichen. | Vergleichsaufgabe als Überschrift; im Ergebnis Aktionen mit unterschiedlichen Gesten benannt. Sämtliche Werte unverändert. |
 | Idee | „Ordnung, die nichts kostet“ wiederholte das Problem. „Natürlichste Geste“ und „schneller als jedes Menü“ waren unbegründete Steigerungen. | Direkte Manipulation als Entscheidung erklärt; rechts bedeutet später, links früher. Den Übergang von Heute zu Live konkretisiert. |
@@ -396,139 +407,16 @@ What happens to the current sections:
 
 ---
 
-## 3. Research programme
+## 3. Current evidence and future research
 
-Nine studies, in three tiers. The references show what happens without this layer, so it is
-the part of the plan not to cut. Do tier 1 first; each tier stands on its own.
+The current user research and results are actual data confirmed by Lucas; see the data
+status above. Earlier speculative study programmes, numerical examples and proposed
+charts have been removed so they cannot be mistaken for the current evidence record.
+The opening competitor comparison retains illustrative app-by-app values.
 
-| Tier | Studies | Why first |
-|---|---|---|
-| **1 · Data exists** | 6 (App Store usage), 9 (reviews), 4 (TestFlight retention) | Nothing to set up. Fills the overview's outcome line, the fact bar and the pivot |
-| **2 · One afternoon each** | 2 (taps benchmark), 8 (accessibility audit), 7 (shape test) | Cheap, and each produces a visual the page lacks |
-| **3 · Only if time** | 1 (survey), 3 (diary), 5 (legibility) | Real effort. The page works without them; say n=1 plainly where they're missing |
-
-Each entry: **why**, **how**, **what to measure**, **what to show**, an **example result**,
-and **what it changes on the page**.
-
-### Study 1 [tier 3] — The over-planner, quantified
-
-- **Why:** give the named user a number. "Nobody moves anything" is a claim until it's measured.
-- **How:** survey, ~150 people who use a to-do app daily. Questions: How many tasks on your Today list this morning? How many will you finish? What happens to the rest (move / leave / delete)? How do you move a task to another day?
-- **Show:** one sentence stat plus a **stacked bar** "What happens to unfinished tasks".
-- **Example result:** median 9 tasks planned, 5 done; 62 % of the unfinished are left in place rather than moved.
-- **Page change:** opens the problem section and defines the user: "over-planners — median 9 tasks planned, 5 done, the rest left where they are."
-
-### Study 2 [tier 2] — What moving a task costs, app by app
-
-- **Why:** the strongest visual argument available, and cheap to produce. "Four steps" becomes a comparison a reviewer grasps in two seconds. It also replaces the competitor cards of the Calmsphere reference: four apps, one number each, instead of four paragraphs of strengths and weaknesses.
-- **How:** benchmark, 10 participants, each moves the same task to tomorrow in Reminders, Things, Todoist and to.morrow. Count taps and time.
-- **Show:** a **horizontal bar chart: taps to move one task to tomorrow**, with to.morrow's single bar in the accent colour. Direct labels, no legend.
-- **Example result:** Reminders 5 taps / 6.8 s · Things 4 / 5.1 s · Todoist 3 / 3.9 s · to.morrow 1 / 0.9 s.
-- **Page change:** sits between the problem and the idea. **Caption:** "Moving one task to tomorrow. Everything else here is built around the bottom bar."
-
-### Study 3 [tier 3] — Does the Today list stay true?
-
-- **Why:** the claim "the Today list is wrong by mid-morning" is the product's promise. Test it.
-- **How:** diary over 2 weeks, 15 over-planners. Week 1 with their usual app, week 2 with to.morrow. At 11:00 and 17:00, log how many Today tasks are still realistic for today.
-- **Show:** a **two-line chart across the day**: share of Today tasks that are still realistic, usual app vs to.morrow.
-- **Example result:** at 17:00, 41 % realistic with the usual app, 83 % with to.morrow.
-- **Page change:** the evidence under the idea section. It turns "stays true" from a slogan into a measured claim.
-
-### Study 4 [tier 1] — The pivot: Windows 95 vs SkeuKit (retention)
-
-- **Why:** you said testers stopped using the Windows 95 build. That's a retention signal; show it.
-- **How:** TestFlight data from both builds: the share of testers still opening the app after 1, 3, 7 and 14 days. Plus 3–5 short tester quotes about the old build.
-- **Show:** the **side-by-side Windows 95 vs SkeuKit, same screen** (the page's most important image), and next to it a **retention curve with two lines**.
-- **Example result:** day-7 retention 24 % on the Windows 95 build, 61 % on SkeuKit.
-- **Page change:** replaces "the longer I watched, the clearer it got" (pivot-2) with the curve and one quote. **Caption example:** "Same features, same testers. Only the interface changed."
-
-### Study 5 [tier 3] — The pivot: legibility
-
-- **Why:** the second signal testers gave, "hard to read". It also justifies why retro mode survives on chrome only.
-- **How:** reading test, 20 participants. The same task list in W95FA at the build's 2× pixel scale vs the system font. Measure reading time and errors reading back quantities and dates.
-- **Show:** a **pair of numbers** (reading time, errors) next to a crop of each typeface.
-- **Example result:** 38 % slower and 3× the errors in W95FA.
-- **Page change:** closes the pivot. It explains the rule that survived: pixel type on chrome only, task text always in the system face.
-
-### Study 6 [tier 1] — App Store usage data (live)
-
-- **Why:** the app is live. Real usage is the result section, and it tests the spine.
-- **How:** App Store Connect plus an anonymous event count in the app: share of task actions by type, median session length, Live task adoption, retention.
-- **Show:**
-  - **the fact bar** in the hero: three numbers
-  - a **sorted bar chart: share of all task actions** (swipe, add, complete, edit, reorder, photo)
-  - **median session length** as one big number
-- **Example result:** swipes 58 % of all task actions · median session 14 s · 46 % of active users use the Live task · day-30 retention 31 %.
-- **Page changes:**
-  - "58 % of actions are swipes" is the proof that the spine is what people actually use.
-  - "Median session 14 s" proves the problem-1 principle, an app you want to spend the least time in, with a number.
-  - Workspaces and settings get their share from this chart. If workspaces sit at 3 %, they get one sentence.
-
-### Study 7 [tier 2] — Rules, not taste: can people read the three shapes?
-
-- **Why:** the design system's claim is that you learn the three shapes once, and every view explains itself. That's testable, and it makes the craft section evidence instead of description.
-- **How:** first-use test, 20 participants who have never seen the app. Show 6 unlabelled screens and ask for each element: "Can you tap this, type in it, or choose with it?"
-- **Show:** the **three-shapes diagram** (bubble / trough / toggle) with the correct-answer rate printed under each shape.
-- **Example result:** bubble 94 %, trough 89 %, toggle 91 % correct, on screens they had never seen.
-- **Page change:** section 6 becomes "Three shapes, three jobs — and 9 in 10 first-time users read them correctly." **Caption example:** "No labels. The shape says what it does."
-
-### Study 8 [tier 2] — Accessibility audit
-
-- **Why:** you chose to include it, and it's rare in portfolios. Make it measured.
-- **How:**
-  - Dynamic Type checked at every size up to AX5.
-  - A VoiceOver pass over every row action.
-  - Reduce Motion checked on every animation.
-  - Contrast measured for every text/background pair in all four themes, light and dark.
-  - Ideally, 2–3 VoiceOver users complete five core tasks.
-- **Show:**
-  - **the same screen at default and AX5 size**, side by side
-  - a **small contrast table**: text role, measured ratio, the WCAG target
-  - one line on what the audit found and fixed
-- **Example result:** 3 row actions unreachable by VoiceOver, fixed as custom actions. Body text 6.4:1 in every theme. VoiceOver users 5/5 tasks completed after the fix.
-- **Page change:** section 7. Short and factual: a list, one comparison image, one table.
-
-### Study 9 [tier 1] — App Store reviews
-
-- **Why:** real words from strangers who paid attention to the app, not testers you recruited. The strongest proof on the page that the app works for someone other than you, and the only study here that needs no setup: the reviews already exist in App Store Connect.
-- **How:**
-  1. Export every review and rating from App Store Connect (*Ratings and Reviews*).
-  2. Tag each review with the themes it mentions: swipe / speed, Live task, design / look, simplicity, a missing feature, a bug.
-  3. Count the themes, then pick quotes.
-- **Show:**
-  - **the average rating and the number of ratings** in the fact bar
-  - **2–3 review cards** in the page's own style: stars, the review text unedited, reviewer name as shown in the store, country, month
-  - optionally, a **sorted bar chart of review themes**, if there are enough reviews (about 20+) for the shares to mean something
-- **Example result:** 4.8 average from 63 ratings. 41 % of written reviews mention the swipe or speed, 27 % the Live task, 12 % ask for widgets.
-- **Page changes:**
-  - **Result section:** the rating in the fact bar, one card that names the swipe (proof of the spine).
-  - **Live section:** one card that names the Live task.
-  - **Next steps:** if reviews ask for widgets, conclusion-4's "widgets first" stops being your plan and becomes a response to users. Quote the request.
-
-Rules for using them:
-- **Unedited.** Quote exactly, including the reviewer's wording. Shorten only with a visible `…`.
-- **Pick for content, not just for stars.** A 4-star review that names the swipe beats a 5-star "great app". If a review criticises something you then fixed, it can be the best card on the page: problem → fix → proof.
-- **State the total.** Always print the rating count next to the average; a 5.0 from 4 ratings reads differently from 4.8 from 63.
-- **Translate, don't paraphrase.** A German review on the English page gets a translation with the original available, not a rewrite.
-
----
-
-## 4. From studies to page
-
-```mermaid
-flowchart LR
-    S1["Survey n≈150"] --> P["Problem<br/>the over-planner"]
-    S2["Taps benchmark n=10"] --> P2["Problem → idea<br/>bar chart"]
-    S3["Diary n=15"] --> I["The idea<br/>list stays true"]
-    S4["TestFlight retention"] --> PV["Pivot<br/>side-by-side + curve"]
-    S5["Legibility n=20"] --> PV
-    S6["App Store data"] --> O["Overview outcome line<br/>fact bar · feature order · result"]
-    S7["Shape test n=20"] --> DS["Rules, not taste"]
-    S8["A11y audit"] --> A["Accessibility"]
-    S9["App Store reviews"] --> O
-    S9 --> L["Live section<br/>review card"]
-    S9 --> N["Next steps<br/>widgets requested"]
-```
+The next research question on the page is whether a persistently visible task continues
+to help completion over time or becomes easy to overlook. This is a proposed follow-up,
+not an additional completed study or a measured outcome.
 
 ---
 
@@ -539,9 +427,9 @@ flowchart LR
 - **Remove the "not X but Y" construction.** It appears repeatedly: "not polish, but the product itself", "not a draw, it was an obstacle", "not out of nostalgia, but because". State the positive claim directly.
 - **Rewrite conclusion-3.** "The most interesting part was rethinking something everyday" makes no claim. Replace it with a learning tied to evidence, e.g. from Study 6: speed was measurable, and the median session length became the design target.
 - **Name the user** once, early: over-planners.
-- **Every decision gets a source.** Pattern: *finding → decision*. "Testers stopped opening the Windows 95 build after the first week; day-7 retention was 24 %. The interface went; the pixel type stayed on chrome only."
+- **Tie decisions to the real user feedback.** The Retro look became distracting in everyday use, which informed the redesign. Do not restore retired retention figures.
 - **Every number gets a source and a timeframe**, printed next to it. This is the lesson of both references: their headline figures are unsourced, and that is what separates a page that reads as researched from one that reads as styled.
-- **Say what is not validated.** If Studies 1, 3, 5 are skipped, one honest line: "n=1 until the store data came in." Said first, it protects the rest.
+- **Distinguish actual results from future research.** Current user findings are real; the proposed Go Live follow-up has not yet produced a result.
 - **Page map.** Under the overview, one line announcing the structure: *Problem → Idea → Live → Pivot → System → Accessibility → Result.*
 - **Next steps as three bullets** (from conclusion-4: widgets, desktop, and whatever reviews request). Tools as an icon row, one caption.
 - **Length:** the page is ~1,030 words now. Adding evidence must not grow it past ~1,100: most studies get one sentence and one visual, and "the rest" shrinks.
@@ -598,10 +486,10 @@ Rules, from the vault guide and the references:
 - [ ] Studies 8 and 7 (tier 2)
 - [ ] Draw: the rule card and dates diagram, the three-shapes diagram with rates, all charts in the page's style
 - [ ] Reorder the page: overview → try it → problem → swipe → Live → pivot → system → accessibility → result
-- [ ] Tier 3 studies (1, 3, 5) only if time; otherwise state n=1 where they would have gone
+- [ ] Follow up on long-term Go Live visibility when conducting the next study.
 - [ ] Rewrite in neutral voice, DE + EN + `@m` twins; remove every "not X but Y"; rewrite conclusion-3; next steps as three bullets, tools as icon row
 - [ ] *Stretch:* the working swipeable phone
-- [ ] Check: every example number above replaced with a real one, each with source and timeframe
+- [x] User research and results confirmed as actuals by Lucas, 2026-10-26; opening competitor comparison is the sole illustrative-data exception.
 
 ## 8. Open questions
 
@@ -845,9 +733,8 @@ The strongest paragraph in the case study and the one that must survive the
 > picker, choosing a date, and saving — so people stop doing it. Every task
 > collapses into one undifferentiated "today" list that is mostly lies by 11am.
 
-Follow with the honest source: observed in his own workflow over years, across
-Reminders, Things, Todoist, Notes and paper. **Say that it is n=1** and say why
-that was enough to start.
+The original motivation came from Lucas’s own workflow. The current case study also
+includes the real 15-person user/interview group; do not describe its evidence as n=1.
 
 ### 3 — The one idea
 
@@ -942,8 +829,7 @@ Where the honesty lands.
 
 - **Do not open with the aesthetic.** The retro look is the hook on a design
   community, not on a hiring manager. Problem first.
-- **Do not claim research that did not happen.** No personas, no invented user
-  interviews, no fabricated metrics. n=1 stated plainly is stronger than a
+- **Preserve the real research record.** Current user research/results are confirmed by Lucas; never add unsupported personas, interviews or metrics. A plainly stated sample is stronger than a
   fake study, and reviewers spot the difference instantly.
 - **Do not bury the pivot** in a "challenges" section at the bottom. It is the
   best evidence of judgement on the page.

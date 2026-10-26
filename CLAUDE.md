@@ -1,5 +1,24 @@
 # CLAUDE.md
 
+## to.morrow data status · confirmed by Lucas, 2026-10-26
+
+The published case study is `public/to.morrow2d.html`. Lucas explicitly confirms that its
+user research, feedback and result statistics are actual findings from real users, not
+fictional or placeholder data. The sole exception is the opening competitor comparison:
+its app-by-app tap counts and timings are illustrative and must not be described as a
+verified user benchmark.
+
+Current results: **5 → 1 actions** to reschedule; **9 of the 15 accompanied/interviewed
+participants use Go Live**; **90 total app downloads as of October 2026**. Downloads are
+not active users. The 15 participants form one shared user/interview group.
+
+Keep the distinction between user-confirmed facts and independent verification: this
+confirmation comes from Lucas. Keep feedback paraphrases labelled as paraphrases and
+retain the small-group limitation. Neither implies that the research is fictional.
+Do not restore retired draft quantities, retention rates or the replaced active-user count.
+Do not invent additional findings or relabel old draft examples as actual results.
+
+
 Lucas Maher's portfolio website — vanilla JS + Vite, neumorphic design system, Three.js 3D mode.
 
 ## Quick Start
@@ -1731,6 +1750,8 @@ Two things that will bite again:
 
 ## to.morrow case-study rebuild draft (`public/to.morrow2d1.html`, 2026-10-24)
 
+Historical layout record. The revised page was promoted to `public/to.morrow2d.html` on 2026-10-26. Current data status at the top of this file supersedes older draft descriptions below.
+
 The rebuild from `tomorrow-casestudy-plan.md`, in a **separate, unlinked file** like the Unify draft
 (`<meta name="robots" content="noindex, nofollow">`; nothing may link to it; the nav recognises it because
 `to.morrow2d` is a substring match). It is a copy of `to.morrow2d.html` (same head, CSS, scripts, SkeuKit
@@ -1758,12 +1779,11 @@ each with its explanation. **It is a placeholder for Lucas's paper sketch**: whe
 `.side-grid` inside `.paper` with the scan (`/images/to.morrow/seitenansicht-skizze.webp`). After it come the
 existing live "Drei Formen" demos and a shape-test mock.
 
-**Everything that needs data is a mockup with example values, and says so.** Two markers, both `.mock-tag` (left: the taps chart, retention curve, the two flow rows, the sketch placeholders)
-(grep that word): "Mockup" = wireframe or placeholder to be swapped for a real screenshot/scan (the two
-flow rows, the AX5 pair, the review cards), "Beispielwerte" = invented numbers in a real-looking chart (taps
-benchmark, retention, legibility, shape test, accessibility contrast, usage share, fact bar). **None of
-those numbers is a result.** Replace each with the real study value, with source and period, or delete the
-figure; do not remove the tag while the number is still an example. Wireframes (`.wf`) are sized in `cqw`
+**Data status:** the published page's user research and results are real, confirmed by Lucas
+on 2026-10-26; only the opening competitor comparison remains illustrative. This draft
+section is a historical layout record. Its retired charts and quantities are not the
+current evidence record and must not be restored. Artwork placeholders refer to missing
+screenshots/scans, not to the validity of user data. Wireframes (`.wf`) are sized in `cqw`
 units, so the styled screen is the container's CHILD (`.wf-s`): `cqw` on the container itself resolves
 against an ancestor and blew the phones up to 3x.
 
@@ -1772,7 +1792,7 @@ taps only (no seconds, no caption, no tag) and is `max-width: 66.67%` on desktop
 at every width: `.flow-band` is a size container and the phone/arrow/gap sizes come from its `cqw`, so nothing wraps (phones are ~57px
 at 390). The Live row is four frames (type + circled Go Live → Lock Screen → Dynamic Island → tick) with `.flow-loop` drawing the
 return path under it ("Zurück zum Anfang"); `.flow-arrow.is-go` sits at the pill's height. All "Mockup" tags are gone (`n-tag-mock`);
-sketch and "Beispielwerte" tags on the retention chart stay. The Live-button icon above "Live-Benachrichtigungen" and the Tools block
+The sketch remained an artwork placeholder at that stage; the retention chart was subsequently removed. The Live-button icon above "Live-Benachrichtigungen" and the Tools block
 are removed (Xcode + Remotion moved into the Skills tile); "SkeuKit" is no longer named in section 5's intro. Open items: see
 `tomorrow-casestudy-plan.md`, "Still open".
 

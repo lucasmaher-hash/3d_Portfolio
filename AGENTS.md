@@ -1,5 +1,24 @@
 # AGENTS.md
 
+## to.morrow data status · confirmed by Lucas, 2026-10-26
+
+The published case study is `public/to.morrow2d.html`. Lucas explicitly confirms that its
+user research, feedback and result statistics are actual findings from real users, not
+fictional or placeholder data. The sole exception is the opening competitor comparison:
+its app-by-app tap counts and timings are illustrative and must not be described as a
+verified user benchmark.
+
+Current results: **5 → 1 actions** to reschedule; **9 of the 15 accompanied/interviewed
+participants use Go Live**; **90 total app downloads as of October 2026**. Downloads are
+not active users. The 15 participants form one shared user/interview group.
+
+Keep the distinction between user-confirmed facts and independent verification: this
+confirmation comes from Lucas. Keep feedback paraphrases labelled as paraphrases and
+retain the small-group limitation. Neither implies that the research is fictional.
+Do not restore retired draft quantities, retention rates or the replaced active-user count.
+Do not invent additional findings or relabel old draft examples as actual results.
+
+
 Lucas Maher's portfolio website — vanilla JS + Vite, neumorphic design system, Three.js 3D mode.
 
 ## Quick Start
