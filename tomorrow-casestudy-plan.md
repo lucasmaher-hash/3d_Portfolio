@@ -896,3 +896,13 @@ preview settings. Controls can be removed after Lucas supplies final values.
 Sketch top margin tightened at Lucas’s request: PDF crop now starts at y=405
 instead of y=300; final image 2406×809 px. This removes 105 px of upper whitespace
 while preserving the complete press arrow, drawings, alignment and appearance controls.
+
+## Sketch appearance approved; controls removed · 2026-10-26
+
+Lucas supplied final settings in his screenshot: darkness 195%, tint 83%,
+ink #38395c, paper #f6f5f0. These are now fixed for every viewport and visitor.
+The effective paper background is #f8f7f3 (83% tint over white); the SVG ink
+mask uses slope 1.95 with flood color #38395c. The original scanned WebP is
+unchanged. Temporary controls, their script, CSS and translations are removed;
+localStorage preview settings no longer affect the page. This supersedes the
+earlier temporary-control/default descriptions above.
