@@ -95,10 +95,10 @@ NOTES={
 def band(kind):
     title=('Von Heute nach Morgen','From Today to Tomorrow') if kind=='reschedule' else ('Von der Eingabe bis zum Abhaken','From entering a task to ticking it off')
     desc=('Ein Wisch verschiebt die Aufgabe. Rückgängig bleibt ein optionaler Schritt.','A swipe moves the task. Undo is an optional step.') if kind=='reschedule' else ('Eine Aufgabe auf dem Sperrbildschirm und in der Dynamic Island.','One task on the Lock Screen and in the Dynamic Island.')
-    out=f'<div class="flow-band no-shade wireflow wireflow--{kind}" data-wireflow="{kind}">\n          <div class="band-head"><p class="band-title" data-i18n="n-flow-{"swipe" if kind=="reschedule" else "live"}">{title[0]}</p><span class="wireflow-kind">WIREFLOW</span></div>\n'
+    out=f'<div class="flow-band no-shade wireflow wireflow--{kind}" data-wireflow="{kind}">\n          <div class="band-head"><p class="band-title" data-i18n="n-flow-{"swipe" if kind=="reschedule" else "live"}">{title[0]}</p></div>\n'
     out+=f'          <p class="wireflow-intro" data-i18n="{bind(kind+"-intro",*desc)}">{desc[0]}</p>\n          <div class="wireflow-scroll" tabindex="0" role="group" aria-labelledby="{kind}-flow-label"><span class="wireflow-sr" id="{kind}-flow-label" data-i18n="{bind("scroll-label","Vier Schritte. Auf Mobile horizontal wischen.","Four steps. Swipe horizontally on mobile.")}">Vier Schritte. Auf Mobile horizontal wischen.</span><div class="wireflow-track"><ol class="wireflow-steps">\n'
     for i,(de,en,note,english_note) in enumerate(NOTES[kind],1):
-        out+=f'            <li class="wireflow-step"><figure>{(reschedule if kind=="reschedule" else live)(i)}<figcaption><span class="wireflow-step-no">0{i}</span><strong data-i18n="{bind(kind+str(i)+"-caption",de,en)}">{de}</strong><span data-i18n="{bind(kind+str(i)+"-note",note,english_note)}">{note}</span></figcaption></figure></li>\n'
+        out+=f'            <li class="wireflow-step"><figure>{(reschedule if kind=="reschedule" else live)(i)}<figcaption><span class="wireflow-step-no">0{i}</span><strong data-i18n="{bind(kind+str(i)+"-caption",de,en)}">{de}</strong></figcaption></figure></li>\n'
     return out+'          </ol><svg class="wireflow-connectors" aria-hidden="true"></svg></div></div>\n        </div>'
 def main():
     s=PAGE.read_text()
