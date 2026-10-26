@@ -882,7 +882,7 @@
     @media (max-width: 640px) { .ph-pair { grid-template-columns: minmax(0, 1fr); } }
 
     /* Three big numbers with a source line each, as on unify2d.html (.fact-bar). */
-    .fact-bar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); margin-top: clamp(32px, 5vw, 60px); }
+    .fact-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); margin-top: clamp(32px, 5vw, 60px); }
     .fact { display: flex; flex-direction: column; gap: 8px; }
     .fact-num { font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: clamp(28px, 3.4vw, 44px); line-height: 1; letter-spacing: -0.04em; color: var(--accent-orange); }
     .fact-label { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
@@ -3168,7 +3168,7 @@
         <span class="step-badge">5</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n-html="n-res-caveat">Die Erkenntnisse stammen aus derselben Gruppe von <b class="kw">15 Personen</b>, die ich als Nutzer begleitet und interviewt habe. Die Gruppe ist klein; ihre Erfahrungen lassen sich nicht auf alle Nutzer übertragen.</p>
+      <p class="guide-text" data-i18n-html="n-res-caveat">Das Nutzerfeedback und die Angabe zur Nutzung von Go Live stammen aus der begleiteten Gruppe von <b class="kw">15 Personen</b>. Die 30 aktiven Nutzer beziehen sich auf die App insgesamt. Die Erfahrungen der Begleitgruppe lassen sich nicht auf alle Nutzer übertragen.</p>
       <div class="fact-bar">
         <div class="fact">
           <span class="fact-num">5 → 1</span>
@@ -3179,6 +3179,11 @@
           <span class="fact-num" data-i18n="n-fact-live-value">9 von 15</span>
           <span class="fact-label" data-i18n="n-fact-live">Personen nutzen Go Live</span>
           <span class="fact-src" data-i18n="n-fact-live-src">Aus derselben Gruppe von 15 Nutzern</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">30</span>
+          <span class="fact-label" data-i18n="n-fact-active">aktive Nutzer der App</span>
+          <span class="fact-src" data-i18n="n-fact-active-date">(Letzter Stand: Oktober 2026)</span>
         </div>
       </div>
       <h3 class="feature-title cs-h3" data-i18n="n-learn">Weniger App als Ziel</h3>
@@ -3440,6 +3445,8 @@
       }
     };
     Object.assign(TRANSLATIONS.en, {
+      "n-fact-active": "active app users",
+      "n-fact-active-date": "(Latest count: October 2026)",
       "n-everyday-title": "What everyday use revealed",
       "n-fact-live-value": "9 of 15",
       "n-fact-live": "participants use Go Live",
@@ -3498,12 +3505,14 @@
   "n-quote-3": "“The look didn’t match the app’s functionality.”",
   "n-quote-src-sep": "Feedback from the participant group · paraphrased",
   "n-quote-src-oct": "Feedback from the participant group · paraphrased",
-  "n-res-caveat": "The findings come from the same group of <b class=\"kw\">15 people</b> I followed as users and interviewed. This is a small group, so their experiences cannot be generalised to all users.",
+  "n-res-caveat": "The feedback and Go Live usage figure come from the <b class=\"kw\">15 people</b> I followed as users and interviewed. The 30 active users refer to the app as a whole. The participant group’s experiences cannot be generalised to all users.",
   "n-fact-actions": "Actions to move a task to tomorrow: taps in Reminders, a swipe in to.morrow",
   "n-fact-actions-src": "My own count · October 2026"
 
 });
     Object.assign(TRANSLATIONS.de, {
+      "n-fact-active": "aktive Nutzer der App",
+      "n-fact-active-date": "(Letzter Stand: Oktober 2026)",
       "n-everyday-title": "Was erst im Alltag sichtbar wurde",
       "n-fact-live-value": "9 von 15",
       "n-fact-live": "Personen nutzen Go Live",
@@ -3563,7 +3572,7 @@
   "n-quote-3": "„Der Look passte nicht zu den Funktionen der App.“",
   "n-quote-src-sep": "Feedback aus der Begleitgruppe · sinngemäß",
   "n-quote-src-oct": "Feedback aus der Begleitgruppe · sinngemäß",
-  "n-res-caveat": "Die Erkenntnisse stammen aus derselben Gruppe von <b class=\"kw\">15 Personen</b>, die ich als Nutzer begleitet und interviewt habe. Die Gruppe ist klein; ihre Erfahrungen lassen sich nicht auf alle Nutzer übertragen.",
+  "n-res-caveat": "Das Nutzerfeedback und die Angabe zur Nutzung von Go Live stammen aus der begleiteten Gruppe von <b class=\"kw\">15 Personen</b>. Die 30 aktiven Nutzer beziehen sich auf die App insgesamt. Die Erfahrungen der Begleitgruppe lassen sich nicht auf alle Nutzer übertragen.",
   "n-fact-actions": "Aktionen zum Verschieben auf morgen: Antippen in Reminders, Wischen in to.morrow",
   "n-fact-actions-src": "Eigene Zählung · Oktober 2026"
 
