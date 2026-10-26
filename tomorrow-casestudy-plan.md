@@ -48,6 +48,71 @@ tagged example values one by one.
 
 ---
 
+## Textreview der unverlinkten Seite · 2026-10-26
+
+Überarbeitet wurde ausschließlich `public/to.morrow2d2.html`, einschließlich der englischen
+Fassung und der deutschen HTML-Fallbacks. Die verlinkte Case Study und die Unison-Variante
+bleiben unverändert. Die bestehenden Zahlen, Zeitmessungen, Quellenzeilen und deutschen
+Originalzitate wurden beibehalten. Ihre Beleglage ist damit weiterhin offen; dieses Review
+bestätigt keine Forschungsdaten. Die Beispielwerte-Warnung am Anfang dieses Plans gilt weiter.
+
+### Befunde und Änderungen nach Position
+
+| Stelle | Problem im bisherigen Text | Änderung |
+|---|---|---|
+| Auf einen Blick | Allgemeine Aussagen über andere Apps und die Formulierung „die eine Sache, die du nicht vergessen darfst“ verdeckten das konkrete Produktmodell. | Drei Listen, Wischgeste und die ausgewählte Live-Aufgabe direkt benannt. |
+| Meta | „Skills“ enthielt vor allem Technologien; das Designsystem stand zusätzlich schon bei der Rolle. Der HTML-Fallback behauptete „laufend“, während die Übersetzung nur den Start nannte. | Rolle als Produktdesign präzisiert, Liste als Tools bezeichnet, Designsystem dort nicht wiederholt. Startdatum in beiden Fassungen angeglichen. |
+| Interview-Einstieg | Der letzte Satz berichtete bereits vom Test der fertigen Lösung, bevor die Idee erklärt wurde. | Den Satz mit acht von zehn nach drei Wochen in den Ergebnisabschnitt verschoben. Alle Angaben erhalten. |
+| Problem | „Jede To-do-App“ und „niemand verschiebt“ verallgemeinerten über das beschriebene Material hinaus. „Bediengeschwindigkeit ist das Produkt“ wiederholte später die gleiche These. | Den konkreten Weg über die Datumsauswahl beschrieben und die schnelle Bedienung als Entwurfsziel formuliert. |
+| Vergleich | „Competitors“ erklärte weder Aufgabe noch Messgröße. Im Ergebnis wurden fünf Taps mit einem Wisch unter dem gemeinsamen Wort „Taps“ verglichen. | Vergleichsaufgabe als Überschrift; im Ergebnis Aktionen mit unterschiedlichen Gesten benannt. Sämtliche Werte unverändert. |
+| Idee | „Ordnung, die nichts kostet“ wiederholte das Problem. „Natürlichste Geste“ und „schneller als jedes Menü“ waren unbegründete Steigerungen. | Direkte Manipulation als Entscheidung erklärt; rechts bedeutet später, links früher. Den Übergang von Heute zu Live konkretisiert. |
+| Datum und Querformat | „Rollover“ erklärte eine Implementierung statt des Nutzens. Die Querformattexte blieben auf Deutsch stehen. | Das sichtbare Verhalten am nächsten Tag beschrieben, mit „standardmäßig“ für die vorhandenen Zeitregeln. Beide Querformatfassungen an die Übersetzung angebunden. |
+| Live | „Homescreen“ konnte wie ein zusätzliches Widget wirken. „Go Live“ in den Bildunterschriften widersprach dem automatischen Start im Fließtext. | Sperrbildschirm und Dynamic Island als Anzeigeorte benannt. Eingabe, automatischer Start und Sichtbarkeitsschalter getrennt erklärt. Der lokale App-Code bestätigt das Speichern beim Schließen der Tastatur. |
+| Einstieg ins Designsystem | Ein allgemeiner Lehrbuchabsatz und die Ankündigung „Hier ist, was ich gebaut und getestet habe“ nahmen viel Raum ein. | Das eigene System und die Wiederverwendung von Elementen im Projekt erklärt; die erste Version direkt an den Screenshots eingeführt. |
+| Windows-95-Wechsel | „Es hatte keinen Zweck“ konnte die gesamte App abwerten. Der ästhetische Grund, die Testreaktionen und das neue System waren unscharf verbunden. | Die Aussage auf die Bedienung des alten Looks eingegrenzt. Die persönliche Motivation behalten und die neue Oberfläche vor ihrem Zahlenvergleich benannt. |
+| Retro-Einstellung | „Retro und Modern“ ließ offen, ob der Schalter die ganze Oberfläche oder die Schrift verändert. „Sonst sieht die App aus wie jede andere“ erklärte keine Entscheidung. | Optionale Pixelschrift von den weiterhin in Systemschrift gesetzten Aufgabentexten unterschieden. |
+| Formen und Seitenansicht | Begründung, Querschnitte und Animationstext erklärten dreimal dieselben drei Funktionen. „Ohne Tippen wählen“ war im Deutschen doppeldeutig. „Höhe liest man am schnellsten“ war eine unbelegte Wahrnehmungsbehauptung. | Begründung = Funktion durch Form; Querschnitt = Aufbau und Licht; Animationen = Verhalten. Umschalter ausdrücklich durch Antippen einer Option erklärt. |
+| Barrierefreiheit | Ein einziger Satz bündelte AX5, VoiceOver, Reduce Motion und Touch-Ziele. | Die einzelnen Funktionen in kurzen Sätzen erklärt, Dynamic Type an die iOS-Schriftgröße angebunden. Technische Werte erhalten; kein neuer Nutzertest behauptet. |
+| Ergebnis | Kleine Stichprobe wurde mit „kein Befund“ pauschal entwertet. Der Interviewbefund stand an einer früheren Stelle. | Die Grenze als eingeschränkte Übertragbarkeit beschrieben und das Follow-up hier ergänzt. Keine Kausalwirkung des Redesigns behauptet. |
+| Reflexion | „Erstens/zweitens/drittens“ und die erneute Beschreibung von drei Formen wiederholten den Hauptteil. | Drei verschiedene Folgerungen: früher Bedienung testen, vorhandene Elemente wiederverwenden, nötige Handgriffe als Entwurfskriterium betrachten. |
+| Ausblick | „Wie es weitergeht“ klang nach einem bestätigten laufenden Releaseplan. | Erweiterungen als mögliche nächste Schritte formuliert. Keine Termine oder Versionen hinzugefügt. |
+| Sprachen | Interview, Retention, Stichprobenhinweis, Zitate, Ergebnislabels und Querformat waren teilweise nicht übersetzt. | Fehlende Schlüssel ergänzt und wiederholte Bildunterschriften an denselben Übersetzungspfad angebunden. Deutsche Originalzitate unverändert; englische Zitate sind Übersetzungen. |
+
+### Humanizer-Pass
+
+Entfernt wurden pauschale Superlative, dramatische Schlussformeln, wiederholte
+„nicht X, sondern Y“-Konstruktionen und satzverbindende Gedankenstriche aus den aktiven Texten.
+Die Ich-Perspektive bleibt dort, wo sie eine eigene Entscheidung oder Erfahrung bezeichnet.
+Die drei tatsächlichen Formen bleiben als Dreiergruppe erhalten. Technische Implementierungsdetails
+wurden durch das sichtbare Verhalten ersetzt, sofern sie keine Gestaltungsentscheidung erklären.
+
+Der deutsche HTML-Text umfasst nach der Überarbeitung 1.303 statt 1.465 Wörter, einschließlich
+Beschriftungen und der doppelten Desktop-/Mobil-Alternativen. Das ist keine Wortzahl eines
+einzelnen gerenderten Bildschirmverlaufs. Nicht mehr verwendete Übersetzungsschlüssel wurden
+bei diesem Review nicht bereinigt.
+
+### Dynamic-Island-Video
+
+Nur diese Seite verwendet nun `public/videos/to.morrow/live-3-island-delayed.mp4`.
+Die ersten sechs Frames bei 60 fps zeigen die leere schwarze Island. Nach 0,1 Sekunden erscheint
+die kompakte to.morrow-Anzeige; erst anschließend klappt sie zum ursprünglichen Zeitpunkt auf.
+Ab Frame 6 bleibt der Ablauf zeitlich identisch mit dem Original. Gesamtlänge 7,5 Sekunden,
+450 Frames und der spätere Abhak-Moment bleiben erhalten. Die Originaldatei bleibt für die
+Unison-Variante bestehen.
+
+### Prüfung
+
+- Alle 96 aktiven Übersetzungsschlüssel sind in Deutsch und Englisch vorhanden; der bestehende
+  Sprachwechsel wurde über den tatsächlichen Message-Handler mit einem minimalen DOM geprüft.
+- Alle zwölf Inline-Skripte lassen sich parsen. Zahlenfelder, Vergleichszeiten, deutsche
+  Quellenzeilen und die drei deutschen TestFlight-Zitate wurden gegen den vorherigen Stand geprüft.
+- Die Änderungen dieser Sitzung bleiben erhalten: volle Breite der sieben Textabsätze,
+  mitdrehendes Rotationssymbol und entfernter App-Store-Platzhalter. `noindex, nofollow` bleibt gesetzt.
+- Die Anfangsframes des neuen Videos wurden visuell geprüft. Keine Browserprüfung der
+  Gesamtdarstellung: Es war kein steuerbarer Browser verbunden.
+- Produktionsbuild und `git diff --check` bestanden. Nach Frame 6 folgt das Video dem
+  Original mit unverändertem Timing; SSIM nach erneuter Kodierung: 0,999459.
+
 ## 0. What the interview established
 
 | Topic | Answer |

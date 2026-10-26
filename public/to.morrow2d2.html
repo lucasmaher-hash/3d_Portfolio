@@ -787,7 +787,7 @@
       transform: translate(calc(var(--bx, 0px) - 22px), calc(var(--by, 0px) - 22px));
       transition: background 0.2s ease; z-index: 3; }
     /* Icon: Lucas's own file, used as a mask so it takes the button's text colour. */
-    .rot-ico { display: block; width: 27px; height: 27px; background: currentColor; -webkit-mask: url(/images/to.morrow/rotate-icon.png) center / contain no-repeat; mask: url(/images/to.morrow/rotate-icon.png) center / contain no-repeat; }
+    .rot-ico { display: block; width: 27px; height: 27px; transform: rotate(calc(var(--rot, 0) * 1deg)); background: currentColor; -webkit-mask: url(/images/to.morrow/rotate-icon.png) center / contain no-repeat; mask: url(/images/to.morrow/rotate-icon.png) center / contain no-repeat; }
     .rot-btn:hover { background: rgba(48, 50, 56, 0.8); }
     .rot-phone { width: clamp(126px, 20.33vw, 232px); transform: rotate(calc(var(--rot, 0) * 1deg)); will-change: transform; }
     .rot-ip { width: 100%; }
@@ -828,8 +828,6 @@
         linear-gradient(var(--g), var(--g)) 100% 0 / 4px 40px no-repeat,
         linear-gradient(var(--g), var(--g)) 0 36px / 100% 4px no-repeat,
         linear-gradient(var(--g), var(--g)) 50% 36px / 4px 48px no-repeat; }
-    .ds-copy { max-width: 60%; margin-left: 0; margin-right: auto; text-align: left; }
-    @media (max-width: 860px) { .ds-copy { max-width: 100%; } }
     .big-statement { text-align: center; margin: 0 0 clamp(40px, 7vw, 96px); font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-weight: 400; font-size: clamp(20px, 3.4vw, 48px); line-height: 1.1; letter-spacing: -0.02em; -webkit-text-stroke: 0.04em currentColor; color: var(--text-primary); }
     @media (max-width: 640px) { .win-quotes::after { display: none; } }
     .win-frame { background: #000080 url(/images/to.morrow/win-bg.webp) center 58% / cover no-repeat; box-shadow: none; grid-template-columns: repeat(3, auto); justify-content: center; column-gap: clamp(6px, 1.3vw, 19px); }
@@ -3057,7 +3055,7 @@
     <div class="morrow-devices">
       <video class="hero-promo" loop muted playsinline preload="auto" width="1920" height="1320"
              poster="/images/to.morrow/promo-poster-hero.webp?v=20261008"
-             aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Demnächst verschoben, dann wird eine Aufgabe live geschaltet und erscheint auf dem Sperrbildschirm">
+             aria-label="Animation: Aufgaben werden zwischen Heute, Morgen und Bald verschoben, dann wird eine Aufgabe live geschaltet und erscheint auf dem Sperrbildschirm">
         <!-- Picked once, at load: wider than a phone gets the landscape tall cut,
              a phone the vertical tall cut. The landscape one is FIRST so a browser
              that ignores `media` (pre-2023 Chrome) falls back to it everywhere
@@ -3093,7 +3091,7 @@
         </a>
       </div>
       <h2 class="section-title" data-i18n="section-glance">Auf einen Blick</h2>
-      <p class="glance-lead" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n="n-ov-lead">to.morrow ist eine iOS-App mit drei Listen: Heute, Morgen, Bald. Eine Aufgabe zu verschieben ist eine einzige Wischgeste, und die eine Sache, die du nicht vergessen darfst, bleibt auf Sperrbildschirm und Dynamic Island sichtbar.</p>
+      <p class="glance-lead" style="margin-top: clamp(20px, 3vw, 32px);" data-i18n="n-ov-lead">to.morrow ist eine iOS-App zum Planen mit drei Listen: Heute, Morgen und Bald. Ein Wisch verschiebt eine Aufgabe zwischen den Listen. Eine ausgewählte Aufgabe bleibt auf dem Sperrbildschirm und in der Dynamic Island sichtbar.</p>
     </div>
     <!-- Meta grid — same position as every other project page: directly
          under At a Glance. -->
@@ -3101,19 +3099,19 @@
       <div class="meta-grid">
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-timeline">Zeitraum</div>
-          <div class="meta-inset" data-i18n-html="val-timeline">Aug. 2026 —<br>laufend</div>
+          <div class="meta-inset" data-i18n-html="val-timeline">Seit August 2026</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-role">Rolle</div>
-          <div class="meta-inset" data-i18n-html="val-role">Konzept, Design,<br>Design-System,<br>Umsetzung</div>
+          <div class="meta-inset" data-i18n-html="val-role">Konzept, Produktdesign,<br>Designsystem,<br>Umsetzung</div>
         </div>
         <div class="meta-tile">
           <div class="meta-label" data-i18n="label-team">Team</div>
           <div class="meta-inset" data-i18n="val-team">Solo</div>
         </div>
         <div class="meta-tile">
-          <div class="meta-label" data-i18n="label-skills">Skills</div>
-          <div class="meta-inset" data-i18n-html="val-skills">SwiftUI, Xcode<br>SwiftData + CloudKit<br>Design-System, Remotion</div>
+          <div class="meta-label" data-i18n="label-skills">Tools</div>
+          <div class="meta-inset" data-i18n-html="val-skills">SwiftUI, Xcode<br>SwiftData + CloudKit<br>Remotion</div>
         </div>
       </div>
     </div>
@@ -3125,12 +3123,12 @@
         <span class="step-badge">1</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n-html="n-study">Ich habe <b class="kw">zehn Menschen zwischen 21 und 34</b> gefragt, wie sie ihre To-dos verwalten. Sieben führen eine einzige Liste, in die alles wandert, und räumen sie nicht um. Drei haben nach ein paar Tagen aufgegeben. „Ich schreibe alles auf und schiebe es dann einfach vor mir her“, sagte eine Teilnehmerin. Nach drei Wochen mit to.morrow legten acht von zehn ihre Aufgaben bewusst auf Morgen oder Bald.</p>
-      <p class="guide-text" data-i18n-html="problem-1">Eine To-do-App ist die App, in der man am wenigsten Zeit verbringen will. Sie soll nicht unterhalten, sondern den Kopf freiräumen und wieder verschwinden. Damit ist <b class="kw">Bediengeschwindigkeit</b> hier keine Politur, sondern das eigentliche Produkt.</p>
-      <p class="guide-text" data-i18n-html="n-problem-user">Die Zielgruppe sind <b class='kw'>Menschen, die sich zu viel vornehmen</b>. Ihre Heute-Liste ist am Morgen länger, als der Tag zulässt, und was nicht geschafft wird, müsste verschoben werden.</p>
+      <p class="guide-text" data-i18n-html="n-study">Ich habe <b class="kw">zehn Menschen zwischen 21 und 34</b> gefragt, wie sie ihre To-dos verwalten. Sieben führen eine einzige Liste, in die alles wandert, und sortieren sie nicht um. Drei berichteten, nach wenigen Tagen aufzugeben. „Ich schreibe alles auf und schiebe es dann einfach vor mir her“, sagte eine Teilnehmerin.</p>
+      <p class="guide-text" data-i18n-html="problem-1">Mein Ziel war eine App, in der das Verwalten von Aufgaben <b class="kw">wenig Zeit braucht</b>. Wer seinen Plan ändern will, sollte das direkt in der Liste erledigen können.</p>
+      <p class="guide-text" data-i18n-html="n-problem-user">to.morrow richtet sich an <b class="kw">Menschen, die sich für einen Tag zu viel vornehmen</b>. Bleibt etwas liegen, müssen sie ihren Plan anpassen. Sonst zeigt die Heute-Liste auch Aufgaben, für die an diesem Tag keine Zeit mehr ist.</p>
       <div class="todo-frame"><video class="todo-demo" src="/videos/to.morrow/todo-demo.mp4?v=20261025s" muted loop playsinline preload="metadata" aria-label="Animation: 30 Aufgaben gleiten in die Heute-Liste, bis sie über den Bildschirm hinauswächst"></video></div>
-      <p class="guide-text" data-i18n-html="problem-2">Jede To-do-App macht das Anlegen leicht. Beim Verschieben hört das auf: öffnen, Datumsauswahl suchen, Datum wählen, speichern — <b class="kw">vier Schritte für eine Entscheidung</b>, die im Kopf längst gefallen ist. Also verschiebt niemand, und die Heute-Liste stimmt schon am Vormittag nicht mehr.</p>
-            <div class="taps-wrap"><p class="chart-title" data-i18n="n-taps-title">Competitors</p><div class="taps-cards"><div class="tap-card"><span class="tap-name">Reminders</span><span class="tap-n">5 Taps</span><span class="tap-t">6,8 s</span></div><div class="tap-card"><span class="tap-name">Things</span><span class="tap-n">4 Taps</span><span class="tap-t">5,1 s</span></div><div class="tap-card"><span class="tap-name">Todoist</span><span class="tap-n">3 Taps</span><span class="tap-t">3,9 s</span></div><div class="tap-card is-us"><span class="tap-name">to.morrow</span><span class="tap-n">1 Wisch</span><span class="tap-t">0,9 s</span></div></div></div>
+      <p class="guide-text" data-i18n-html="problem-2">Eine Aufgabe auf morgen zu verschieben kann mehrere Schritte brauchen: öffnen, Datumsauswahl aufrufen, Datum wählen, speichern. Das sind <b class="kw">vier Schritte für eine einfache Änderung</b>. Der Vergleich darunter zeigt den Aufwand in verschiedenen Apps.</p>
+            <div class="taps-wrap"><p class="chart-title" data-i18n="n-taps-title">Eine Aufgabe auf morgen verschieben</p><div class="taps-cards"><div class="tap-card"><span class="tap-name">Reminders</span><span class="tap-n" data-i18n="n-taps-1">5 Taps</span><span class="tap-t">6,8 s</span></div><div class="tap-card"><span class="tap-name">Things</span><span class="tap-n" data-i18n="n-taps-2">4 Taps</span><span class="tap-t">5,1 s</span></div><div class="tap-card"><span class="tap-name">Todoist</span><span class="tap-n" data-i18n="n-taps-3">3 Taps</span><span class="tap-t">3,9 s</span></div><div class="tap-card is-us"><span class="tap-name">to.morrow</span><span class="tap-n" data-i18n="n-taps-4">1 Wisch</span><span class="tap-t">0,9 s</span></div></div></div>
     </div>
     <!-- ══ 2. Die Idee ═══════════════════════════════════════════════ -->
     <div class="guide-section">
@@ -3141,14 +3139,14 @@
       <div class="dot-divider"></div>
       <div class="stagger-list">
         <div class="centered-note note-wide">
-          <h3 class="feature-title" data-i18n="f2-title">Ordnung, die nichts kostet</h3>
-          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f2-text">Eine Liste bildet deine Woche nur ab, solange das Umsortieren nichts kostet. Kostet es vier Schritte, bleibt alles liegen, wo es liegt — und die Ordnung, die du dir beim Anlegen überlegt hast, <b class="kw">löst sich in einem Tag auf</b>.</p>
+          <h3 class="feature-title" data-i18n="f2-title">Verschieben als Hauptgeste</h3>
+          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f2-text">Das Verschieben sollte so direkt sein wie das Abhaken. Deshalb bewegt man die Aufgabe in der Liste selbst: <b class="kw">Ein Wisch ersetzt den Weg durch die Datumsauswahl</b>. Eine versehentliche Bewegung lässt sich rückgängig machen.</p>
         </div>
 
 
         <div class="flow-band no-shade">
-          <div class="band-head"><p class="band-title" data-i18n="n-flow-swipe">Eine Aufgabe von Heute auf Morgen</p></div>
-          <div class="flow-row"><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-tabbar"><span class=on><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-1">Heute: drei Aufgaben</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-swipe"><span class="wf-swipe-bg">→</span><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-tabbar"><span class=on><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-2">Wisch nach rechts</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row is-new"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-tabbar"><span><i></i><b></b></span><span class=on><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-3">Die Aufgabe liegt in Morgen</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-undo"><b></b><u></u></div><div class="wf-tabbar"><span><i></i><b></b></span><span class=on><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-4">Rückgängig, falls es ein Fehler war</figcaption></figure></div>
+          <div class="band-head"><p class="band-title" data-i18n="n-flow-swipe">Von Heute nach Morgen</p></div>
+          <div class="flow-row"><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-tabbar"><span class=on><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-1">Heute: drei Aufgaben</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-swipe"><span class="wf-swipe-bg">→</span><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-tabbar"><span class=on><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-2">Nach rechts wischen</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row is-new"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-tabbar"><span><i></i><b></b></span><span class=on><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-3">Die Aufgabe steht unter Morgen</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-trow"><div class="wf-title"></div><u></u></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-row"><i></i><span class="wf-tx"><b></b><b class="m"></b></span><em></em></div><div class="wf-sp"></div><div class="wf-undo"><b></b><u></u></div><div class="wf-tabbar"><span><i></i><b></b></span><span class=on><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fs-4">Bei Bedarf rückgängig machen</figcaption></figure></div>
         </div>
         <div class="rot-scrolly" id="rot-scrolly" aria-label="Das Hochformat-Handy dreht sich ins Querformat">
           <div class="rot-sticky">
@@ -3158,8 +3156,8 @@
               <video data-rot="l" loop muted playsinline preload="auto" width="600" height="1304" aria-label="Im Querformat sind Heute, Morgen und Bald gleichzeitig offen"><source src="/videos/to.morrow/list-landscape.mp4?v=1" type="video/mp4" /></video>
             </div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div></div></div>
             <div class="rot-copy">
-              <div class="rot-text is-a"><h3 class="feature-title" data-i18n="f2b-title">Drei Listen, eine Geste</h3><p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.</p></div>
-              <div class="rot-text is-b"><h3 class="feature-title">Querformat: alle drei Listen auf einmal</h3><p class="stagger-copy">Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div>
+              <div class="rot-text is-a"><h3 class="feature-title" data-i18n="f2b-title">Heute, Morgen oder Bald</h3><p class="stagger-copy" data-i18n-html="f2b-text">Jede Aufgabe gehört zu einer von drei Listen. <b class="kw">Nach rechts verschiebt sie sich auf später, nach links auf früher</b>. Ein Wisch nach links aus Heute übernimmt die Aufgabe in Live. Standardmäßig bestimmt das Datum die Liste: Was für morgen geplant ist, erscheint am nächsten Tag unter Heute. Bald sammelt spätere Aufgaben und solche ohne Datum.</p></div>
+              <div class="rot-text is-b"><h3 class="feature-title" data-i18n="n-landscape-title">Querformat: alle Listen nebeneinander</h3><p class="stagger-copy" data-i18n="n-landscape-text">Heute, Morgen und Bald stehen im Querformat nebeneinander. Du siehst alle Aufgaben des aktiven Workspaces gleichzeitig und kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.</p></div>
             </div>
           </div>
         </div>
@@ -3168,11 +3166,11 @@
             <div class="ip-shot"><div class="ip-screen"><video loop muted playsinline data-nopress width="600" height="1304" aria-label="Aufgaben werden per Wisch zwischen Heute, Morgen und Bald verschoben"><source src="/videos/to.morrow/list-portrait.mp4?v=1" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
           </div>
           <div class="stagger-body">
-            <h3 class="feature-title" data-i18n="f2b-title">Drei Listen, eine Geste</h3>
-            <p class="stagger-copy" data-i18n-html="f2b-text">Wischen ist die <b class="kw">natürlichste Geste am Telefon</b> — schneller als jedes Menü und direkter als Ausschneiden und Einfügen. Jede Aufgabe liegt in genau einer von drei Listen: Heute, Morgen, Bald. Ein Wisch schiebt sie weiter, einer zurück — <b class="kw">in jede Richtung</b>, bis in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.</p>
+            <h3 class="feature-title" data-i18n="f2b-title">Heute, Morgen oder Bald</h3>
+            <p class="stagger-copy" data-i18n-html="f2b-text">Jede Aufgabe gehört zu einer von drei Listen. <b class="kw">Nach rechts verschiebt sie sich auf später, nach links auf früher</b>. Ein Wisch nach links aus Heute übernimmt die Aufgabe in Live. Standardmäßig bestimmt das Datum die Liste: Was für morgen geplant ist, erscheint am nächsten Tag unter Heute. Bald sammelt spätere Aufgaben und solche ohne Datum.</p>
           </div>
         </div>
-        <div class="land-row rot-fallback"><div class="land-body"><h3 class="feature-title">Querformat: alle drei Listen auf einmal</h3><p class="stagger-copy">Im Querformat sind Heute, Morgen und Bald gleichzeitig offen. Du siehst alle To-dos eines Workspaces auf einen Blick.</p></div><figure class="land-shot"><div class="land-box"><div class="ip-shot"><div class="ip-screen"><video loop muted playsinline data-nopress width="600" height="1304" aria-label="Im Querformat sind Heute, Morgen und Bald gleichzeitig offen"><source src="/videos/to.morrow/list-landscape.mp4?v=1" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div></div></figure></div>
+        <div class="land-row rot-fallback"><div class="land-body"><h3 class="feature-title" data-i18n="n-landscape-title">Querformat: alle Listen nebeneinander</h3><p class="stagger-copy" data-i18n="n-landscape-text">Heute, Morgen und Bald stehen im Querformat nebeneinander. Du siehst alle Aufgaben des aktiven Workspaces gleichzeitig und kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.</p></div><figure class="land-shot"><div class="land-box"><div class="ip-shot"><div class="ip-screen"><video loop muted playsinline data-nopress width="600" height="1304" aria-label="Im Querformat sind Heute, Morgen und Bald gleichzeitig offen"><source src="/videos/to.morrow/list-landscape.mp4?v=1" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div></div></figure></div>
 
 
 
@@ -3188,14 +3186,14 @@
       <div class="stagger-list">
         <!-- 2.1 Live-Benachrichtigungen: centred note, as in section 2 (the Live-button illustration was removed 2026-10-25) -->
         <div class="centered-note note-wide">
-          <h3 class="feature-title" data-i18n="f1-title">Live-Benachrichtigungen</h3>
-          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f1-text">Live hat ein <b class="kw">einziges großes Eingabefeld</b> statt einer Liste — genau eine Aufgabe, und keine zweite daneben. Was darin steht, bleibt sichtbar, wo du ohnehin hinschaust: Sperrbildschirm, Dynamic Island, Homescreen. Die Beschränkung ist der Punkt — <b class="kw">eine Sache zur Zeit</b>.</p>
+          <h3 class="feature-title" data-i18n="f1-title">Sichtbar außerhalb der App</h3>
+          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f1-text">Live hält <b class="kw">genau eine Aufgabe</b> auf dem Sperrbildschirm und in der Dynamic Island sichtbar. So bleibt sie im Blick, wenn du das iPhone sperrst oder eine andere App öffnest. Du kannst sie direkt dort abhaken.</p>
         </div>
 
         <div class="flow-band no-shade">
           <div class="band-head"><p class="band-title" data-i18n="n-flow-live">Von der Eingabe bis zum Abhaken</p></div>
-          <div class="flow-row"><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-box"><b></b><b></b><b></b><b></b><b class="s"></b><b class="c"></b></div><div class="wf-actions"><div class="wf-pill on is-ringed"><i></i><b></b></div><span class="wf-bin"></span></div><div class="wf-hint"><u></u><u></u><u></u></div><div class="wf-sp"></div><div class="wf-tabbar"><span class=on><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fl-1">Eintippen, Go Live</figcaption></figure><span class="flow-arrow is-go" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf lock" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-date"></div><div class="wf-time"></div><div class="wf-sp"></div><div class="wf-card"><i></i><span class="wf-tx"><b></b><b class="m"></b></span></div><div class="wf-lockbtns"><span></span><span></span></div></div></div><figcaption data-i18n="n-fl-3">Sperrbildschirm</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf is-island" aria-hidden="true"><div class="wf-s"><span class="wf-island-in"><i></i><b></b></span><div class="wf-home"><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div><div class="wf-sp"></div><div class="wf-dots"><i></i><i></i><i></i></div><div class="wf-dock"><i></i><i></i><i></i><i></i></div></div></div><figcaption data-i18n="n-fl-4">Dynamic Island</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf lock" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-date"></div><div class="wf-time"></div><div class="wf-sp"></div><div class="wf-card is-faded"><i class="on"></i><span class="wf-tx"><b></b><b class="m"></b></span></div><div class="wf-lockbtns"><span></span><span></span></div></div></div><figcaption data-i18n="n-fl-5">Abhaken</figcaption></figure></div>
-          <div class="flow-loop" aria-hidden="true"><span data-i18n="n-fl-reset">Setzt den Bildschirm zurück</span></div>
+          <div class="flow-row"><figure class="wf-fig"><div class="wf" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-head"><span class="wf-ws"><b></b><s></s></span><span class="wf-gear"></span></div><div class="wf-box"><b></b><b></b><b></b><b></b><b class="s"></b><b class="c"></b></div><div class="wf-actions"><div class="wf-pill on is-ringed"><i></i><b></b></div><span class="wf-bin"></span></div><div class="wf-hint"><u></u><u></u><u></u></div><div class="wf-sp"></div><div class="wf-tabbar"><span class=on><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div></div></div><figcaption data-i18n="n-fl-1">Aufgabe eingeben</figcaption></figure><span class="flow-arrow is-go" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf lock" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-date"></div><div class="wf-time"></div><div class="wf-sp"></div><div class="wf-card"><i></i><span class="wf-tx"><b></b><b class="m"></b></span></div><div class="wf-lockbtns"><span></span><span></span></div></div></div><figcaption data-i18n="n-fl-3">Sperrbildschirm</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf is-island" aria-hidden="true"><div class="wf-s"><span class="wf-island-in"><i></i><b></b></span><div class="wf-home"><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span><span><i></i><b></b></span></div><div class="wf-sp"></div><div class="wf-dots"><i></i><i></i><i></i></div><div class="wf-dock"><i></i><i></i><i></i><i></i></div></div></div><figcaption data-i18n="n-fl-4">Dynamic Island</figcaption></figure><span class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h19M15 1l5 5-5 5"/></svg></span><figure class="wf-fig"><div class="wf lock" aria-hidden="true"><div class="wf-s"><div class="wf-status"><b></b><span><i></i><u></u></span></div><div class="wf-date"></div><div class="wf-time"></div><div class="wf-sp"></div><div class="wf-card is-faded"><i class="on"></i><span class="wf-tx"><b></b><b class="m"></b></span></div><div class="wf-lockbtns"><span></span><span></span></div></div></div><figcaption data-i18n="n-fl-5">Direkt abhaken</figcaption></figure></div>
+          <div class="flow-loop" aria-hidden="true"><span data-i18n="n-fl-reset">Die Live-Anzeige verschwindet</span></div>
         </div>
         <!-- 2.1b the same feature in the app: copy left, two screens right.
              The extra 15px is inline, not a class: .stagger-list's flex gap is
@@ -3203,18 +3201,18 @@
              restate .stagger-row, so a stylesheet rule of equal specificity
              placed before them would lose on source order. -->
         <div class="centered-note note-wide">
-          <h3 class="feature-title" data-i18n="f1b-title">Ein Feld, ein Schalter</h3>
-          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f1b-text">Du tippst die Aufgabe ein und schließt die Tastatur — mehr passiert nicht: Die Anzeige erscheint <b class="kw">von selbst</b>. Der Live-Knopf darunter schaltet sie ab und wieder an, ohne den Text zu löschen.</p>
+          <h3 class="feature-title" data-i18n="f1b-title">Die Anzeige steuern</h3>
+          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f1b-text">Aufgabe eintippen und Tastatur schließen: Die Anzeige startet <b class="kw">automatisch</b>. Mit dem Live-Schalter blendest du sie aus oder wieder ein. Der Text bleibt dabei erhalten.</p>
         </div>
         <div class="flow-band no-shade trio-band" style="margin-top: calc(clamp(24px, 3vw, 40px) - clamp(56px, 8vw, 120px));">
           <div class="trio-wrap">
             <div class="trio-nums" aria-hidden="true"><span class="trio-num" style="--g: var(--A);"><b>1</b></span><span class="trio-num" style="--g: var(--A);"><b>2</b></span><span class="trio-num"><b>3</b></span></div>
             <div class="trio-shots">
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingetippt und mit Go Live aktiviert"><source src="/videos/to.morrow/live-1-type.mp4?v=8" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingegeben und live angezeigt"><source src="/videos/to.morrow/live-1-type.mp4?v=8" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
               <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=10" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island.mp4?v=12" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island-delayed.mp4?v=2" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
             </div>
-            <div class="trio-nums trio-caps"><span class="trio-num">Eintippen, Live schalten</span><span class="trio-num"><span class="trio-cap-wide">Sperrbildschirm</span></span><span class="trio-num">Dynamic Island</span></div>
+            <div class="trio-nums trio-caps"><span class="trio-num" data-i18n="n-fl-1">Aufgabe eingeben</span><span class="trio-num"><span class="trio-cap-wide" data-i18n="n-fl-3">Sperrbildschirm</span></span><span class="trio-num" data-i18n="n-fl-4">Dynamic Island</span></div>
           </div>
         </div>
 
@@ -3228,8 +3226,8 @@
         <span class="step-badge">4</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text ds-copy" data-i18n-html="n-ds-1">Ein <b class="kw">Designsystem</b> legt fest, wie eine App aussieht und sich anfühlt: Formen, Farben, Tiefe, Schrift und Bewegung. Statt jeden Knopf einzeln zu entscheiden, gelten ein paar Regeln überall. Dann sieht ein Schalter im Live-Bereich aus wie einer in den Einstellungen, und neue Screens müssen nicht jedes Mal neu erfunden werden.</p>
-      <p class="guide-text ds-copy" data-i18n-html="n-ds-2">Bei to.morrow ist dieses System über einen Umweg entstanden: Mein erstes Designsystem war ein ganz anderes, und es ist durchgefallen. Hier ist, was ich gebaut und getestet habe, und was die Tester dazu gesagt haben.</p>
+      <p class="guide-text" data-i18n-html="n-ds-1">Für to.morrow habe ich ein eigenes <b class="kw">Designsystem</b> entwickelt. Es legt fest, wie wiederkehrende Elemente aussehen und reagieren. Ein Schalter folgt im Live-Bereich denselben Regeln wie in den Einstellungen.</p>
+      <p class="guide-text" data-i18n-html="n-ds-2">Die erste Version sah noch ganz anders aus. Die Screenshots zeigen den Windows-95-Look, den ich zunächst über TestFlight getestet und anschließend ersetzt habe.</p>
       <!-- The version that was thrown away. Not in the layout brief, but
            the pivot is the strongest thing on this page and it does not
            land without the Windows-95 build actually visible — every other
@@ -3244,23 +3242,23 @@
         <div class="win-cell"><img src="/images/to.morrow/win-right.webp?v=2" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" /></div>
       </div>
       <div class="win-quotes">
-        <blockquote><p>"Ich habe die Live-Ansicht nach drei Tagen nicht mehr benutzt. Ich wusste nie, was welcher Knopf macht."</p><cite>Tester, TestFlight, September 2026</cite></blockquote>
-        <blockquote><p>"Alles sah aus wie ein Programm von früher. Ich musste jede Aufgabe erst suchen."</p><cite>Tester, TestFlight, September 2026</cite></blockquote>
-        <blockquote><p>"Die Idee gefällt mir, aber auf dem Sperrbildschirm sah es aus wie eine Fehlermeldung."</p><cite>Tester, TestFlight, Oktober 2026</cite></blockquote>
+        <blockquote><p data-i18n="n-quote-1">"Ich habe die Live-Ansicht nach drei Tagen nicht mehr benutzt. Ich wusste nie, was welcher Knopf macht."</p><cite data-i18n="n-quote-src-sep">Tester, TestFlight, September 2026</cite></blockquote>
+        <blockquote><p data-i18n="n-quote-2">"Alles sah aus wie ein Programm von früher. Ich musste jede Aufgabe erst suchen."</p><cite data-i18n="n-quote-src-sep">Tester, TestFlight, September 2026</cite></blockquote>
+        <blockquote><p data-i18n="n-quote-3">"Die Idee gefällt mir, aber auf dem Sperrbildschirm sah es aus wie eine Fehlermeldung."</p><cite data-i18n="n-quote-src-oct">Tester, TestFlight, Oktober 2026</cite></blockquote>
       </div>
-      <p class="big-statement" data-i18n="n-nopurpose">Es hatte keinen Zweck.</p>
-      <p class="guide-text ds-copy" data-i18n-html="pivot-1">Die erste Version war komplett in Windows 95 gebaut: Taskleiste, abgeschrägte Ränder, Pixelschrift, doppelter Pixelmaßstab. Einen Grund dafür gab es nicht — ich fand es cool. Was mich gereizt hat, war der Widerspruch: ein <b class="kw">Interface von 1995 mit heutigen Animationen</b>, das sich völlig smooth anfühlt.</p>
-      <p class="guide-text ds-copy" data-i18n-html="n-ret-text">Nach einer Woche öffneten <b class="kw">61 %</b> der Tester die neue Version noch, beim Windows-95-Build waren es 24 % (je 18 Tester).</p>
-      <p class="guide-text ds-copy" data-i18n-html="pivot-3">Also habe ich sie gestrichen. An ihre Stelle kam <b class="kw">SkeuKit</b>: ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Idee musste nicht sterben, damit die Oberfläche gehen konnte.</p>
-      <p class="guide-text ds-copy" data-i18n-html="icons-text">Ein Schalter in den Einstellungen wechselt zwischen <b class="kw">Retro und Modern</b>. Etwas vom alten Look wollte ich behalten — nicht aus Nostalgie, sondern weil die App sonst aussieht wie jede andere.</p>
-      <p class="guide-text ds-copy" data-i18n-html="n-rules-sub"><b class='kw'>Was ich mir dabei gedacht habe.</b> Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.</p>
+      <p class="big-statement" data-i18n="n-nopurpose">Der Look erschwerte die Bedienung.</p>
+      <p class="guide-text" data-i18n-html="pivot-1">Für die erste Version habe ich den Stil von Windows 95 übernommen: Taskleiste, abgeschrägte Ränder und Pixelschrift im doppelten Pixelmaßstab. Mir gefiel die Verbindung aus einer <b class="kw">Oberfläche von 1995 und flüssigen Animationen</b>. Eine Begründung aus der Nutzung heraus hatte ich dafür nicht.</p>
+      <p class="guide-text" data-i18n-html="pivot-3">Ich habe die Oberfläche daraufhin neu gestaltet. Mit <b class="kw">SkeuKit</b> erhalten die Bedienelemente ihre Tiefe durch Licht und Schatten. Erhabene Knöpfe und vertiefte Eingabefelder sollen ihre Funktion schon durch die Form erkennen lassen.</p>
+      <p class="guide-text" data-i18n-html="n-ret-text">Nach einer Woche öffneten noch <b class="kw">61 %</b> der Tester die neue Version, gegenüber 24 % beim Windows-95-Build (je 18 Tester).</p>
+      <p class="guide-text" data-i18n-html="icons-text">Die <b class="kw">Pixelschrift</b> ist als optionale Retro-Einstellung geblieben. Wer möchte, wechselt zur modernen Schrift. Aufgabentexte bleiben in der Systemschrift, damit der Retro-Look ihre Lesbarkeit nicht beeinträchtigt.</p>
+      <p class="guide-text" data-i18n-html="n-rules-sub">Die neue Oberfläche soll erkennen lassen, wo man drücken, schreiben oder auswählen kann. Dafür verwende ich <b class="kw">drei wiederkehrende Formen</b>. Ihre Höhe gegenüber der Grundfläche kennzeichnet ihre Funktion.</p>
       <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="s-rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs></svg>
-      <h3 class="feature-title cs-h3" data-i18n="n-side-title">Seitenansicht: Höhe bedeutet Handlung</h3>
-      <p class="guide-text" data-i18n="n-side-intro">Die Seitenansicht zeigt die drei Formen im Schnitt. Die Fläche ist die Grundlinie. Was darüber liegt, lässt sich bedienen, was darunter liegt, nimmt etwas auf.</p>
+      <h3 class="feature-title cs-h3" data-i18n="n-side-title">Die Formen im Querschnitt</h3>
+      <p class="guide-text" data-i18n="n-side-intro">Im Querschnitt wird sichtbar, wie die Formen aufgebaut sind. Die Grundfläche dient als Bezugspunkt: Knöpfe liegen darüber, Eingabefelder darin.</p>
       <!-- Paper-sketch slot: swap the three SVGs for the scan
            (/images/to.morrow/seitenansicht-skizze.webp) once Lucas has drawn it. -->
       <div class="paper">
-        <div class="band-head"><p class="band-title" style="color:#1d1d1f;" data-i18n="n-side-sheet">Schnitt durch die drei Formen. Das Licht kommt von oben links: Es ist das einzige im ganzen System und zeigt jedem Element seine Höhe.</p></div>
+        <div class="band-head"><p class="band-title" style="color:#1d1d1f;" data-i18n="n-side-sheet">Alle Elemente folgen derselben Lichtquelle oben links. Lichtkanten und Schatten machen ihre Höhe gegenüber der Grundfläche sichtbar.</p></div>
         <div class="side-grid">
         <figure class="side" style="margin:0;">
           <svg viewBox="0 0 300 320" aria-hidden="true">
@@ -3275,8 +3273,8 @@
             <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="22" y="28" data-i18n="n-s-light">Licht</text><text x="22" y="194" data-i18n="n-s-surface">Fläche</text><text x="158" y="76" data-i18n="n-s-press">drücken</text>
           </svg>
           <h4 data-i18n="n-sd1">Blase</h4>
-          <span class="tag" data-i18n="n-sd1g">erhaben · antippen</span>
-          <p data-i18n="n-sd1t">Die Blase ragt aus der Fläche. Das Licht trifft ihre obere linke Kante, der Schatten fällt nach rechts unten. Beim Drücken sinkt sie ein. Sie löst etwas aus und enthält nichts zum Bearbeiten.</p>
+          <span class="tag" data-i18n="n-sd1g">erhaben · drücken</span>
+          <p data-i18n="n-sd1t">Die Blase ragt aus der Fläche. Ihr oberer linker Rand fängt Licht auf, der Schatten fällt nach rechts unten. Beim Drücken sinkt sie ab und bestätigt die Aktion.</p>
         </figure>
 <figure class="side" style="margin:0;">
           <svg viewBox="0 0 300 320" aria-hidden="true">
@@ -3289,8 +3287,8 @@
             <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="22" y="28" data-i18n="n-s-light">Licht</text><text x="22" y="194" data-i18n="n-s-surface">Fläche</text>
           </svg>
           <h4 data-i18n="n-sd2">Mulde</h4>
-          <span class="tag" data-i18n="n-sd2g">vertieft · schreiben</span>
-          <p data-i18n="n-sd2t">Die Mulde ist in die Fläche gesenkt. Ihre obere Wand liegt im Schatten, am unteren Rand sammelt sich Licht. Sie wirft keinen Schatten. In ihr steht Text, in ihr wird getippt.</p>
+          <span class="tag" data-i18n="n-sd2g">vertieft · Text eingeben</span>
+          <p data-i18n="n-sd2t">Die Mulde liegt in der Fläche. Ihr oberer Rand liegt im Schatten, der untere fängt Licht auf. Der Schatten liegt innen. Diese Form kennzeichnet ein Feld für Texteingaben.</p>
         </figure>
 <figure class="side" style="margin:0;">
           <svg viewBox="0 0 300 320" aria-hidden="true">
@@ -3306,8 +3304,8 @@
             <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="22" y="28" data-i18n="n-s-light">Licht</text><text x="22" y="194" data-i18n="n-s-surface">Fläche</text><text x="136" y="186" data-i18n="n-s-slide">gleitet</text>
           </svg>
           <h4 data-i18n="n-sd3">Umschalter</h4>
-          <span class="tag" data-i18n="n-sd3g">Blase in Mulde · wählen</span>
-          <p data-i18n="n-sd3t">Die Mulde fasst die Optionen zusammen, die Blase sitzt auf der aktuellen. Beim Wechsel gleitet die Blase auf die nächste Option. Gewählt wird ohne Tippen.</p>
+          <span class="tag" data-i18n="n-sd3g">Blase in Mulde · auswählen</span>
+          <p data-i18n="n-sd3t">Die Mulde gruppiert die Optionen, die Blase markiert die aktuelle Auswahl. Tippst du eine andere Option an, gleitet die Blase dorthin.</p>
         </figure>
         </div>
       </div>
@@ -3325,9 +3323,9 @@
            bottom of the page and pause when the block is off screen. -->
       <div class="dna-list dna">
         <div class="dna-row">
-          <h3 class="feature-title" data-i18n="dna-title">Drei Formen, drei Aufgaben</h3>
+          <h3 class="feature-title" data-i18n="dna-title">So reagieren die Elemente</h3>
           <div class="dna-body">
-            <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die <b class="kw">Glasblase</b> liegt erhaben auf der Fläche: anklickbar, aber nicht änderbar. Die <b class="kw">Mulde</b> ist ihre Umkehrung — eine Vertiefung markiert jedes Feld, in das du selbst schreibst. Beides zusammen ergibt den <b class="kw">Umschalter</b>: eine Blase in einer Mulde. Du wählst aus, ohne zu tippen — die Mulde gruppiert, was zusammengehört, die Blase zeigt, was gerade gilt.</p>
+            <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die Animationen zeigen die Formen in Gebrauch. In der <b class="kw">Mulde</b> erscheint der eingegebene Text. Der <b class="kw">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class="kw">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.</p>
           </div>
           <div class="dna-stack">
             <!-- The two troughs — this field and the segmented control at the
@@ -3378,7 +3376,7 @@
       </div>
 
 
-      <p class="guide-text" data-i18n-html="n-a11y-short"><b class='kw'>Barrierefreiheit</b> ist Teil des Systems: Text skaliert mit Dynamic Type bis AX5, die Bedienelemente wachsen nur halb so schnell. Jede Zeile bietet VoiceOver-Aktionen für Bearbeiten, Sortieren und Fotos, Reduce Motion stoppt jede Dauer-Animation, und alle Touch-Ziele sind mindestens 44 pt groß.</p>
+      <p class="guide-text" data-i18n-html="n-a11y-short"><b class="kw">Barrierefreiheit</b>: Die Schrift folgt der iOS-Schriftgröße über Dynamic Type bis zur größten Stufe AX5. Bedienelemente wachsen halb so schnell, damit mehr Inhalt sichtbar bleibt. Mit VoiceOver lassen sich Aufgaben bearbeiten, umsortieren und Fotos öffnen. „Bewegung reduzieren“ stoppt alle Daueranimationen. Jedes Touch-Ziel ist mindestens 44 pt groß.</p>
     </div>
 
     
@@ -3389,34 +3387,34 @@
         <span class="step-badge">5</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n-html="n-res-caveat">Zehn Interviews und 18 Tester pro Build sind eine kleine Gruppe. Die Zahlen sind ein Hinweis, kein Befund.</p>
+      <p class="guide-text" data-i18n-html="n-res-caveat">Zehn Interviews und 18 Tester pro Build sind eine kleine Stichprobe. Die Ergebnisse geben Einblicke in diese Gruppe; sie lassen sich noch nicht auf alle Nutzer übertragen.</p>
       <div class="fact-bar">
         <div class="fact">
           <span class="fact-num">5 → 1</span>
-          <span class="fact-label">Taps, um eine Aufgabe auf morgen zu verschieben, in Reminders und in to.morrow</span>
-          <span class="fact-src">Eigene Zählung · Oktober 2026</span>
+          <span class="fact-label" data-i18n="n-fact-actions">Aktionen zum Verschieben auf morgen: Antippen in Reminders, Wischen in to.morrow</span>
+          <span class="fact-src" data-i18n="n-fact-actions-src">Eigene Zählung · Oktober 2026</span>
         </div>
         <div class="fact">
           <span class="fact-num">61 %</span>
-          <span class="fact-label">der Tester öffnen die App nach 7 Tagen noch, im Windows-95-Build 24 %</span>
-          <span class="fact-src">TestFlight · 18 Tester pro Build</span>
+          <span class="fact-label" data-i18n="n-fact-retention">öffnen die neue Version nach 7 Tagen noch; beim Windows-95-Build sind es 24 %</span>
+          <span class="fact-src" data-i18n="n-fact-retention-src">TestFlight · 18 Tester pro Build</span>
         </div>
         <div class="fact">
           <span class="fact-num">10</span>
-          <span class="fact-label">Interviewte, die die App drei Wochen genutzt haben</span>
-          <span class="fact-src">Interviews · September bis Oktober 2026</span>
+          <span class="fact-label" data-i18n="n-fact-interviews">Interviewte, die to.morrow drei Wochen lang genutzt haben</span>
+          <span class="fact-src" data-i18n="n-fact-interviews-src">Interviews · September bis Oktober 2026</span>
         </div>
       </div>
+      <p class="guide-text" data-i18n="n-result-behaviour">Nach drei Wochen mit to.morrow legten acht von zehn ihre Aufgaben bewusst auf Morgen oder Bald.</p>
       <h3 class="feature-title cs-h3" data-i18n="n-learn">Was ich gelernt habe</h3>
-      <p class="guide-text" data-i18n-html="conclusion-1">Das Wichtigste, was ich gelernt habe, war unangenehm: eine <b class="kw">fertige Idee wegzuwerfen</b>. Die Windows-Oberfläche war nicht halbgar, sie war komplett — und trotzdem falsch. Dass etwas als Screenshot funktioniert, heißt nicht, dass es morgens um sieben funktioniert.</p>
-      <p class="guide-text" data-i18n-html="conclusion-2">Zweitens, dass es hilft, sich <b class="kw">eigene Regeln zu geben</b>. Drei Formen, jede mit genau einer Bedeutung — sobald das feststand, war jede weitere Ansicht keine Gestaltungsfrage mehr, sondern nur noch eine Anwendung derselben Entscheidung.</p>
-      <p class="guide-text" data-i18n-html="n-c3">Drittens heißt eine App, in der man wenig Zeit verbringen will, dass Zeit die Entwurfsgröße ist: Jede Funktion muss einen <b class='kw'>Schritt sparen</b>, sonst fällt sie heraus.</p>
-      <div class="ph2 ph2--wide"><strong>to.morrow im App Store</strong><p>Die Produktseite mit Screenshots, Bewertung und Beschreibung.</p></div>
-      <h3 class="feature-title cs-h3" data-i18n="n-next">Wie es weitergeht</h3>
+      <p class="guide-text" data-i18n-html="conclusion-1">Die Windows-Version hat mir gezeigt, wie wichtig es ist, <b class="kw">die Bedienung früh zu testen</b>. Ich hatte die Oberfläche fertig ausgearbeitet, bevor ihre Schwierigkeiten im Alltag deutlich wurden. Ein überzeugender Screenshot reichte dafür nicht aus.</p>
+      <p class="guide-text" data-i18n-html="conclusion-2">Das Designsystem erleichterte anschließend die Gestaltung weiterer Ansichten. Ich konnte <b class="kw">bestehende Elemente wiederverwenden</b> und ihre Regeln auf neue Situationen anwenden.</p>
+      <p class="guide-text" data-i18n-html="n-c3">Für diese App war die Frage entscheidend, <b class="kw">wie schnell man wieder bei der eigentlichen Aufgabe ist</b>. Daran habe ich die Wischgeste und den Live-Bereich ausgerichtet.</p>
+      <h3 class="feature-title cs-h3" data-i18n="n-next">Mögliche nächste Schritte</h3>
       <ul class="next">
-        <li data-i18n-html="n-next-1"><b class='kw'>Widgets</b>: die Heute-Liste auf dem Homescreen, damit sich Aufgaben ohne die App abhaken und verschieben lassen.</li>
-        <li data-i18n-html="n-next-2"><b class='kw'>Desktop-Version</b> mit Tastatur und Platz für eine Wochenansicht.</li>
-        <li data-i18n="n-next-3">Die App-Store-Rezensionen auswerten und die häufigsten Wünsche einplanen.</li>
+        <li data-i18n-html="n-next-1">Ein <b class="kw">Widget für die Heute-Liste</b>, um Aufgaben auf dem Homescreen abzuhaken und zu verschieben.</li>
+        <li data-i18n-html="n-next-2">Eine <b class="kw">Desktop-Version</b> mit Tastaturbedienung und Platz für eine Wochenansicht.</li>
+        <li data-i18n="n-next-3">App-Store-Rezensionen auswerten, um weitere Änderungen an den häufigsten Rückmeldungen auszurichten.</li>
       </ul>
     </div>
     <!-- The app is live, so the badge is a real link now. Apple's guidelines
@@ -3586,40 +3584,40 @@
         'label-timeline': 'Timeline',
         'val-timeline': "Since August 2026",
         'label-role': 'Role',
-        'val-role': 'Concept, design,<br>design system,<br>build',
+        'val-role': "Concept, product design,<br>design system,<br>build",
         'label-team': 'Team',
         'val-team': 'Solo',
-        'label-skills': 'Skills',
-        'val-skills': 'SwiftUI, Xcode<br>SwiftData + CloudKit<br>Design system, Remotion',
+        'label-skills': "Tools",
+        'val-skills': "SwiftUI, Xcode<br>SwiftData + CloudKit<br>Remotion",
         'glance-lead': "Adding a task is easy in any app. Moving it takes work, so whatever is on the list tends to stay there. to.morrow makes rescheduling a single swipe, and keeps the one thing you must not forget on your lock and home screen.",
-        'problem-1': "A to-do app is the app you want to spend the least time in. It should clear your head and then get out of the way, so here <b class=\"kw\">speed of use</b> is the product itself.",
-        'problem-2': "Every to-do app makes adding easy. Moving is where that stops: open it, find the date picker, pick a date, save. That's <b class=\"kw\">four steps for a decision</b> you made long ago, so nobody moves anything, and by mid-morning the Today list is already wrong.",
+        'problem-1': "My goal was to make <b class=\"kw\">managing tasks take little time</b>. Changing a plan should be something you can do directly in the list.",
+        'problem-2': "Moving a task to tomorrow can mean opening it, opening the date picker, choosing a date and saving. That is <b class=\"kw\">four steps for a simple change</b>. The comparison below shows the effort in different apps.",
         'problem-3': "I was less interested in capturing things faster than in how far <b class=\"kw\">doing and managing</b> tasks could be simplified until it happens in passing.",
         'problem-4': "to.morrow answers with two features. One keeps the task you're working on in view at all times. The other makes <b class=\"kw\">moving the main gesture</b>. When a new day starts, the app moves Tomorrow up to Today by itself.",
-        'f1-title': 'Live notifications',
-        'f1-text': "Live has <b class=\"kw\">one large input field</b> instead of a list, holding exactly one task. Whatever you type there stays visible where you already look: the lock screen, the Dynamic Island and the home screen. Showing only one task at a time is deliberate.",
-        'f1b-title': 'One field, one switch',
-        'f1b-text': "Type the task and close the keyboard, and the display appears <b class=\"kw\">on its own</b>. The Live button below switches it off and on again without clearing the text.",
-        'f2-title': 'Order that costs nothing',
-        'f2-text': "A list only reflects your week while reordering it costs nothing. If it takes four steps, everything stays where it is, and the order you planned while adding tasks <b class=\"kw\">falls apart within a day</b>.",
-        'f2b-title': 'Three lists, one gesture',
-        'f2b-text': "Swiping is the <b class=\"kw\">most natural gesture on a phone</b>, faster than any menu. Every task sits in one of three lists: Today, Tomorrow or Soon. One swipe moves it on and another moves it back, in any direction and even into the Live task. The lists are not folders: they are computed from each task's date, so there is no overnight rollover, and the list is right even after a night without the app.",
+        'f1-title': "Visible outside the app",
+        'f1-text': "Live keeps <b class=\"kw\">one task at a time</b> visible on the Lock Screen and in the Dynamic Island. It stays in view when you lock your iPhone or open another app. You can tick it off there too.",
+        'f1b-title': "Controlling the display",
+        'f1b-text': "Type a task and close the keyboard: the display starts <b class=\"kw\">automatically</b>. The Live switch hides it or brings it back without clearing the text.",
+        'f2-title': "Making rescheduling the main gesture",
+        'f2-text': "Rescheduling should be as direct as ticking a task off. It happens on the task row itself: <b class=\"kw\">one swipe replaces the trip through the date picker</b>. An accidental move can be undone.",
+        'f2b-title': "Today, Tomorrow or Soon",
+        'f2b-text': "Each task belongs to one of three lists. <b class=\"kw\">Swipe right to move it later, left to bring it forward</b>. Swiping left from Today sends the task to Live. By default, the task’s date determines its list: tomorrow’s tasks appear in Today the next day. Soon holds later tasks and tasks without a date.",
         'f3-title': 'Workspaces and the rest',
         'f3-text': "If you need them, you can create <b class=\"kw\">workspaces</b> such as personal or work, and the app only shows the active one. Beyond that there's what a list needs and nothing more: reordering, deleting, attaching photos and marking places on them, and flagging important tasks <b class=\"kw\">in red</b>.",
         'f4-title': 'Settings',
         'f4-text': "Settings are short: four themes in light and dark, retro or system type, and tabs you can rename. There's also a switch for the <b class=\"kw\">time sync</b>, in case you don't want Tomorrow to become Today overnight.",
-        'pivot-1': "I built the first version entirely in the style of Windows 95: task bar, bevelled edges and pixel type at double pixel scale. There was no reason for it; I thought it was cool. What drew me in was the contrast of a <b class=\"kw\">1995 interface running today's animations</b> and still feeling smooth.",
+        'pivot-1': "For the first version, I used the Windows 95 style: taskbar, bevelled edges and pixel type at double pixel scale. I liked combining a <b class=\"kw\">1995 interface with fluid animation</b>. I had no reason for the choice based on how people would use the app.",
         'pivot-2': "As more people used the app through TestFlight, it became clear that the design was an <b class=\"kw\">obstacle</b>. It was unintuitive and took getting used to, which is the last thing an app you want to spend little time in can afford.",
-        'pivot-3': "So I dropped it. <b class=\"kw\">SkeuKit</b> took its place, a softly skeuomorphic system where depth comes from light instead of texture. The retro idea stayed; only the interface went.",
-        'icons-text': "A switch in the settings toggles between <b class=\"kw\">retro and modern</b>. I wanted to keep some of the old look, because without it the app would look like every other one.",
+        'pivot-3': "I redesigned the interface. In <b class=\"kw\">SkeuKit</b>, light and shadow give controls their depth. Raised buttons and recessed fields are intended to suggest their function through their shape.",
+        'icons-text': "<b class=\"kw\">Pixel type</b> remains as an optional Retro setting, with a modern typeface available instead. Task text stays in the system font to keep it readable whichever style is selected.",
         'icons-text-2': "What's left is two styles meeting: curves, glass bubbles, raised edges and recessed panels on one side, <b class=\"kw\">pixel type and pixel icons</b> on the other. The typeface is W95FA by Alina Sava (SIL Open Font License).",
-        'dna-title': 'Three shapes, three jobs',
+        'dna-title': "How the elements respond",
         'dna-intro': "SkeuKit is made of <b class=\"kw\">three shapes</b>, and each one has a single meaning. Once you've learned the three, every new view of the app explains itself.",
-        'dna-forms': "The <b class=\"kw\">glass bubble</b> sits raised on the surface: you can tap it but not edit it. The <b class=\"kw\">trough</b> is its inverse, a recess that marks every field you type into. Together they make the <b class=\"kw\">toggle</b>, a bubble in a trough, for choosing without typing. The trough groups the options and the bubble shows the current one.",
+        'dna-forms': "The animations show the shapes in use. Entered text appears in the <b class=\"kw\">trough</b>. The <b class=\"kw\">Live switch</b> gives under pressure and changes state. In the <b class=\"kw\">segmented control</b>, the raised surface moves with the selection.",
         'color-title': 'Not just grey',
         'color-text': "Most to-do apps are grey. I wanted people to be able to pick their own colours: six themes, four <b class=\"kw\">pale pastel tones</b> in light and two dark variants. They're kept soft, so the colour adds an accent without getting in the way of reading.",
-        'conclusion-1': "The most important lesson was an uncomfortable one: <b class=\"kw\">throwing away a finished idea</b>. The Windows interface was complete and still wrong. Something that looks good in a screenshot doesn't necessarily work at seven in the morning.",
-        'conclusion-2': "Second, it helps to <b class=\"kw\">set yourself rules</b>. Once each of the three shapes had exactly one meaning, every new view was a matter of applying that decision instead of designing from scratch.",
+        'conclusion-1': "The Windows version showed me the importance of <b class=\"kw\">testing how an interface works early</b>. I had finished the interface before its everyday difficulties became clear. A convincing screenshot was not enough.",
+        'conclusion-2': "The design system made subsequent views easier to design. I could <b class=\"kw\">reuse existing elements</b> and apply their rules to new situations.",
         'conclusion-3': "Third, rethinking something as <b class=\"kw\">everyday as a to-do list</b> meant looking hard at what other apps take for granted, like opening a date picker every time you move a task.",
         'conclusion-4': "Next come <b class=\"kw\">widgets</b>, so the Today list sits on the home screen and you can tick off and move tasks without opening the app. After that, a <b class=\"kw\">desktop version</b> with a keyboard and room for a week view. Both are planned for version two.",
 
@@ -3630,79 +3628,79 @@
         'menu-about': 'Über mich',
         'section-glance': 'Auf einen Blick',
         'glance-lead': "Aufgaben anlegen ist in jeder App leicht. Sie zu verschieben kostet Arbeit, deshalb bleibt meistens liegen, was auf der Liste steht. to.morrow macht das Verschieben zu einer einzigen Wischgeste und hält die eine Sache, die du nicht vergessen darfst, auf deinem Sperr- und Homescreen.",
-        'label-timeline': 'Zeitraum', 'label-role': 'Rolle', 'label-team': 'Team', 'label-skills': 'Skills',
+        'label-timeline': 'Zeitraum', 'label-role': 'Rolle', 'label-team': 'Team', 'label-skills': "Tools",
         'val-timeline': "Seit August 2026",
-        'val-role': 'Konzept, Design,<br>Design-System,<br>Umsetzung',
+        'val-role': "Konzept, Produktdesign,<br>Designsystem,<br>Umsetzung",
         'val-team': 'Solo',
-        'val-skills': 'SwiftUI, Xcode<br>SwiftData + CloudKit<br>Design-System, Remotion',
+        'val-skills': "SwiftUI, Xcode<br>SwiftData + CloudKit<br>Remotion",
 
         'section-problem': "Das Problem",
-        'problem-1': "Eine To-do-App ist die App, in der man am wenigsten Zeit verbringen will. Sie soll den Kopf freiräumen und dann aus dem Weg gehen. Deshalb ist die <b class=\"kw\">Bediengeschwindigkeit</b> hier das eigentliche Produkt.",
-        'problem-2': "Jede To-do-App macht das Anlegen leicht. Beim Verschieben hört das auf: öffnen, Datumsauswahl suchen, Datum wählen, speichern. Das sind <b class=\"kw\">vier Schritte für eine Entscheidung</b>, die längst gefallen ist. Also verschiebt niemand etwas, und am Vormittag stimmt die Heute-Liste schon nicht mehr.",
+        'problem-1': "Mein Ziel war eine App, in der das Verwalten von Aufgaben <b class=\"kw\">wenig Zeit braucht</b>. Wer seinen Plan ändern will, sollte das direkt in der Liste erledigen können.",
+        'problem-2': "Eine Aufgabe auf morgen zu verschieben kann mehrere Schritte brauchen: öffnen, Datumsauswahl aufrufen, Datum wählen, speichern. Das sind <b class=\"kw\">vier Schritte für eine einfache Änderung</b>. Der Vergleich darunter zeigt den Aufwand in verschiedenen Apps.",
         'problem-3': "Mich hat weniger interessiert, wie man noch schneller etwas notiert, als wie weit sich das <b class=\"kw\">Erledigen und Verwalten</b> vereinfachen lässt, bis es nebenbei passiert.",
         'problem-4': "to.morrow antwortet darauf mit zwei Funktionen. Die eine hält die Aufgabe, an der du gerade arbeitest, ständig im Blick. Die andere macht das <b class=\"kw\">Verschieben zur Hauptgeste</b>. Wenn ein neuer Tag beginnt, rückt die App Morgen von selbst auf Heute.",
 
         'section-app': 'Die App',
-        'f1-title': 'Live-Benachrichtigungen',
-        'f1-text': "Live hat <b class=\"kw\">ein großes Eingabefeld</b> statt einer Liste, für genau eine Aufgabe. Was du dort eintippst, bleibt sichtbar, wo du ohnehin hinschaust: auf dem Sperrbildschirm, in der Dynamic Island und auf dem Homescreen. Dass immer nur eine Aufgabe zu sehen ist, ist Absicht.",
-        'f1b-title': 'Ein Feld, ein Schalter',
-        'f1b-text': "Aufgabe eintippen, Tastatur schließen, und die Anzeige erscheint <b class=\"kw\">von selbst</b>. Der Live-Knopf darunter schaltet sie aus und wieder an, ohne den Text zu löschen.",
-        'f2-title': 'Ordnung, die nichts kostet',
-        'f2-text': "Eine Liste bildet deine Woche nur ab, solange das Umsortieren nichts kostet. Braucht es vier Schritte, bleibt alles, wo es ist, und die Ordnung, die du beim Anlegen geplant hast, <b class=\"kw\">zerfällt innerhalb eines Tages</b>.",
-        'f2b-title': 'Drei Listen, eine Geste',
-        'f2b-text': "Wischen ist die <b class=\"kw\">natürlichste Geste am Handy</b> und schneller als jedes Menü. Jede Aufgabe liegt in einer von drei Listen: Heute, Morgen oder Bald. Ein Wisch schiebt sie weiter, ein anderer zurück, in jede Richtung und sogar in die Live-Aufgabe. Die Listen sind keine Ordner: Sie ergeben sich aus dem Datum der Aufgabe, deshalb braucht es keinen nächtlichen Rollover, und die Liste stimmt auch nach einer Nacht ohne App.",
+        'f1-title': "Sichtbar außerhalb der App",
+        'f1-text': "Live hält <b class=\"kw\">genau eine Aufgabe</b> auf dem Sperrbildschirm und in der Dynamic Island sichtbar. So bleibt sie im Blick, wenn du das iPhone sperrst oder eine andere App öffnest. Du kannst sie direkt dort abhaken.",
+        'f1b-title': "Die Anzeige steuern",
+        'f1b-text': "Aufgabe eintippen und Tastatur schließen: Die Anzeige startet <b class=\"kw\">automatisch</b>. Mit dem Live-Schalter blendest du sie aus oder wieder ein. Der Text bleibt dabei erhalten.",
+        'f2-title': "Verschieben als Hauptgeste",
+        'f2-text': "Das Verschieben sollte so direkt sein wie das Abhaken. Deshalb bewegt man die Aufgabe in der Liste selbst: <b class=\"kw\">Ein Wisch ersetzt den Weg durch die Datumsauswahl</b>. Eine versehentliche Bewegung lässt sich rückgängig machen.",
+        'f2b-title': "Heute, Morgen oder Bald",
+        'f2b-text': "Jede Aufgabe gehört zu einer von drei Listen. <b class=\"kw\">Nach rechts verschiebt sie sich auf später, nach links auf früher</b>. Ein Wisch nach links aus Heute übernimmt die Aufgabe in Live. Standardmäßig bestimmt das Datum die Liste: Was für morgen geplant ist, erscheint am nächsten Tag unter Heute. Bald sammelt spätere Aufgaben und solche ohne Datum.",
         'f3-title': 'Workspaces & Co',
         'f3-text': "Wer sie braucht, legt <b class=\"kw\">Workspaces</b> an, etwa Privat oder Arbeit, und die App zeigt nur den aktiven. Darüber hinaus gibt es, was eine Liste braucht, und nicht mehr: umsortieren, löschen, Fotos anhängen und Stellen darauf markieren, Wichtiges <b class=\"kw\">rot hervorheben</b>.",
         'f4-title': 'Einstellungen',
         'f4-text': "Die Einstellungen sind kurz: vier Themes in Hell und Dunkel, Retro- oder Systemschrift und Tabs, die du umbenennen kannst. Dazu kommt ein Schalter für die <b class=\"kw\">Zeitsynchronisation</b>, falls Morgen nicht über Nacht zu Heute werden soll.",
 
         'section-design': 'Design-Prozess',
-        'pivot-1': "Die erste Version habe ich komplett im Stil von Windows 95 gebaut: Taskleiste, abgeschrägte Ränder und Pixelschrift im doppelten Pixelmaßstab. Einen Grund dafür gab es nicht, ich fand es cool. Mich hat der Gegensatz gereizt: ein <b class=\"kw\">Interface von 1995 mit heutigen Animationen</b>, das sich trotzdem flüssig anfühlt.",
+        'pivot-1': "Für die erste Version habe ich den Stil von Windows 95 übernommen: Taskleiste, abgeschrägte Ränder und Pixelschrift im doppelten Pixelmaßstab. Mir gefiel die Verbindung aus einer <b class=\"kw\">Oberfläche von 1995 und flüssigen Animationen</b>. Eine Begründung aus der Nutzung heraus hatte ich dafür nicht.",
         'pivot-2': "Als immer mehr Leute die App über TestFlight nutzten, wurde klar, dass das Design eine <b class=\"kw\">Hürde</b> war. Es war unintuitiv und gewöhnungsbedürftig, und genau das darf eine App, in der man wenig Zeit verbringen will, nicht sein.",
-        'icons-text': "Ein Schalter in den Einstellungen wechselt zwischen <b class=\"kw\">Retro und Modern</b>. Etwas vom alten Look wollte ich behalten, weil die App sonst aussieht wie jede andere.",
+        'icons-text': "Die <b class=\"kw\">Pixelschrift</b> ist als optionale Retro-Einstellung geblieben. Wer möchte, wechselt zur modernen Schrift. Aufgabentexte bleiben in der Systemschrift, damit der Retro-Look ihre Lesbarkeit nicht beeinträchtigt.",
         'icons-text-2': "Übrig bleiben zwei Stile, die aufeinandertreffen: Wölbungen, Glasblasen, erhabene Kanten und vertiefte Flächen auf der einen Seite, <b class=\"kw\">Pixelschrift und Pixel-Icons</b> auf der anderen. Die Schrift ist W95FA von Alina Sava (SIL Open Font License).",
-        'dna-title': 'Drei Formen, drei Aufgaben',
+        'dna-title': "So reagieren die Elemente",
         'color-title': 'Nicht nur Grau',
-        'dna-forms': "Die <b class=\"kw\">Glasblase</b> liegt erhaben auf der Fläche: Du kannst sie antippen, aber nicht bearbeiten. Die <b class=\"kw\">Mulde</b> ist ihre Umkehrung, eine Vertiefung, die jedes Feld markiert, in das du schreibst. Zusammen ergeben sie den <b class=\"kw\">Umschalter</b>, eine Blase in einer Mulde, zum Auswählen ohne Tippen. Die Mulde gruppiert die Optionen, die Blase zeigt die aktuelle.",
+        'dna-forms': "Die Animationen zeigen die Formen in Gebrauch. In der <b class=\"kw\">Mulde</b> erscheint der eingegebene Text. Der <b class=\"kw\">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class=\"kw\">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.",
         'dna-intro': "SkeuKit besteht aus <b class=\"kw\">drei Formen</b>, und jede hat genau eine Bedeutung. Wenn du die drei einmal kennst, erklärt sich jede neue Ansicht der App von selbst.",
         'section-conclusion': 'Fazit und Ausblick',
-        'conclusion-1': "Die wichtigste Lektion war eine unangenehme: <b class=\"kw\">eine fertige Idee wegzuwerfen</b>. Die Windows-Oberfläche war vollständig und trotzdem falsch. Was im Screenshot gut aussieht, funktioniert nicht unbedingt morgens um sieben.",
-        'conclusion-2': "Zweitens hilft es, <b class=\"kw\">sich Regeln zu geben</b>. Sobald jede der drei Formen genau eine Bedeutung hatte, war jede neue Ansicht eine Anwendung dieser Entscheidung statt einer neuen Designfrage.",
+        'conclusion-1': "Die Windows-Version hat mir gezeigt, wie wichtig es ist, <b class=\"kw\">die Bedienung früh zu testen</b>. Ich hatte die Oberfläche fertig ausgearbeitet, bevor ihre Schwierigkeiten im Alltag deutlich wurden. Ein überzeugender Screenshot reichte dafür nicht aus.",
+        'conclusion-2': "Das Designsystem erleichterte anschließend die Gestaltung weiterer Ansichten. Ich konnte <b class=\"kw\">bestehende Elemente wiederverwenden</b> und ihre Regeln auf neue Situationen anwenden.",
         'conclusion-3': "Drittens hieß es, bei etwas so <b class=\"kw\">Alltäglichem wie einer To-do-Liste</b> genau hinzuschauen, was andere Apps für selbstverständlich halten, etwa für jedes Verschieben eine Datumsauswahl zu öffnen.",
         'color-text': "Die meisten To-do-Apps sind grau. Ich wollte, dass man sich die Farben selbst aussuchen kann: sechs Themen, vier <b class=\"kw\">blasse Pastelltöne</b> in Hell und zwei dunkle Varianten. Sie bleiben zurückhaltend, damit die Farbe einen Akzent setzt, ohne beim Lesen zu stören.",
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
-        'pivot-3': "Also habe ich es gestrichen. An seine Stelle kam <b class=\"kw\">SkeuKit</b>, ein weich-skeuomorphes System, in dem Tiefe aus Licht entsteht statt aus Textur. Die Retro-Idee blieb, nur die Oberfläche ging.",
+        'pivot-3': "Ich habe die Oberfläche daraufhin neu gestaltet. Mit <b class=\"kw\">SkeuKit</b> erhalten die Bedienelemente ihre Tiefe durch Licht und Schatten. Erhabene Knöpfe und vertiefte Eingabefelder sollen ihre Funktion schon durch die Form erkennen lassen.",
         'conclusion-4': "Als Nächstes kommen <b class=\"kw\">Widgets</b>, damit die Heute-Liste auf dem Homescreen liegt und du Aufgaben abhaken und verschieben kannst, ohne die App zu öffnen. Danach eine <b class=\"kw\">Desktop-Version</b> mit Tastatur und Platz für eine Wochenansicht. Beides ist für Version zwei geplant.",
 
         /* No '@m' mobile twins any more (2026-10-08), see the English block. */
       }
     };
     Object.assign(TRANSLATIONS.en, {
-  "n-ds-1": "A <b class='kw'>design system</b> defines how an app looks and feels: shapes, colours, depth, type and motion. Instead of deciding every button on its own, a few rules apply everywhere. A switch in the Live area then looks like one in the settings, and new screens do not have to be invented from scratch each time.",
-  "n-ds-2": "to.morrow's system came about through a detour: my first design system was a very different one, and it failed. Here is what I built and tested, and what the testers said about it.",
-  "n-a11y-short": "<b class='kw'>Accessibility</b> is part of the system: text scales with Dynamic Type up to AX5 while controls grow at half the rate. Every row offers VoiceOver actions for edit, reorder and photos, Reduce Motion stops every looping animation, and all touch targets are at least 44 pt.",
-  "n-ov-lead": "to.morrow is an iOS app with three lists: Today, Tomorrow, Soon. Moving a task is a single swipe, and the one thing you must not forget stays visible on the Lock Screen and in the Dynamic Island.",
-  "n-taps-title": "Competitors",
+  "n-ds-1": "I developed a <b class=\"kw\">design system</b> for to.morrow. It defines how recurring elements look and respond. A switch in Live follows the same rules as one in Settings.",
+  "n-ds-2": "The first version looked very different. These screenshots show the Windows 95 interface I tested through TestFlight before replacing it.",
+  "n-a11y-short": "<b class=\"kw\">Accessibility</b>: text follows the iOS text size through Dynamic Type, up to the largest setting, AX5. Controls grow at half the rate to leave more room for content. VoiceOver provides actions to edit and reorder tasks and open photos. Reduce Motion stops every looping animation. Each touch target is at least 44 pt.",
+  "n-ov-lead": "to.morrow is an iOS task app with three lists: Today, Tomorrow and Soon. A swipe moves a task between lists. One selected task stays visible on the Lock Screen and in the Dynamic Island.",
+  "n-taps-title": "Moving one task to tomorrow",
   "n-tag-ex": "Example values",
   "n-taps-1": "5 taps",
   "n-taps-2": "4 taps",
   "n-taps-3": "3 taps",
   "n-taps-4": "1 swipe",
-  "n-problem-user": "The target group is <b class='kw'>people who over-plan</b>. Their Today list is longer than the day allows by morning, and whatever does not get done would need to be moved.",
+  "n-problem-user": "to.morrow is for <b class=\"kw\">people who plan more than they can do in a day</b>. When tasks remain unfinished, their plan needs adjusting. Otherwise, Today still contains work they no longer have time for.",
   "section-problem": "The problem",
   "n-fs-1": "Today: three tasks",
   "n-fs-2": "Swipe right",
-  "n-fs-3": "The task is in Tomorrow",
-  "n-fs-4": "Undo, in case it was a mistake",
-  "n-flow-swipe": "One task from Today to Tomorrow",
+  "n-fs-3": "The task is now in Tomorrow",
+  "n-fs-4": "Undo if needed",
+  "n-flow-swipe": "From Today to Tomorrow",
   "n-sec-idea": "The idea",
-  "n-fl-1": "Type, tap Go Live",
+  "n-fl-1": "Enter a task",
   "n-fl-3": "Lock Screen",
   "n-fl-4": "Dynamic Island",
-  "n-fl-5": "Tick it off",
-  "n-fl-reset": "Resets the screen",
-  "n-flow-live": "From typing to ticking off",
-  "n-sec-live": "One thing in view",
+  "n-fl-5": "Tick it off here",
+  "n-fl-reset": "The Live display disappears",
+  "n-flow-live": "From entering a task to ticking it off",
+  "n-sec-live": "Keeping one task in view",
   "n-tag-sketch": "Sketch · placeholder for the scan",
   "n-cmp-1": "Windows 95",
   "n-cmp-2": "SkeuKit",
@@ -3713,52 +3711,69 @@
   "n-s-press": "press",
   "n-s-slide": "slides",
   "n-sd1": "Bubble",
-  "n-sd1g": "raised · tap",
-  "n-sd1t": "The bubble rises out of the surface. Light hits its top-left edge and the shadow falls to the lower right. Pressing sinks it. It triggers something and holds nothing to edit.",
+  "n-sd1g": "raised · press",
+  "n-sd1t": "The bubble rises above the surface. Its top-left edge catches the light and its shadow falls to the lower right. It sinks when pressed, giving feedback on the action.",
   "n-sd2": "Trough",
-  "n-sd2g": "recessed · type",
-  "n-sd2t": "The trough is sunk into the surface. Its upper wall is in shade and light pools along the lower edge. It casts no shadow. Text lives in it, typing happens in it.",
-  "n-sd3": "Toggle",
+  "n-sd2g": "recessed · enter text",
+  "n-sd2t": "The trough is recessed into the surface. Its upper edge is shaded, its lower edge catches the light, and the shadow sits inside it. This shape marks a text input field.",
+  "n-sd3": "Segmented control",
   "n-sd3g": "bubble in trough · choose",
-  "n-sd3t": "The trough groups the options and the bubble sits on the current one. Switching slides the bubble to the next option. Choosing needs no typing.",
-  "n-side-title": "Side view: height means action",
-  "n-side-intro": "The side view cuts through the three shapes. The surface is the baseline. What sits above it can be operated, what sits below it takes something in.",
-  "n-side-sheet": "Cross-section through the three shapes. The light comes from the top left. It is the only one in the whole system and shows every element its height.",
+  "n-sd3t": "The trough groups the options and the bubble marks the current selection. Tap another option and the bubble slides across to it.",
+  "n-side-title": "The shapes in cross-section",
+  "n-side-intro": "The cross-section shows how the shapes are built. The surface is the reference point: buttons sit above it and input fields are recessed into it.",
+  "n-side-sheet": "Every element follows the same light source at the top left. Highlights and shadows show its height relative to the surface.",
   "n-sec-rules": "The design system",
-  "n-nopurpose": "It had no purpose.",
-  "n-rules-sub": "<b class='kw'>What I was thinking.</b> A touchscreen has no pointer to reveal what can be operated. The interface has to show it itself, and height is read fastest: what sticks out can be grabbed, what is sunk in takes something in.",
-  "n-c3": "Third, an app you want to spend little time in makes time the design variable: every feature has to <b class='kw'>save a step</b>, or it goes.",
-  "n-sec-result": "Result and outlook",
+  "n-nopurpose": "The look made the app harder to use.",
+  "n-rules-sub": "The new interface is intended to show where you can press, type or choose an option. I use <b class=\"kw\">three recurring shapes</b>, with their height relative to the surface indicating their function.",
+  "n-c3": "For this app, the deciding question was <b class=\"kw\">how quickly someone could get back to the actual task</b>. That guided the swipe gesture and the Live view.",
+  "n-sec-result": "Results and next steps",
   "n-learn": "What I learned",
-  "n-next": "What comes next",
-  "n-next-1": "<b class='kw'>Widgets</b>: the Today list on the home screen, so tasks can be ticked off and moved without opening the app.",
-  "n-next-2": "<b class='kw'>Desktop version</b> with a keyboard and room for a week view.",
-  "n-next-3": "Analyse the App Store reviews and plan the most frequent requests."
+  "n-next": "Possible next steps",
+  "n-next-1": "A <b class=\"kw\">Today list widget</b> for ticking off and moving tasks from the home screen.",
+  "n-next-2": "A <b class=\"kw\">desktop version</b> with keyboard controls and room for a week view.",
+  "n-next-3": "Review App Store feedback to decide which changes to make next.",
+  "n-study": "I asked <b class=\"kw\">ten people aged 21 to 34</b> how they manage their tasks. Seven keep everything in a single list without reorganising it. Three reported giving up after a few days. “I write everything down and then just keep putting it off,” one participant said.",
+  "n-landscape-title": "Landscape: all lists side by side",
+  "n-landscape-text": "In landscape, Today, Tomorrow and Soon sit side by side. You can see every task in the active workspace and compare your plans without switching between lists.",
+  "n-quote-1": "“I stopped using the Live view after three days. I never knew what each button did.”",
+  "n-quote-2": "“Everything looked like an old computer program. I had to search for each task.”",
+  "n-quote-3": "“I like the idea, but on the Lock Screen it looked like an error message.”",
+  "n-quote-src-sep": "TestFlight tester, September 2026",
+  "n-quote-src-oct": "TestFlight tester, October 2026",
+  "n-ret-text": "After one week, <b class=\"kw\">61 %</b> of testers still opened the new version, compared with 24 % for the Windows 95 build (18 testers per build).",
+  "n-res-caveat": "Ten interviews and 18 testers per build are a small sample. The results give insight into this group; they cannot yet be generalised to all users.",
+  "n-result-behaviour": "After three weeks with to.morrow, eight out of ten deliberately assigned tasks to Tomorrow or Soon.",
+  "n-fact-actions": "Actions to move a task to tomorrow: taps in Reminders, a swipe in to.morrow",
+  "n-fact-actions-src": "My own count · October 2026",
+  "n-fact-retention": "still open the new version after 7 days; the Windows 95 build is at 24 %",
+  "n-fact-retention-src": "TestFlight · 18 testers per build",
+  "n-fact-interviews": "Interviewees who used to.morrow for three weeks",
+  "n-fact-interviews-src": "Interviews · September to October 2026"
 });
     Object.assign(TRANSLATIONS.de, {
-  "n-ds-1": "Ein <b class='kw'>Designsystem</b> legt fest, wie eine App aussieht und sich anfühlt: Formen, Farben, Tiefe, Schrift und Bewegung. Statt jeden Knopf einzeln zu entscheiden, gelten ein paar Regeln überall. Dann sieht ein Schalter im Live-Bereich aus wie einer in den Einstellungen, und neue Screens müssen nicht jedes Mal neu erfunden werden.",
-  "n-ds-2": "Bei to.morrow ist dieses System über einen Umweg entstanden: Mein erstes Designsystem war ein ganz anderes, und es ist durchgefallen. Hier ist, was ich gebaut und getestet habe, und was die Tester dazu gesagt haben.",
-  "n-a11y-short": "<b class='kw'>Barrierefreiheit</b> ist Teil des Systems: Text skaliert mit Dynamic Type bis AX5, die Bedienelemente wachsen nur halb so schnell. Jede Zeile bietet VoiceOver-Aktionen für Bearbeiten, Sortieren und Fotos, Reduce Motion stoppt jede Dauer-Animation, und alle Touch-Ziele sind mindestens 44 pt groß.",
-  "n-ov-lead": "to.morrow ist eine iOS-App mit drei Listen: Heute, Morgen, Bald. Eine Aufgabe zu verschieben ist eine einzige Wischgeste, und die eine Sache, die du nicht vergessen darfst, bleibt auf Sperrbildschirm und Dynamic Island sichtbar.",
-  "n-taps-title": "Competitors",
+  "n-ds-1": "Für to.morrow habe ich ein eigenes <b class=\"kw\">Designsystem</b> entwickelt. Es legt fest, wie wiederkehrende Elemente aussehen und reagieren. Ein Schalter folgt im Live-Bereich denselben Regeln wie in den Einstellungen.",
+  "n-ds-2": "Die erste Version sah noch ganz anders aus. Die Screenshots zeigen den Windows-95-Look, den ich zunächst über TestFlight getestet und anschließend ersetzt habe.",
+  "n-a11y-short": "<b class=\"kw\">Barrierefreiheit</b>: Die Schrift folgt der iOS-Schriftgröße über Dynamic Type bis zur größten Stufe AX5. Bedienelemente wachsen halb so schnell, damit mehr Inhalt sichtbar bleibt. Mit VoiceOver lassen sich Aufgaben bearbeiten, umsortieren und Fotos öffnen. „Bewegung reduzieren“ stoppt alle Daueranimationen. Jedes Touch-Ziel ist mindestens 44 pt groß.",
+  "n-ov-lead": "to.morrow ist eine iOS-App zum Planen mit drei Listen: Heute, Morgen und Bald. Ein Wisch verschiebt eine Aufgabe zwischen den Listen. Eine ausgewählte Aufgabe bleibt auf dem Sperrbildschirm und in der Dynamic Island sichtbar.",
+  "n-taps-title": "Eine Aufgabe auf morgen verschieben",
   "n-tag-ex": "Beispielwerte",
   "n-taps-1": "5 Taps",
   "n-taps-2": "4 Taps",
   "n-taps-3": "3 Taps",
   "n-taps-4": "1 Wisch",
-  "n-problem-user": "Die Zielgruppe sind <b class='kw'>Menschen, die sich zu viel vornehmen</b>. Ihre Heute-Liste ist am Morgen länger, als der Tag zulässt, und was nicht geschafft wird, müsste verschoben werden.",
+  "n-problem-user": "to.morrow richtet sich an <b class=\"kw\">Menschen, die sich für einen Tag zu viel vornehmen</b>. Bleibt etwas liegen, müssen sie ihren Plan anpassen. Sonst zeigt die Heute-Liste auch Aufgaben, für die an diesem Tag keine Zeit mehr ist.",
   "section-problem": "Das Problem",
   "n-fs-1": "Heute: drei Aufgaben",
-  "n-fs-2": "Wisch nach rechts",
-  "n-fs-3": "Die Aufgabe liegt in Morgen",
-  "n-fs-4": "Rückgängig, falls es ein Fehler war",
-  "n-flow-swipe": "Eine Aufgabe von Heute auf Morgen",
+  "n-fs-2": "Nach rechts wischen",
+  "n-fs-3": "Die Aufgabe steht unter Morgen",
+  "n-fs-4": "Bei Bedarf rückgängig machen",
+  "n-flow-swipe": "Von Heute nach Morgen",
   "n-sec-idea": "Die Idee",
-  "n-fl-1": "Eintippen, Go Live",
+  "n-fl-1": "Aufgabe eingeben",
   "n-fl-3": "Sperrbildschirm",
   "n-fl-4": "Dynamic Island",
-  "n-fl-5": "Abhaken",
-  "n-fl-reset": "Setzt den Bildschirm zurück",
+  "n-fl-5": "Direkt abhaken",
+  "n-fl-reset": "Die Live-Anzeige verschwindet",
   "n-flow-live": "Von der Eingabe bis zum Abhaken",
   "n-sec-live": "Eine Sache im Blick",
   "n-tag-sketch": "Skizze · Platzhalter für den Scan",
@@ -3771,27 +3786,44 @@
   "n-s-press": "drücken",
   "n-s-slide": "gleitet",
   "n-sd1": "Blase",
-  "n-sd1g": "erhaben · antippen",
-  "n-sd1t": "Die Blase ragt aus der Fläche. Das Licht trifft ihre obere linke Kante, der Schatten fällt nach rechts unten. Beim Drücken sinkt sie ein. Sie löst etwas aus und enthält nichts zum Bearbeiten.",
+  "n-sd1g": "erhaben · drücken",
+  "n-sd1t": "Die Blase ragt aus der Fläche. Ihr oberer linker Rand fängt Licht auf, der Schatten fällt nach rechts unten. Beim Drücken sinkt sie ab und bestätigt die Aktion.",
   "n-sd2": "Mulde",
-  "n-sd2g": "vertieft · schreiben",
-  "n-sd2t": "Die Mulde ist in die Fläche gesenkt. Ihre obere Wand liegt im Schatten, am unteren Rand sammelt sich Licht. Sie wirft keinen Schatten. In ihr steht Text, in ihr wird getippt.",
+  "n-sd2g": "vertieft · Text eingeben",
+  "n-sd2t": "Die Mulde liegt in der Fläche. Ihr oberer Rand liegt im Schatten, der untere fängt Licht auf. Der Schatten liegt innen. Diese Form kennzeichnet ein Feld für Texteingaben.",
   "n-sd3": "Umschalter",
-  "n-sd3g": "Blase in Mulde · wählen",
-  "n-sd3t": "Die Mulde fasst die Optionen zusammen, die Blase sitzt auf der aktuellen. Beim Wechsel gleitet die Blase auf die nächste Option. Gewählt wird ohne Tippen.",
-  "n-side-title": "Seitenansicht: Höhe bedeutet Handlung",
-  "n-side-intro": "Die Seitenansicht zeigt die drei Formen im Schnitt. Die Fläche ist die Grundlinie. Was darüber liegt, lässt sich bedienen, was darunter liegt, nimmt etwas auf.",
-  "n-side-sheet": "Schnitt durch die drei Formen. Das Licht kommt von oben links: Es ist das einzige im ganzen System und zeigt jedem Element seine Höhe.",
+  "n-sd3g": "Blase in Mulde · auswählen",
+  "n-sd3t": "Die Mulde gruppiert die Optionen, die Blase markiert die aktuelle Auswahl. Tippst du eine andere Option an, gleitet die Blase dorthin.",
+  "n-side-title": "Die Formen im Querschnitt",
+  "n-side-intro": "Im Querschnitt wird sichtbar, wie die Formen aufgebaut sind. Die Grundfläche dient als Bezugspunkt: Knöpfe liegen darüber, Eingabefelder darin.",
+  "n-side-sheet": "Alle Elemente folgen derselben Lichtquelle oben links. Lichtkanten und Schatten machen ihre Höhe gegenüber der Grundfläche sichtbar.",
   "n-sec-rules": "Das Designsystem",
-  "n-nopurpose": "Es hatte keinen Zweck.",
-  "n-rules-sub": "<b class='kw'>Was ich mir dabei gedacht habe.</b> Auf einem Touchscreen gibt es keinen Mauszeiger, der verrät, was sich bedienen lässt. Die Oberfläche muss es selbst zeigen, und am schnellsten liest man Höhe: Was herausragt, lässt sich greifen. Was eingesenkt ist, nimmt etwas auf.",
-  "n-c3": "Drittens heißt eine App, in der man wenig Zeit verbringen will, dass Zeit die Entwurfsgröße ist: Jede Funktion muss einen <b class='kw'>Schritt sparen</b>, sonst fällt sie heraus.",
+  "n-nopurpose": "Der Look erschwerte die Bedienung.",
+  "n-rules-sub": "Die neue Oberfläche soll erkennen lassen, wo man drücken, schreiben oder auswählen kann. Dafür verwende ich <b class=\"kw\">drei wiederkehrende Formen</b>. Ihre Höhe gegenüber der Grundfläche kennzeichnet ihre Funktion.",
+  "n-c3": "Für diese App war die Frage entscheidend, <b class=\"kw\">wie schnell man wieder bei der eigentlichen Aufgabe ist</b>. Daran habe ich die Wischgeste und den Live-Bereich ausgerichtet.",
   "n-sec-result": "Ergebnis und Ausblick",
   "n-learn": "Was ich gelernt habe",
-  "n-next": "Wie es weitergeht",
-  "n-next-1": "<b class='kw'>Widgets</b>: die Heute-Liste auf dem Homescreen, damit sich Aufgaben ohne die App abhaken und verschieben lassen.",
-  "n-next-2": "<b class='kw'>Desktop-Version</b> mit Tastatur und Platz für eine Wochenansicht.",
-  "n-next-3": "Die App-Store-Rezensionen auswerten und die häufigsten Wünsche einplanen."
+  "n-next": "Mögliche nächste Schritte",
+  "n-next-1": "Ein <b class=\"kw\">Widget für die Heute-Liste</b>, um Aufgaben auf dem Homescreen abzuhaken und zu verschieben.",
+  "n-next-2": "Eine <b class=\"kw\">Desktop-Version</b> mit Tastaturbedienung und Platz für eine Wochenansicht.",
+  "n-next-3": "App-Store-Rezensionen auswerten, um weitere Änderungen an den häufigsten Rückmeldungen auszurichten.",
+  "n-study": "Ich habe <b class=\"kw\">zehn Menschen zwischen 21 und 34</b> gefragt, wie sie ihre To-dos verwalten. Sieben führen eine einzige Liste, in die alles wandert, und sortieren sie nicht um. Drei berichteten, nach wenigen Tagen aufzugeben. „Ich schreibe alles auf und schiebe es dann einfach vor mir her“, sagte eine Teilnehmerin.",
+  "n-landscape-title": "Querformat: alle Listen nebeneinander",
+  "n-landscape-text": "Heute, Morgen und Bald stehen im Querformat nebeneinander. Du siehst alle Aufgaben des aktiven Workspaces gleichzeitig und kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.",
+  "n-quote-1": "\"Ich habe die Live-Ansicht nach drei Tagen nicht mehr benutzt. Ich wusste nie, was welcher Knopf macht.\"",
+  "n-quote-2": "\"Alles sah aus wie ein Programm von früher. Ich musste jede Aufgabe erst suchen.\"",
+  "n-quote-3": "\"Die Idee gefällt mir, aber auf dem Sperrbildschirm sah es aus wie eine Fehlermeldung.\"",
+  "n-quote-src-sep": "Tester, TestFlight, September 2026",
+  "n-quote-src-oct": "Tester, TestFlight, Oktober 2026",
+  "n-ret-text": "Nach einer Woche öffneten noch <b class=\"kw\">61 %</b> der Tester die neue Version, gegenüber 24 % beim Windows-95-Build (je 18 Tester).",
+  "n-res-caveat": "Zehn Interviews und 18 Tester pro Build sind eine kleine Stichprobe. Die Ergebnisse geben Einblicke in diese Gruppe; sie lassen sich noch nicht auf alle Nutzer übertragen.",
+  "n-result-behaviour": "Nach drei Wochen mit to.morrow legten acht von zehn ihre Aufgaben bewusst auf Morgen oder Bald.",
+  "n-fact-actions": "Aktionen zum Verschieben auf morgen: Antippen in Reminders, Wischen in to.morrow",
+  "n-fact-actions-src": "Eigene Zählung · Oktober 2026",
+  "n-fact-retention": "öffnen die neue Version nach 7 Tagen noch; beim Windows-95-Build sind es 24 %",
+  "n-fact-retention-src": "TestFlight · 18 Tester pro Build",
+  "n-fact-interviews": "Interviewte, die to.morrow drei Wochen lang genutzt haben",
+  "n-fact-interviews-src": "Interviews · September bis Oktober 2026"
 });
     // Below 640px a key may be answered by a slightly shorter '<key>@m' twin.
     // Most keys have none and read identically at every width — two variants
