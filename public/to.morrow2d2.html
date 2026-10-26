@@ -875,13 +875,17 @@
     .ip-screen { position: absolute; left: 3.8813%; top: 1.5487%; width: 92.2374%; height: 96.9027%; overflow: hidden; border-radius: 16.0891% / 7.4201%; background: #000; }
     .ip-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: block; transition: opacity 0.6s ease; }
     .trio-band { cursor: pointer; position: relative; }
+    /* The Live band sits on the dark grey of the app's own dark screens. */
+    .flow-band.trio-band { background: #26272c; box-shadow: none; }
+    .trio-band .trio-num { color: #a3a5ad; }
+    .trio-band .trio-num b { background: #323339; color: #ececee; box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 2px 6px rgba(0,0,0,0.35); }
     .trio-fx { position: absolute; left: -40px; top: -60px; width: calc(100% + 80px); height: calc(100% + 140px); pointer-events: none; z-index: 5; }
     /* The Live band restarts as a whole on a click, and the whole frame (not the single screens) gives the press. */
     .trio-band { transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
     .trio-band.is-pressed { transform: scale(1.012); transition-duration: 110ms; }
     @media (prefers-reduced-motion: reduce) { .trio-band, .trio-band.is-pressed { transition: none; transform: none; } }
     .trio-band.is-fading .ip-screen video { opacity: 0; }
-    .ip-shot:nth-child(n+2) .ip-screen video { filter: blur(9px); transform: scale(1.07); transition: filter 0.7s ease, transform 0.7s ease, opacity 0.6s ease; }
+    .ip-shot:nth-child(n+2) .ip-screen video { filter: blur(9px); transform: scale(1.07); transform-origin: 50% 3.7%; transition: filter 0.7s ease, transform 0.7s ease, opacity 0.6s ease; }   /* zoom about the island, so the blurred island stays under the frame's own */
     .ip-shot.is-live .ip-screen video { filter: none; transform: none; }
     .ip-frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
     .trio-caps .trio-num:nth-child(1), .trio-caps .trio-num:nth-child(2) { margin-right: var(--A); }
@@ -3206,9 +3210,9 @@
           <div class="trio-wrap">
             <div class="trio-nums" aria-hidden="true"><span class="trio-num" style="--g: var(--A);"><b>1</b></span><span class="trio-num" style="--g: var(--A);"><b>2</b></span><span class="trio-num"><b>3</b></span></div>
             <div class="trio-shots">
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingetippt und mit Go Live aktiviert"><source src="/videos/to.morrow/live-1-type.mp4?v=7" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=9" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island.mp4?v=11" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingetippt und mit Go Live aktiviert"><source src="/videos/to.morrow/live-1-type.mp4?v=8" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=10" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island.mp4?v=12" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
             </div>
             <div class="trio-nums trio-caps"><span class="trio-num">Eintippen, Live schalten</span><span class="trio-num"><span class="trio-cap-wide">Sperrbildschirm</span></span><span class="trio-num">Dynamic Island</span></div>
           </div>
@@ -4536,14 +4540,14 @@
   var GO1 = 4.45;                  // video 1: Go is tapped, the task goes live
   var LEAD2 = 0.27;                // video 2 starts this long before the dot lands (its task appears 0.27 s in)
   var HOLD2 = 1.60, WAIT2 = 0.96;  // video 2 waits here; the dot leaves for video 3 a moment after the task has appeared (tuned so the return flight to 1 lands on its switch-off)
-  var CLICK3 = 3.30;               // video 3: the tick is pressed
+  var CLICK3 = 3.47;               // video 3: the tick is pressed
   var LOOP_A = 6.4, LOOP_B = 14.4, PERIOD = 2.0, OFF1 = 14.6;    // video 1 (light recording): breathing live button, switch-off
   var FLY = 1.0, FLY_BACK = 0.7;   // outward flights; the two return flights are 30 % quicker
   var on = false, raf = 0, timer = 0, step = 0, released = false, restarting = false, flights = [], t2 = 0;
   var canvas = document.createElement('canvas'); canvas.className = 'trio-fx'; canvas.setAttribute('aria-hidden', 'true');
   band.appendChild(canvas);
   var ctx = canvas.getContext('2d');
-  var INK = '#5d7ea9';
+  var INK = '#8eaad3';
   var LIVE = (function () { var c = []; for (var y = 0; y <= 10; y++) for (var x = 0; x <= 10; x++) { var d = Math.hypot(x - 5, y - 5); if ((d > 3.6 && d < 5.2) || d < 1.6) c.push([x, y]); } return c; })();
   function fill(k, f) { var el = nums[k]; if (!el) return; el.style.setProperty('--f', Math.max(0, Math.min(1, f)).toFixed(4)); el.classList.toggle('is-full', f >= 1); }
   function pop(k) { var el = nums[k]; if (!el) return; el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
@@ -4583,7 +4587,7 @@
       });
       if (k < 1) {                                                 // the head: the Live ring in pixels
         var hp = bez(P0, P1, P2, tNow), pk = k < 0.18 ? 0.4 + 0.6 * k / 0.18 : k > 0.88 ? 1 - 0.5 * (k - 0.88) / 0.12 : 1;
-        var c = 3 * pk; ctx.globalAlpha = 1; ctx.shadowColor = 'rgba(93,126,169,.55)'; ctx.shadowBlur = 10;
+        var c = 3 * pk; ctx.globalAlpha = 1; ctx.shadowColor = 'rgba(142,170,211,.6)'; ctx.shadowBlur = 10;
         LIVE.forEach(function (p) { ctx.fillRect(hp[0] + (p[0] - 5.5) * c, hp[1] + (p[1] - 5.5) * c, c + 0.3, c + 0.3); });
         ctx.shadowBlur = 0;
       } else if (!F.done) { F.done = true; if (F.onArrive) F.onArrive(); }
