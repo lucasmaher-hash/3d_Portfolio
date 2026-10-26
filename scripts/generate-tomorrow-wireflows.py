@@ -9,8 +9,9 @@ def bind(k, de, en):
     TR['de'][k], TR['en'][k] = de, en
     return k
 
-def text(x, y, de, en=None, size=14, fill='#303030', weight=400, center=False, key=None):
+def text(x, y, de, en=None, size=14, fill='#303030', weight=400, center=False, key=None, strike=False):
     attr = f' data-i18n="{bind(key, de, en)}"' if en is not None else ''
+    if strike: attr += ' text-decoration="line-through"'
     return f'<text x="{x}" y="{y}" font-size="{size}" fill="{fill}" font-weight="{weight}" text-anchor="{"middle" if center else "start"}"{attr}>{html.escape(de)}</text>'
 def box(x, y, w, h, radius=0, fill='#fff', stroke='none', anchor=None, active=False):
     attrs = f' data-flow-anchor="{anchor}"' if anchor else ''
@@ -81,11 +82,11 @@ def live(n):
     elif n==2:
         b=lockbase()+box(19,352,242,84,16,'#fff','#b8b8b8',anchor='live-card')+text(34,375,'to.morrow',size=11,fill='#666')+text(34,403,'Reisepass mitnehmen','Bring passport',15,weight=600,key='passport')+circle(237,399,14,'#333')+'<path d="M230 399l5 5 9-11" fill="none" stroke="#333" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round"/>'
     elif n==3:
-        b=home()+box(90,16,116,29,14,'#242424',anchor='island-compact')+circle(193,30,7,'#ddd')+circle(193,30,2,'#ddd')+circle(193,30,9.8,active=True)
+        b=home()+box(90,16,116,29,14,'#242424',anchor='island-compact')+circle(193,30,7,'#ddd')+circle(193,30,2,'#ddd')+circle(193,30,12.74,active=True)
     else:
         b=home()+box(15,16,250,108,28,'#242424',anchor='island-expanded')+box(99,23,82,19,10,'#111')
-        b+=text(31,84,'Reisepass mitnehmen','Bring passport',15,fill='#fff',weight=600,key='passport')+circle(244,79,14,anchor='island-tick',active=True)+f'<path d="M237 79l5 5 9-11" fill="none" stroke="{ACC}" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round"/>'
-    titles=[('Live: Aufgabe eingeben und die Tastatur schließen.','Live: enter a task and close the keyboard.'),('Die Aufgabe bleibt auf dem Sperrbildschirm sichtbar.','The task stays visible on the Lock Screen.'),('Geschlossene Dynamic Island mit blau markiertem Live-Ring.','Compact Dynamic Island with an accent ring around its Live icon.'),('Geöffnete Dynamic Island mit der Aufgabe und vergrößertem Abhak-Kreis mit Haken.','Expanded Dynamic Island with the task and an enlarged checked completion circle.')]
+        b+=text(31,84,'Reisepass mitnehmen','Bring passport',15,fill='#fff',weight=600,key='passport',strike=True)+circle(236,79,14,anchor='island-tick',active=True)+f'<path d="M229 79l5 5 9-11" fill="none" stroke="{ACC}" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round"/>'
+    titles=[('Live: Aufgabe eingeben und die Tastatur schließen.','Live: enter a task and close the keyboard.'),('Die Aufgabe bleibt auf dem Sperrbildschirm sichtbar.','The task stays visible on the Lock Screen.'),('Geschlossene Dynamic Island mit blau markiertem Live-Ring.','Compact Dynamic Island with an accent ring around its Live icon.'),('Geöffnete Dynamic Island mit weiß durchgestrichener Aufgabe und Abhak-Kreis mit Haken.','Expanded Dynamic Island with a white struck-through task and a checked completion circle.')]
     return phone(b,ident,*titles[n-1],bg='#f3f3f3' if n>1 else '#fff',island=n<3)
 NOTES={
 'reschedule': [('Ausgangsliste','Starting list','Drei Aufgaben für heute.','Three tasks for today.'),('Nach rechts wischen','Swipe right','Die Aufgabe auf später verschieben.','Move the task to a later day.'),('Unter Morgen','In Tomorrow','Die Aufgabe ist verschoben.','The task has moved.'),('Optional: Rückgängig','Optional: Undo','Die Aufgabe kehrt zu Heute zurück.','The task returns to Today.')],
