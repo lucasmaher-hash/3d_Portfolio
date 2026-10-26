@@ -3207,7 +3207,7 @@
             <div class="trio-nums" aria-hidden="true"><span class="trio-num" style="--g: var(--A);"><b>1</b></span><span class="trio-num" style="--g: var(--A);"><b>2</b></span><span class="trio-num"><b>3</b></span></div>
             <div class="trio-shots">
               <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingetippt und mit Go Live aktiviert"><source src="/videos/to.morrow/live-1-type.mp4?v=6" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=7" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=8" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
               <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island.mp4?v=10" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
             </div>
             <div class="trio-nums trio-caps"><span class="trio-num">Eintippen, Live schalten</span><span class="trio-num"><span class="trio-cap-wide">Sperrbildschirm</span></span><span class="trio-num">Dynamic Island</span></div>
@@ -4535,10 +4535,10 @@
   var A_LIVE1 = [0, 0.377, 0.673], A_CARD2 = [1, 0.36, 0.80], A_CHECK2 = [1, 0.847, 0.80], A_ISL3 = [2, 0.50, 0.035], A_TICK3 = [2, 0.871, 0.0746];
   var GO1 = 4.45;                  // video 1: Go is tapped, the task goes live
   var LEAD2 = 0.27;                // video 2 starts this long before the dot lands (its task appears 0.27 s in)
-  var HOLD2 = 1.60, WAIT2 = 0.35;  // video 2 waits here; the dot leaves for video 3 a moment after the task has appeared
+  var HOLD2 = 1.60, WAIT2 = 0.96;  // video 2 waits here; the dot leaves for video 3 a moment after the task has appeared (tuned so the return flight to 1 lands on its switch-off)
   var CLICK3 = 3.30;               // video 3: the tick is pressed
   var LOOP_A = 5.4, LOOP_B = 13.4, PERIOD = 2.0, OFF1 = 13.44;   // video 1: breathing live button, switch-off
-  var FLY = 1.0;
+  var FLY = 1.0, FLY_BACK = 0.7;   // outward flights; the two return flights are 30 % quicker
   var on = false, raf = 0, timer = 0, step = 0, released = false, restarting = false, flights = [], t2 = 0;
   var canvas = document.createElement('canvas'); canvas.className = 'trio-fx'; canvas.setAttribute('aria-hidden', 'true');
   band.appendChild(canvas);
@@ -4633,11 +4633,11 @@
       }
       if (step === 3 && !v3.paused && v3.currentTime >= CLICK3) {
         step = 4;
-        fly(A_TICK3, A_CHECK2, -1, FLY, function () {
+        fly(A_TICK3, A_CHECK2, -1, FLY_BACK, function () {
           play(v2);                                                  // 2 is pressed and drops the task
           var c1 = v1.currentTime, ph = ((c1 - LOOP_A) % PERIOD + PERIOD) % PERIOD;
           var s1 = LOOP_B - PERIOD + ph, rem = OFF1 - s1;          // same breathing phase, last cycle before the switch-off
-          if (rem < 0.6) { s1 -= PERIOD; rem += PERIOD; }
+          if (rem < 0.45) { s1 -= PERIOD; rem += PERIOD; }
           v1.currentTime = s1; released = true;
           fly(A_CHECK2, A_LIVE1, -1, rem, null, null);             // lands exactly as 1 switches Live off
         }, null);
