@@ -1508,10 +1508,6 @@
          wrong thing. It is an illustration with air around it, not a bullet. */
       .stagger-row .stagger-figure:not(.phone):not(.duo) { margin-bottom: 22px; }
 
-      /* The three primitives read as a centred group on a phone; docked left
-         they looked like a column that had lost its second column. */
-      .dna-list .dna-stack .dna-stage { justify-items: center; }
-
       #top-bar { height: 140px; }
       #top-bar.hide { transform: translateY(-90px); }
       .section { padding: 24px 20px; }
@@ -2259,109 +2255,36 @@
 
     .dna-list { margin-top: var(--block-gap); }
 
-    /* One text, three demos — not three captioned sections. The stack's own
-       gap is a fifth of .stagger-list's clamp(56px, 8vw, 120px): the three
-       controls are one exhibit, so they sit as a group rather than reading
-       as three separate rows with air between them. */
-    /* Heading, copy, then the three demos side by side under it — one centred
-       column rather than text beside a stack of three. Source order IS the
-       visual order here (an `order` override put the demos in the middle for
-       one round and was dropped again), so the copy reads straight on from the
-       heading it belongs to. Its width
-       is deliberately NOT the content column's: 820px keeps the paragraphs at
-       a readable measure and still gives each demo ~250px, and the text and
-       the demos share those same two edges because they are siblings in it. */
+    /* Three demos in alternating rows, each with its own explanation. */
     .dna-row {
       display: flex;
       flex-direction: column;
-      gap: clamp(22px, 3vw, 40px);
-      /* 700, not the 820 this started at: the copy and the demo row are meant
-         to read as one column of the same width, and they met in the middle —
-         the text came in, the demos went out (see --z and the 100% widths
-         below). */
-      width: min(700px, 100%);
+      gap: clamp(28px, 4vw, 48px);
+      width: min(860px, 100%);
       margin-inline: auto;
     }
-
-    /* Full width of that block, so the copy's edges are the demos' edges. */
-    .dna-copy { max-width: none; }
-
-    /* A heading belongs to the text under it, so it sits close to it — the
-       section's own 28px gap would read as two separate blocks. */
-    .feature-title + .guide-text { margin-top: -16px; }
-
-    /* The demos sit BETWEEN the two paragraphs, at every width (2026-09-08 —
-       it was heading / both paragraphs / exhibit before, which read as a wall
-       of text followed by a gallery).
-       display: contents dissolves .dna-body so its two paragraphs become
-       direct children of .dna-row's flex column — they cannot be reordered
-       against .dna-stack while they are still wrapped in a box of their own.
-       Every item then needs an explicit order, since the default 0 would
-       leave the heading and the stack tied. .dna-body's own gap goes with the
-       box; the spacing between all four is .dna-row's own gap now, which is
-       what makes them read as one column. */
-    .dna-body { display: contents; }
-    .dna-row > .feature-title { order: 1; }
-    .dna-body > .dna-copy:nth-child(1) { order: 2; }
-    .dna-row > .dna-stack { order: 3; }
-    .dna-body > .dna-copy:nth-child(2) { order: 4; }
-
-    .dna-stack {
-      display: flex;
-      flex-direction: row;
+    .dna-stack { display: flex; flex-direction: column; gap: clamp(40px, 6vw, 80px); width: 100%; }
+    .dna-demo {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(20px, 4vw, 56px);
       align-items: center;
-      /* Tight: the three are one exhibit, and at the old clamp(14, 2.4vw, 40)
-         the air between them was wider than the gaps inside the controls. */
-      gap: clamp(8px, 1.1vw, 16px);
-      /* The definite width still lives HERE, not on .dna-stage: the stages
-         size from it and the troughs' percentage widths size from those. In
-         this row layout the stages are flex: 1 1 0 — a basis of ZERO, not
-         auto, so each stage resolves from this definite width rather than
-         from its own content. With auto the chain would be circular and the
-         troughs would silently collapse, the same trap as before. */
-      width: 100%;
-      flex: none;
     }
-
-    /* The stage is a fixed box so the three demos line up on one column
-       edge no matter how wide each control actually is. */
+    .dna-body { min-width: 0; }
+    .dna-copy { max-width: none; }
     .dna-stage {
-      /* The two outer stages share whatever the middle one does not use
-         (2026-09-08). All three stages used to be equal, and the middle demo
-         is content-sized — it sat in a 223px stage at 110px wide, i.e. ~113px
-         of the row was empty air around ONE button. Handing that slack to the
-         two that fill their stage edge to edge is what pays for the +20%
-         below WITHOUT widening the block: at 1440 the outer demos go 223 →
-         268px, and the group's left and right edges still line up with the
-         copy. The basis stays ZERO here: with auto the troughs' percentage
-         widths would have nothing definite to size against and would silently
-         collapse. */
-      flex: 1 1 0;
+      width: 100%;
+      max-width: 300px;
       min-width: 0;
       display: grid;
-      place-items: center;
-      /* --z0 is the authored size of each demo (inline, per stage); --z is
-         what the SkeuKit metrics actually read. Keeping them separate is what
-         lets the row layout scale all three by one number without touching
-         the markup — and lets the phone put them back to 1:1 further down.
-         1.30 is the old 1.18 plus 10% (2026-09-08 — it went to 1.416, +20%,
-         and came back down: at that size the three read as the loudest thing
-         in the section). Paid for in width by the stage flex above, so the
-         outer demos gain the same ~10% in WIDTH that this gains them in
-         height and all three grow in proportion instead of just getting
-         taller. */
+      justify-items: start;
+      align-items: center;
       --z: calc(var(--z0, 1) * 1.30);
     }
+    .dna-demo:nth-child(even) .dna-stage { grid-column: 2; grid-row: 1; justify-self: end; justify-items: end; }
+    .dna-demo:nth-child(even) .dna-body { grid-column: 1; grid-row: 1; }
 
-    /* The middle demo is the exception: it is CONTENT-sized (a button, not a
-       percentage-width trough), so it takes its own width as its basis and
-       neither grows nor shrinks — the two outer stages then split whatever is
-       left. A fixed weight was wrong here: the button's width comes from --z
-       in px, so on a 641-860px row a 1/5 share fell to ~105px and the 132px
-       button spilled out of its own stage into the gaps. Basis auto is safe
-       on THIS stage only, because its child's width does not depend on the
-       stage's — which is exactly what would make the outer two circular. */
-    .dna-stack .dna-stage:nth-child(2) { flex: 0 0 auto; }
+    .feature-title + .guide-text { margin-top: -16px; }
 
     /* ── Trough: the hole in the surface ─────────────────────────────────
        The fill and inner shadows live on ::before rather than on the element
@@ -2488,24 +2411,6 @@
     .dna-ws[data-onair="true"] .dna-ws__mark {
       animation: dna-breathe 1s ease-in-out infinite alternate;
     }
-    /* Side by side, each demo is centred in its own third — the shared left
-       edge that made them line up as a column is meaningless in a row. */
-    .dna-stack .dna-stage { justify-items: center; }
-
-    /* 20px more air on each side of the middle demo (2026-09-08), taken out of
-       the two OUTER controls' WIDTH — not out of the row, not out of anyone's
-       height or type. They dock outward so the whole 20px lands in the gap
-       beside the middle one and the block's own edges do not move; centred,
-       half of it would leak to the outside instead.
-       min-width, so it cannot reach the phone row below, where the three are
-       already as narrow as they go. */
-    @media (min-width: 641px) {
-      .dna-stack .dna-stage:first-child { justify-items: start; }
-      .dna-stack .dna-stage:last-child  { justify-items: end; }
-      .dna-stack .dna-stage:first-child .dna-fieldwrap,
-      .dna-stack .dna-stage:last-child  .dna-seg { width: calc(100% - 20px); }
-    }
-
     /* ── Row 2 — indented panel ──────────────────────────────────────── */
     .dna-fieldwrap { width: 100%; display: grid; gap: calc(10px * var(--z)); }
     .dna-seg { width: 100%; }
@@ -2616,58 +2521,15 @@
       .dna-segpill.is-landing { scale: 1; }
     }
 
-    @media (max-width: 860px) {
-      /* Full width of the block here too — the demos are a row of three
-         across it, not a column beside the copy. */
-      .dna-stack { width: 100%; }
-    }
-
     @media (max-width: 640px) {
-      /* Three ACROSS on a phone too (2026-09-08). They stacked here before,
-         on the arithmetic that a third of 350px is ~110px; what makes three
-         fit is that the two troughs and the pill are mostly padding, and the
-         padding is the only thing that shrinks — height, type size and the
-         authored --z are all untouched, so each control keeps its proportions
-         and only loses the air inside it. --seg-pad / --opt-pad-x / --ws-pad-x
-         exist for exactly this; the segmented pill's own geometry is written
-         against --seg-pad, so it follows without a second edit. */
-      .dna-stack {
-        flex-direction: row;
-        align-items: center;
-        width: 100%;
-        max-width: none;
-        margin-inline: 0;
-        gap: 6px;
-      }
-      /* :nth-child(2) as well, or the base rule for the middle stage (which
-         is one class more specific) keeps its auto basis here. */
-      .dna-stack .dna-stage,
-      .dna-stack .dna-stage:nth-child(2) { flex: 1 1 0; width: auto; min-width: 0; }
-      /* The authored size: the row layout's 1.18 scale-up is a desktop move. */
-      .dna-stack .dna-stage { --z: var(--z0, 1); }
-      .dna-fieldwrap { width: 100%; }
-      .dna-seg { width: 100%; }
-      /* A bigger FRAME on a phone, same type (2026-09-09). The pill was the
-         one control in the row that read as undersized: 35px tall against the
-         two troughs' 51px, because its --h is 46 against their 51 AND it
-         carries the smaller authored --z (0.764 vs 1.001). Height and padding
-         are the only dials touched — --z is deliberately not, since the label
-         and the mark are both sized from it and the type must not grow.
-         The middle stage is flex: 1 1 0 like the other two, so this grows
-         into its own share of the row; at 390 the pill lands at ~85px inside
-         a 112.7px stage. --ws-pad-x went 7 -> 16 rather than the gap doing
-         the work: the gap sits between the mark and the word, and widening
-         that pulls the pair apart instead of adding air around it. */
-      .dna-ws  { --h: 60; --ws-pad-x: 16px; --ws-gap: 6px; }
+      .dna-stage { --z: var(--z0, 1); }
+      .dna-ws { --h: 60; --ws-pad-x: 16px; --ws-gap: 6px; }
       .dna-seg { --seg-pad: 3px; }
       .dna-seg .sk-seg__opt { --opt-pad-x: 1px; }
-      .dna-seg__long  { display: none; }
+      .dna-seg__long { display: none; }
       .dna-seg__short { display: inline; }
-
-      /* The demos-between-the-paragraphs order lives in the base rules now
-         (it applies at every width) — nothing to restate here. */
     }
-  
+
     /* Former pixel-font labels that are buttons or carry weight: one step
        heavier than body text so they still read as UI (Lucas, 2026-10-06). */
     .meta-label,
@@ -3306,8 +3168,7 @@
         </figure>
         </div>
       </div>
-      <!-- Three primitives, one per row: text left, the live control right,
-           stacked down the right edge like the stagger rows above.
+      <!-- Three primitives in alternating rows: control left, right, left, with its explanation beside it.
 
            Each animation shows the primitive's OWN job and nothing else —
            the lip swells because it can be pressed, the trough fills with
@@ -3321,21 +3182,8 @@
       <div class="dna-list dna">
         <div class="dna-row">
           <h3 class="feature-title" data-i18n="dna-title">So reagieren die Elemente</h3>
-          <div class="dna-body">
-            <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die Animationen zeigen die Formen in Gebrauch. In der <b class="kw">Mulde</b> erscheint der eingegebene Text. Der <b class="kw">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class="kw">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.</p>
-          </div>
           <div class="dna-stack">
-            <!-- The two troughs — this field and the segmented control at the
-                 end of the row — carry the same --z0, so both come out 60px
-                 tall. It was 1.229, which matched the seg's height INCLUDING
-                 its outer bevel (.sk-trough__bloom sits at inset -5.3px * --z,
-                 i.e. ~6px proud top and bottom) — that shading is not the
-                 control, so it does not count.
-                 The raised button sits BETWEEN the two troughs (2026-09-08,
-                 Lucas): it is the smallest of the three, and with it leading
-                 the row the block stepped up in size from left to right
-                 instead of reading as balanced. On a phone the same source
-                 order puts the small one in the middle of the stack. -->
+          <div class="dna-demo">
             <div class="dna-stage sk" style="--z0: 1.001;">
               <div class="dna-fieldwrap">
                 <!-- .sk-field__input is not decoration: .sk-trough's fill and
@@ -3346,11 +3194,17 @@
                 <div class="sk-field sk-trough"><span class="sk-field__input"><span class="dna-type"></span><i class="dna-caret"></i></span></div>
               </div>
             </div>
+            <div class="dna-body"><p class="stagger-copy dna-copy" data-i18n-html="dna-input-text">In der <b class="kw">Mulde</b> erscheint der eingegebene Text.</p></div>
+          </div>
+          <div class="dna-demo">
             <div class="dna-stage sk" style="--z0: 0.764;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
                 <span class="dna-ws__mark"></span><span class="dna-ws__label"><span class="dna-ws__off">Off air</span><span class="dna-ws__on">On air</span></span>
               </button>
             </div>
+            <div class="dna-body"><p class="stagger-copy dna-copy" data-i18n-html="dna-live-text">Der <b class="kw">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand.</p></div>
+          </div>
+          <div class="dna-demo">
             <div class="dna-stage sk" style="--z0: 1.001;">
               <div class="sk-seg sk-trough dna-seg">
                 <!-- The outer bevel. A segmented trough is furniture sitting in
@@ -3358,16 +3212,13 @@
                      nothing around it — see .sk-trough__bloom. -->
                 <span class="sk-trough__bloom"></span>
                 <span class="dna-segpill sk-glass" style="--i: 0"></span>
-                <!-- Two labels per option, one shown at a time (2026-09-09):
-                     the phone row fits all three demos across ~350px, and
-                     "Heute"/"Morgen" are the longest strings in it. Below
-                     640px each option falls back to On/Off, which buys the
-                     segmented trough its width back. Markup rather than a
-                     JS text swap so there is nothing to re-run on resize. -->
+                <!-- Compact labels keep the control readable beside its text on phones. -->
                 <span class="sk-seg__opt is-on"><span class="dna-seg__long">Heute</span><span class="dna-seg__short">On</span></span>
                 <span class="sk-seg__opt"><span class="dna-seg__long">Morgen</span><span class="dna-seg__short">Off</span></span>
               </div>
             </div>
+            <div class="dna-body"><p class="stagger-copy dna-copy" data-i18n-html="dna-toggle-text">Beim <b class="kw">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.</p></div>
+          </div>
           </div>
         </div>
       </div>
@@ -3610,7 +3461,6 @@
         'icons-text-2': "What's left is two styles meeting: curves, glass bubbles, raised edges and recessed panels on one side, <b class=\"kw\">pixel type and pixel icons</b> on the other. The typeface is W95FA by Alina Sava (SIL Open Font License).",
         'dna-title': "How the elements respond",
         'dna-intro': "SkeuKit is made of <b class=\"kw\">three shapes</b>, and each one has a single meaning. Once you've learned the three, every new view of the app explains itself.",
-        'dna-forms': "The animations show the shapes in use. Entered text appears in the <b class=\"kw\">trough</b>. The <b class=\"kw\">Live switch</b> gives under pressure and changes state. In the <b class=\"kw\">segmented control</b>, the raised surface moves with the selection.",
         'color-title': 'Not just grey',
         'color-text': "Most to-do apps are grey. I wanted people to be able to pick their own colours: six themes, four <b class=\"kw\">pale pastel tones</b> in light and two dark variants. They're kept soft, so the colour adds an accent without getting in the way of reading.",
         'conclusion-1': "The Windows version showed me the importance of <b class=\"kw\">testing how an interface works early</b>. I had finished the interface before its everyday difficulties became clear. A convincing screenshot was not enough.",
@@ -3658,7 +3508,6 @@
         'icons-text-2': "Übrig bleiben zwei Stile, die aufeinandertreffen: Wölbungen, Glasblasen, erhabene Kanten und vertiefte Flächen auf der einen Seite, <b class=\"kw\">Pixelschrift und Pixel-Icons</b> auf der anderen. Die Schrift ist W95FA von Alina Sava (SIL Open Font License).",
         'dna-title': "So reagieren die Elemente",
         'color-title': 'Nicht nur Grau',
-        'dna-forms': "Die Animationen zeigen die Formen in Gebrauch. In der <b class=\"kw\">Mulde</b> erscheint der eingegebene Text. Der <b class=\"kw\">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class=\"kw\">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.",
         'dna-intro': "SkeuKit besteht aus <b class=\"kw\">drei Formen</b>, und jede hat genau eine Bedeutung. Wenn du die drei einmal kennst, erklärt sich jede neue Ansicht der App von selbst.",
         'section-conclusion': 'Fazit und Ausblick',
         'conclusion-1': "Die Windows-Version hat mir gezeigt, wie wichtig es ist, <b class=\"kw\">die Bedienung früh zu testen</b>. Ich hatte die Oberfläche fertig ausgearbeitet, bevor ihre Schwierigkeiten im Alltag deutlich wurden. Ein überzeugender Screenshot reichte dafür nicht aus.",
@@ -3673,6 +3522,9 @@
       }
     };
     Object.assign(TRANSLATIONS.en, {
+  "dna-input-text": "Entered text appears in the <b class=\"kw\">trough</b>.",
+  "dna-live-text": "The <b class=\"kw\">Live switch</b> gives under pressure and changes state.",
+  "dna-toggle-text": "In the <b class=\"kw\">segmented control</b>, the raised surface moves with the selection.",
   "n-ds-1": "I developed a <b class=\"kw\">design system</b> for to.morrow. It defines how recurring elements look and respond. A switch in Live follows the same rules as one in Settings.",
   "n-ds-2": "The first version looked very different. These screenshots show the Windows 95 interface I tested through TestFlight before replacing it.",
   "n-a11y-short": "<b class=\"kw\">Accessibility</b>: text follows the iOS text size through Dynamic Type, up to the largest setting, AX5. Controls grow at half the rate to leave more room for content. VoiceOver provides actions to edit and reorder tasks and open photos. Reduce Motion stops every looping animation. Each touch target is at least 44 pt.",
@@ -3748,6 +3600,9 @@
   "n-fact-interviews-src": "Interviews · September to October 2026"
 });
     Object.assign(TRANSLATIONS.de, {
+  "dna-input-text": "In der <b class=\"kw\">Mulde</b> erscheint der eingegebene Text.",
+  "dna-live-text": "Der <b class=\"kw\">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand.",
+  "dna-toggle-text": "Beim <b class=\"kw\">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.",
   "n-ds-1": "Für to.morrow habe ich ein eigenes <b class=\"kw\">Designsystem</b> entwickelt. Es legt fest, wie wiederkehrende Elemente aussehen und reagieren. Ein Schalter folgt im Live-Bereich denselben Regeln wie in den Einstellungen.",
   "n-ds-2": "Die erste Version sah noch ganz anders aus. Die Screenshots zeigen den Windows-95-Look, den ich zunächst über TestFlight getestet und anschließend ersetzt habe.",
   "n-a11y-short": "<b class=\"kw\">Barrierefreiheit</b>: Die Schrift folgt der iOS-Schriftgröße über Dynamic Type bis zur größten Stufe AX5. Bedienelemente wachsen halb so schnell, damit mehr Inhalt sichtbar bleibt. Mit VoiceOver lassen sich Aufgaben bearbeiten, umsortieren und Fotos öffnen. „Bewegung reduzieren“ stoppt alle Daueranimationen. Jedes Touch-Ziel ist mindestens 44 pt groß.",

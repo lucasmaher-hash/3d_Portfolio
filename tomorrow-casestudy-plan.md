@@ -114,6 +114,11 @@ den unterschiedlichen Bildschirmhintergründen. Video-Cacheversion: `v=3`.
 Die drei Bildunterschriften stehen jetzt über den Screens anstelle der Zahlen. Die animierten
 Verbindungslinien bleiben zwischen den Beschriftungen erhalten; die untere Beschriftungszeile entfällt.
 
+Die drei animierten Designsystem-Beispiele stehen in separaten Zeilen: Eingabefeld links,
+Live-Schalter rechts, Umschalter links. Jeder Erklärungssatz steht direkt daneben, auch auf
+schmalen Ansichten. Die bestehenden Animationen und ihre Reduced-Motion-Steuerung bleiben erhalten.
+Die aufgeteilten Texte sind in Deutsch und Englisch angebunden; aktuell 98 aktive Übersetzungsschlüssel.
+
 ### Prüfung
 
 - Alle 96 aktiven Übersetzungsschlüssel sind in Deutsch und Englisch vorhanden; der bestehende
