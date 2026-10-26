@@ -2419,33 +2419,21 @@
     .dna-ws__glass { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; isolation: isolate; pointer-events: none; }
     .dna-ws::after { z-index: 2; }
 
-    /* Both labels sit in ONE grid cell, and the state only cross-fades between
-       them (2026-09-09). Swapping textContent instead would change the pill's
-       width — and the pill is a content-sized flex item whose stage is
-       `flex: 0 0 auto`, so the two troughs either side would re-flex every
-       time it toggled. Stacked, the box is as wide as the LONGER of the two
-       and nothing in the row can move. */
+    /* Recording 2026-10-26: glass swells on a tap; mark AND word breathe
+       together while live. The full-width capsule keeps its resting size. */
+    .dna-ws.sk-press { transform: scale(var(--press-scale, 1)); transition: none; cursor: pointer; touch-action: manipulation; }
+    .dna-ws__content { display: inline-flex; align-items: center; justify-content: center; gap: calc(var(--ws-gap) * var(--z)); color: var(--ink-muted); opacity: .55; }
     .dna-ws__label { position: relative; z-index: 1; display: grid; }
-    .dna-ws__label > span {
-      grid-area: 1 / 1;
-      text-align: center;
-      transition: opacity 160ms ease;
-    }
+    .dna-ws__label > span { grid-area: 1 / 1; text-align: center; transition: opacity 160ms ease-out; }
     .dna-ws__on { opacity: 0; }
     .dna-ws[data-onair="true"] .dna-ws__off { opacity: 0; }
-    .dna-ws[data-onair="true"] .dna-ws__on  { opacity: 1; }
-
-    /* The breath is the state — the same motion .live__mark uses further up
-       (slow, shallow, growing and becoming visible as one motion), just on
-       currentColor rather than the registered --core, since this mark takes
-       both its ring and its core from the pill's ink. */
+    .dna-ws[data-onair="true"] .dna-ws__on { opacity: 1; }
     @keyframes dna-breathe {
-      from { opacity: .28; transform: scale(.88); }
-      to   { opacity: 1;   transform: scale(1.08); }
+      from { opacity: 1; transform: scale(1.08); filter: brightness(.66); }
+      to { opacity: .28; transform: scale(.88); filter: brightness(1); }
     }
-    .dna-ws[data-onair="true"] .dna-ws__mark {
-      animation: dna-breathe 1s ease-in-out infinite alternate;
-    }
+    .dna-ws[data-onair="true"] .dna-ws__content { color: var(--ink); animation: dna-breathe 1s ease-in-out infinite alternate; }
+    .dna-ws:focus-visible, .dna-seg .sk-seg__opt:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
     /* ── Row 2 — indented panel ──────────────────────────────────────── */
     .dna-fieldwrap { width: 100%; display: grid; gap: calc(10px * var(--z)); }
     .dna-seg { width: 100%; }
@@ -2523,37 +2511,24 @@
       left: calc(var(--seg-pad) * var(--z));
       width: calc((100% - var(--seg-pad) * 2 * var(--z) - 3px * var(--z)) / 2);
       border-radius: 999px; pointer-events: none;
-      transform: translateX(calc(var(--i, 0) * (100% + 3px * var(--z))));
-      /* The scale is FAST and the glide is not. They shared 400ms, which is
-         why the swell read as lagging: added at 380ms it had 190ms to travel a
-         400ms transition, so it never reached 1.055 and what you saw was the
-         tail of it arriving after the pill had already stopped. 150ms in,
-         started 250ms into the glide, puts the peak exactly on arrival. */
-      transition: transform 400ms cubic-bezier(.2, .8, .3, 1),
-                  scale    150ms cubic-bezier(.34, 1.56, .64, 1);
+      /* Independent sampled springs drive translation and press, exactly as
+         the app's layout (.40/.86) and swell (.36/.60) do. */
+      transform: translateX(calc(var(--i, 0) * (100% + 3px * var(--z)))) scale(var(--swell, 1));
     }
-    /* the swell on arrival: the glide alone reads as the whole event, so
-       landing is what gives the journey an end */
-    .dna-segpill.is-landing { scale: 1.055; }
+    .dna-seg .sk-seg__opt { font-family: inherit; cursor: pointer; touch-action: manipulation; transform: scale(var(--label-swell, 1)); }
     .sk-seg__opt > span { position: relative; z-index: 1; }
     /* The short pair is the phone's; see the markup comment. */
     .dna-seg__short { display: none; }
 
     @media (prefers-reduced-motion: reduce) {
       .dna-caret { animation: none; }
-      /* Same rule as .live__mark's: the breath is the only thing saying the
-         switch is on air, so with motion off the mark settles at the large,
-         fully-opaque end — never the faint one. (The demo loop never starts
-         under reduced motion, so this only matters if it is turned on while
-         the button happens to be on air.) */
-      .dna-ws[data-onair="true"] .dna-ws__mark {
-        animation: none; opacity: 1; transform: scale(1.08);
-      }
+      .dna-ws[data-onair="true"] .dna-ws__content { animation: none; opacity: 1; transform: none; filter: none; }
+      .dna-ws.sk-press, .dna-seg .sk-seg__opt { transform: none; }
       .dna-ws__label > span { transition: none; }
       .sk-press { transition: none; }
       .sk-press.is-pressed { transform: none; }
       .dna-segpill { transition: none; }
-      .dna-segpill.is-landing { scale: 1; }
+
     }
 
     @media (max-width: 640px) {
@@ -2690,6 +2665,17 @@
     .wireflow-step-no { font-size: 11px; font-variant-numeric: tabular-nums; color: #777; padding-top: 3px; }
     .wireflow-step strong { font-weight: 600; color: #303030; }
     .wireflow-step figcaption > span:last-child { grid-column: 2; }
+    /* Mobile (2026-10-26): the Live wireflow drops its intro sentence, step captions sit ABOVE each
+       screen, and the phones are 20% smaller (so the frame they sit in gets shorter). */
+    @media (max-width: 640px) {
+      .wireflow-intro[data-i18n="wf-live-intro"] { display: none; }
+      .wireflow-steps { grid-template-columns: repeat(4, 176px); }
+      .wireflow-step figure { display: flex; flex-direction: column; align-items: center; }
+      .wireflow-step figcaption { order: -1; margin-top: 0; margin-bottom: 12px; width: 100%; text-align: center; }
+      .wireflow-step figcaption > span:last-child { grid-column: auto; }
+      .wireflow-step figcaption { grid-template-columns: 1fr; justify-items: center; }
+      .wireflow-phone { width: 80%; max-width: none; }
+    }
     .wireflow-sr { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     @media (max-width: 860px) {
       .wireflow.flow-band { overflow: hidden; }
@@ -2801,6 +2787,19 @@
     }
       .stagger-figure.phone .ip-screen video { width: 100% !important; height: 100% !important; margin: 0 !important; }
     .stagger-figure.phone .ip-frame { width: 100% !important; height: 100% !important; margin: 0 !important; }
+  </style>
+  <style id="mobile-reading-pass">
+    /* Reading sizes and contrast for phones/tablets; desktop keeps its palette. */
+    @media (max-width: 860px) {
+      :root { --text-secondary: #555760; --mobile-accent-ink: #49627f; }
+      .guide-text, .stagger-copy, .next li { font-size: 16px; }
+      .side p, .win-quotes p, .meta-inset { font-size: 15px; }
+      .meta-inset { min-width: 0; overflow-wrap: anywhere; }
+      .meta-label, .fact-num, .tap-card.is-us .tap-n { color: var(--mobile-accent-ink); }
+      .trio-num { font-size: 12px; line-height: 1.4; }
+      .trio-label { max-width: 100%; padding-inline: 2px; white-space: normal; overflow-wrap: anywhere; hyphens: auto; }
+      .side .tag, .fact-src { font-size: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -3021,9 +3020,9 @@
           <div class="trio-wrap">
             <div class="trio-nums"><span class="trio-num" style="--g: var(--A);"><span class="trio-label" data-i18n="n-fl-1">Aufgabe eingeben</span></span><span class="trio-num" style="--g: var(--A);"><span class="trio-label" data-i18n="n-fl-3">Sperrbildschirm</span></span><span class="trio-num"><span class="trio-label" data-i18n="n-fl-4">Dynamic Island</span></span></div>
             <div class="trio-shots">
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Eine Aufgabe wird eingegeben und live angezeigt"><source src="/videos/to.morrow/live-1-type.mp4?v=8" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=10" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
-              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="auto" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island-delayed.mp4?v=3" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="metadata" width="600" height="1304" aria-label="Eine Aufgabe wird eingegeben und live angezeigt"><source src="/videos/to.morrow/live-1-type.mp4?v=8" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="metadata" width="600" height="1304" aria-label="Die Aufgabe erscheint auf dem Sperrbildschirm und wird abgehakt"><source src="/videos/to.morrow/live-2-lock.mp4?v=10" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
+              <div class="ip-shot"><div class="ip-screen"><video data-seq muted playsinline preload="metadata" width="600" height="1304" aria-label="Die Aufgabe in der Dynamic Island auf dem Homescreen, abgehakt"><source src="/videos/to.morrow/live-3-island-delayed.mp4?v=3" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div>
             </div>
           </div>
         </div>
@@ -3147,13 +3146,13 @@
               </div>
             </div>
             <div class="dna-stage sk" style="--z0: 1.001;">
-              <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
+              <button class="dna-ws sk-glass sk-press sk-chrome" type="button" aria-pressed="false">
                 <span class="dna-ws__glass" aria-hidden="true">
                   <span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span>
                   <span class="live__glow"></span>
                   <span class="live__relief"></span>
                 </span>
-                <span class="dna-ws__mark"></span><span class="dna-ws__label"><span class="dna-ws__off">Off air</span><span class="dna-ws__on">On air</span></span>
+                <span class="dna-ws__content"><span class="dna-ws__mark" aria-hidden="true"></span><span class="dna-ws__label"><span class="dna-ws__off">Off air</span><span class="dna-ws__on">Live</span></span></span>
               </button>
             </div>
             <div class="dna-stage sk" style="--z0: 1.001;">
@@ -3164,8 +3163,8 @@
                 <span class="sk-trough__bloom"></span>
                 <span class="dna-segpill sk-glass" style="--i: 0"></span>
                 <!-- Compact labels keep the control readable in the three-column phone layout. -->
-                <span class="sk-seg__opt is-on"><span class="dna-seg__long">Heute</span><span class="dna-seg__short">On</span></span>
-                <span class="sk-seg__opt"><span class="dna-seg__long">Morgen</span><span class="dna-seg__short">Off</span></span>
+                <button type="button" class="sk-seg__opt is-on" aria-pressed="true"><span class="dna-seg__long">Heute</span><span class="dna-seg__short">On</span></button>
+                <button type="button" class="sk-seg__opt" aria-pressed="false"><span class="dna-seg__long">Morgen</span><span class="dna-seg__short">Off</span></button>
               </div>
             </div>
           </div>
@@ -3721,6 +3720,7 @@
     }
     function applyLang(lang) {
       const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+      document.documentElement.lang = TRANSLATIONS[lang] ? lang : 'en';
       document.querySelectorAll('[data-i18n]').forEach(el => { const v = pick(t, el.dataset.i18n); if (v !== undefined) el.textContent = v; });
       document.querySelectorAll('[data-i18n-html]').forEach(el => { const v = pick(t, el.dataset.i18nHtml); if (v !== undefined) el.innerHTML = v; });
     }
@@ -4159,20 +4159,8 @@
       });
     })();
   </script>
-  <!-- ── The three-primitive demos ────────────────────────────────────────
-       One IIFE, entirely self-contained: it only ever touches nodes inside
-       .dna-list, so it cannot collide with anything else on the page.
-
-       Everything is driven by setInterval rather than CSS keyframes because
-       all three loops need to STOP when the block is off screen — three
-       animations running behind the reader for the length of a case study
-       is wasted work on a phone, and the toggle's arrival swell needs a
-       state change 400ms after the glide starts, which a keyframe cannot
-       express without duplicating the timing in two places.
-
-       prefers-reduced-motion is honoured by never starting: the controls
-       stay legible in their resting state, which is what the section is
-       actually about. -->
+  <!-- Three primitive demos: source-recorded spring timings, shared by autoplay
+       and direct interaction. Animation work stops when off screen or hidden. -->
   <script>
     (function () {
       var root = document.querySelector('.dna-list');
@@ -4180,37 +4168,64 @@
 
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-      // ── 1. Raised lip: pressed, released, pause. ─────────────────────
       var lip = root.querySelector('.dna-ws');
-
-      // ── 2. Trough: type the value in, hold it, take it back out. ─────
       var typeEl = root.querySelector('.dna-type');
-      var WORDS  = ['Personal', 'Work'];
+      var WORDS = ['Personal', 'Work'];
       var wi = 0, ci = 0, erasing = false;
-
-      // ── 3. Glass bubble: glide to the next column, swell on arrival. ──
-      var seg  = root.querySelector('.dna-seg');
+      var seg = root.querySelector('.dna-seg');
       var pill = root.querySelector('.dna-segpill');
       var opts = seg ? seg.querySelectorAll('.sk-seg__opt') : [];
-      var si = 0;
+      var si = 0, onAir = false, timers = [], lipTimer = null;
 
-      var timers = [];
-
-      // The press TOGGLES the switch: off air -> on air -> off air, label and
-      // breath together, because that is what this control does in the app
-      // (see f1b-text). The state flips at the press itself, not when the
-      // bulge settles, so the label changes on the same frame the button
-      // moves. On air dwells LONGER than off: the breath is a 1s alternate,
-      // and under ~3s it reads as a blink rather than as breathing.
-      var onAir = false;
-      var lipTimer = null;
+      // The app uses response/damping pairs, not a cubic-bezier approximation.
+      // Integrate each damped spring analytically so a second tap inherits its
+      // current position AND velocity instead of restarting from an endpoint.
+      function spring(value, response, damping) { return { x: value, v: 0, target: value, response: response, damping: damping }; }
+      var motion = {
+        position: spring(0, .40, .86),
+        glass: spring(1, .36, .60),
+        label0: spring(1, .36, .60), label1: spring(1, .36, .60),
+        press: spring(1, .36, .60)
+      };
+      var motionFrame = null, motionLast = performance.now();
+      function advance(now) {
+        var dt = Math.max(0, (now - motionLast) / 1000); motionLast = now;
+        Object.keys(motion).forEach(function (name) {
+          var m = motion[name], w = 2 * Math.PI / m.response, d = m.damping * w;
+          var wd = w * Math.sqrt(1 - m.damping * m.damping), y = m.x - m.target;
+          var c = (m.v + d * y) / wd, e = Math.exp(-d * dt), co = Math.cos(wd * dt), sn = Math.sin(wd * dt);
+          m.x = m.target + e * (y * co + c * sn);
+          m.v = e * ((-d * y + wd * c) * co + (-d * c - wd * y) * sn);
+          if (Math.abs(m.x - m.target) < .0001 && Math.abs(m.v) < .001) { m.x = m.target; m.v = 0; }
+        });
+      }
+      function paintMotion() {
+        if (lip) lip.style.setProperty('--press-scale', motion.press.x.toFixed(5));
+        if (pill) { pill.style.setProperty('--i', motion.position.x.toFixed(5)); pill.style.setProperty('--swell', motion.glass.x.toFixed(5)); }
+        for (var i = 0; i < opts.length; i++) opts[i].style.setProperty('--label-swell', motion['label' + i].x.toFixed(5));
+      }
+      function animateMotion(now) {
+        motionFrame = null; advance(now); paintMotion();
+        if (Object.keys(motion).some(function (name) { var m = motion[name]; return m.x !== m.target || m.v !== 0; })) motionFrame = requestAnimationFrame(animateMotion);
+      }
+      function aim(name, value) {
+        advance(performance.now());
+        var m = motion[name]; m.target = value;
+        if (reduce.matches) { m.x = value; m.v = 0; paintMotion(); return; }
+        if (motionFrame === null) motionFrame = requestAnimationFrame(animateMotion);
+      }
+      var lipRelease = null, glassRelease = null, labelRelease = null;
       function pressLip() {
         if (!lip) return;
-        lip.classList.add('is-pressed');
-        timers.push(setTimeout(function () { lip.classList.remove('is-pressed'); }, 260));
+        clearTimeout(lipTimer); clearTimeout(lipRelease);
+        if (!reduce.matches) {
+          aim('press', 1.115);
+          lipRelease = setTimeout(function () { aim('press', 1); }, 260);
+        }
         onAir = !onAir;
         lip.dataset.onair = onAir ? 'true' : 'false';
-        lipTimer = setTimeout(pressLip, onAir ? 3600 : 2200);
+        lip.setAttribute('aria-pressed', onAir ? 'true' : 'false');
+        if (running) lipTimer = setTimeout(pressLip, onAir ? 3600 : 2200);
       }
 
       function stepType() {
@@ -4228,19 +4243,29 @@
         return 38;
       }
 
-      function stepSeg() {
-        if (!pill) return;
-        si = (si + 1) % opts.length;
-        pill.style.setProperty('--i', si);
-        for (var i = 0; i < opts.length; i++) opts[i].classList.toggle('is-on', i === si);
-        // The swell peaks WITH the pill. The glide is 400ms and the scale is
-        // 150ms, so it starts at 250ms — earlier or later and the button
-        // appears to be pressed before or after it gets where it is going.
-        timers.push(setTimeout(function () {
-          pill.classList.add('is-landing');
-          timers.push(setTimeout(function () { pill.classList.remove('is-landing'); }, 150));
-        }, 250));
+      function chooseSeg(index) {
+        if (!pill || !opts.length) return;
+        si = index;
+        aim('position', si);
+        for (var i = 0; i < opts.length; i++) {
+          opts[i].classList.toggle('is-on', i === si);
+          opts[i].setAttribute('aria-pressed', i === si ? 'true' : 'false');
+        }
+        if (!reduce.matches) {
+          clearTimeout(glassRelease); clearTimeout(labelRelease);
+          // Both start on the tap. The selected glass holds for 300ms;
+          // its label uses the ordinary 260ms press from the recording.
+          aim('glass', 1.115);
+          for (var j = 0; j < opts.length; j++) aim('label' + j, j === si ? 1.115 : 1);
+          glassRelease = setTimeout(function () { aim('glass', 1); }, 300);
+          labelRelease = setTimeout(function () { for (var j = 0; j < opts.length; j++) aim('label' + j, 1); }, 260);
+        }
       }
+      function stepSeg() { chooseSeg((si + 1) % opts.length); }
+      if (lip) lip.addEventListener('click', pressLip);
+      for (var oi = 0; oi < opts.length; oi++) (function (index) {
+        opts[index].addEventListener('click', function () { chooseSeg(index); });
+      })(oi);
 
       // Each loop reschedules itself, so the typewriter can vary its own
       // delay per character without a second timer fighting the first.
@@ -4249,28 +4274,31 @@
 
       var running = false;
       function start() {
-        if (running || reduce.matches) return;
+        if (running || reduce.matches || document.hidden) return;
         running = true;
         lipTimer = setTimeout(pressLip, 2600);
         timers.push(setInterval(stepSeg, 2050));
         typeLoop();
       }
       function stop() {
-        if (!running) return;
         running = false;
         for (var i = 0; i < timers.length; i++) { clearTimeout(timers[i]); clearInterval(timers[i]); }
         timers = [];
         clearTimeout(typeTimer);
         clearTimeout(lipTimer);
-        // Back to off air: a CSS animation would otherwise keep breathing off
-        // screen, which is the work this whole observer exists to avoid.
-        if (lip) { lip.classList.remove('is-pressed'); lip.dataset.onair = 'false'; onAir = false; }
-        if (pill) pill.classList.remove('is-landing');
+        clearTimeout(lipRelease); clearTimeout(glassRelease); clearTimeout(labelRelease);
+        if (motionFrame !== null) cancelAnimationFrame(motionFrame);
+        motionFrame = null; motionLast = performance.now();
+        Object.keys(motion).forEach(function (name) { var m = motion[name]; m.x = m.target = name === 'position' ? si : 1; m.v = 0; });
+        paintMotion();
+        if (lip) { lip.dataset.onair = 'false'; lip.setAttribute('aria-pressed', 'false'); onAir = false; }
       }
 
+      var visible = true;
       if ('IntersectionObserver' in window) {
         new IntersectionObserver(function (entries) {
-          entries[0].isIntersecting ? start() : stop();
+          visible = entries[0].isIntersecting;
+          visible ? start() : stop();
         }, { rootMargin: '80px' }).observe(root);
       } else {
         start();
@@ -4278,7 +4306,8 @@
 
       // A reader who turns reduced motion on mid-page gets the still
       // version immediately rather than on the next reload.
-      var onPref = function () { reduce.matches ? stop() : start(); };
+      var onPref = function () { reduce.matches || document.hidden || !visible ? stop() : start(); };
+      document.addEventListener('visibilitychange', onPref);
       reduce.addEventListener ? reduce.addEventListener('change', onPref)
                               : reduce.addListener(onPref);
     })();
@@ -4575,7 +4604,19 @@
   }
   vids.forEach(function (v) { v.loop = false; v.autoplay = false; });
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mobile = window.matchMedia('(max-width: 860px)').matches;
+  if (!mobile) vids.forEach(function (v) { v.preload = 'auto'; });
   if (reduce || !('IntersectionObserver' in window)) return;
+  // Warm the complete sequence before it enters view, rather than competing
+  // with the hero for bandwidth on a phone. Metadata keeps previews available.
+  if (mobile) {
+    var warm = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      vids.forEach(function (v) { v.preload = 'auto'; v.load(); });
+      warm.disconnect();
+    }, { rootMargin: '600px 0px' });
+    warm.observe(band);
+  }
   new IntersectionObserver(function (e) {
     var vis = e[0].isIntersecting;
     if (vis && !on) { on = true; begin(); }
