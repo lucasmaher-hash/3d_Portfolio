@@ -240,6 +240,15 @@ unter `~/.codex/skills/wireframes` für die automatische Auswahl verknüpft.
 - Generierte SVG-Flüsse visuell geprüft; Elementverbindungen und Sprachwechsel geprüft.
   Der persönliche Wireframe-Skill hält statisches Desktop-Layout als Standard fest.
 
+## Freigegebene Vergleichskarten · 2026-10-26
+
+Lucas hat die Darstellung im Screenshot mit voller Abschnittsbreite freigegeben.
+Die alte Desktop-Begrenzung auf 66,67 % ist entfernt; Überschrift, Einleitung und
+alle vier Karten nutzen dieselbe volle Breite. Die Einleitung übernimmt wie im
+Einstellpanel die geerbte Textgröße. Quadratische Bilder, 7–11 px Kartenpolster,
+18 px Rundung und bestehende Text-/Zwischenabstände bleiben erhalten.
+Das temporäre Einstellpanel samt CSS und JavaScript wurde vollständig entfernt.
+
 ## 0. What the interview established
 
 | Topic | Answer |
