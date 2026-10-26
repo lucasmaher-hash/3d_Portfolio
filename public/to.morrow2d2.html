@@ -883,7 +883,7 @@
     @media (max-width: 640px) { .ph-pair { grid-template-columns: minmax(0, 1fr); } }
 
     /* Three big numbers with a source line each, as on unify2d.html (.fact-bar). */
-    .fact-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); margin-top: clamp(32px, 5vw, 60px); }
+    .fact-bar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); margin-top: clamp(32px, 5vw, 60px); }
     .fact { display: flex; flex-direction: column; gap: 8px; }
     .fact-num { font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: clamp(28px, 3.4vw, 44px); line-height: 1; letter-spacing: -0.04em; color: var(--accent-orange); }
     .fact-label { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
@@ -2921,7 +2921,7 @@
         <span class="step-badge">1</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n-html="n-study">Ich habe <b class="kw">zehn Menschen zwischen 21 und 34</b> gefragt, wie sie ihre To-dos verwalten. Sieben führen eine einzige Liste, in die alles wandert, und sortieren sie nicht um. Drei berichteten, nach wenigen Tagen aufzugeben. „Ich schreibe alles auf und schiebe es dann einfach vor mir her“, sagte eine Teilnehmerin.</p>
+      <p class="guide-text" data-i18n-html="n-study">Ich habe <b class="kw">15 Menschen</b> bei ihrer Nutzung von to.morrow begleitet und mit ihnen Interviews geführt. Es war dieselbe Gruppe, die die App nutzte und mir von ihren Erfahrungen berichtete.</p>
       <p class="guide-text" data-i18n-html="problem-1">Eine To-do-App sollte möglichst wenig deiner Zeit beanspruchen. Das ist das Grundprinzip von to.morrow: <b class="kw">Aufgaben mit möglichst wenig Aufwand verwalten</b>. Wer seinen Plan ändern will, sollte das direkt in der Liste erledigen können.</p>
       <p class="guide-text" data-i18n-html="n-problem-user">to.morrow richtet sich an <b class="kw">Menschen, die sich zu viel vornehmen</b>, den Überblick über ihre Aufgaben verlieren und ihre Liste irgendwann aufgeben.</p>
       <div class="todo-frame"><video class="todo-demo" src="/videos/to.morrow/todo-demo.mp4?v=20261025s" muted loop playsinline preload="metadata" aria-label="Animation: 30 Aufgaben gleiten in die Heute-Liste, bis sie über den Bildschirm hinauswächst"></video></div>
@@ -3009,7 +3009,7 @@
              restate .stagger-row, so a stylesheet rule of equal specificity
              placed before them would lose on source order. -->
         <div class="centered-note note-wide">
-          <p class="stagger-copy" data-i18n-html="f1b-text">Sobald du die Tastatur schließt, erscheint die Aufgabe auf dem <b class="kw">Sperrbildschirm und in der Dynamic Island auf dem Home-Bildschirm</b>.</p>
+          <p class="stagger-copy" data-i18n-html="f1b-text">Sobald du die Tastatur schließt, erscheint die Aufgabe auf dem <b class="kw">Sperrbildschirm und in der Dynamic Island</b>.</p>
         </div>
         <div class="flow-band no-shade trio-band" style="margin-top: calc(clamp(24px, 3vw, 40px) - clamp(56px, 8vw, 120px));">
           <div class="trio-wrap">
@@ -3033,7 +3033,7 @@
       </div>
       <div class="dot-divider"></div>
       <p class="guide-text" data-i18n="n-ds-1">Meine Begeisterung für alte Technik brachte mich auf die Idee, die App im Stil von Windows 95 zu gestalten. Die kantige Optik zusammen mit flüssigen Animationen und schnellen Reaktionen auf Eingaben fand ich spannend.</p>
-      <p class="guide-text" data-i18n="n-ds-2">Gespräche mit den ersten Nutzern änderten meine Sicht darauf. Einige hatten anfangs Spaß am Retro-Look. Insgesamt machte er die App aber weniger angenehm und intuitiv bedienbar.</p>
+      <p class="guide-text" data-i18n="n-ds-2">Gespräche mit den Nutzern, die ich begleitete, änderten meine Sicht darauf. Einige hatten anfangs Spaß am Retro-Look. Insgesamt machte er die App aber weniger angenehm und intuitiv bedienbar.</p>
       <!-- The version that was thrown away. Not in the layout brief, but
            the pivot is the strongest thing on this page and it does not
            land without the Windows-95 build actually visible — every other
@@ -3048,14 +3048,13 @@
         <div class="win-cell"><img src="/images/to.morrow/win-right.webp?v=2" width="792" height="1600" loading="lazy" alt="Die erste Version im Windows-95-Stil: die laufende Live-Aufgabe auf dem Sperrbildschirm" /></div>
       </div>
       <div class="win-quotes">
-        <blockquote><p data-i18n="n-quote-1">„Die scharfen Kanten und harten Linien passten nicht zu den flüssigen Bewegungen.“</p><cite data-i18n="n-quote-src-sep">TestFlight-Feedback, September 2026 · sinngemäß</cite></blockquote>
-        <blockquote><p data-i18n="n-quote-2">„Am Anfang hat es Spaß gemacht. Mit der Zeit wurde es eher zur Ablenkung.“</p><cite data-i18n="n-quote-src-sep">TestFlight-Feedback, September 2026 · sinngemäß</cite></blockquote>
-        <blockquote><p data-i18n="n-quote-3">„Der Look passte nicht zu den Funktionen der App.“</p><cite data-i18n="n-quote-src-oct">TestFlight-Feedback, Oktober 2026 · sinngemäß</cite></blockquote>
+        <blockquote><p data-i18n="n-quote-1">„Die scharfen Kanten und harten Linien passten nicht zu den flüssigen Bewegungen.“</p><cite data-i18n="n-quote-src-sep">Feedback aus der Begleitgruppe · sinngemäß</cite></blockquote>
+        <blockquote><p data-i18n="n-quote-2">„Am Anfang hat es Spaß gemacht. Mit der Zeit wurde es eher zur Ablenkung.“</p><cite data-i18n="n-quote-src-sep">Feedback aus der Begleitgruppe · sinngemäß</cite></blockquote>
+        <blockquote><p data-i18n="n-quote-3">„Der Look passte nicht zu den Funktionen der App.“</p><cite data-i18n="n-quote-src-oct">Feedback aus der Begleitgruppe · sinngemäß</cite></blockquote>
       </div>
       <p class="big-statement" data-i18n="n-nopurpose">Der Look erschwerte die Bedienung.</p>
       <p class="guide-text" data-i18n-html="pivot-1">Die erste Version hatte eine <b class="kw">Taskleiste, abgeschrägte Ränder und Pixelschrift im doppelten Pixelmaßstab</b>.</p>
       <p class="guide-text" data-i18n-html="pivot-3">Ich habe die Oberfläche daraufhin neu gestaltet. Mit <b class="kw">SkeuKit</b> erhalten die Bedienelemente ihre Tiefe durch Licht und Schatten. Erhabene Knöpfe und vertiefte Eingabefelder sollen ihre Funktion schon durch die Form erkennen lassen.</p>
-      <p class="guide-text" data-i18n-html="n-ret-text">Nach einer Woche öffneten noch <b class="kw">61 %</b> der Tester die neue Version, gegenüber 24 % beim Windows-95-Build (je 18 Tester).</p>
       <p class="guide-text" data-i18n-html="icons-text">Die <b class="kw">Pixelschrift</b> ist als optionale Retro-Einstellung geblieben. Wer möchte, wechselt zur modernen Schrift. Aufgabentexte bleiben in der Systemschrift, damit der Retro-Look ihre Lesbarkeit nicht beeinträchtigt.</p>
       <p class="guide-text" data-i18n-html="n-rules-sub">Die neue Oberfläche soll erkennen lassen, wo man drücken, schreiben oder auswählen kann. Dafür verwende ich <b class="kw">drei wiederkehrende Formen</b>. Ihre Höhe gegenüber der Grundfläche kennzeichnet ihre Funktion.</p>
       <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="s-rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs></svg>
@@ -3179,7 +3178,7 @@
         <span class="step-badge">5</span>
       </div>
       <div class="dot-divider"></div>
-      <p class="guide-text" data-i18n-html="n-res-caveat">Zehn Interviews und 18 Tester pro Build sind eine kleine Stichprobe. Die Ergebnisse geben Einblicke in diese Gruppe; sie lassen sich noch nicht auf alle Nutzer übertragen.</p>
+      <p class="guide-text" data-i18n-html="n-res-caveat">Die Erkenntnisse stammen aus derselben Gruppe von <b class="kw">15 Personen</b>, die ich als Nutzer begleitet und interviewt habe. Die Gruppe ist klein; ihre Erfahrungen lassen sich nicht auf alle Nutzer übertragen.</p>
       <div class="fact-bar">
         <div class="fact">
           <span class="fact-num">5 → 1</span>
@@ -3187,17 +3186,11 @@
           <span class="fact-src" data-i18n="n-fact-actions-src">Eigene Zählung · Oktober 2026</span>
         </div>
         <div class="fact">
-          <span class="fact-num">61 %</span>
-          <span class="fact-label" data-i18n="n-fact-retention">öffnen die neue Version nach 7 Tagen noch; beim Windows-95-Build sind es 24 %</span>
-          <span class="fact-src" data-i18n="n-fact-retention-src">TestFlight · 18 Tester pro Build</span>
-        </div>
-        <div class="fact">
-          <span class="fact-num">10</span>
-          <span class="fact-label" data-i18n="n-fact-interviews">Interviewte, die to.morrow drei Wochen lang genutzt haben</span>
-          <span class="fact-src" data-i18n="n-fact-interviews-src">Interviews · September bis Oktober 2026</span>
+          <span class="fact-num">15</span>
+          <span class="fact-label" data-i18n="n-fact-interviews">Personen, die ich als Nutzer begleitet und auch interviewt habe</span>
+          <span class="fact-src" data-i18n="n-fact-interviews-src">Eine gemeinsame Nutzer- und Interviewgruppe</span>
         </div>
       </div>
-      <p class="guide-text" data-i18n="n-result-behaviour">Nach drei Wochen mit to.morrow legten acht von zehn ihre Aufgaben bewusst auf Morgen oder Bald.</p>
       <h3 class="feature-title cs-h3" data-i18n="n-learn">Was ich gelernt habe</h3>
       <p class="guide-text" data-i18n-html="conclusion-1">Die Windows-Version hat mir gezeigt, wie wichtig es ist, <b class="kw">die Bedienung früh zu testen</b>. Ich hatte die Oberfläche fertig ausgearbeitet, bevor ihre Schwierigkeiten im Alltag deutlich wurden. Ein überzeugender Screenshot reichte dafür nicht aus.</p>
       <p class="guide-text" data-i18n-html="conclusion-2">Das Designsystem erleichterte anschließend die Gestaltung weiterer Ansichten. Ich konnte <b class="kw">bestehende Elemente wiederverwenden</b> und ihre Regeln auf neue Situationen anwenden.</p>
@@ -3388,7 +3381,7 @@
         'problem-4': "to.morrow answers with two features. One keeps the task you're working on in view at all times. The other makes <b class=\"kw\">moving the main gesture</b>. When a new day starts, the app moves Tomorrow up to Today by itself.",
         "f1-title": "Always in view",
         "f1-text": "Really important tasks need special treatment. A timer is too intrusive for this: it interrupts you at one specific moment. A calendar entry is too passive and easy to miss.<br><br><b class=\"kw\">“Go live” sits in between.</b> It keeps reminding you while you use your phone, without interrupting you with an alarm.",
-        "f1b-text": "Close the keyboard and your task immediately appears on the <b class=\"kw\">Lock Screen and in the Dynamic Island on the Home Screen</b>.",
+        "f1b-text": "Close the keyboard and your task immediately appears on the <b class=\"kw\">Lock Screen and in the Dynamic Island</b>.",
         'f2-title': "Making rescheduling the main gesture",
         'f2-text': "Rescheduling should be as direct as ticking a task off. It happens on the task row itself: <b class=\"kw\">one swipe replaces the trip through the date picker</b>. An accidental move can be undone.",
         'f2b-title': "Today, Tomorrow or Soon",
@@ -3433,7 +3426,7 @@
         'section-app': 'Die App',
         "f1-title": "Immer im Blick",
         "f1-text": "Besonders wichtige Aufgaben brauchen besondere Aufmerksamkeit. Ein Timer ist dafür zu aufdringlich: Er unterbricht dich zu einem festen Zeitpunkt. Ein Kalendereintrag ist dagegen zu passiv und leicht zu übersehen.<br><br><b class=\"kw\">„Go live“ liegt dazwischen.</b> Die Aufgabe bleibt im Blick, während du dein iPhone nutzt, ohne dich mit einem Alarm zu unterbrechen.",
-        "f1b-text": "Sobald du die Tastatur schließt, erscheint die Aufgabe auf dem <b class=\"kw\">Sperrbildschirm und in der Dynamic Island auf dem Home-Bildschirm</b>.",
+        "f1b-text": "Sobald du die Tastatur schließt, erscheint die Aufgabe auf dem <b class=\"kw\">Sperrbildschirm und in der Dynamic Island</b>.",
         'f2-title': "Verschieben als Hauptgeste",
         'f2-text': "Das Verschieben sollte so direkt sein wie das Abhaken. Deshalb bewegt man die Aufgabe in der Liste selbst: <b class=\"kw\">Ein Wisch ersetzt den Weg durch die Datumsauswahl</b>. Eine versehentliche Bewegung lässt sich rückgängig machen.",
         'f2b-title': "Heute, Morgen oder Bald",
@@ -3465,7 +3458,7 @@
     };
     Object.assign(TRANSLATIONS.en, {
       "n-ds-1": "My love of old tech gave me the idea to design the app in a Windows 95 style. I thought its harsh, blocky look would make an interesting contrast with fluid animations and responsive controls.",
-      "n-ds-2": "Conversations with early users soon changed my view. Some enjoyed the retro look at first, but it made the overall experience less pleasant and intuitive.",
+      "n-ds-2": "Conversations with the users I was following soon changed my view. Some enjoyed the retro look at first, but it made the overall experience less pleasant and intuitive.",
   "dna-forms": "Entered text appears in the <b class=\"kw\">trough</b>. The <b class=\"kw\">Live switch</b> gives under pressure and changes state. In the <b class=\"kw\">segmented control</b>, the raised surface moves with the selection.",
   "n-a11y-short": "<b class=\"kw\">Accessibility</b>: text follows the iOS text size through Dynamic Type, up to the largest setting, AX5. Controls grow at half the rate to leave more room for content. VoiceOver provides actions to edit and reorder tasks and open photos. Reduce Motion stops every looping animation. Each touch target is at least 44 pt.",
   "n-ov-lead": "to.morrow is an iOS task app with three lists: Today, Tomorrow and Soon. A swipe moves a task between lists. One selected task stays visible on the Lock Screen and in the Dynamic Island.",
@@ -3521,27 +3514,23 @@
   "n-next-1": "A <b class=\"kw\">Today list widget</b> for ticking off and moving tasks from the home screen.",
   "n-next-2": "A <b class=\"kw\">desktop version</b> with keyboard controls and room for a week view.",
   "n-next-3": "Review App Store feedback to decide which changes to make next.",
-  "n-study": "I asked <b class=\"kw\">ten people aged 21 to 34</b> how they manage their tasks. Seven keep everything in a single list without reorganising it. Three reported giving up after a few days. “I write everything down and then just keep putting it off,” one participant said.",
+  "n-study": "I followed <b class=\"kw\">15 people</b> through their experience with to.morrow and interviewed them along the way. They were the same people using the app and sharing their experiences with me.",
   "n-landscape-title": "Landscape: all lists side by side",
   "n-landscape-text": "In landscape, Today, Tomorrow and Soon sit side by side. You can see every task in the active workspace and compare your plans without switching between lists.",
   "n-quote-1": "“The sharp edges and hard lines didn’t match the fluid motion.”",
   "n-quote-2": "“It was fun at first, but became more of a distraction over time.”",
   "n-quote-3": "“The look didn’t match the app’s functionality.”",
-  "n-quote-src-sep": "TestFlight feedback, September 2026 · paraphrased",
-  "n-quote-src-oct": "TestFlight feedback, October 2026 · paraphrased",
-  "n-ret-text": "After one week, <b class=\"kw\">61 %</b> of testers still opened the new version, compared with 24 % for the Windows 95 build (18 testers per build).",
-  "n-res-caveat": "Ten interviews and 18 testers per build are a small sample. The results give insight into this group; they cannot yet be generalised to all users.",
-  "n-result-behaviour": "After three weeks with to.morrow, eight out of ten deliberately assigned tasks to Tomorrow or Soon.",
+  "n-quote-src-sep": "Feedback from the participant group · paraphrased",
+  "n-quote-src-oct": "Feedback from the participant group · paraphrased",
+  "n-res-caveat": "The findings come from the same group of <b class=\"kw\">15 people</b> I followed as users and interviewed. This is a small group, so their experiences cannot be generalised to all users.",
   "n-fact-actions": "Actions to move a task to tomorrow: taps in Reminders, a swipe in to.morrow",
   "n-fact-actions-src": "My own count · October 2026",
-  "n-fact-retention": "still open the new version after 7 days; the Windows 95 build is at 24 %",
-  "n-fact-retention-src": "TestFlight · 18 testers per build",
-  "n-fact-interviews": "Interviewees who used to.morrow for three weeks",
-  "n-fact-interviews-src": "Interviews · September to October 2026"
+  "n-fact-interviews": "people I followed as users and also interviewed",
+  "n-fact-interviews-src": "One shared user and interview group"
 });
     Object.assign(TRANSLATIONS.de, {
       "n-ds-1": "Meine Begeisterung für alte Technik brachte mich auf die Idee, die App im Stil von Windows 95 zu gestalten. Die kantige Optik zusammen mit flüssigen Animationen und schnellen Reaktionen auf Eingaben fand ich spannend.",
-      "n-ds-2": "Gespräche mit den ersten Nutzern änderten meine Sicht darauf. Einige hatten anfangs Spaß am Retro-Look. Insgesamt machte er die App aber weniger angenehm und intuitiv bedienbar.",
+      "n-ds-2": "Gespräche mit den Nutzern, die ich begleitete, änderten meine Sicht darauf. Einige hatten anfangs Spaß am Retro-Look. Insgesamt machte er die App aber weniger angenehm und intuitiv bedienbar.",
   "dna-forms": "In der <b class=\"kw\">Mulde</b> erscheint der eingegebene Text. Der <b class=\"kw\">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class=\"kw\">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.",
   "n-a11y-short": "<b class=\"kw\">Barrierefreiheit</b>: Die Schrift folgt der iOS-Schriftgröße über Dynamic Type bis zur größten Stufe AX5. Bedienelemente wachsen halb so schnell, damit mehr Inhalt sichtbar bleibt. Mit VoiceOver lassen sich Aufgaben bearbeiten, umsortieren und Fotos öffnen. „Bewegung reduzieren“ stoppt alle Daueranimationen. Jedes Touch-Ziel ist mindestens 44 pt groß.",
   "n-ov-lead": "to.morrow ist eine iOS-App zum Planen mit drei Listen: Heute, Morgen und Bald. Ein Wisch verschiebt eine Aufgabe zwischen den Listen. Eine ausgewählte Aufgabe bleibt auf dem Sperrbildschirm und in der Dynamic Island sichtbar.",
@@ -3597,23 +3586,19 @@
   "n-next-1": "Ein <b class=\"kw\">Widget für die Heute-Liste</b>, um Aufgaben auf dem Homescreen abzuhaken und zu verschieben.",
   "n-next-2": "Eine <b class=\"kw\">Desktop-Version</b> mit Tastaturbedienung und Platz für eine Wochenansicht.",
   "n-next-3": "App-Store-Rezensionen auswerten, um weitere Änderungen an den häufigsten Rückmeldungen auszurichten.",
-  "n-study": "Ich habe <b class=\"kw\">zehn Menschen zwischen 21 und 34</b> gefragt, wie sie ihre To-dos verwalten. Sieben führen eine einzige Liste, in die alles wandert, und sortieren sie nicht um. Drei berichteten, nach wenigen Tagen aufzugeben. „Ich schreibe alles auf und schiebe es dann einfach vor mir her“, sagte eine Teilnehmerin.",
+  "n-study": "Ich habe <b class=\"kw\">15 Menschen</b> bei ihrer Nutzung von to.morrow begleitet und mit ihnen Interviews geführt. Es war dieselbe Gruppe, die die App nutzte und mir von ihren Erfahrungen berichtete.",
   "n-landscape-title": "Querformat: alle Listen nebeneinander",
   "n-landscape-text": "Heute, Morgen und Bald stehen im Querformat nebeneinander. Du siehst alle Aufgaben des aktiven Workspaces gleichzeitig und kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.",
   "n-quote-1": "„Die scharfen Kanten und harten Linien passten nicht zu den flüssigen Bewegungen.“",
   "n-quote-2": "„Am Anfang hat es Spaß gemacht. Mit der Zeit wurde es eher zur Ablenkung.“",
   "n-quote-3": "„Der Look passte nicht zu den Funktionen der App.“",
-  "n-quote-src-sep": "TestFlight-Feedback, September 2026 · sinngemäß",
-  "n-quote-src-oct": "TestFlight-Feedback, Oktober 2026 · sinngemäß",
-  "n-ret-text": "Nach einer Woche öffneten noch <b class=\"kw\">61 %</b> der Tester die neue Version, gegenüber 24 % beim Windows-95-Build (je 18 Tester).",
-  "n-res-caveat": "Zehn Interviews und 18 Tester pro Build sind eine kleine Stichprobe. Die Ergebnisse geben Einblicke in diese Gruppe; sie lassen sich noch nicht auf alle Nutzer übertragen.",
-  "n-result-behaviour": "Nach drei Wochen mit to.morrow legten acht von zehn ihre Aufgaben bewusst auf Morgen oder Bald.",
+  "n-quote-src-sep": "Feedback aus der Begleitgruppe · sinngemäß",
+  "n-quote-src-oct": "Feedback aus der Begleitgruppe · sinngemäß",
+  "n-res-caveat": "Die Erkenntnisse stammen aus derselben Gruppe von <b class=\"kw\">15 Personen</b>, die ich als Nutzer begleitet und interviewt habe. Die Gruppe ist klein; ihre Erfahrungen lassen sich nicht auf alle Nutzer übertragen.",
   "n-fact-actions": "Aktionen zum Verschieben auf morgen: Antippen in Reminders, Wischen in to.morrow",
   "n-fact-actions-src": "Eigene Zählung · Oktober 2026",
-  "n-fact-retention": "öffnen die neue Version nach 7 Tagen noch; beim Windows-95-Build sind es 24 %",
-  "n-fact-retention-src": "TestFlight · 18 Tester pro Build",
-  "n-fact-interviews": "Interviewte, die to.morrow drei Wochen lang genutzt haben",
-  "n-fact-interviews-src": "Interviews · September bis Oktober 2026"
+  "n-fact-interviews": "Personen, die ich als Nutzer begleitet und auch interviewt habe",
+  "n-fact-interviews-src": "Eine gemeinsame Nutzer- und Interviewgruppe"
 });
     // Wireflow labels share the page’s language switch, including SVG accessible titles.
     Object.assign(TRANSLATIONS.de, {

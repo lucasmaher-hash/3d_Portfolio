@@ -14,8 +14,9 @@ in git history) that the current page was built from. That plan's description of
 works, the research it was based on, the page structure it set and its list of things to avoid are kept as
 **Appendices A–D** at the end of this file.
 
-> **All numbers in this file are example values** showing the *shape* of a finding and
-> where it would go on the page. Replace every one with the real result before it ships.
+> **Unless explicitly confirmed below, numbers in this file are example values** showing the
+> *shape* of a finding and where it would go on the page. Older participant counts are superseded
+> by the confirmed cohort below; historical entries remain as a record of earlier drafts.
 
 ---
 
@@ -27,6 +28,21 @@ works, the research it was based on, the page structure it set and its list of t
 - The lower Live recordings initially request metadata; a 600 px prefetch margin warms the full sequence before it appears. Desktop retains automatic preloading. Checked hero playback, all three sequence stages, and pausing after scrolling away.
 - The document language now follows the existing EN/DE control. Checked both buttons through the nav iframe's existing message path.
 - No document-wide horizontal overflow or browser errors in the checks. Desktop section geometry and control dimensions match the baseline. Production build passes. Measurements use headless Chromium with mobile device metrics/touch enabled; no physical-device Safari check was performed.
+
+## Confirmed participant group · 2026-10-26
+
+Lucas confirmed a single group of **15 people**, followed as users and also interviewed
+about their experience. They are the same participants, not separate user and interview
+samples. Do not revert to ten interviewees or 18 testers per build. No age range,
+subgroup totals, retention rates, or fixed follow-up duration was confirmed with this
+correction. The older quantities elsewhere in this plan are historical draft values.
+
+Lucas explicitly requested removal of the old outcome rates: 61 % vs. 24 % and
+“eight out of ten” are not retained or recalculated. The draft page now gives only
+the confirmed 15-person research cohort; the unrelated task-action comparison is
+unchanged. The result area uses two fact cards rather than leaving an empty third
+column. The keyboard-dismissal text now ends at “Dynamic Island”, without the
+additional Home Screen phrase.
 
 ## Status 2026-10-24: draft built
 
