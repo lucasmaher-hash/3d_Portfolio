@@ -2350,6 +2350,7 @@
        inherits whatever the pill's ink is. */
     .dna-ws__mark {
       position: relative;
+      z-index: 1;
       flex: none;
       width:  calc(19px * var(--z));
       height: calc(19px * var(--z));
@@ -2368,6 +2369,7 @@
       --h: 51;
       width: 100%;
       justify-content: center;
+      isolation: isolate;
       /* Same idea as --seg-pad: the width of this pill is its label plus these
          two, and the phone row shrinks them rather than the type. */
       --ws-pad-x: 22px;
@@ -2381,13 +2383,19 @@
       line-height: 1;
     }
 
+    /* The app's complete glass recipe, under the label: five lenses,
+       bottom glow, then vertical relief and a shaded side wall.
+       The dedicated layer supplies the fill instead of .sk-glass's shorthand. */
+    .dna-ws__glass { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; isolation: isolate; pointer-events: none; }
+    .dna-ws::after { z-index: 2; }
+
     /* Both labels sit in ONE grid cell, and the state only cross-fades between
        them (2026-09-09). Swapping textContent instead would change the pill's
        width — and the pill is a content-sized flex item whose stage is
        `flex: 0 0 auto`, so the two troughs either side would re-flex every
        time it toggled. Stacked, the box is as wide as the LONGER of the two
        and nothing in the row can move. */
-    .dna-ws__label { display: grid; }
+    .dna-ws__label { position: relative; z-index: 1; display: grid; }
     .dna-ws__label > span {
       grid-area: 1 / 1;
       text-align: center;
@@ -3193,6 +3201,11 @@
             </div>
             <div class="dna-stage sk" style="--z0: 1.001;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
+                <span class="dna-ws__glass" aria-hidden="true">
+                  <span class="live__lens"><i></i><i></i><i></i><i></i><i></i></span>
+                  <span class="live__glow"></span>
+                  <span class="live__relief"></span>
+                </span>
                 <span class="dna-ws__mark"></span><span class="dna-ws__label"><span class="dna-ws__off">Off air</span><span class="dna-ws__on">On air</span></span>
               </button>
             </div>

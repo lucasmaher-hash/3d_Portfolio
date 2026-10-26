@@ -120,6 +120,10 @@ Querschnittsabbildung darüber. Der gemeinsame Erklärungstext steht darunter un
 Die drei Größenfaktoren sind vereinheitlicht; die vorherige Verdoppelung des Live-Schalters entfällt.
 Animationen und Reduced-Motion-Steuerung bleiben erhalten. Die Texte sind in Deutsch und Englisch
 angebunden; aktuell 96 aktive Übersetzungsschlüssel.
+Der mittlere Knopf verwendet jetzt den vollständigen Glasaufbau aus `SkeuGlass` und
+`SkeuGlassBackground` der App: fünf weiße Linsenschichten, den unteren Lichtreflex,
+vertikales Relief und die weich schattierten Seiten. Diese Fläche sitzt unter Symbol und
+Beschriftung; die bestehende Lichtkontur und die äußeren Schatten bleiben erhalten.
 
 ### Prüfung
 
