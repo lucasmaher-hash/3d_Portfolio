@@ -111,6 +111,9 @@ den Fehler: Helligkeit neben der rechten Notch 78,1/255 gegenüber 201,3/255 bei
 Nach der Korrektur liegt der rechte Clip bei 193,1/255. Die verbleibende Differenz entspricht
 den unterschiedlichen Bildschirmhintergründen. Video-Cacheversion: `v=3`.
 
+Die drei Bildunterschriften stehen jetzt über den Screens anstelle der Zahlen. Die animierten
+Verbindungslinien bleiben zwischen den Beschriftungen erhalten; die untere Beschriftungszeile entfällt.
+
 ### Prüfung
 
 - Alle 96 aktiven Übersetzungsschlüssel sind in Deutsch und Englisch vorhanden; der bestehende
