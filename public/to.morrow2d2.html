@@ -2725,7 +2725,11 @@
     .cmp figcaption { font-size: 12.5px; line-height: 1.4; color: var(--text-secondary); }
     .cmp-cap { text-align: center; font-size: 13px; line-height: 1.5; color: var(--text-secondary); max-width: 52ch; margin: 0 auto; }
 
-    /* Sketch spread (placeholder for the scan). */
+    .component-principles { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+    .component-principles li { position: relative; padding-left: 24px; }
+    .component-principles li::before { content: ''; position: absolute; left: 0; top: .65em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-orange); }
+
+    /* Sketch spread: only two short annotations; explanations live above it. */
     .paper { padding: clamp(16px, 3vw, 28px); border-radius: 6px; background: #f6f5f0; box-shadow: 0 1px 2px rgba(40, 40, 90, 0.18), 0 8px 22px rgba(40, 40, 90, 0.1); display: flex; flex-direction: column; gap: 12px; }
     .paper .band-head { margin-bottom: 4px; }
     .paper svg { width: 100%; height: auto; display: block; }
@@ -3053,20 +3057,32 @@
         <blockquote><p data-i18n="n-quote-3">„Der Look passte nicht zu den Funktionen der App.“</p><cite data-i18n="n-quote-src-oct">Feedback aus der Begleitgruppe · sinngemäß</cite></blockquote>
       </div>
       <p class="big-statement" data-i18n="n-nopurpose">Der Look erschwerte die Bedienung.</p>
-      <p class="guide-text" data-i18n-html="pivot-1">Die erste Version hatte eine <b class="kw">Taskleiste, abgeschrägte Ränder und Pixelschrift im doppelten Pixelmaßstab</b>.</p>
-      <p class="guide-text" data-i18n-html="pivot-3">Ich habe die Oberfläche daraufhin neu gestaltet. Mit <b class="kw">SkeuKit</b> erhalten die Bedienelemente ihre Tiefe durch Licht und Schatten. Erhabene Knöpfe und vertiefte Eingabefelder sollen ihre Funktion schon durch die Form erkennen lassen.</p>
-      <p class="guide-text" data-i18n-html="icons-text">Die <b class="kw">Pixelschrift</b> ist als optionale Retro-Einstellung geblieben. Wer möchte, wechselt zur modernen Schrift. Aufgabentexte bleiben in der Systemschrift, damit der Retro-Look ihre Lesbarkeit nicht beeinträchtigt.</p>
-      <p class="guide-text" data-i18n-html="n-rules-sub">Die neue Oberfläche soll erkennen lassen, wo man drücken, schreiben oder auswählen kann. Dafür verwende ich <b class="kw">drei wiederkehrende Formen</b>. Ihre Höhe gegenüber der Grundfläche kennzeichnet ihre Funktion.</p>
+      <p class="guide-text" data-i18n-html="pivot-1">Für die nächste Version hatte ich ein klares Ziel: eine <b class="kw">durchdachte, intuitive Gestaltung</b>.</p>
+      <p class="guide-text" data-i18n-html="pivot-3">Ich habe mit verschiedenen Formen experimentiert, um eine klare Hierarchie zwischen den Bedienelementen zu schaffen. Jede Form folgt einer festen Regel:</p>
+      <ul class="guide-text component-principles">
+        <li data-i18n-html="n-form-input"><b class="kw">Eingabefelder sind vertieft.</b> Eine Mulde zeigt, wo du Text eingeben kannst.</li>
+        <li data-i18n-html="n-form-button"><b class="kw">Knöpfe sind erhaben.</b> Ihre Form ragt wie eine Blase aus der Oberfläche und lädt zum Drücken ein, wie ein echter Knopf.</li>
+        <li data-i18n-html="n-form-toggle"><b class="kw">Umschalter verbinden beide Formen.</b> Eine erhabene Blase sitzt in einer Mulde. Drückst du die andere Option, wechselt der Zustand und die Blase wandert dorthin.</li>
+      </ul>
       <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="s-rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs></svg>
       <h3 class="feature-title cs-h3" data-i18n="n-side-title">Die Formen im Querschnitt</h3>
-      <p class="guide-text" data-i18n="n-side-intro">Im Querschnitt wird sichtbar, wie die Formen aufgebaut sind. Die Grundfläche dient als Bezugspunkt: Knöpfe liegen darüber, Eingabefelder darin.</p>
       <!-- Paper-sketch slot: swap the three SVGs for the scan
            (/images/to.morrow/seitenansicht-skizze.webp) once Lucas has drawn it. -->
       <div class="paper">
-        <div class="band-head"><p class="band-title" style="color:#1d1d1f;" data-i18n="n-side-sheet">Alle Elemente folgen derselben Lichtquelle oben links. Lichtkanten und Schatten machen ihre Höhe gegenüber der Grundfläche sichtbar.</p></div>
         <div class="side-grid">
-        <figure class="side" style="margin:0;">
-          <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <figure class="side" style="margin:0;">
+            <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <g filter="url(#s-rough)">
+              <path class="s-slab s-ink" d="M16 200H78C78 200 86 272 150 272C214 272 222 200 222 200H284V300H16Z"/>
+              <path class="s-sh" d="M82 210C92 252 114 268 148 270"/>
+              <path class="s-hi" d="M152 270C190 268 212 246 220 208"/>
+              <path class="s-thin" d="M118 238h14M140 238h24M172 238h10"/><path class="s-thin" d="M188 230v16"/>
+            </g>
+            <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="22" y="28" data-i18n="n-s-light">Licht</text>
+          </svg>
+          </figure>
+          <figure class="side" style="margin:0;">
+            <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs><linearGradient id="s-fade" x1="0" x2="1"><stop offset="0" stop-color="#2b2b30" stop-opacity=".28"/><stop offset="1" stop-color="#2b2b30" stop-opacity="0"/></linearGradient></defs>
             <g filter="url(#s-rough)">
               <path class="s-slab s-ink" d="M16 200H78C78 200 86 128 150 128C214 128 222 200 222 200H284V276H16Z"/>
@@ -3075,28 +3091,11 @@
               <path class="s-sh" d="M200 142C214 156 220 182 221 198"/>
               <path class="s-thin" d="M150 80v30M141 102l9 10 9-10"/>
             </g>
-            <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="22" y="28" data-i18n="n-s-light">Licht</text><text x="22" y="194" data-i18n="n-s-surface">Fläche</text><text x="158" y="76" data-i18n="n-s-press">drücken</text>
+            <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g>
           </svg>
-          <h4 data-i18n="n-sd1">Blase</h4>
-          <span class="tag" data-i18n="n-sd1g">erhaben · drücken</span>
-          <p data-i18n="n-sd1t">Die Blase ragt aus der Fläche. Ihr oberer linker Rand fängt Licht auf, der Schatten fällt nach rechts unten. Beim Drücken sinkt sie ab und bestätigt die Aktion.</p>
-        </figure>
-<figure class="side" style="margin:0;">
-          <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <g filter="url(#s-rough)">
-              <path class="s-slab s-ink" d="M16 200H78C78 200 86 272 150 272C214 272 222 200 222 200H284V300H16Z"/>
-              <path class="s-sh" d="M82 210C92 252 114 268 148 270"/>
-              <path class="s-hi" d="M152 270C190 268 212 246 220 208"/>
-              <path class="s-thin" d="M118 238h14M140 238h24M172 238h10"/><path class="s-thin" d="M188 230v16"/>
-            </g>
-            <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="22" y="28" data-i18n="n-s-light">Licht</text><text x="22" y="194" data-i18n="n-s-surface">Fläche</text>
-          </svg>
-          <h4 data-i18n="n-sd2">Mulde</h4>
-          <span class="tag" data-i18n="n-sd2g">vertieft · Text eingeben</span>
-          <p data-i18n="n-sd2t">Die Mulde liegt in der Fläche. Ihr oberer Rand liegt im Schatten, der untere fängt Licht auf. Der Schatten liegt innen. Diese Form kennzeichnet ein Feld für Texteingaben.</p>
-        </figure>
-<figure class="side" style="margin:0;">
-          <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          </figure>
+          <figure class="side" style="margin:0;">
+            <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g filter="url(#s-rough)">
               <path class="s-slab s-ink" d="M16 200H34C34 200 40 272 76 272H224C260 272 266 200 266 200H284V300H16Z"/>
               <path class="s-sh" d="M38 210C44 252 56 268 76 270"/>
@@ -3106,12 +3105,9 @@
               <path class="s-dash" d="M160 272C160 272 168 230 200 230C232 230 240 272 240 272"/>
               <path class="s-thin" d="M112 212C140 194 172 194 198 212M188 204l11 8-12 4"/>
             </g>
-            <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="22" y="28" data-i18n="n-s-light">Licht</text><text x="22" y="194" data-i18n="n-s-surface">Fläche</text><text x="136" y="186" data-i18n="n-s-slide">gleitet</text>
+            <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="136" y="186" data-i18n="n-s-slide">gleitet</text>
           </svg>
-          <h4 data-i18n="n-sd3">Umschalter</h4>
-          <span class="tag" data-i18n="n-sd3g">Blase in Mulde · auswählen</span>
-          <p data-i18n="n-sd3t">Die Mulde gruppiert die Optionen, die Blase markiert die aktuelle Auswahl. Tippst du eine andere Option an, gleitet die Blase dorthin.</p>
-        </figure>
+          </figure>
         </div>
       </div>
       <!-- Three equal-size primitives across the full content width, followed by their shared explanation.
@@ -3162,12 +3158,12 @@
               </div>
             </div>
           </div>
-          <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">In der <b class="kw">Mulde</b> erscheint der eingegebene Text. Der <b class="kw">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class="kw">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.</p>
+          <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">Die Animationen zeigen diese Regeln in Anwendung: Text eingeben, einen Knopf drücken und zwischen zwei Zuständen wechseln.</p>
         </div>
       </div>
 
 
-      <p class="guide-text" data-i18n-html="n-a11y-short"><b class="kw">Barrierefreiheit</b>: Die Schrift folgt der iOS-Schriftgröße über Dynamic Type bis zur größten Stufe AX5. Bedienelemente wachsen halb so schnell, damit mehr Inhalt sichtbar bleibt. Mit VoiceOver lassen sich Aufgaben bearbeiten, umsortieren und Fotos öffnen. „Bewegung reduzieren“ stoppt alle Daueranimationen. Jedes Touch-Ziel ist mindestens 44 pt groß.</p>
+      <p class="guide-text" data-i18n-html="n-a11y-short">Die Bedienelemente unterstützen größere Schrift über <b class="kw">Dynamic Type</b> und Aufgabenaktionen über VoiceOver. Touch-Ziele sind mindestens 44 pt groß. „Bewegung reduzieren“ stoppt die Daueranimationen.</p>
     </div>
 
     
@@ -3390,10 +3386,9 @@
         'f3-text': "If you need them, you can create <b class=\"kw\">workspaces</b> such as personal or work, and the app only shows the active one. Beyond that there's what a list needs and nothing more: reordering, deleting, attaching photos and marking places on them, and flagging important tasks <b class=\"kw\">in red</b>.",
         'f4-title': 'Settings',
         'f4-text': "Settings are short: four themes in light and dark, retro or system type, and tabs you can rename. There's also a switch for the <b class=\"kw\">time sync</b>, in case you don't want Tomorrow to become Today overnight.",
-        "pivot-1": "The first version had a <b class=\"kw\">taskbar, bevelled edges and pixel type at double pixel scale</b>.",
+        "pivot-1": "For the next iteration, I had a clear goal: make the design <b class=\"kw\">intentional and intuitive</b> above all else.",
         'pivot-2': "As more people used the app through TestFlight, it became clear that the design was an <b class=\"kw\">obstacle</b>. It was unintuitive and took getting used to, which is the last thing an app you want to spend little time in can afford.",
-        'pivot-3': "I redesigned the interface. In <b class=\"kw\">SkeuKit</b>, light and shadow give controls their depth. Raised buttons and recessed fields are intended to suggest their function through their shape.",
-        'icons-text': "<b class=\"kw\">Pixel type</b> remains as an optional Retro setting, with a modern typeface available instead. Task text stays in the system font to keep it readable whichever style is selected.",
+        "pivot-3": "I experimented with different shapes to give the components a clear hierarchy. Each shape follows one consistent rule:",
         'icons-text-2': "What's left is two styles meeting: curves, glass bubbles, raised edges and recessed panels on one side, <b class=\"kw\">pixel type and pixel icons</b> on the other. The typeface is W95FA by Alina Sava (SIL Open Font License).",
         'dna-title': "How the elements respond",
         'dna-intro': "SkeuKit is made of <b class=\"kw\">three shapes</b>, and each one has a single meaning. Once you've learned the three, every new view of the app explains itself.",
@@ -3437,9 +3432,8 @@
         'f4-text': "Die Einstellungen sind kurz: vier Themes in Hell und Dunkel, Retro- oder Systemschrift und Tabs, die du umbenennen kannst. Dazu kommt ein Schalter für die <b class=\"kw\">Zeitsynchronisation</b>, falls Morgen nicht über Nacht zu Heute werden soll.",
 
         'section-design': 'Design-Prozess',
-        "pivot-1": "Die erste Version hatte eine <b class=\"kw\">Taskleiste, abgeschrägte Ränder und Pixelschrift im doppelten Pixelmaßstab</b>.",
+        "pivot-1": "Für die nächste Version hatte ich ein klares Ziel: eine <b class=\"kw\">durchdachte, intuitive Gestaltung</b>.",
         'pivot-2': "Als immer mehr Leute die App über TestFlight nutzten, wurde klar, dass das Design eine <b class=\"kw\">Hürde</b> war. Es war unintuitiv und gewöhnungsbedürftig, und genau das darf eine App, in der man wenig Zeit verbringen will, nicht sein.",
-        'icons-text': "Die <b class=\"kw\">Pixelschrift</b> ist als optionale Retro-Einstellung geblieben. Wer möchte, wechselt zur modernen Schrift. Aufgabentexte bleiben in der Systemschrift, damit der Retro-Look ihre Lesbarkeit nicht beeinträchtigt.",
         'icons-text-2': "Übrig bleiben zwei Stile, die aufeinandertreffen: Wölbungen, Glasblasen, erhabene Kanten und vertiefte Flächen auf der einen Seite, <b class=\"kw\">Pixelschrift und Pixel-Icons</b> auf der anderen. Die Schrift ist W95FA von Alina Sava (SIL Open Font License).",
         'dna-title': "So reagieren die Elemente",
         'color-title': 'Nicht nur Grau',
@@ -3450,17 +3444,20 @@
         'conclusion-3': "Drittens hieß es, bei etwas so <b class=\"kw\">Alltäglichem wie einer To-do-Liste</b> genau hinzuschauen, was andere Apps für selbstverständlich halten, etwa für jedes Verschieben eine Datumsauswahl zu öffnen.",
         'color-text': "Die meisten To-do-Apps sind grau. Ich wollte, dass man sich die Farben selbst aussuchen kann: sechs Themen, vier <b class=\"kw\">blasse Pastelltöne</b> in Hell und zwei dunkle Varianten. Sie bleiben zurückhaltend, damit die Farbe einen Akzent setzt, ohne beim Lesen zu stören.",
         'nav-prev': '<< ZURÜCK', 'nav-next': 'WEITER >>',
-        'pivot-3': "Ich habe die Oberfläche daraufhin neu gestaltet. Mit <b class=\"kw\">SkeuKit</b> erhalten die Bedienelemente ihre Tiefe durch Licht und Schatten. Erhabene Knöpfe und vertiefte Eingabefelder sollen ihre Funktion schon durch die Form erkennen lassen.",
+        "pivot-3": "Ich habe mit verschiedenen Formen experimentiert, um eine klare Hierarchie zwischen den Bedienelementen zu schaffen. Jede Form folgt einer festen Regel:",
         'conclusion-4': "Als Nächstes kommen <b class=\"kw\">Widgets</b>, damit die Heute-Liste auf dem Homescreen liegt und du Aufgaben abhaken und verschieben kannst, ohne die App zu öffnen. Danach eine <b class=\"kw\">Desktop-Version</b> mit Tastatur und Platz für eine Wochenansicht. Beides ist für Version zwei geplant.",
 
         /* No '@m' mobile twins any more (2026-10-08), see the English block. */
       }
     };
     Object.assign(TRANSLATIONS.en, {
+      "n-form-toggle": "<b class=\"kw\">Toggles combine both shapes.</b> A raised bubble sits in a recess. Press the other option to switch states and move the bubble.",
+      "n-form-button": "<b class=\"kw\">Buttons are raised.</b> Their bubble-like shape suggests something you can press, like a physical button.",
+      "n-form-input": "<b class=\"kw\">Inputs are recessed.</b> An indentation marks the place where you can enter text.",
       "n-ds-1": "My love of old tech gave me the idea to design the app in a Windows 95 style. I thought its harsh, blocky look would make an interesting contrast with fluid animations and responsive controls.",
       "n-ds-2": "Early user feedback made me rethink the design. Some enjoyed the retro look at first, but it made the overall experience less pleasant and intuitive.",
-  "dna-forms": "Entered text appears in the <b class=\"kw\">trough</b>. The <b class=\"kw\">Live switch</b> gives under pressure and changes state. In the <b class=\"kw\">segmented control</b>, the raised surface moves with the selection.",
-  "n-a11y-short": "<b class=\"kw\">Accessibility</b>: text follows the iOS text size through Dynamic Type, up to the largest setting, AX5. Controls grow at half the rate to leave more room for content. VoiceOver provides actions to edit and reorder tasks and open photos. Reduce Motion stops every looping animation. Each touch target is at least 44 pt.",
+  "dna-forms": "The animations show these rules in use: entering text, pressing a button and switching between two states.",
+  "n-a11y-short": "The same controls support larger text through <b class=\"kw\">Dynamic Type</b> and task actions through VoiceOver. Touch targets are at least 44 pt, and Reduce Motion stops looping animations.",
   "n-ov-lead": "to.morrow is an iOS task app with three lists: Today, Tomorrow and Soon. A swipe moves a task between lists. One selected task stays visible on the Lock Screen and in the Dynamic Island.",
   "n-taps-title": "Moving one task to tomorrow",
   "n-tag-ex": "Example values",
@@ -3489,24 +3486,10 @@
   "n-cmp-cap": "The same view in both builds. The function stayed the same, the interface did not.",
   "n-sec-pivot": "The pivot",
   "n-s-light": "Light",
-  "n-s-surface": "surface",
-  "n-s-press": "press",
   "n-s-slide": "slides",
-  "n-sd1": "Bubble",
-  "n-sd1g": "raised · press",
-  "n-sd1t": "The bubble rises above the surface. Its top-left edge catches the light and its shadow falls to the lower right. It sinks when pressed, giving feedback on the action.",
-  "n-sd2": "Trough",
-  "n-sd2g": "recessed · enter text",
-  "n-sd2t": "The trough is recessed into the surface. Its upper edge is shaded, its lower edge catches the light, and the shadow sits inside it. This shape marks a text input field.",
-  "n-sd3": "Segmented control",
-  "n-sd3g": "bubble in trough · choose",
-  "n-sd3t": "The trough groups the options and the bubble marks the current selection. Tap another option and the bubble slides across to it.",
   "n-side-title": "The shapes in cross-section",
-  "n-side-intro": "The cross-section shows how the shapes are built. The surface is the reference point: buttons sit above it and input fields are recessed into it.",
-  "n-side-sheet": "Every element follows the same light source at the top left. Highlights and shadows show its height relative to the surface.",
   "n-sec-rules": "The design system",
   "n-nopurpose": "The look made the app harder to use.",
-  "n-rules-sub": "The new interface is intended to show where you can press, type or choose an option. I use <b class=\"kw\">three recurring shapes</b>, with their height relative to the surface indicating their function.",
   "n-c3": "For this app, the deciding question was <b class=\"kw\">how quickly someone could get back to the actual task</b>. That guided the swipe gesture and the Live view.",
   "n-sec-result": "Results and next steps",
   "n-learn": "What I learned",
@@ -3529,10 +3512,13 @@
   "n-fact-interviews-src": "One shared user and interview group"
 });
     Object.assign(TRANSLATIONS.de, {
+      "n-form-toggle": "<b class=\"kw\">Umschalter verbinden beide Formen.</b> Eine erhabene Blase sitzt in einer Mulde. Drückst du die andere Option, wechselt der Zustand und die Blase wandert dorthin.",
+      "n-form-button": "<b class=\"kw\">Knöpfe sind erhaben.</b> Ihre Form ragt wie eine Blase aus der Oberfläche und lädt zum Drücken ein, wie ein echter Knopf.",
+      "n-form-input": "<b class=\"kw\">Eingabefelder sind vertieft.</b> Eine Mulde zeigt, wo du Text eingeben kannst.",
       "n-ds-1": "Meine Begeisterung für alte Technik brachte mich auf die Idee, die App im Stil von Windows 95 zu gestalten. Die kantige Optik zusammen mit flüssigen Animationen und schnellen Reaktionen auf Eingaben fand ich spannend.",
       "n-ds-2": "Das erste Nutzerfeedback brachte mich dazu, den Entwurf zu überdenken. Einige hatten anfangs Spaß am Retro-Look. Insgesamt machte er die App aber weniger angenehm und intuitiv bedienbar.",
-  "dna-forms": "In der <b class=\"kw\">Mulde</b> erscheint der eingegebene Text. Der <b class=\"kw\">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class=\"kw\">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.",
-  "n-a11y-short": "<b class=\"kw\">Barrierefreiheit</b>: Die Schrift folgt der iOS-Schriftgröße über Dynamic Type bis zur größten Stufe AX5. Bedienelemente wachsen halb so schnell, damit mehr Inhalt sichtbar bleibt. Mit VoiceOver lassen sich Aufgaben bearbeiten, umsortieren und Fotos öffnen. „Bewegung reduzieren“ stoppt alle Daueranimationen. Jedes Touch-Ziel ist mindestens 44 pt groß.",
+  "dna-forms": "Die Animationen zeigen diese Regeln in Anwendung: Text eingeben, einen Knopf drücken und zwischen zwei Zuständen wechseln.",
+  "n-a11y-short": "Die Bedienelemente unterstützen größere Schrift über <b class=\"kw\">Dynamic Type</b> und Aufgabenaktionen über VoiceOver. Touch-Ziele sind mindestens 44 pt groß. „Bewegung reduzieren“ stoppt die Daueranimationen.",
   "n-ov-lead": "to.morrow ist eine iOS-App zum Planen mit drei Listen: Heute, Morgen und Bald. Ein Wisch verschiebt eine Aufgabe zwischen den Listen. Eine ausgewählte Aufgabe bleibt auf dem Sperrbildschirm und in der Dynamic Island sichtbar.",
   "n-taps-title": "Eine Aufgabe auf morgen verschieben",
   "n-tag-ex": "Beispielwerte",
@@ -3561,24 +3547,10 @@
   "n-cmp-cap": "Dieselbe Ansicht in beiden Builds. Die Funktion ist gleich geblieben, die Oberfläche nicht.",
   "n-sec-pivot": "Der Pivot",
   "n-s-light": "Licht",
-  "n-s-surface": "Fläche",
-  "n-s-press": "drücken",
   "n-s-slide": "gleitet",
-  "n-sd1": "Blase",
-  "n-sd1g": "erhaben · drücken",
-  "n-sd1t": "Die Blase ragt aus der Fläche. Ihr oberer linker Rand fängt Licht auf, der Schatten fällt nach rechts unten. Beim Drücken sinkt sie ab und bestätigt die Aktion.",
-  "n-sd2": "Mulde",
-  "n-sd2g": "vertieft · Text eingeben",
-  "n-sd2t": "Die Mulde liegt in der Fläche. Ihr oberer Rand liegt im Schatten, der untere fängt Licht auf. Der Schatten liegt innen. Diese Form kennzeichnet ein Feld für Texteingaben.",
-  "n-sd3": "Umschalter",
-  "n-sd3g": "Blase in Mulde · auswählen",
-  "n-sd3t": "Die Mulde gruppiert die Optionen, die Blase markiert die aktuelle Auswahl. Tippst du eine andere Option an, gleitet die Blase dorthin.",
   "n-side-title": "Die Formen im Querschnitt",
-  "n-side-intro": "Im Querschnitt wird sichtbar, wie die Formen aufgebaut sind. Die Grundfläche dient als Bezugspunkt: Knöpfe liegen darüber, Eingabefelder darin.",
-  "n-side-sheet": "Alle Elemente folgen derselben Lichtquelle oben links. Lichtkanten und Schatten machen ihre Höhe gegenüber der Grundfläche sichtbar.",
   "n-sec-rules": "Das Designsystem",
   "n-nopurpose": "Der Look erschwerte die Bedienung.",
-  "n-rules-sub": "Die neue Oberfläche soll erkennen lassen, wo man drücken, schreiben oder auswählen kann. Dafür verwende ich <b class=\"kw\">drei wiederkehrende Formen</b>. Ihre Höhe gegenüber der Grundfläche kennzeichnet ihre Funktion.",
   "n-c3": "Für diese App war die Frage entscheidend, <b class=\"kw\">wie schnell man wieder bei der eigentlichen Aufgabe ist</b>. Daran habe ich die Wischgeste und den Live-Bereich ausgerichtet.",
   "n-sec-result": "Ergebnis und Ausblick",
   "n-learn": "Was ich gelernt habe",

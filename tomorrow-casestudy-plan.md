@@ -276,6 +276,20 @@ stehenden Auftrag mit „just leave it out“ geklärt: die beiden einleitenden
 Designsystem-Absätze samt Sprachschlüsseln entfallen. 127 aktive Sprachschlüssel,
 Skriptprüfung und Build bestanden; keine Browser-Gesamtprüfung in diesem Abgleich.
 
+## Designsystem-Kapitel neu gefasst · 2026-10-26
+
+Der Abschnitt unter der Windows-Schlussaussage bis zum Ergebnis-Kapitel ist in DE
+und EN neu gegliedert: Ziel einer durchdachten, intuitiven Gestaltung → Experimente
+mit Formen → drei blaue Listenpunkte für Eingabe-Mulde, erhabenen Knopf und die
+Kombination zum Umschalten. Die Erklärungen stehen außerhalb der Skizzenfläche.
+Auf dem Blatt bleiben nur die zwei kurzen Notizen „Licht“ und „gleitet“; lange
+Überschriften, Tags und Absätze innerhalb des Blatts entfallen. Skizzen und Demos
+verwenden jetzt dieselbe Reihenfolge: Eingabe, Knopf, Umschalter. Die bisherigen
+15:16-Proportionen gelten weiter auf allen Bildschirmgrößen. Demo-Beschreibung und
+Barrierefreiheitsabsatz sind kürzer gefasst. Sprachwechsel, Bewegungslogik, SVG-
+Notizumfang und Build geprüft; das vereinfachte Blatt als SVG gerendert und visuell
+geprüft. Keine Browser-Gesamtprüfung.
+
 ## 0. What the interview established
 
 | Topic | Answer |
