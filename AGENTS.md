@@ -65,6 +65,8 @@ When resuming work in a new session:
 | `public/about2d.html` | About page |
 | `public/contact2d.html` | Contact page |
 | `public/unify2d.html` | Project page — Unify (01) |
+| `public/to.morrow2d.html` | Published to.morrow case study — promoted from `to.morrow2d2.html` on 2026-10-26; wireflow generator targets this file |
+| `public/to.morrow2d2.html` | Previous to.morrow page, now an unlinked `noindex` archive |
 | `public/virtual_cooking2d.html` | Project page — Virtual Cooking (02) |
 | `public/kaffeemaschine2d.html` | Project page — Cybercoffee (03) |
 | `public/mac-lamp2d.html` | Project page — Mac-Lamp (04) |

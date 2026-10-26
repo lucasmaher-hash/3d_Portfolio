@@ -1,7 +1,7 @@
 """Regenerate only the two explanatory SVG wireflows and their language overrides."""
 from pathlib import Path
 import re, json, html
-PAGE = Path(__file__).resolve().parents[1] / 'public/to.morrow2d2.html'
+PAGE = Path(__file__).resolve().parents[1] / 'public/to.morrow2d.html'
 TR = {'de': {}, 'en': {}}
 ACC = 'var(--wire-accent, #607D9E)'
 def bind(k, de, en):
