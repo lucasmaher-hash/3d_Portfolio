@@ -16,6 +16,7 @@ import React from 'react';
 import {AbsoluteFill, Easing, Img, interpolate, spring, staticFile, useCurrentFrame} from 'remotion';
 import {blueHex, BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, LiveGlyph, mix, Pal, Pixel, ROW, Trough, sf} from './ui';
 import {AddRow, KNOB, LiveBox, LiveControls, LockCard, TabBar, TaskRow, TopBar} from './app';
+import {createHeroTiming} from './heroTiming';
 
 /* ─────────────────────────────────────────────────────────────────────────
    to.morrow — 24 s promo loop, 1920x1080 @ 30 fps (720 frames).
@@ -1359,6 +1360,22 @@ const checkScreen = toScreen(toGlobal(PR_CX, ISL_CHECK[0], ISL_CHECK[1]), camAt(
 const E = {cut: E_CUT, hold: 60 + E_SETTLE, clock0: LIVE_CUT + 30, zoom: [8 + E_SETTLE, 56 + E_SETTLE] as [number, number]};
 export const DURATION_E = FLOOD.end - E.clock0 + E.cut + E.hold + 1;
 export const DURATION_F = DURATION_E + INS.len - INS_SKIP;
+// Map Live-scene cues back through both existing clocks to the film's clock.
+const LIVE_OFFSET = E.cut + E.hold - E.clock0 + INS.len - INS_SKIP;
+export const HERO_TIMING_16 = createHeroTiming(DURATION_F, [
+  [TYPE.start + sum(TYPE.gaps), BUILD.check],
+  [CAM_MOVE[1], M1.appear],
+  [M1.land, M2.down],
+  [M2.land, GZ],
+  [GOLIVE.tap + 4, GOLIVE.start],
+  [GOLIVE.fade[1], INS.at],
+  [INS.typeEnd, INS.delStart],
+  [E.cut + INS.len - INS_SKIP + 14, E.cut + INS.len - INS_SKIP + 12 + E_SETTLE],
+  [LTYPE_END + LIVE_OFFSET, GO + LIVE_OFFSET],
+  [ARRIVE + 28 + LIVE_OFFSET, UNLOCK + LIVE_OFFSET],
+  [ISL_IN + 44 + LIVE_OFFSET, ISL_TAP + LIVE_OFFSET],
+  [ISL_EXP + 24 + LIVE_OFFSET, TICK + LIVE_OFFSET],
+]);
 const eClock = (f0: number) => E.clock0 + Math.max(0, f0 - E.cut - E.hold);
 const LABEL_W = 52.9; // pt — "Go Live" in the ROW setting (SF Pro Text Regular 16.4pt, −0.05em); refit off the rendered cut
 /* The anchor: the left edge of the pill's label, in world px. */
@@ -1438,8 +1455,9 @@ const PromoE: React.FC<{variant: Variant; f0: number; ins?: boolean}> = ({varian
 const GOLIVE_CUT_D = GOLIVE.fade[1] + 43; // ~1.4 s alone on dark (Lucas)
 export const GOLIVE_HOLD = GOLIVE_CUT_D - LIVE_CUT; // D's Live section runs this much later
 export const DURATION = FLOOD.end + 2;
-export const Promo16: React.FC<{variant: Variant; transition?: Transition}> = ({variant, transition = 'line'}) => {
-  const f0 = useCurrentFrame();
+export const Promo16: React.FC<{variant: Variant; transition?: Transition; heroPace?: boolean}> = ({variant, transition = 'line', heroPace = false}) => {
+  const frame = useCurrentFrame();
+  const f0 = heroPace ? HERO_TIMING_16.frameAt(frame) : frame;
   if (transition === 'golive2' || transition === 'golive3') return <PromoE variant={variant} f0={f0} ins={transition === 'golive3'} />;
   const off = transition === 'golive' ? GOLIVE_HOLD : 0;
   const f = f0 - off; // the Live section's clock
@@ -1461,7 +1479,7 @@ export const Promo16: React.FC<{variant: Variant; transition?: Transition}> = ({
 /* Tall cut for the website hero (2026-10-08): the same film with EXT px of canvas
    above the frame, exactly like PromoTall in Promo.tsx. */
 export const EXT = 240; // video px; 1920 x 1320
-export const Promo16Tall: React.FC<{variant: Variant; transition?: Transition}> = (props) => (
+export const Promo16Tall: React.FC<{variant: Variant; transition?: Transition; heroPace?: boolean}> = (props) => (
   <ExtTop.Provider value={EXT}>
     <AbsoluteFill style={{background: LIGHT.canvas}}>
       <div style={{position: 'absolute', left: 0, top: EXT, width: W, height: H}}>

@@ -2,12 +2,13 @@ import React from 'react';
 import {Composition, continueRender, delayRender, staticFile} from 'remotion';
 import {Lab, LAB_BTN, LAB_H, LAB_W, LabBox, LabButtons} from './Lab';
 import {DURATION_E, DURATION_F, EXT, FPS, LabPhone, Promo, PromoTall} from './Promo';
-import {DURATION_F as DURATION_FV, EXT_V, PromoV, PromoVTall} from './PromoV';
+import {DURATION_F as DURATION_FV, EXT_V, HERO_TIMING_V, PromoV, PromoVTall} from './PromoV';
 import {TILE as UNIFY_TILE, UNIFY_DURATION, UNIFY_EXT, UnifyPromo, UnifyPromoTall, UnifyPromoTile} from './unify/UnifyPromo';
 import {UnifyLab} from './unify/Lab';
 import {UnifyVoice, UnifyVoiceTall, VOICE_DURATION} from './unify/UnifyVoice';
 import {UNIFY_EXT_V, UnifyPromoV, UnifyPromoVTall, VH as UNIFY_VH, VW as UNIFY_VW} from './unify/UnifyPromoV';
-import {DURATION_F as DURATION_F16, Promo16} from './Promo16';
+import {DURATION_F as DURATION_F16, EXT as EXT16, HERO_TIMING_16, Promo16, Promo16Tall} from './Promo16';
+import {HERO_FPS} from './heroTiming';
 import './sk.css';
 
 /* W95FA (Alina Sava, SIL OFL 1.1) — the app's chrome face. Block rendering
@@ -42,6 +43,8 @@ nunito
 
 export const RemotionRoot: React.FC = () => (
   <>
+    <Composition id="TomorrowHeroV2" component={Promo16Tall} durationInFrames={HERO_TIMING_16.durationInFrames} fps={HERO_FPS} width={1920} height={1080 + EXT16} defaultProps={{variant: 'A' as const, transition: 'golive3' as const, heroPace: true}} />
+    <Composition id="TomorrowHeroMobileV2" component={PromoVTall} durationInFrames={HERO_TIMING_V.durationInFrames} fps={HERO_FPS} width={1080} height={1350 + EXT_V} defaultProps={{variant: 'A' as const, transition: 'golive3' as const, heroPace: true}} />
     {/* ── Unify promo ── */}
     <Composition id="UnifyPromo" component={UnifyPromo} durationInFrames={UNIFY_DURATION} fps={30} width={1920} height={1080} />
     <Composition id="UnifyVoice" component={UnifyVoice} durationInFrames={VOICE_DURATION} fps={30} width={1920} height={1080} defaultProps={{music: 'unify/music/poptrack03.mp3'}} />
