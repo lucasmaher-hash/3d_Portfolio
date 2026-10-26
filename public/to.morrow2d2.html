@@ -874,7 +874,8 @@
     .ip-shot { position: relative; flex: none; width: var(--P); aspect-ratio: 876 / 1808; }
     .ip-screen { position: absolute; left: 3.8813%; top: 1.5487%; width: 92.2374%; height: 96.9027%; overflow: hidden; border-radius: 16.0891% / 7.4201%; background: #000; }
     .ip-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: block; transition: opacity 0.6s ease; }
-    .trio-band { cursor: pointer; }
+    .trio-band { cursor: pointer; position: relative; }
+    .trio-fx { position: absolute; left: -40px; top: -60px; width: calc(100% + 80px); height: calc(100% + 140px); pointer-events: none; z-index: 5; }
     /* The Live band restarts as a whole on a click, and the whole frame (not the single screens) gives the press. */
     .trio-band { transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
     .trio-band.is-pressed { transform: scale(1.012); transition-duration: 110ms; }
@@ -4516,45 +4517,94 @@
 })();
 </script>
 <script>
-// The three Live recordings run on one timeline, all locked to video 1's clock:
-//  1 starts; as its keyboard folds away (KB_DOWN) the task appears on the lock screen in 2 (which starts V2_AT, half a second earlier);
-//  GAP23 later 3 starts (the app slides into the Dynamic Island, stays open for a moment, closes);
-//  at that closing the task is ticked off everywhere in the same moment: 2 drops it away, 1 switches Live off.
-//  Video 1's live button breathes every 2 s; the offsets below are chosen so that its switch-off (13.4 s) lands exactly on the island's closing.
-//  Everything that has started stays sharp until the loop restarts.
+// The three Live recordings, linked by a travelling pixel dot (the Live ring from the hero film):
+//  1 goes live -> the dot flies (arc below) to 2 -> the task appears on the lock screen
+//  2 -> the dot flies (arc below) to 3 -> the app sits on the home screen, the island opens
+//  the tick in 3 is pressed -> the dot flies back (arc over the top) to 2 -> 2 is pressed and drops the task
+//  2's press -> the dot flies on (over the top) to 1 -> 1 switches Live off.
+//  Each step only happens once the dot has arrived. The previous, all-in-unison version is kept in to.morrow2d2-unison.html.
 (function () {
   var vids = Array.prototype.slice.call(document.querySelectorAll('video[data-seq]'));
   if (vids.length < 3) return;
   var v1 = vids[0], v2 = vids[1], v3 = vids[2];
   var shots = vids.map(function (v) { return v.closest('.ip-shot'); });
+  var screens = shots.map(function (s) { return s.querySelector('.ip-screen'); });
   var nums = Array.prototype.slice.call(document.querySelectorAll('.trio-nums:not(.trio-caps) .trio-num'));
-  var KB_DOWN = 4.35;              // video 1: the keyboard folds away
-  var V2_AT = 3.95;                // video 1 clock: video 2 starts here, so that its task appears (0.5 s into the clip) just as the keyboard folds
-  var GAP23 = 1.78;                // video 1 clock: from the keyboard to the start of video 3 (the island then rests closed for 1.4 s before it opens; all three clicks start at 3.30 s of video 3)
-  var SKIP1 = 4.0;                 // two breaths of the live button skipped at video 3's start, so that its switch-off meets the island closing
-  var CLOSE3 = 3.74;               // video 3: the island starts to close (closed rest 1.4 s, opening slowed by 20 %, tick click before the close)
-  var HOLD2 = 1.60, LEAD2 = 0.44;  // video 2 waits here; its press starts LEAD2 s before the island closes, i.e. together with the tick click in video 3 and Live's switch-off in video 1
-  var on = false, raf = 0, timer = 0, s2 = false, s3 = false, ticked = false, restarting = false;
+  var band = v1.closest('.trio-band') || v1, busy = false;
+  // anchors, as fractions of each screen
+  var A_LIVE1 = [0, 0.377, 0.673], A_CARD2 = [1, 0.36, 0.80], A_CHECK2 = [1, 0.847, 0.80], A_ISL3 = [2, 0.50, 0.035], A_TICK3 = [2, 0.871, 0.0746];
+  var GO1 = 4.45;                  // video 1: Go is tapped, the task goes live
+  var LEAD2 = 0.27;                // video 2 starts this long before the dot lands (its task appears 0.27 s in)
+  var HOLD2 = 1.60, WAIT2 = 0.35;  // video 2 waits here; the dot leaves for video 3 a moment after the task has appeared
+  var CLICK3 = 3.30;               // video 3: the tick is pressed
+  var LOOP_A = 5.4, LOOP_B = 13.4, PERIOD = 2.0, OFF1 = 13.44;   // video 1: breathing live button, switch-off
+  var FLY = 1.0;
+  var on = false, raf = 0, timer = 0, step = 0, released = false, restarting = false, flights = [], t2 = 0;
+  var canvas = document.createElement('canvas'); canvas.className = 'trio-fx'; canvas.setAttribute('aria-hidden', 'true');
+  band.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+  var INK = '#5d7ea9';
+  var LIVE = (function () { var c = []; for (var y = 0; y <= 10; y++) for (var x = 0; x <= 10; x++) { var d = Math.hypot(x - 5, y - 5); if ((d > 3.6 && d < 5.2) || d < 1.6) c.push([x, y]); } return c; })();
   function fill(k, f) { var el = nums[k]; if (!el) return; el.style.setProperty('--f', Math.max(0, Math.min(1, f)).toFixed(4)); el.classList.toggle('is-full', f >= 1); }
   function pop(k) { var el = nums[k]; if (!el) return; el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
   function play(v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
   function live(k) { shots[k].classList.add('is-live'); }
+  function pt(a) { var r = screens[a[0]].getBoundingClientRect(), c = canvas.getBoundingClientRect(); return [r.left - c.left + r.width * a[1], r.top - c.top + r.height * a[2]]; }
+  var easeIO = function (x) { return 0.5 - 0.5 * Math.cos(Math.PI * x); };
+  function fly(from, to, dir, dur, onArrive, line) { flights.push({ from: from, to: to, dir: dir, t0: performance.now(), dur: dur * 1000, done: false, onArrive: onArrive, line: line }); }
+  function bez(P0, P1, P2, t) { var u = 1 - t; return [u * u * P0[0] + 2 * u * t * P1[0] + t * t * P2[0], u * u * P0[1] + 2 * u * t * P1[1] + t * t * P2[1]]; }
+  function draw(now) {
+    var dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight;
+    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+    var CELL = 4, FADE = 530;
+    flights = flights.filter(function (F) { return now - F.t0 < F.dur + 1100; });
+    flights.forEach(function (F) {
+      var P0 = pt(F.from), P2 = pt(F.to), span = Math.abs(P2[0] - P0[0]);
+      var P1 = [(P0[0] + P2[0]) / 2, F.dir < 0 ? Math.min(P0[1], P2[1]) - span * 0.55 : Math.max(P0[1], P2[1]) + span * 0.45];
+      var k = Math.max(0, Math.min(1, (now - F.t0) / F.dur)), tNow = easeIO(k);
+      if (F.line != null) fill(F.line, k);
+      ctx.fillStyle = INK;
+      for (var i = 1; i < 46; i++) {                                // trail of pixel cells, each fading after it is laid
+        var ti = i / 46; if (ti > tNow) break;
+        var laid = F.t0 + F.dur * (Math.acos(1 - 2 * ti) / Math.PI);
+        var op = 1 - (now - laid) / FADE; if (op <= 0) continue;
+        var q = bez(P0, P1, P2, ti);
+        ctx.globalAlpha = op * 0.85;
+        ctx.fillRect(Math.round(q[0] / CELL) * CELL - CELL / 2, Math.round(q[1] / CELL) * CELL - CELL / 2, CELL, CELL);
+      }
+      [[P0, F.t0, 3], [P2, F.t0 + F.dur, 2]].forEach(function (R) {    // ripples where it leaves and where it lands
+        for (var j = 0; j < R[2]; j++) {
+          var t = (now - R[1] - j * 170) / 870; if (t < 0 || t > 1) continue;
+          var r = 7 + (R[2] === 3 ? 40 : 62) * (1 - Math.pow(1 - t, 3));
+          ctx.globalAlpha = (1 - t) * 0.5; ctx.strokeStyle = INK; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(R[0][0], R[0][1], r, 0, Math.PI * 2); ctx.stroke();
+        }
+      });
+      if (k < 1) {                                                 // the head: the Live ring in pixels
+        var hp = bez(P0, P1, P2, tNow), pk = k < 0.18 ? 0.4 + 0.6 * k / 0.18 : k > 0.88 ? 1 - 0.5 * (k - 0.88) / 0.12 : 1;
+        var c = 3 * pk; ctx.globalAlpha = 1; ctx.shadowColor = 'rgba(93,126,169,.55)'; ctx.shadowBlur = 10;
+        LIVE.forEach(function (p) { ctx.fillRect(hp[0] + (p[0] - 5.5) * c, hp[1] + (p[1] - 5.5) * c, c + 0.3, c + 0.3); });
+        ctx.shadowBlur = 0;
+      } else if (!F.done) { F.done = true; if (F.onArrive) F.onArrive(); }
+    });
+    ctx.globalAlpha = 1;
+  }
   function reset() {
     vids.forEach(function (v) { try { v.pause(); v.currentTime = 0; } catch (e) {} });
     shots.forEach(function (s) { s.classList.remove('is-live'); });
     fill(0, 0); fill(1, 0); nums.forEach(function (e) { e.classList.remove('pulse'); });
-    s2 = s3 = ticked = restarting = false;
+    flights = []; step = 0; released = restarting = false;
+    ctx && ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
   function begin() { reset(); live(0); play(v1); loop(); }
-  // between rounds (and on a click anywhere in the frame): fade the three screens to black, back to the start, play again
-  var band = v1.closest('.trio-band') || v1, busy = false;
   function restart() {
     if (busy || !on) return;
     busy = true; clearTimeout(timer); cancelAnimationFrame(raf);
     vids.forEach(function (v) { v.pause(); });
     band.classList.add('is-fading');
     timer = setTimeout(function () {
-      reset();                                                 // behind the black: every screen back at its first frame
+      reset();
       timer = setTimeout(function () {
         band.classList.remove('is-fading');
         timer = setTimeout(function () { busy = false; if (on) begin(); }, 700);
@@ -4566,22 +4616,36 @@
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (e) { band.addEventListener(e, function () { band.classList.remove('is-pressed'); }); });
   function loop() {
     cancelAnimationFrame(raf);
-    (function frame() {
+    (function frame(now) {
       if (!on) return;
+      now = now || performance.now();
       var t1 = v1.currentTime;
-      if (!s2) {
-        fill(0, t1 / V2_AT);
-        if (t1 >= V2_AT) { s2 = true; fill(0, 1); live(1); play(v2); pop(1); }
-      } else if (!s3) {
-        fill(1, (t1 - V2_AT) / (KB_DOWN + GAP23 - V2_AT));
-        if (t1 >= KB_DOWN + GAP23) { s3 = true; fill(1, 1); live(2); play(v3); pop(2); v1.currentTime = t1 + SKIP1; }
+      if (!released && t1 >= LOOP_B) v1.currentTime = LOOP_A + (t1 - LOOP_B);          // the live button keeps breathing until the dot comes back
+      if (step === 0 && t1 >= GO1) {
+        step = 1;
+        fly(A_LIVE1, A_CARD2, +1, FLY, function () { pop(1); }, 0);
+        timer = setTimeout(function () { live(1); play(v2); }, (FLY - LEAD2) * 1000);   // 2's task appears as the dot lands
       }
-      if (!ticked) {
-        if (s2 && v2.currentTime >= HOLD2) v2.pause();                          // the task waits on the lock screen
-        if (s3 && v3.currentTime >= CLOSE3 - LEAD2) { ticked = true; play(v2); }  // island closes -> task drops away (video 1 reaches its switch-off by itself)
-      } else if (!restarting && v1.ended && v2.ended && v3.ended) {
+      if (step === 1 && v2.currentTime >= HOLD2) { v2.pause(); step = 2; t2 = now; }
+      if (step === 2 && now - t2 >= WAIT2 * 1000) {
+        step = 3;
+        fly(A_CARD2, A_ISL3, +1, FLY, function () { pop(2); live(2); play(v3); }, 1);
+      }
+      if (step === 3 && !v3.paused && v3.currentTime >= CLICK3) {
+        step = 4;
+        fly(A_TICK3, A_CHECK2, -1, FLY, function () {
+          play(v2);                                                  // 2 is pressed and drops the task
+          var c1 = v1.currentTime, ph = ((c1 - LOOP_A) % PERIOD + PERIOD) % PERIOD;
+          var s1 = LOOP_B - PERIOD + ph, rem = OFF1 - s1;          // same breathing phase, last cycle before the switch-off
+          if (rem < 0.6) { s1 -= PERIOD; rem += PERIOD; }
+          v1.currentTime = s1; released = true;
+          fly(A_CHECK2, A_LIVE1, -1, rem, null, null);             // lands exactly as 1 switches Live off
+        }, null);
+      }
+      if (step === 4 && !restarting && v1.ended && v2.ended && v3.ended) {
         restarting = true; clearTimeout(timer); timer = setTimeout(function () { restart(); }, 900);
       }
+      draw(now);
       raf = requestAnimationFrame(frame);
     })();
   }
