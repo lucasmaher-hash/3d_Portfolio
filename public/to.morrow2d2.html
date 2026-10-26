@@ -4524,8 +4524,8 @@
   var LEAD2 = 0.27;                // video 2 starts this long before the dot lands (its task appears 0.27 s in)
   var HOLD2 = 1.60, WAIT2 = 0.96;  // video 2 waits here; the dot leaves for video 3 a moment after the task has appeared (tuned so the return flight to 1 lands on its switch-off)
   var CLICK3 = 3.47;               // video 3: the tick is pressed
-  var LOOP_A = 6.4, LOOP_B = 14.4, PERIOD = 2.0, OFF1 = 14.6;    // video 1 (light recording): breathing live button, switch-off
-  var FLY = 1.0, FLY_BACK = 0.7;   // outward flights; the two return flights are 30 % quicker
+  var LOOP_A = 6.4, LOOP_B = 14.4, OFF1 = 14.6;    // video 1 (light recording): breathing live button, switch-off
+  var FLY = 1.0, FLY_BACK = 0.7, REBOUND = 0.44; // the second return hop loses height and flight time
   // Last visible clip movement measured frame by frame; stop before each static tail.
   var LAST_MOTION = [15.10, 2.50, 4.25], FINAL_HOLD = 1000;
   var middleStarted = false, finalStillAt = null;
@@ -4541,7 +4541,7 @@
   function live(k) { shots[k].classList.add('is-live'); }
   function pt(a) { var r = screens[a[0]].getBoundingClientRect(), c = canvas.getBoundingClientRect(); return [r.left - c.left + r.width * a[1], r.top - c.top + r.height * a[2]]; }
   var easeIO = function (x) { return 0.5 - 0.5 * Math.cos(Math.PI * x); };
-  function fly(from, to, dir, dur, onArrive, line) { flights.push({ from: from, to: to, dir: dir, t0: performance.now(), dur: dur * 1000, done: false, onArrive: onArrive, line: line }); }
+  function fly(from, to, dir, dur, onArrive, line, arcScale) { flights.push({ from: from, to: to, dir: dir, arcScale: arcScale === undefined ? 1 : arcScale, t0: performance.now(), dur: dur * 1000, done: false, onArrive: onArrive, line: line }); }
   function bez(P0, P1, P2, t) { var u = 1 - t; return [u * u * P0[0] + 2 * u * t * P1[0] + t * t * P2[0], u * u * P0[1] + 2 * u * t * P1[1] + t * t * P2[1]]; }
   function draw(now) {
     var dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight;
@@ -4551,13 +4551,13 @@
     flights = flights.filter(function (F) { return now - F.t0 < F.dur + 1100; });
     flights.forEach(function (F) {
       var P0 = pt(F.from), P2 = pt(F.to), span = Math.abs(P2[0] - P0[0]);
-      var P1 = [(P0[0] + P2[0]) / 2, F.dir < 0 ? Math.min(P0[1], P2[1]) - span * 0.55 : Math.max(P0[1], P2[1]) + span * 0.45];
-      var k = Math.max(0, Math.min(1, (now - F.t0) / F.dur)), tNow = easeIO(k);
+      var P1 = [(P0[0] + P2[0]) / 2, F.dir < 0 ? Math.min(P0[1], P2[1]) - span * 0.55 * F.arcScale : Math.max(P0[1], P2[1]) + span * 0.45];
+      var k = Math.max(0, Math.min(1, (now - F.t0) / F.dur)), tNow = F.dir < 0 ? k : easeIO(k);
 
       ctx.fillStyle = INK;
       for (var i = 1; i < 46; i++) {                                // trail of pixel cells, each fading after it is laid
         var ti = i / 46; if (ti > tNow) break;
-        var laid = F.t0 + F.dur * (Math.acos(1 - 2 * ti) / Math.PI);
+        var laid = F.t0 + F.dur * (F.dir < 0 ? ti : Math.acos(1 - 2 * ti) / Math.PI);
         var op = 1 - (now - laid) / FADE; if (op <= 0) continue;
         var q = bez(P0, P1, P2, ti);
         ctx.globalAlpha = op * 0.85;
@@ -4630,11 +4630,10 @@
         step = 4;
         fly(A_TICK3, A_CHECK2, -1, FLY_BACK, function () {
           play(v2);                                                  // 2 is pressed and drops the task
-          var c1 = v1.currentTime, ph = ((c1 - LOOP_A) % PERIOD + PERIOD) % PERIOD;
-          var s1 = LOOP_B - PERIOD + ph, rem = OFF1 - s1;          // same breathing phase, last cycle before the switch-off
-          if (rem < 0.45) { s1 -= PERIOD; rem += PERIOD; }
-          v1.currentTime = s1; released = true;
-          fly(A_CHECK2, A_LIVE1, -1, rem, null, null);             // lands exactly as 1 switches Live off
+          // One quick, lower rebound; align the switch-off to its landing
+          // instead of stretching the flight to wait for a breathing cycle.
+          v1.currentTime = OFF1 - REBOUND; released = true;
+          fly(A_CHECK2, A_LIVE1, -1, REBOUND, null, null, 0.40);
         }, null);
       }
       if (step === 4) {
