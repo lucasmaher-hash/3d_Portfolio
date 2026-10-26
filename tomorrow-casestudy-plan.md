@@ -119,15 +119,14 @@ Grid-Spalten und mit einheitlicher Höhe. Die Gruppe nutzt dieselbe volle Inhalt
 Querschnittsabbildung darüber. Der gemeinsame Erklärungstext steht darunter und hat dieselbe Breite.
 Die drei Größenfaktoren sind vereinheitlicht; die vorherige Verdoppelung des Live-Schalters entfällt.
 Animationen und Reduced-Motion-Steuerung bleiben erhalten. Die Texte sind in Deutsch und Englisch
-angebunden; aktuell 97 aktive Übersetzungsschlüssel.
+angebunden; aktuell 96 aktive Übersetzungsschlüssel.
 Der mittlere Knopf verwendet jetzt den vollständigen Glasaufbau aus `SkeuGlass` und
 `SkeuGlassBackground` der App: fünf weiße Linsenschichten, den unteren Lichtreflex,
 vertikales Relief und die weich schattierten Seiten. Diese Fläche sitzt unter Symbol und
 Beschriftung; die bestehende Lichtkontur und die äußeren Schatten bleiben erhalten.
-Unter der linken Mulde sitzt ein Regler von 50–150 % für Höhe, Schriftgröße und Tiefe. Die
-gewählten 116 % sind der neue Standard; weitere Anpassungen bleiben lokal im Browser gespeichert.
-Die drei Elemente teilen ausdrücklich dieselbe horizontal zentrierte Grid-Zeile, der Regler
-liegt separat darunter. Damit beeinflusst die Reglerhöhe nicht die Ausrichtung der Elemente.
+Die gewählten 116 % sind für die linke Mulde fest hinterlegt. Der temporäre Größenregler samt
+Speicherlogik ist entfernt. Alle drei Elemente bleiben an ihrer gemeinsamen horizontalen
+Mittellinie ausgerichtet.
 
 ### Prüfung
 

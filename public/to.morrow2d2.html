@@ -2267,7 +2267,6 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       align-items: center;
       gap: clamp(12px, 2.4vw, 32px);
-      row-gap: 12px;
       width: 100%;
     }
     .dna-copy { width: 100%; max-width: none; }
@@ -2279,11 +2278,8 @@
       align-items: center;
       --z: calc(var(--z0, 1) * 1.30);
     }
-    .dna-stage--adjustable .sk-field__input { overflow: hidden; }
+    .dna-stage--input .sk-field__input { overflow: hidden; }
     .dna-stack > .dna-stage { grid-row: 1; align-self: center; }
-    .dna-size { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
-    .dna-size input { width: 100%; min-width: 0; accent-color: var(--accent-orange); cursor: pointer; }
-    .dna-size output { min-width: 4ch; text-align: right; font-variant-numeric: tabular-nums; }
 
     .feature-title + .guide-text { margin-top: -16px; }
 
@@ -3195,7 +3191,7 @@
         <div class="dna-row">
           <h3 class="feature-title" data-i18n="dna-title">So reagieren die Elemente</h3>
           <div class="dna-stack">
-            <div class="dna-stage dna-stage--adjustable sk" style="--z0: 1.16116;">
+            <div class="dna-stage dna-stage--input sk" style="--z0: 1.16116;">
               <div class="dna-fieldwrap">
                 <!-- .sk-field__input is not decoration: .sk-trough's fill and
                      lip are ::before/::after, i.e. POSITIONED descendants, so
@@ -3226,11 +3222,6 @@
                 <span class="sk-seg__opt is-on"><span class="dna-seg__long">Heute</span><span class="dna-seg__short">On</span></span>
                 <span class="sk-seg__opt"><span class="dna-seg__long">Morgen</span><span class="dna-seg__short">Off</span></span>
               </div>
-            </div>
-            <div class="dna-size">
-              <label for="dna-left-size" data-i18n="dna-size-label">Größe</label>
-              <input id="dna-left-size" type="range" min="50" max="150" step="1" value="116" aria-valuetext="116%" />
-              <output id="dna-left-size-value" for="dna-left-size">116%</output>
             </div>
           </div>
           <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">In der <b class="kw">Mulde</b> erscheint der eingegebene Text. Der <b class="kw">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class="kw">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.</p>
@@ -3536,7 +3527,6 @@
       }
     };
     Object.assign(TRANSLATIONS.en, {
-  "dna-size-label": "Size",
   "dna-forms": "Entered text appears in the <b class=\"kw\">trough</b>. The <b class=\"kw\">Live switch</b> gives under pressure and changes state. In the <b class=\"kw\">segmented control</b>, the raised surface moves with the selection.",
   "n-ds-1": "I developed a <b class=\"kw\">design system</b> for to.morrow. It defines how recurring elements look and respond. A switch in Live follows the same rules as one in Settings.",
   "n-ds-2": "The first version looked very different. These screenshots show the Windows 95 interface I tested through TestFlight before replacing it.",
@@ -3613,7 +3603,6 @@
   "n-fact-interviews-src": "Interviews · September to October 2026"
 });
     Object.assign(TRANSLATIONS.de, {
-  "dna-size-label": "Größe",
   "dna-forms": "In der <b class=\"kw\">Mulde</b> erscheint der eingegebene Text. Der <b class=\"kw\">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class=\"kw\">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.",
   "n-ds-1": "Für to.morrow habe ich ein eigenes <b class=\"kw\">Designsystem</b> entwickelt. Es legt fest, wie wiederkehrende Elemente aussehen und reagieren. Ein Schalter folgt im Live-Bereich denselben Regeln wie in den Einstellungen.",
   "n-ds-2": "Die erste Version sah noch ganz anders aus. Die Screenshots zeigen den Windows-95-Look, den ich zunächst über TestFlight getestet und anschließend ersetzt habe.",
@@ -4156,24 +4145,6 @@
     (function () {
       var root = document.querySelector('.dna-list');
       if (!root) return;
-
-      // The preview's size control changes only the left demo and remembers the choice locally.
-      var sizeInput = root.querySelector('#dna-left-size');
-      var sizeOutput = root.querySelector('#dna-left-size-value');
-      var sizeStage = root.querySelector('.dna-stage--adjustable');
-      var sizeKey = 'portfolio-tomorrow-left-size-v2';
-      if (sizeInput && sizeOutput && sizeStage) {
-        try { var savedSize = localStorage.getItem(sizeKey); if (savedSize !== null) sizeInput.value = savedSize; } catch (e) {}
-        function applySize() {
-          var value = Number(sizeInput.value);
-          sizeStage.style.setProperty('--z0', (1.001 * value / 100).toFixed(5));
-          sizeOutput.value = value + '%';
-          sizeInput.setAttribute('aria-valuetext', value + '%');
-          try { localStorage.setItem(sizeKey, String(value)); } catch (e) {}
-        }
-        sizeInput.addEventListener('input', applySize);
-        applySize();
-      }
 
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
