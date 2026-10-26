@@ -2255,34 +2255,29 @@
 
     .dna-list { margin-top: var(--block-gap); }
 
-    /* Three demos in alternating rows, each with its own explanation. */
+    /* Match the full-width cross-section above: equal controls, then shared copy. */
     .dna-row {
       display: flex;
       flex-direction: column;
       gap: clamp(28px, 4vw, 48px);
-      width: min(860px, 100%);
-      margin-inline: auto;
+      width: 100%;
     }
-    .dna-stack { display: flex; flex-direction: column; gap: clamp(72px, 10vw, 140px); width: 100%; }
-    .dna-demo {
+    .dna-stack {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: clamp(20px, 4vw, 56px);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       align-items: center;
+      gap: clamp(12px, 2.4vw, 32px);
+      width: 100%;
     }
-    .dna-body { min-width: 0; }
-    .dna-copy { max-width: none; }
+    .dna-copy { width: 100%; max-width: none; }
     .dna-stage {
       width: 100%;
-      max-width: 300px;
       min-width: 0;
       display: grid;
-      justify-items: start;
+      justify-items: stretch;
       align-items: center;
       --z: calc(var(--z0, 1) * 1.30);
     }
-    .dna-demo:nth-child(even) .dna-stage { grid-column: 2; grid-row: 1; justify-self: end; justify-items: end; }
-    .dna-demo:nth-child(even) .dna-body { grid-column: 1; grid-row: 1; }
 
     .feature-title + .guide-text { margin-top: -16px; }
 
@@ -2370,7 +2365,9 @@
     }
 
     .dna-ws {
-      --h: 46;
+      --h: 51;
+      width: 100%;
+      justify-content: center;
       /* Same idea as --seg-pad: the width of this pill is its label plus these
          two, and the phone row shrinks them rather than the type. */
       --ws-pad-x: 22px;
@@ -2380,7 +2377,7 @@
       padding: 0 calc(var(--ws-pad-x) * var(--z));
       border-radius: 999px; border: 0; background: none; cursor: default;
       color: var(--ink);
-      font-size: calc(19.7px * var(--z) * var(--fs));
+      font-size: calc(15px * var(--z) * var(--fs));
       line-height: 1;
     }
 
@@ -2523,9 +2520,8 @@
 
     @media (max-width: 640px) {
       .dna-stage { --z: var(--z0, 1); }
-      .dna-demo:nth-child(even) { grid-template-columns: minmax(0, 1fr) auto; }
-      .dna-demo:nth-child(even) .dna-stage { width: auto; }
-      .dna-ws { --h: 60; --ws-pad-x: 16px; --ws-gap: 6px; }
+      .dna-ws { --ws-pad-x: 6px; --ws-gap: 4px; }
+      .dna-fieldwrap .sk-field__input { padding-inline: calc(12px * var(--z)); }
       .dna-seg { --seg-pad: 3px; }
       .dna-seg .sk-seg__opt { --opt-pad-x: 1px; }
       .dna-seg__long { display: none; }
@@ -3170,7 +3166,7 @@
         </figure>
         </div>
       </div>
-      <!-- Three primitives in alternating rows: control left, right, left, with its explanation beside it.
+      <!-- Three equal-size primitives across the full content width, followed by their shared explanation.
 
            Each animation shows the primitive's OWN job and nothing else —
            the lip swells because it can be pressed, the trough fills with
@@ -3185,7 +3181,6 @@
         <div class="dna-row">
           <h3 class="feature-title" data-i18n="dna-title">So reagieren die Elemente</h3>
           <div class="dna-stack">
-          <div class="dna-demo">
             <div class="dna-stage sk" style="--z0: 1.001;">
               <div class="dna-fieldwrap">
                 <!-- .sk-field__input is not decoration: .sk-trough's fill and
@@ -3196,17 +3191,11 @@
                 <div class="sk-field sk-trough"><span class="sk-field__input"><span class="dna-type"></span><i class="dna-caret"></i></span></div>
               </div>
             </div>
-            <div class="dna-body"><p class="stagger-copy dna-copy" data-i18n-html="dna-input-text">In der <b class="kw">Mulde</b> erscheint der eingegebene Text.</p></div>
-          </div>
-          <div class="dna-demo">
-            <div class="dna-stage sk" style="--z0: 1.528;">
+            <div class="dna-stage sk" style="--z0: 1.001;">
               <button class="dna-ws sk-glass sk-press sk-chrome" type="button" tabindex="-1" aria-hidden="true">
                 <span class="dna-ws__mark"></span><span class="dna-ws__label"><span class="dna-ws__off">Off air</span><span class="dna-ws__on">On air</span></span>
               </button>
             </div>
-            <div class="dna-body"><p class="stagger-copy dna-copy" data-i18n-html="dna-live-text">Der <b class="kw">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand.</p></div>
-          </div>
-          <div class="dna-demo">
             <div class="dna-stage sk" style="--z0: 1.001;">
               <div class="sk-seg sk-trough dna-seg">
                 <!-- The outer bevel. A segmented trough is furniture sitting in
@@ -3214,14 +3203,13 @@
                      nothing around it — see .sk-trough__bloom. -->
                 <span class="sk-trough__bloom"></span>
                 <span class="dna-segpill sk-glass" style="--i: 0"></span>
-                <!-- Compact labels keep the control readable beside its text on phones. -->
+                <!-- Compact labels keep the control readable in the three-column phone layout. -->
                 <span class="sk-seg__opt is-on"><span class="dna-seg__long">Heute</span><span class="dna-seg__short">On</span></span>
                 <span class="sk-seg__opt"><span class="dna-seg__long">Morgen</span><span class="dna-seg__short">Off</span></span>
               </div>
             </div>
-            <div class="dna-body"><p class="stagger-copy dna-copy" data-i18n-html="dna-toggle-text">Beim <b class="kw">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.</p></div>
           </div>
-          </div>
+          <p class="stagger-copy dna-copy" data-i18n-html="dna-forms">In der <b class="kw">Mulde</b> erscheint der eingegebene Text. Der <b class="kw">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class="kw">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.</p>
         </div>
       </div>
 
@@ -3524,9 +3512,7 @@
       }
     };
     Object.assign(TRANSLATIONS.en, {
-  "dna-input-text": "Entered text appears in the <b class=\"kw\">trough</b>.",
-  "dna-live-text": "The <b class=\"kw\">Live switch</b> gives under pressure and changes state.",
-  "dna-toggle-text": "In the <b class=\"kw\">segmented control</b>, the raised surface moves with the selection.",
+  "dna-forms": "Entered text appears in the <b class=\"kw\">trough</b>. The <b class=\"kw\">Live switch</b> gives under pressure and changes state. In the <b class=\"kw\">segmented control</b>, the raised surface moves with the selection.",
   "n-ds-1": "I developed a <b class=\"kw\">design system</b> for to.morrow. It defines how recurring elements look and respond. A switch in Live follows the same rules as one in Settings.",
   "n-ds-2": "The first version looked very different. These screenshots show the Windows 95 interface I tested through TestFlight before replacing it.",
   "n-a11y-short": "<b class=\"kw\">Accessibility</b>: text follows the iOS text size through Dynamic Type, up to the largest setting, AX5. Controls grow at half the rate to leave more room for content. VoiceOver provides actions to edit and reorder tasks and open photos. Reduce Motion stops every looping animation. Each touch target is at least 44 pt.",
@@ -3602,9 +3588,7 @@
   "n-fact-interviews-src": "Interviews · September to October 2026"
 });
     Object.assign(TRANSLATIONS.de, {
-  "dna-input-text": "In der <b class=\"kw\">Mulde</b> erscheint der eingegebene Text.",
-  "dna-live-text": "Der <b class=\"kw\">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand.",
-  "dna-toggle-text": "Beim <b class=\"kw\">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.",
+  "dna-forms": "In der <b class=\"kw\">Mulde</b> erscheint der eingegebene Text. Der <b class=\"kw\">Live-Schalter</b> gibt beim Drücken nach und wechselt seinen Zustand. Beim <b class=\"kw\">Umschalter</b> wandert die erhabene Fläche mit der Auswahl.",
   "n-ds-1": "Für to.morrow habe ich ein eigenes <b class=\"kw\">Designsystem</b> entwickelt. Es legt fest, wie wiederkehrende Elemente aussehen und reagieren. Ein Schalter folgt im Live-Bereich denselben Regeln wie in den Einstellungen.",
   "n-ds-2": "Die erste Version sah noch ganz anders aus. Die Screenshots zeigen den Windows-95-Look, den ich zunächst über TestFlight getestet und anschließend ersetzt habe.",
   "n-a11y-short": "<b class=\"kw\">Barrierefreiheit</b>: Die Schrift folgt der iOS-Schriftgröße über Dynamic Type bis zur größten Stufe AX5. Bedienelemente wachsen halb so schnell, damit mehr Inhalt sichtbar bleibt. Mit VoiceOver lassen sich Aufgaben bearbeiten, umsortieren und Fotos öffnen. „Bewegung reduzieren“ stoppt alle Daueranimationen. Jedes Touch-Ziel ist mindestens 44 pt groß.",

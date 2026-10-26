@@ -114,13 +114,12 @@ den unterschiedlichen Bildschirmhintergründen. Video-Cacheversion: `v=3`.
 Die drei Bildunterschriften stehen jetzt über den Screens anstelle der Zahlen. Die animierten
 Verbindungslinien bleiben zwischen den Beschriftungen erhalten; die untere Beschriftungszeile entfällt.
 
-Die drei animierten Designsystem-Beispiele stehen in separaten Zeilen: Eingabefeld links,
-Live-Schalter rechts, Umschalter links. Jeder Erklärungssatz steht direkt daneben, auch auf
-schmalen Ansichten. Die bestehenden Animationen und ihre Reduced-Motion-Steuerung bleiben erhalten.
-Die aufgeteilten Texte sind in Deutsch und Englisch angebunden; aktuell 98 aktive Übersetzungsschlüssel.
-Der Zeilenabstand beträgt jetzt `clamp(72px, 10vw, 140px)`. Der Live-Schalter ist über seinen
-Größenfaktor von 0,764 auf 1,528 in allen Dimensionen verdoppelt; auf schmalen Ansichten bekommt
-seine Spalte die benötigte Inhaltsbreite, während der Erklärungstext daneben bleibt.
+Die drei animierten Designsystem-Beispiele stehen wieder nebeneinander, in gleich breiten
+Grid-Spalten und mit einheitlicher Höhe. Die Gruppe nutzt dieselbe volle Inhaltsbreite wie die
+Querschnittsabbildung darüber. Der gemeinsame Erklärungstext steht darunter und hat dieselbe Breite.
+Die drei Größenfaktoren sind vereinheitlicht; die vorherige Verdoppelung des Live-Schalters entfällt.
+Animationen und Reduced-Motion-Steuerung bleiben erhalten. Die Texte sind in Deutsch und Englisch
+angebunden; aktuell 96 aktive Übersetzungsschlüssel.
 
 ### Prüfung
 
