@@ -141,6 +141,34 @@ Mittellinie ausgerichtet.
 - Produktionsbuild und `git diff --check` bestanden. Nach Frame 6 folgt das Video dem
   Original mit unverändertem Timing; SSIM nach erneuter Kodierung: 0,999462.
 
+## Wireflows überarbeitet · 2026-10-26
+
+Nur die zwei erklärenden Abläufe auf `to.morrow2d2.html` wurden neu aufgebaut.
+Die Referenzen des Nutzers geben die weiß-graue Gestaltung vor. Es sind nachträglich
+vereinfachte Darstellungen des aktuellen Verhaltens, keine historischen Entwurfsskizzen.
+
+- **Konstruktion:** konsistente Telefonproportionen, weiße Flächen, graue Gruppen und
+  schwarze Konturen; echte Aufgaben und eindeutige Beschriftungen statt Textbalken.
+  Gleiche Aufgabe und Navigation über die Zustände hinweg, aktive Liste sichtbar markiert.
+- **Verschieben:** Heute → Wisch nach rechts → Morgen → optionales Rückgängigmachen.
+  Die drei Aufgaben des Ausgangszustands stimmen mit der Beschriftung überein.
+- **Live:** Eingabe mit Tastatur → Sperrbildschirm → geöffnete Dynamic Island → Anzeige
+  nach dem Abhaken verschwunden. Tastaturschließen startet Live; ein zusätzlicher
+  „Go Live“-Schritt wird nicht behauptet. Sperrbildschirm und Island sind zwei Ansichten
+  derselben Aufgabe, keine zwei verpflichtenden Schritte zum Erledigen.
+- **Darstellung:** acht Inline-SVGs, über den vorhandenen Sprachwechsel vollständig DE/EN
+  übersetzt, einschließlich zugänglicher Bildtitel. Vier Screens nebeneinander; auf schmalen
+  Breiten scrollbar statt unlesbar verkleinert. Scrollbereich per Tastatur fokussierbar.
+- **Prüfung:** Vektorgrafiken gerendert und visuell geprüft; 131 aktive Übersetzungsschlüssel
+  und EN→DE→EN-Sprachwechsel geprüft, zwölf Skripte parsebar, Produktionsbuild erfolgreich.
+  Keine Browserprüfung des Gesamtlayouts; kein steuerbarer Browser verbunden.
+
+Grundlage: [NN/g: Wireflows](https://www.nngroup.com/articles/wireflows/) verbindet
+Bildschirmzustände mit Aktionen und Feedback; [Figma: What is wireframing?](https://www.figma.com/resource-library/what-is-wireframing/)
+beschreibt abgestufte Detailgrade, Inhaltshierarchie und funktionale Struktur vor der
+visuellen Ausgestaltung. Hier passt mittlere Detailtiefe: genug echte Beschriftungen zum
+Verstehen des Ablaufs, ohne die Materialeffekte des fertigen Produkts nachzubauen.
+
 ## 0. What the interview established
 
 | Topic | Answer |
