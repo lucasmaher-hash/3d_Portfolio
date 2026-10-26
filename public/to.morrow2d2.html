@@ -2759,6 +2759,9 @@
     @media (max-width: 860px) { .rules { grid-template-columns: 1fr; } }
     .side-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.5vw, 32px); }
     .side { display: flex; flex-direction: column; gap: 6px; }
+    /* Keep the desktop 300×320 drawing proportions in stacked mobile cards;
+       intrinsic dimensions and flex:none prevent the SVG viewport shrinking. */
+    .side > svg { aspect-ratio: 15 / 16; flex: none; }
     .side h4 { font-size: 15px; font-weight: 500; color: #1d1d1f; margin-top: 4px; }
     .side .tag { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5b5b5e; }
     .side p { font-size: 13.5px; line-height: 1.6; color: #4a4a4e; }
@@ -3064,7 +3067,7 @@
         <div class="band-head"><p class="band-title" style="color:#1d1d1f;" data-i18n="n-side-sheet">Alle Elemente folgen derselben Lichtquelle oben links. Lichtkanten und Schatten machen ihre Höhe gegenüber der Grundfläche sichtbar.</p></div>
         <div class="side-grid">
         <figure class="side" style="margin:0;">
-          <svg viewBox="0 0 300 320" aria-hidden="true">
+          <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs><linearGradient id="s-fade" x1="0" x2="1"><stop offset="0" stop-color="#2b2b30" stop-opacity=".28"/><stop offset="1" stop-color="#2b2b30" stop-opacity="0"/></linearGradient></defs>
             <g filter="url(#s-rough)">
               <path class="s-slab s-ink" d="M16 200H78C78 200 86 128 150 128C214 128 222 200 222 200H284V276H16Z"/>
@@ -3080,7 +3083,7 @@
           <p data-i18n="n-sd1t">Die Blase ragt aus der Fläche. Ihr oberer linker Rand fängt Licht auf, der Schatten fällt nach rechts unten. Beim Drücken sinkt sie ab und bestätigt die Aktion.</p>
         </figure>
 <figure class="side" style="margin:0;">
-          <svg viewBox="0 0 300 320" aria-hidden="true">
+          <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g filter="url(#s-rough)">
               <path class="s-slab s-ink" d="M16 200H78C78 200 86 272 150 272C214 272 222 200 222 200H284V300H16Z"/>
               <path class="s-sh" d="M82 210C92 252 114 268 148 270"/>
@@ -3094,7 +3097,7 @@
           <p data-i18n="n-sd2t">Die Mulde liegt in der Fläche. Ihr oberer Rand liegt im Schatten, der untere fängt Licht auf. Der Schatten liegt innen. Diese Form kennzeichnet ein Feld für Texteingaben.</p>
         </figure>
 <figure class="side" style="margin:0;">
-          <svg viewBox="0 0 300 320" aria-hidden="true">
+          <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g filter="url(#s-rough)">
               <path class="s-slab s-ink" d="M16 200H34C34 200 40 272 76 272H224C260 272 266 200 266 200H284V300H16Z"/>
               <path class="s-sh" d="M38 210C44 252 56 268 76 270"/>
