@@ -866,3 +866,19 @@ Mobile retains 40:49. The mobile to.morrow list crop is anchored at 51% to remov
 the clipped circle at its top edge; the separate bottom-nav crop remains intact.
 An 8% blue-gray overlay slightly darkens and tints only the to.morrow screenshot
 on both layouts, without changing the source asset.
+
+## Eigene Querschnittsskizze eingesetzt · 2026-10-26
+
+Lucas’ Scan `~/Downloads/Gescanntes Dokument 2.pdf` ersetzt die drei künstlichen
+SVG-Zeichnungen auf der veröffentlichten Seite. Die PDF-Seite wurde um 90° im
+Uhrzeigersinn gedreht und auf den Bereich (20, 300)–(2417, 1188) der gedrehten
+Seite beschnitten. Ergebnis: 2397×888 px, etwa 2,7:1; alle drei Zeichnungen und
+Pfeile bleiben erhalten. Nur Blattrand entfernt, keine zeichnerische Ergänzung.
+Webasset: `public/images/to.morrow/seitenansicht-skizze.webp`; Desktop und Mobile
+zeigen denselben vollständigen Ausschnitt. Die Bildbeschreibung ist DE/EN.
+Die frühere offene Aufgabe „Skizze liefern/einsetzen“ ist damit erledigt.
+
+Nach Lucas’ Sichtprüfung: beim Rendern aus dem Original-PDF zusätzlich um 0,6°
+gegen den Uhrzeigersinn ausgerichtet, damit die rechte Seite nicht absinkt.
+Finales Webasset: 2407×914 px, ca. 2,63:1. Keine Linien nachgezeichnet, keine
+Perspektivkorrektur einzelner Formen; nur die leichte globale Neigung korrigiert.

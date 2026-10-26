@@ -2749,10 +2749,8 @@
     .component-principles li::before { content: ''; position: absolute; left: 0; top: .65em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-orange); }
 
     /* Sketch spread: only two short annotations; explanations live above it. */
-    .paper { padding: clamp(16px, 3vw, 28px); border-radius: 6px; background: #f6f5f0; box-shadow: 0 1px 2px rgba(40, 40, 90, 0.18), 0 8px 22px rgba(40, 40, 90, 0.1); display: flex; flex-direction: column; gap: 12px; }
-    .paper .band-head { margin-bottom: 4px; }
-    .paper svg { width: 100%; height: auto; display: block; }
-    .paper-cap { font-size: 12.5px; line-height: 1.5; color: #5b5b5e; }
+    .paper { margin: 0; padding: 0; border-radius: 6px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(40, 40, 90, 0.18), 0 8px 22px rgba(40, 40, 90, 0.1); }
+    .paper > img { display: block; width: 100%; height: auto; }
 
     /* ── Rule card and the week diagram ── */
     .rule-card { display: flex; flex-direction: column; gap: 14px; padding: clamp(18px, 3vw, 28px); border-radius: 18px; box-shadow: var(--shadow-pressed); }
@@ -2780,23 +2778,6 @@
     .rule h4 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin: 3px 0 4px; }
     .rule p { font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
     @media (max-width: 860px) { .rules { grid-template-columns: 1fr; } }
-    .side-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.5vw, 32px); }
-    .side { display: flex; flex-direction: column; gap: 6px; }
-    /* Keep the same three-panel landscape composition at every viewport;
-       each drawing retains its original 300×320 proportions. */
-    .side > svg { aspect-ratio: 15 / 16; flex: none; }
-    .side h4 { font-size: 15px; font-weight: 500; color: #1d1d1f; margin-top: 4px; }
-    .side .tag { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5b5b5e; }
-    .side p { font-size: 13.5px; line-height: 1.6; color: #4a4a4e; }
-    .s-ink { fill: none; stroke: #2b2b30; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .s-slab { fill: #ecebe6; }
-    .s-body { fill: #f7f6f2; }
-    .s-hi { fill: none; stroke: #fff; stroke-width: 5; stroke-linecap: round; opacity: 0.95; }
-    .s-sh { fill: none; stroke: #2b2b30; stroke-width: 5; stroke-linecap: round; opacity: 0.22; }
-    .s-dash { fill: none; stroke: #2b2b30; stroke-width: 1.6; stroke-dasharray: 5 5; stroke-linecap: round; opacity: 0.6; }
-    .s-thin { fill: none; stroke: #2b2b30; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: 0.8; }
-    .paper svg text { font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size: 11px; fill: #4a4a4e; font-size-adjust: none; }
-
     /* ── Accessibility ── */
 
     /* ── Result ── */
@@ -2826,12 +2807,12 @@
     @media (max-width: 860px) {
       :root { --text-secondary: #555760; --mobile-accent-ink: #49627f; }
       .guide-text, .stagger-copy, .next li { font-size: 16px; }
-      .side p, .win-quotes p, .meta-inset { font-size: 15px; }
+      .win-quotes p, .meta-inset { font-size: 15px; }
       .meta-inset { min-width: 0; overflow-wrap: anywhere; }
       .meta-label, .fact-num, .tap-card.is-us .tap-n { color: var(--mobile-accent-ink); }
       .trio-num { font-size: 12px; line-height: 1.4; }
       .trio-label { max-width: 100%; padding-inline: 2px; white-space: normal; overflow-wrap: anywhere; hyphens: auto; }
-      .side .tag, .fact-src { font-size: 12px; }
+      .fact-src { font-size: 12px; }
       .fact-src { opacity: 1; }
       .fact-label { font-size: 16px; line-height: 1.5; }
     }
@@ -3108,52 +3089,11 @@
         <li data-i18n-html="n-form-button"><b class="kw">Knöpfe sind erhaben.</b> Ihre Form ragt wie eine Blase aus der Oberfläche und lädt zum Drücken ein, wie ein echter Knopf.</li>
         <li data-i18n-html="n-form-toggle"><b class="kw">Umschalter verbinden beide Formen.</b> Eine erhabene Blase sitzt in einer Mulde. Drückst du die andere Option, wechselt der Zustand und die Blase wandert dorthin.</li>
       </ul>
-      <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="s-rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs></svg>
       <h3 class="feature-title cs-h3" data-i18n="n-side-title">Die Formen im Querschnitt</h3>
-      <!-- Paper-sketch slot: swap the three SVGs for the scan
-           (/images/to.morrow/seitenansicht-skizze.webp) once Lucas has drawn it. -->
-      <div class="paper">
-        <div class="side-grid">
-          <figure class="side" style="margin:0;">
-            <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <g filter="url(#s-rough)">
-              <path class="s-slab s-ink" d="M16 200H78C78 200 86 272 150 272C214 272 222 200 222 200H284V300H16Z"/>
-              <path class="s-sh" d="M82 210C92 252 114 268 148 270"/>
-              <path class="s-hi" d="M152 270C190 268 212 246 220 208"/>
-              <path class="s-thin" d="M118 238h14M140 238h24M172 238h10"/><path class="s-thin" d="M188 230v16"/>
-            </g>
-            <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="22" y="28" data-i18n="n-s-light">Licht</text>
-          </svg>
-          </figure>
-          <figure class="side" style="margin:0;">
-            <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <defs><linearGradient id="s-fade" x1="0" x2="1"><stop offset="0" stop-color="#2b2b30" stop-opacity=".28"/><stop offset="1" stop-color="#2b2b30" stop-opacity="0"/></linearGradient></defs>
-            <g filter="url(#s-rough)">
-              <path class="s-slab s-ink" d="M16 200H78C78 200 86 128 150 128C214 128 222 200 222 200H284V276H16Z"/>
-              <path d="M222 200H280V206Q250 207 222 203Z" fill="url(#s-fade)"/>
-              <path class="s-hi" d="M92 178C102 150 124 136 148 134"/>
-              <path class="s-sh" d="M200 142C214 156 220 182 221 198"/>
-              <path class="s-thin" d="M150 80v30M141 102l9 10 9-10"/>
-            </g>
-            <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g>
-          </svg>
-          </figure>
-          <figure class="side" style="margin:0;">
-            <svg width="300" height="320" viewBox="0 0 300 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <g filter="url(#s-rough)">
-              <path class="s-slab s-ink" d="M16 200H34C34 200 40 272 76 272H224C260 272 266 200 266 200H284V300H16Z"/>
-              <path class="s-sh" d="M38 210C44 252 56 268 76 270"/>
-              <path class="s-hi" d="M224 270C250 268 262 244 264 210"/>
-              <path class="s-body s-ink" d="M62 272C62 272 70 230 102 230C134 230 142 272 142 272Z"/>
-              <path class="s-hi" d="M72 256C78 240 90 234 104 233"/>
-              <path class="s-dash" d="M160 272C160 272 168 230 200 230C232 230 240 272 240 272"/>
-              <path class="s-thin" d="M112 212C140 194 172 194 198 212M188 204l11 8-12 4"/>
-            </g>
-            <g class="s-thin"><path d="M26 36l30 30M56 66l-9-2M56 66l-2-9"/></g><text x="136" y="186" data-i18n="n-s-slide">gleitet</text>
-          </svg>
-          </figure>
-        </div>
-      </div>
+      <figure class="paper paper--scan">
+        <img src="/images/to.morrow/seitenansicht-skizze.webp?v=2" width="2407" height="914" loading="lazy" alt="" />
+        <figcaption class="wireflow-sr" data-i18n="n-side-description">Handgezeichnete Querschnitte: links eine vertiefte Texteingabe, in der Mitte ein erhabener Knopf mit Druckpfeil, rechts eine Blase, die sich in einer Mulde zwischen zwei Zuständen bewegt.</figcaption>
+      </figure>
       <!-- Skill implementation note followed by three equal-size primitives across the full content width.
 
            Each animation shows the primitive's OWN job and nothing else —
@@ -3493,6 +3433,7 @@
       }
     };
     Object.assign(TRANSLATIONS.en, {
+      "n-side-description": "Hand-drawn cross-sections: a recessed text input on the left, a raised button with a press arrow in the middle, and a bubble moving between two states within a recess on the right.",
       "n-taps-5": "1 swipe",
       "n-fact-downloads": "total downloads",
       "n-fact-downloads-date": "(Latest count: October 2026)",
@@ -3530,13 +3471,10 @@
   "n-fl-reset": "The Live display disappears",
   "n-flow-live": "From entering a task to ticking it off",
   "n-sec-live": "Keeping one task in view",
-  "n-tag-sketch": "Sketch · placeholder for the scan",
   "n-cmp-1": "Windows 95",
   "n-cmp-2": "SkeuKit",
   "n-cmp-cap": "The same view in both builds. The function stayed the same, the interface did not.",
   "n-sec-pivot": "The pivot",
-  "n-s-light": "Light",
-  "n-s-slide": "slides",
   "n-side-title": "The shapes in cross-section",
   "n-sec-rules": "The design system",
   "n-nopurpose": "The look made the app harder to use.",
@@ -3559,6 +3497,7 @@
 
 });
     Object.assign(TRANSLATIONS.de, {
+      "n-side-description": "Handgezeichnete Querschnitte: links eine vertiefte Texteingabe, in der Mitte ein erhabener Knopf mit Druckpfeil, rechts eine Blase, die sich in einer Mulde zwischen zwei Zuständen bewegt.",
       "n-taps-5": "1 Wisch",
       "n-fact-downloads": "Downloads insgesamt",
       "n-fact-downloads-date": "(Letzter Stand: Oktober 2026)",
@@ -3597,13 +3536,10 @@
   "n-fl-reset": "Die Live-Anzeige verschwindet",
   "n-flow-live": "Von der Eingabe bis zum Abhaken",
   "n-sec-live": "Eine Sache im Blick",
-  "n-tag-sketch": "Skizze · Platzhalter für den Scan",
   "n-cmp-1": "Windows 95",
   "n-cmp-2": "SkeuKit",
   "n-cmp-cap": "Dieselbe Ansicht in beiden Builds. Die Funktion ist gleich geblieben, die Oberfläche nicht.",
   "n-sec-pivot": "Der Pivot",
-  "n-s-light": "Licht",
-  "n-s-slide": "gleitet",
   "n-side-title": "Die Formen im Querschnitt",
   "n-sec-rules": "Das Designsystem",
   "n-nopurpose": "Der Look erschwerte die Bedienung.",
