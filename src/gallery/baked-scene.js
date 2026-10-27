@@ -85,5 +85,5 @@ export async function prepareBakedGallery(model,scene,renderer,onProgress=()=>{}
   // are compiled; otherwise the first frames show the unpatched bake (no shadow, black slits).
   model.visible=false
   scene.add(model);model.updateMatrixWorld(true)
-  return {settings,collidables,view,probes}
+  return {settings,collidables,view,probes,textures:[view.texture,...[...maps.values()].map(m=>m.texture)]}
 }

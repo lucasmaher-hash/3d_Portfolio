@@ -2,12 +2,15 @@ import './style.css'
 import { prepareBakedGallery } from './gallery/baked-scene.js'
 import { roundAndTintMacLamp } from './gallery/mac-lamp-orange.js'
 import { applyTomorrowLook } from './gallery/tomorrow-look.js'
+import { installProjectViewer } from './gallery/project-viewer.js'
+import { warmGallery } from './gallery/warmup.js'
 
 const IS_DEFAULT_GALLERY = ['/', '/index.html'].includes(location.pathname)
 const IS_BAKED_GALLERY = IS_DEFAULT_GALLERY || ['/gallery-baked.html','/gallery-4.html'].includes(location.pathname)
 const IS_GALLERY = IS_BAKED_GALLERY
 const GALLERY_ENTRY_ID = IS_DEFAULT_GALLERY ? 'default' : IS_BAKED_GALLERY ? 'gallery-4' : 'gallery-1'
 const RETURN_STATE_KEY = IS_DEFAULT_GALLERY ? '_defaultBakedGalleryReturnState' : IS_BAKED_GALLERY ? '_bakedGalleryReturnState' : '_3dReturnState'
+let sceneLoading = IS_GALLERY
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 // PERF.lightGlb: the production GLB is meshopt-compressed (scripts/optimize-glb.mjs).
@@ -126,8 +129,8 @@ function resCap() {
 }
 function resApply(r) {
   res.ratio = r
+  // setPixelRatio already resizes the drawing buffer in Three r184.
   renderer.setPixelRatio(r)
-  renderer.setSize(window.innerWidth, window.innerHeight)
 }
 // Called once per drawn frame (never under an overlay). Starts sampling 1.5 s after the
 // scene is revealed, so shader warm-up and the first shadow draw do not count.
@@ -2647,7 +2650,7 @@ loadScene(
   async (gltf) => {
     if (IS_GALLERY) {
       try {
-        const { settings, collidables: galleryWalls, view, probes } = await prepareBakedGallery(gltf.scene, scene, renderer, p => loadProgress(GLB_SHARE + p * (0.9 - GLB_SHARE)))
+        const { settings, collidables: galleryWalls, view, probes, textures } = await prepareBakedGallery(gltf.scene, scene, renderer, p => loadProgress(GLB_SHARE + p * (0.9 - GLB_SHARE)))
         await roundAndTintMacLamp(gltf.scene, loader)
         applyTomorrowLook(gltf.scene)
         collidables = galleryWalls
@@ -2717,10 +2720,8 @@ loadScene(
             camera.updateProjectionMatrix();syncSteeringToView()
           }
         }
-        // Capped like the main path's 4s reveal timeout: the welcome screen cannot be closed
-        // until _sceneReady() fires, so a compileAsync that never settles must not hold it.
-        await Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 4000))])
-        gltf.scene.visible = true   // revealed only now: patched, compiled, no unpatched first frames
+        await warmGallery(renderer, scene, camera, gltf.scene, textures)
+        sceneLoading = false
         for (const h of helpIcons) h.mesh.visible = true
         loadProgress(0.97)
         roomAccent.ready = true
@@ -2731,6 +2732,7 @@ loadScene(
         sceneReady()
       } catch (error) {
         console.error('Gallery setup failed:', error)
+        sceneLoading = false
         gltf.scene.visible = true; for (const h of helpIcons) h.mesh.visible = true   // never leave the scene hidden
         sceneReady()
       }
@@ -3005,6 +3007,7 @@ loadScene(
   },
   err => {
     console.error('GLB load error:', err)
+    sceneLoading = false
     if (window.track) window.track('scene_load_failed', { mobile: isMobile })
     if (window._loader) window._loader.done()
     // Never hold the welcome screen forever on a failed load.
@@ -3095,6 +3098,45 @@ const right   = new THREE.Vector3()
 const UP      = new THREE.Vector3(0, 1, 0)
 const clock   = new THREE.Clock()
 
+function resetSceneInput() {
+  for (const code of Object.keys(keys)) keys[code] = false
+  isLookDown = false
+  lookButton = -1
+  lookMoved = false
+  joystickX = joystickY = 0
+  cameraTouchId = joystickTouchId = null
+  if (joystickThumb) joystickThumb.style.transform = 'translate(0,0)'
+  targetHeadingYaw = headingYaw
+  swipeVelYaw = 0
+  flingVelYaw = 0
+  document.body.classList.remove('looking')
+}
+
+const projectViewer = installProjectViewer({
+  onOpen() {
+    resetSceneInput()
+    isOverlayOpen = true
+  },
+  onClose() {
+    isOverlayOpen = false
+    overlayFrameDone = false
+    popNavigating = false
+    resetSceneInput()
+    clock.getDelta()
+    try { sessionStorage.removeItem(RETURN_STATE_KEY) } catch (_) {}
+    // Time behind a project must not count as GPU load for the governor.
+    res.samples.length = 0
+    res.windowT0 = performance.now()
+    res.liveAfter = performance.now() + 1500
+  },
+})
+// Existing navigation entry points also work for the retained gallery routes.
+const navigatePage = window._nav
+window._nav = (url, into) => {
+  if (!projectViewer.open(url)) navigatePage(url, into)
+}
+window.addEventListener('blur', resetSceneInput)
+
 // ── Head bob ─────────────────────────────────────────────────────
 let bobTime      = 0
 let bobIntensity = 0
@@ -3142,8 +3184,8 @@ let popNavigating = false   // guards a double-click firing two navigations
 // out of a project page does NOT reload: it restores this page from the
 // back-forward cache, script state and all. So the flag stayed true and every
 // later project click hit its early return, i.e. nothing in the scene was
-// clickable any more. The Exit pill was unaffected because it is a plain link
-// to `/`, which is a fresh load rather than a history traversal.
+// clickable any more. The project viewer resets this latch on close too; a
+// standalone project's Exit still falls back to a fresh scene navigation.
 // `pageshow` with `persisted` is the only signal a bfcache restore gives.
 window.addEventListener('pageshow', e => {
   if (!e.persisted) return
@@ -3281,6 +3323,7 @@ function animate() {
   // exponential ease to its target. 0.1s caps the damage: stalls simply
   // don't advance the simulation, normal frames (16–33ms) are untouched.
   const rawDelta = clock.getDelta()
+  if (sceneLoading || projectViewer.isOpen || document.hidden) return
   const delta = Math.min(rawDelta, 0.1)
   updatePops(delta)   // click-pop pulses run regardless of overlay state
   if (galleryExhibits.length && !isOverlayOpen) updateGalleryExhibits(delta)
@@ -3531,6 +3574,7 @@ window.addEventListener('resize', () => {
     res.smooth = 0
     res.pending = 0
     resApply(Math.min(resCap(), res.ratio))
+    renderer.setSize(window.innerWidth, window.innerHeight)
   } else {
     renderer.setSize(window.innerWidth, window.innerHeight)
   }
@@ -3696,9 +3740,8 @@ renderer.domElement.addEventListener('click', e => {
     const data = CONTENT[name]
     if (data.url) {
       if (window.track) window.track('project_open', { project: data.title, via: '3d-click' })
-      // Save the exact spot we're leaving from so the Exit button on the
-      // destination page can bring us right back to it (read back by the
-      // restore logic right after the GLTFLoader spawn block above).
+      // Keep a reload fallback: the project viewer retains the live camera,
+      // but refreshing its bookmarkable project URL opens it standalone.
       sessionStorage.setItem(RETURN_STATE_KEY, JSON.stringify({
         x: camera.position.x, y: camera.position.y, z: camera.position.z,
         yaw, pitch

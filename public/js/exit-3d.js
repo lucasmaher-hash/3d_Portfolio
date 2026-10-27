@@ -2,7 +2,8 @@
 
 // 3D-scene entry point: ?from=3d (set by the click handler in src/main.js
 // when a scene object navigates here) hides the usual nav bar and shows
-// a fixed "Exit" pill (top-left) that returns to the 3D scene instead.
+// a fixed "Exit" pill (top-left). In the project viewer it closes the iframe;
+// standalone / refreshed project URLs navigate back to the scene entry.
 (function () {
   if (new URLSearchParams(location.search).get('from') !== '3d') return;
   var topBarEl = document.getElementById('top-bar');
@@ -39,7 +40,15 @@
     if (btn.dataset.leaving) return;   // double-click guard
     btn.dataset.leaving = '1';
     btn.style.animation = 'exitPop 280ms ease';
-    setTimeout(function () { window.location.href = btn.getAttribute('href'); }, 280);
+    setTimeout(function () {
+      // Embedded project: reveal the still-resident scene. Direct visits and
+      // refreshed project URLs retain the normal link fallback above.
+      if (window.parent !== window && window.frameElement && window.frameElement.id === 'project-viewer') {
+        window.parent.postMessage({ type: 'gallery-project-close' }, location.origin);
+      } else {
+        window.location.href = btn.getAttribute('href');
+      }
+    }, 280);
   });
 
   // An iOS forward-swipe back into this page restores it from the

@@ -24,5 +24,5 @@ export async function installBlenderView(renderer) {
   renderer.toneMapping=THREE.CustomToneMapping
   renderer.toneMappingExposure=1 // The approved Blender exposure is inside the LUT.
   renderer.outputColorSpace=THREE.SRGBColorSpace
-  return {settings,bind(shader){shader.uniforms.uBlenderView={value:lut}}}
+  return {settings,texture:lut,bind(shader){shader.uniforms.uBlenderView={value:lut}}}
 }
