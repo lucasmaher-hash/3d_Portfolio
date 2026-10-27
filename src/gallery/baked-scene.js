@@ -26,13 +26,27 @@ export async function prepareBakedGallery(model,scene,renderer,onProgress=()=>{}
   }))
   pmrem.dispose();scene.environment=probes[0].texture;scene.environmentIntensity=1
   const loader=new THREE.TextureLoader(),maps=new Map()
+  let mobile = null
+  if (navigator.maxTouchPoints > 0 && matchMedia('(pointer: coarse)').matches) {
+    try {
+      mobile = await (await import('./mobile-lightmaps.js')).mobileLightmapLoader(renderer)
+    } catch (error) { console.warn('Mobile lightmaps unavailable, using originals:', error) }
+  }
   await Promise.all(Object.entries(settings.lightmaps).map(async ([key,info])=>{
-    const texture=await loader.loadAsync('/gallery-baked-assets/maps/'+info.file)
+    let texture
+    if (mobile?.maps[key]) {
+      try {
+        texture = await mobile.loader.loadAsync('/gallery-baked-assets/maps-mobile/' + mobile.maps[key].file)
+      } catch (error) { console.warn('Mobile lightmap fallback:', key, error) }
+    }
+    if (!texture) texture=await loader.loadAsync('/gallery-baked-assets/maps/'+info.file)
     texture.flipY=false;texture.colorSpace=THREE.NoColorSpace
+    texture.premultiplyAlpha=false
     texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter
     texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());texture.needsUpdate=true
     maps.set(key,{...info,texture});tick()
   }))
+  if (mobile?.loader.transcoderPending) mobile.loader.dispose()
   const collidables=[]
   model.updateMatrixWorld(true)
   model.traverse(mesh=>{

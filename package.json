@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "prebuild": "node scripts/optimize-glb.mjs",
+    "prebuild": "node scripts/optimize-glb.mjs && node scripts/mobile-lightmaps.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },
