@@ -845,7 +845,7 @@
     .tap-card { align-items: center; }
     @media (max-width: 640px) {
       .taps-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .tap-card.is-us { grid-column: 1 / -1; justify-self: center; width: calc((100% - clamp(10px, 1.6vw, 20px)) / 2); }
+      .tap-card.is-us { display: none; }
     }
     .tap-shot { width: 100%; aspect-ratio: 400 / 539; overflow: hidden; border-radius: 10px; background: #fff; margin-bottom: 8px; }
     .tap-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
@@ -909,7 +909,7 @@
     .fact-num { font-family: 'OCR-A-BT', monospace; font-size-adjust: none; font-size: clamp(28px, 3.4vw, 44px); line-height: 1; letter-spacing: -0.04em; color: var(--accent-orange); }
     .fact-label { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
     .fact-src { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); opacity: 0.8; }
-    @media (max-width: 640px) { .fact-bar { grid-template-columns: minmax(0, 1fr); gap: 28px; } .fact-label { font-size: 16px; line-height: 1.45; } }
+    @media (max-width: 640px) { .fact-bar { grid-template-columns: minmax(0, 1fr); gap: 28px; } .fact { align-items: flex-start; text-align: left; } .fact-label { font-size: 16px; line-height: 1.45; } }
 
     /* Three captioned screens, each its own recording on the iPhone 16 Pro frame; they play one after another.
        --P is one phone's width, derived from the band's width so all three stay on one line at every size. */
