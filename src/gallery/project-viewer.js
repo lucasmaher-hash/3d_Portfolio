@@ -30,7 +30,11 @@ export function installProjectViewer({ onOpen, onClose }) {
     frame.id = 'project-viewer'
     frame.title = 'Project case study'
     frame.setAttribute('allow', 'autoplay; fullscreen')
-    frame.src = url
+    // Give the embedded document a fresh cache key for this lifecycle. Old
+    // cached project HTML loaded an Exit script that navigated the iframe.
+    const embeddedUrl = new URL(url)
+    embeddedUrl.searchParams.set('viewer', 'warm-v1')
+    frame.src = embeddedUrl.href
     document.body.classList.add('project-is-open')
     document.body.appendChild(frame)
     frame.focus()
