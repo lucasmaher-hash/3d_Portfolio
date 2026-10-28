@@ -4,49 +4,62 @@ import {installBlenderView} from './blender-view.js'
 
 // onProgress(0..1) reports the downloads below (colour LUT, probes, lightmaps) for the
 // welcome screen's percentage. The LUT is ~7 MB, so it counts as six items.
-export async function prepareBakedGallery(model,scene,renderer,onProgress=()=>{}) {
+export async function loadBakedGalleryResources(renderer,onProgress=()=>{}) {
   const response=await fetch('/gallery-baked-assets/scene.json')
   if(!response.ok)throw Error('Fourth gallery settings unavailable')
   const settings=await response.json()
   const LUT_WEIGHT=6,total=LUT_WEIGHT+settings.probes.length+Object.keys(settings.lightmaps).length
   let done=0;const tick=(w=1)=>{done+=w;onProgress(Math.min(1,done/total))}
-  for(const child of [...scene.children])if(child.isLight)scene.remove(child)
-  scene.fog=null;scene.background=new THREE.Color(0x071012);scene.environment=null
-  renderer.shadowMap.enabled=false
-  renderer.domElement.tabIndex=0
-  renderer.domElement.addEventListener('pointerdown',()=>renderer.domElement.focus({preventScroll:true}))
-  const view=await installBlenderView(renderer);tick(LUT_WEIGHT)
+  const viewTask=installBlenderView(renderer).then(view=>{tick(LUT_WEIGHT);return view})
   const pmrem=new THREE.PMREMGenerator(renderer)
   const probeLoader=new EXRLoader().setDataType(THREE.HalfFloatType)
-  const probes=await Promise.all(settings.probes.map(async probe=>{
+  const probesTask=Promise.all(settings.probes.map(async probe=>{
     const hdr=await probeLoader.loadAsync('/gallery-baked-assets/probes/'+probe.file)
     hdr.mapping=THREE.EquirectangularReflectionMapping
     const filtered=pmrem.fromEquirectangular(hdr);hdr.dispose();tick()
     return {...probe,texture:filtered.texture}
   }))
-  pmrem.dispose();scene.environment=probes[0].texture;scene.environmentIntensity=1
+
   const loader=new THREE.TextureLoader(),maps=new Map()
-  let mobile = null
-  if (navigator.maxTouchPoints > 0 && matchMedia('(pointer: coarse)').matches) {
-    try {
-      mobile = await (await import('./mobile-lightmaps.js')).mobileLightmapLoader(renderer)
-    } catch (error) { console.warn('Mobile lightmaps unavailable, using originals:', error) }
-  }
-  await Promise.all(Object.entries(settings.lightmaps).map(async ([key,info])=>{
-    let texture
-    if (key !== 'floor' && mobile?.maps[key]) {
+  const mapsTask=(async()=>{
+    let compressed = null
+    if (new URLSearchParams(location.search).get('textures') !== 'original') {
       try {
-        texture = await mobile.loader.loadAsync('/gallery-baked-assets/maps-mobile/' + mobile.maps[key].file)
-      } catch (error) { console.warn('Mobile lightmap fallback:', key, error) }
+        compressed = await (await import('./compressed-lightmaps.js')).compressedLightmapLoader(renderer)
+      } catch (error) { console.warn('Compressed lightmaps unavailable, using originals:', error) }
     }
-    if (!texture) texture=await loader.loadAsync('/gallery-baked-assets/maps/'+info.file)
-    texture.flipY=false;texture.colorSpace=THREE.NoColorSpace
-    texture.premultiplyAlpha=false
-    texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter
-    texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());texture.needsUpdate=true
-    maps.set(key,{...info,texture});tick()
-  }))
-  if (mobile?.loader.transcoderPending) mobile.loader.dispose()
+    await Promise.all(Object.entries(settings.lightmaps).map(async ([key,info])=>{
+      let texture
+      // RGBM floor gradients show visible block artifacts on mobile GPUs.
+      // Always use its original PNG, including in the full compressed tier.
+      if (key !== 'floor' && compressed?.maps[key]) {
+        try {
+          texture = await compressed.loader.loadAsync('/gallery-baked-assets/' + compressed.folder + '/' + compressed.maps[key].file)
+        } catch (error) { console.warn('Compressed lightmap fallback:', key, error) }
+      }
+      if (!texture) texture=await loader.loadAsync('/gallery-baked-assets/maps/'+info.file)
+      texture.flipY=false;texture.colorSpace=THREE.NoColorSpace
+      texture.premultiplyAlpha=false
+      texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter
+      texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());texture.needsUpdate=true
+      maps.set(key,{...info,texture});tick()
+    }))
+    if (compressed?.loader.transcoderPending) compressed.loader.dispose()
+  })()
+  pmrem.compileEquirectangularShader()
+  const [view, probes] = await Promise.all([viewTask, probesTask, mapsTask])
+  pmrem.dispose()
+  return {settings,view,probes,maps}
+}
+
+export async function prepareBakedGallery(model,scene,renderer,onProgress=()=>{},resources=null) {
+  const {settings,view,probes,maps}=await(resources || loadBakedGalleryResources(renderer,onProgress))
+  for(const child of [...scene.children])if(child.isLight)scene.remove(child)
+  scene.fog=null;scene.background=new THREE.Color(0x071012);scene.environment=null
+  renderer.shadowMap.enabled=false
+  renderer.domElement.tabIndex=0
+  renderer.domElement.addEventListener('pointerdown',()=>renderer.domElement.focus({preventScroll:true}))
+  scene.environment=probes[0].texture;scene.environmentIntensity=1
   const collidables=[]
   model.updateMatrixWorld(true)
   model.traverse(mesh=>{

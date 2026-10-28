@@ -1,5 +1,6 @@
 import './style.css'
-import { prepareBakedGallery } from './gallery/baked-scene.js'
+import { prepareBakedGallery, loadBakedGalleryResources } from './gallery/baked-scene.js'
+import { loadStartupData } from './gallery/startup-data.js'
 import { roundAndTintMacLamp } from './gallery/mac-lamp-orange.js'
 import { applyTomorrowLook } from './gallery/tomorrow-look.js'
 import { installProjectViewer } from './gallery/project-viewer.js'
@@ -196,7 +197,7 @@ if (PERF.glassHalfRes) renderer.transmissionResolutionScale = 0.5
 document.body.appendChild(renderer.domElement)
 
 // One-time setup for RectAreaLight. Must run before the first frame that contains one.
-RectAreaLightUniformsLib.init()
+if (!IS_GALLERY) RectAreaLightUniformsLib.init()
 
 // Environment map — gives metalness/roughness materials something to reflect.
 // Without this, any metallic material renders black/dead (no IBL to sample).
@@ -232,7 +233,7 @@ function uniformEnvironment(hex) {
   shell.material.dispose()
   return rt.texture
 }
-scene.environment = uniformEnvironment(0xffffff)
+if (!IS_GALLERY) scene.environment = uniformEnvironment(0xffffff)
 // Calibrated, not guessed: with RoomEnvironment at 0.22 the reference wall measured a mean
 // luminance of 62.8/255. A flat white shell is dimmer than RoomEnvironment's emissive
 // panels per unit intensity, so this is NOT 0.22 — sweeping 0.14/0.18/0.30/0.60/0.90 gave
@@ -1682,7 +1683,7 @@ async function readLightmap(file) {
   gl.getExtension('WEBGL_lose_context')?.loseContext()
   return { w: bmp.width, h: bmp.height, data }
 }
-async function capPodiumTops(model, settings) {
+async function capPodiumTops(model, settings, prepared = null) {
   const maps = new Map(), done = []
   const mains = []
   model.traverse(o => {
@@ -1699,65 +1700,70 @@ async function capPodiumTops(model, settings) {
     const info = settings.lightmaps[o.userData.galleryBakeLabel]
     const uvA = o.geometry.getAttribute('galleryBakeUV'), pos = o.geometry.getAttribute('position')
     if (!info || !uvA) continue
-    if (!maps.has(info.file)) maps.set(info.file, await readLightmap(info.file))
-    const lm = maps.get(info.file)
-    // Radiance at every top-surface vertex near the axis.
-    const R = PODIUM_CAP_R, N = PODIUM_FIELD_N, cell = 2 * R / N
-    const buckets = Array.from({ length: N * N }, () => [])
-    const v = new THREE.Vector3()
-    const profile = label === SHADOW_SOURCE ? Array.from({ length: SHADOW_BINS }, () => []) : null
-    for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
-      if (v.y < top - 0.0006) continue
-      if (profile) {
-        const bin = Math.floor(Math.hypot(v.x - c.x, v.z - c.z) / SHADOW_BIN)
-        if (bin < SHADOW_BINS) {
-          const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
-          const py = Math.min(lm.h - 1, Math.max(0, Math.floor(uvA.getY(i) * lm.h)))
-          const k = (py * lm.w + px) * 4, m = lm.data[k + 3] / 255 * info.range / 255
-          profile[bin].push(0.2126 * lm.data[k] * m + 0.7152 * lm.data[k + 1] * m + 0.0722 * lm.data[k + 2] * m)
+    const R = PODIUM_CAP_R, N = PODIUM_FIELD_N
+    let field = prepared?.caps[label]
+    if (!field) {
+      if (!maps.has(info.file)) maps.set(info.file, await readLightmap(info.file))
+      const lm = maps.get(info.file)
+      // Radiance at every top-surface vertex near the axis.
+      const cell = 2 * R / N
+      const buckets = Array.from({ length: N * N }, () => [])
+      const v = new THREE.Vector3()
+      const profile = label === SHADOW_SOURCE ? Array.from({ length: SHADOW_BINS }, () => []) : null
+      for (let i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
+        if (v.y < top - 0.0006) continue
+        if (profile) {
+          const bin = Math.floor(Math.hypot(v.x - c.x, v.z - c.z) / SHADOW_BIN)
+          if (bin < SHADOW_BINS) {
+            const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
+            const py = Math.min(lm.h - 1, Math.max(0, Math.floor(uvA.getY(i) * lm.h)))
+            const k = (py * lm.w + px) * 4, m = lm.data[k + 3] / 255 * info.range / 255
+            profile[bin].push(0.2126 * lm.data[k] * m + 0.7152 * lm.data[k + 1] * m + 0.0722 * lm.data[k + 2] * m)
+          }
+        }
+        const gx = Math.floor((v.x - c.x + R) / cell), gz = Math.floor((v.z - c.z + R) / cell)
+        if (gx < -1 || gz < -1 || gx > N || gz > N) continue
+        const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
+        const py = Math.min(lm.h - 1, Math.max(0, Math.floor(uvA.getY(i) * lm.h)))
+        const k = (py * lm.w + px) * 4, m = lm.data[k + 3] / 255 * info.range / 255
+        const rad = [lm.data[k] * m, lm.data[k + 1] * m, lm.data[k + 2] * m]
+        // Each vertex feeds its own cell and the 8 around it (a 3x3 gather per cell).
+        for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) {
+          const x = gx + dx, z = gz + dz
+          if (x >= 0 && z >= 0 && x < N && z < N) buckets[z * N + x].push(rad)
         }
       }
-      const gx = Math.floor((v.x - c.x + R) / cell), gz = Math.floor((v.z - c.z + R) / cell)
-      if (gx < -1 || gz < -1 || gx > N || gz > N) continue
-      const px = Math.min(lm.w - 1, Math.max(0, Math.floor(uvA.getX(i) * lm.w)))
-      const py = Math.min(lm.h - 1, Math.max(0, Math.floor(uvA.getY(i) * lm.h)))
-      const k = (py * lm.w + px) * 4, m = lm.data[k + 3] / 255 * info.range / 255
-      const rad = [lm.data[k] * m, lm.data[k + 1] * m, lm.data[k + 2] * m]
-      // Each vertex feeds its own cell and the 8 around it (a 3x3 gather per cell).
-      for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) {
-        const x = gx + dx, z = gz + dz
-        if (x >= 0 && z >= 0 && x < N && z < N) buckets[z * N + x].push(rad)
+      if (profile) {
+        // 75th percentile per ring (drops the dark seam slits); the unshadowed level is the outer rings.
+        const lum = profile.map(b => b.length ? b.sort((p, q) => p - q)[Math.floor(b.length * 0.75)] : NaN)
+        const ref = lum.slice(-6).filter(Number.isFinite).reduce((p, q) => p + q, 0) / Math.max(1, lum.slice(-6).filter(Number.isFinite).length)
+        let last = 0
+        shadowDark = lum.map(l => { const d = Number.isFinite(l) ? Math.min(1, Math.max(0, 1 - l / ref)) : last; return (last = d) })
+        console.log('Podest-Schatten (to.morrow) Tiefe je 2 cm:', shadowDark.map(d => d.toFixed(2)).join(' '))
       }
-    }
-    if (profile) {
-      // 75th percentile per ring (drops the dark seam slits); the unshadowed level is the outer rings.
-      const lum = profile.map(b => b.length ? b.sort((p, q) => p - q)[Math.floor(b.length * 0.75)] : NaN)
-      const ref = lum.slice(-6).filter(Number.isFinite).reduce((p, q) => p + q, 0) / Math.max(1, lum.slice(-6).filter(Number.isFinite).length)
-      let last = 0
-      shadowDark = lum.map(l => { const d = Number.isFinite(l) ? Math.min(1, Math.max(0, 1 - l / ref)) : last; return (last = d) })
-      console.log('Podest-Schatten (to.morrow) Tiefe je 2 cm:', shadowDark.map(d => d.toFixed(2)).join(' '))
-    }
-    const field = new Float32Array(N * N * 4), have = new Uint8Array(N * N)
-    buckets.forEach((b, i) => {
-      if (!b.length) return
-      b.sort((p, q) => (p[0] + p[1] + p[2]) - (q[0] + q[1] + q[2]))
-      const r = b[Math.min(b.length - 1, Math.floor(b.length * 0.75))]
-      field.set([r[0], r[1], r[2], 1], i * 4); have[i] = 1
-    })
-    for (let i = 0; i < N * N; i++) if (!have[i]) {   // empty cells: nearest filled one
-      let best = Infinity, bj = -1
-      for (let j = 0; j < N * N; j++) if (have[j]) {
-        const d = (i % N - j % N) ** 2 + (Math.floor(i / N) - Math.floor(j / N)) ** 2
-        if (d < best) { best = d; bj = j }
+      field = new Float32Array(N * N * 4)
+      const have = new Uint8Array(N * N)
+      buckets.forEach((b, i) => {
+        if (!b.length) return
+        b.sort((p, q) => (p[0] + p[1] + p[2]) - (q[0] + q[1] + q[2]))
+        const r = b[Math.min(b.length - 1, Math.floor(b.length * 0.75))]
+        field.set([r[0], r[1], r[2], 1], i * 4); have[i] = 1
+      })
+      for (let i = 0; i < N * N; i++) if (!have[i]) {   // empty cells: nearest filled one
+        let best = Infinity, bj = -1
+        for (let j = 0; j < N * N; j++) if (have[j]) {
+          const d = (i % N - j % N) ** 2 + (Math.floor(i / N) - Math.floor(j / N)) ** 2
+          if (d < best) { best = d; bj = j }
+        }
+        if (bj >= 0) field.set(field.subarray(bj * 4, bj * 4 + 4), i * 4)
       }
-      if (bj >= 0) field.set(field.subarray(bj * 4, bj * 4 + 4), i * 4)
-    }
-    if (label === SHADOW_TARGET && shadowDark) {
-      for (let i = 0; i < N * N; i++) {
-        const r = Math.hypot(((i % N) + 0.5) * cell - R, (Math.floor(i / N) + 0.5) * cell - R) * SHADOW_SCALE
-        const d = shadowDark[Math.min(SHADOW_BINS - 1, Math.floor(r / SHADOW_BIN))] * SHADOW_OPACITY
-        for (let k = 0; k < 3; k++) field[i * 4 + k] *= 1 - d
+      if (label === SHADOW_TARGET && shadowDark) {
+        for (let i = 0; i < N * N; i++) {
+          const r = Math.hypot(((i % N) + 0.5) * cell - R, (Math.floor(i / N) + 0.5) * cell - R) * SHADOW_SCALE
+          const d = shadowDark[Math.min(SHADOW_BINS - 1, Math.floor(r / SHADOW_BIN))] * SHADOW_OPACITY
+          for (let k = 0; k < 3; k++) field[i * 4 + k] *= 1 - d
+        }
       }
     }
     const tex = new THREE.DataTexture(field, N, N, THREE.RGBAFormat, THREE.FloatType)
@@ -1814,47 +1820,53 @@ function setWallSeams(s) {
   WALL_SEAM_U.uSeamWidth.value = WALL_SEAM.width
   WALL_SEAM_U.uSeamSoft.value = WALL_SEAM.soft
 }
-async function drawWallSeams(model, settings) {
-  const res = await fetch('/gallery-baked-assets/wall-seams.json')
-  if (!res.ok) { console.warn('Wandfugen: wall-seams.json fehlt'); return }
-  const planes = await res.json()
+async function drawWallSeams(model, settings, prepared = null) {
+  let planes = null
+  if (!prepared) {
+    const res = await fetch('/gallery-baked-assets/wall-seams.json')
+    if (!res.ok) { console.warn('Wandfugen: wall-seams.json fehlt'); return }
+    planes = await res.json()
+  }
   setWallSeams({})
   const walls = []
-  model.traverse(o => { if (o.isMesh && o.userData.galleryRole === 'wall' && planes[o.userData.galleryBakeLabel]) walls.push(o) })
+  model.traverse(o => { if (o.isMesh && o.userData.galleryRole === 'wall' && (prepared?.seams[o.name] || planes?.[o.userData.galleryBakeLabel])) walls.push(o) })
   let meshes = 0
   const CELL = 0.5, MAX_D = 0.9
   for (const o of walls) {
-    // Line centres per height level (written by the Blender build). A vertex's seam
-    // distance is its horizontal distance to the nearest line centre of its OWN level,
-    // so the line follows the panel joint through the flared coves.
-    const levels = new Map()
-    for (const [key, flat] of Object.entries(planes[o.userData.galleryBakeLabel])) {
-      const pts = new Float64Array(flat.length)
-      for (let i = 0; i < flat.length; i++) pts[i] = flat[i] / 1e4
-      const grid = new Map()
-      for (let i = 0; i < pts.length; i += 2) {
-        const k = Math.floor(pts[i] / CELL) + ',' + Math.floor(pts[i + 1] / CELL)
-        if (!grid.has(k)) grid.set(k, []); grid.get(k).push(i >> 1)
-      }
-      levels.set(+key, { pts, grid })
-    }
-    const pos = o.geometry.getAttribute('position'), v = new THREE.Vector3()
-    const dist = new Float32Array(pos.count).fill(10)
-    for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
-      // Levels are profile rows written from Blender; the GLB's 16-bit quantized
-      // positions can land a millimetre either side of the key.
-      const key = Math.round(v.y * 1000)
-      const L = levels.get(key) || levels.get(key - 1) || levels.get(key + 1) || levels.get(key - 2) || levels.get(key + 2)
-      if (!L) continue
-      const gx = Math.floor(v.x / CELL), gz = Math.floor(v.z / CELL)
-      let best = MAX_D, hit = false
-      for (let x = gx - 1; x <= gx + 1; x++) for (let z = gz - 1; z <= gz + 1; z++)
-        for (const j of L.grid.get(x + ',' + z) || []) {
-          const d = Math.hypot(v.x - L.pts[2 * j], v.z - L.pts[2 * j + 1])
-          if (d < best) { best = d; hit = true }
+    let dist = prepared?.seams[o.name]
+    if (!dist) {
+      // Line centres per height level (written by the Blender build). A vertex's seam
+      // distance is its horizontal distance to the nearest line centre of its OWN level,
+      // so the line follows the panel joint through the flared coves.
+      const levels = new Map()
+      for (const [key, flat] of Object.entries(planes[o.userData.galleryBakeLabel])) {
+        const pts = new Float64Array(flat.length)
+        for (let i = 0; i < flat.length; i++) pts[i] = flat[i] / 1e4
+        const grid = new Map()
+        for (let i = 0; i < pts.length; i += 2) {
+          const k = Math.floor(pts[i] / CELL) + ',' + Math.floor(pts[i + 1] / CELL)
+          if (!grid.has(k)) grid.set(k, []); grid.get(k).push(i >> 1)
         }
-      dist[i] = hit ? best : 10
+        levels.set(+key, { pts, grid })
+      }
+      const pos = o.geometry.getAttribute('position'), v = new THREE.Vector3()
+      dist = new Float32Array(pos.count).fill(10)
+      for (let i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
+        // Levels are profile rows written from Blender; the GLB's 16-bit quantized
+        // positions can land a millimetre either side of the key.
+        const key = Math.round(v.y * 1000)
+        const L = levels.get(key) || levels.get(key - 1) || levels.get(key + 1) || levels.get(key - 2) || levels.get(key + 2)
+        if (!L) continue
+        const gx = Math.floor(v.x / CELL), gz = Math.floor(v.z / CELL)
+        let best = MAX_D, hit = false
+        for (let x = gx - 1; x <= gx + 1; x++) for (let z = gz - 1; z <= gz + 1; z++)
+          for (const j of L.grid.get(x + ',' + z) || []) {
+            const d = Math.hypot(v.x - L.pts[2 * j], v.z - L.pts[2 * j + 1])
+            if (d < best) { best = d; hit = true }
+          }
+        dist[i] = hit ? best : 10
+      }
     }
     o.geometry.setAttribute('gallerySeamD', new THREE.BufferAttribute(dist, 1))
     for (const m of [o.material].flat()) {
@@ -2645,20 +2657,41 @@ function sceneReady() {
   if (window._loader) window._loader.progress(1)
   if (window._sceneReady) window._sceneReady()
 }
+let modelLoadProgress = 0, resourceLoadProgress = 0
+const bakedResources = IS_GALLERY ? loadBakedGalleryResources(renderer, p => {
+  resourceLoadProgress = p
+  loadProgress(GLB_SHARE * modelLoadProgress + (0.9 - GLB_SHARE) * p)
+}) : null
+// A resource can fail before the model finishes. Its error is handled by the
+// existing gallery setup catch when prepareBakedGallery awaits this promise.
+bakedResources?.catch(() => {})
+const preparedStartup = IS_GALLERY ? loadStartupData() : null
+const roundedLamp = IS_GALLERY ? loader.loadAsync('/models/mac-lamp-orange-rounded.glb?v=1') : null
+roundedLamp?.catch(() => {})
 loadScene(
   PERF.lightGlb ? GLB_OPTIMIZED : GLB_ORIGINAL,
   async (gltf) => {
     if (IS_GALLERY) {
       try {
-        const { settings, collidables: galleryWalls, view, probes, textures } = await prepareBakedGallery(gltf.scene, scene, renderer, p => loadProgress(GLB_SHARE + p * (0.9 - GLB_SHARE)))
-        await roundAndTintMacLamp(gltf.scene, loader)
+        // Build while the independent lightmaps/probes are still downloading.
+        // Establish the same exact bounds that prepareBakedGallery used before
+        // BVH construction; its epsilon-expanded bounds must not alter shading.
+        if (PERF.bvh) gltf.scene.traverse(mesh => {
+          if (!mesh.isMesh) return
+          let owner = mesh
+          while (owner.parent && owner !== gltf.scene && !owner.userData.galleryRole) owner = owner.parent
+          const role = mesh.userData.galleryRole || owner.userData.galleryRole
+          if ((role === 'wall' || role === 'podium') && !mesh.geometry.boundsTree) {
+            mesh.geometry.computeBoundingBox()
+            mesh.geometry.computeBoundsTree({ indirect: true })
+          }
+        })
+        const { settings, collidables: galleryWalls, view, probes, textures } = await prepareBakedGallery(gltf.scene, scene, renderer, undefined, bakedResources)
+        await roundAndTintMacLamp(gltf.scene, loader, roundedLamp)
         applyTomorrowLook(gltf.scene)
         collidables = galleryWalls
         // Include the lower cove in shoulder-width collision checks.
         lowCollidables.push(...galleryWalls)
-        if (PERF.bvh) for (const mesh of galleryWalls) {
-          if (!mesh.geometry.boundsTree) mesh.geometry.computeBoundsTree({ indirect: true })
-        }
         floorY = settings.floorY
         playerHeight = settings.eyeHeight
         camera.position.fromArray(settings.spawn)
@@ -2700,8 +2733,9 @@ loadScene(
             addGalleryExhibit(group, project, data, bounds, view)
           }
           addCentreHelpPodium(gltf.scene)
-          await capPodiumTops(gltf.scene, settings)
-          await drawWallSeams(gltf.scene, settings)
+          const prepared = await preparedStartup
+          await capPodiumTops(gltf.scene, settings, prepared)
+          await drawWallSeams(gltf.scene, settings, prepared)
           try {
             const saved = JSON.parse(sessionStorage.getItem(RETURN_STATE_KEY))
             if (saved && ['x','y','z','yaw','pitch'].every(k => Number.isFinite(saved[k]))) {
@@ -3003,7 +3037,10 @@ loadScene(
   e => {
     // Real download progress for the loading screen (e.total is 0 if the
     // server sends no content-length — then the loader just eases on done())
-    if (e.total) loadProgress(GLB_SHARE * e.loaded / e.total)
+    if (e.total) {
+      modelLoadProgress = e.loaded / e.total
+      loadProgress(GLB_SHARE * modelLoadProgress + (0.9 - GLB_SHARE) * resourceLoadProgress)
+    }
   },
   err => {
     console.error('GLB load error:', err)

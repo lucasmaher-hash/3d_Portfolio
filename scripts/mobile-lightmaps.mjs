@@ -60,3 +60,24 @@ if (encode) {
   await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n')
 }
 console.log(`PASS: ${Object.keys(settings.lightmaps).length} full-resolution mobile lightmaps; GPU mips ${(originalBytes / 1048576).toFixed(1)} → ${(gpuBytes / 1048576).toFixed(1)} MiB; downloads ${(downloadBytes / 1048576).toFixed(1)} MiB`)
+
+// The shared faster-loading tier keeps the sensitive floor at full resolution.
+const balanced = JSON.parse(await fs.readFile(new URL('lightmaps-balanced.json', root)))
+let balancedBytes = 0
+for (const [key, info] of Object.entries(settings.lightmaps)) {
+  if (key === 'floor') continue
+  const entry = balanced.maps[key]
+  const source = await fs.readFile(new URL('maps/' + info.file, root))
+  if (!entry || entry.sourceSHA256 !== crypto.createHash('sha256').update(source).digest('hex') || entry.range !== info.range) {
+    throw Error(`Stale balanced lightmap ${key}; regenerate with scripts/balanced-lightmaps.py`)
+  }
+  const bytes = await fs.readFile(new URL('maps-balanced/' + entry.file, root))
+  const ktx = read(bytes), scale = key === 'floor' ? 1 : 0.5
+  if (ktx.pixelWidth !== Math.max(1, info.width * scale) || ktx.pixelHeight !== Math.max(1, info.height * scale) ||
+      ktx.dataFormatDescriptor[0].transferFunction !== 1 || ktx.dataFormatDescriptor[0].flags !== 0 ||
+      ktx.levels.length !== Math.floor(Math.log2(Math.max(ktx.pixelWidth, ktx.pixelHeight))) + 1) {
+    throw Error('Invalid balanced lightmap: ' + key)
+  }
+  balancedBytes += bytes.length
+}
+console.log(`PASS: 23 balanced lightmaps, original PNG floor; ${(balancedBytes / 1048576).toFixed(1)} MiB download plus floor`)

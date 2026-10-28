@@ -176,12 +176,12 @@ function bottleDials(model) {
   ])
 }
 
-export async function roundAndTintMacLamp(model, gltfLoader) {
+export async function roundAndTintMacLamp(model, gltfLoader, pendingRounded = null) {
   metalGrey(model)
   bottleDials(model)
   const targets = NAMES.map(n => model.getObjectByName(n)).filter(o => o && o.isMesh)
   try {
-    const rounded = (await gltfLoader.loadAsync('/models/mac-lamp-orange-rounded.glb?v=1')).scene
+    const rounded = (await (pendingRounded || gltfLoader.loadAsync('/models/mac-lamp-orange-rounded.glb?v=1'))).scene
     for (const mesh of targets) {
       const src = rounded.getObjectByName(mesh.name)
       if (!src || !src.isMesh) continue

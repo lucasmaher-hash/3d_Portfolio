@@ -1,0 +1,82 @@
+{
+  "inputs": {
+    "gallery.glb": "8df0d06a201712a1857973a1a246b255d24c7de9cf845186296d10dc23733c4b",
+    "scene.json": "691b6c51af91867ac36ba268e4050174dbead23b160927ba18b2da7122c8e9ef",
+    "wall-seams.json": "ec62bb874aecf59456406ba63a639d411f7f2b93f14d0933d17143fcc906f34f",
+    "maps/podium-01.png": "fe1b7bfd2331b676c95a52a1dd2effca7242856179ed5d6935f599842c955328",
+    "maps/podium-02.png": "989b8e35cfdac491dedcddee13f0e4c2f839702020aba1c597009371b853a906",
+    "maps/podium-03.png": "9779d403c051913b39dd5ba1249da099a598a681d73c82f9b559bb50c1ecf062",
+    "maps/podium-04.png": "f905fa34a66f59023ec65d81ac70e5be1f673cd2b5d4eea5117b777934728788",
+    "maps/podium-05.png": "34398c8ccf2c8e794a50a1fce9d69d932c63c3a7cd1419fe5d09e25b9a56ab48",
+    "maps/podium-06.png": "488c07da667d9a225d3d6915ab8cecbf85376d696c52831c63e82650279dad81",
+    "maps/podium-07.png": "afad23060d9b0725f8df75ad1489ef72ff428af178880e7f67be232549230a82",
+    "calculation": "48b13cfd3f4a3d116df5505a7c041e48e3a4590ebb76486a59f3e738f90f7bb9"
+  },
+  "caps": {
+    "podium-01": {
+      "width": 64,
+      "height": 64,
+      "offset": 0,
+      "length": 65536,
+      "sha256": "f09d70c4be5eef418b4a64926574a9b3788f0da0dab69e839f7dcf895f711721"
+    },
+    "podium-02": {
+      "width": 64,
+      "height": 64,
+      "offset": 65536,
+      "length": 65536,
+      "sha256": "7c670840c788daff406552e34d91d36b5a0fac75579908111f382dadcdeae1fd"
+    },
+    "podium-03": {
+      "width": 64,
+      "height": 64,
+      "offset": 131072,
+      "length": 65536,
+      "sha256": "663736a5c6f888871dd74bd4e497f50c94dd1f583ae3a34650cdb95736b9bd7a"
+    },
+    "podium-04": {
+      "width": 64,
+      "height": 64,
+      "offset": 196608,
+      "length": 65536,
+      "sha256": "1860238f59a2fa2dd5617d8d4999c58767c4f1a23615991b847c10956bd2275c"
+    },
+    "podium-05": {
+      "width": 64,
+      "height": 64,
+      "offset": 262144,
+      "length": 65536,
+      "sha256": "d29a99b5a429fdc478c6023b376d020489c608f3e7b3dac222f8e1413ceee260"
+    },
+    "podium-06": {
+      "width": 64,
+      "height": 64,
+      "offset": 327680,
+      "length": 65536,
+      "sha256": "33189b10473f67befa1eae74fca998095bc80f3f28c6d5592af29bbc478056a6"
+    },
+    "podium-07": {
+      "width": 64,
+      "height": 64,
+      "offset": 393216,
+      "length": 65536,
+      "sha256": "7d2e01c9663bf9eb859512f392ad589a87557eb262b6cc210f25bf344150b7cc"
+    }
+  },
+  "seams": {
+    "Inner_Ring_|_12_m_|_9_cm_shells_|_rounded_returns": {
+      "count": 350198,
+      "offset": 458752,
+      "length": 1400792,
+      "sha256": "a83d121764de12bf384d62d0299b544cbc099b53085e32e37cb9e78cef440dca"
+    },
+    "Outer_Wall_|_closed_|_inward_coves_|_9_cm_thick": {
+      "count": 290496,
+      "offset": 1859544,
+      "length": 1161984,
+      "sha256": "0d51ddb49baf71be7ffa2e7328ac45d5bbafc6357eb3f24ee4ba5c4cd4c2ba07"
+    }
+  },
+  "file": "startup-data.57c0dcb65f83.bin",
+  "sha256": "57c0dcb65f83c466eecf0832d39d7702d6fd0d53dc57f2a6b8bed50bc36fa3a9"
+}

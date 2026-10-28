@@ -37,10 +37,20 @@ async function check({ width, touch }) {
     const state = window.__sceneTest
     state.renderer = __perf.renderer
     __perf.renderer.domElement.addEventListener('webglcontextlost', () => state.lost++)
-    return { token: state.token, programs: __perf.renderer.info.programs.length,
+    const floors = new Set()
+    _gallery.model.traverse(mesh => {
+      if (!mesh.isMesh || mesh.userData.galleryBakeLabel !== 'floor') return
+      for (const material of [mesh.material].flat()) {
+        const texture = __perf.renderer.properties.get(material).uniforms?.uBakedDiffuse?.value
+        if (texture) floors.add(texture)
+      }
+    })
+    return { floorOriginal: floors.size > 0 && [...floors].every(t => !t.isCompressedTexture && t.image.width === _gallery.settings.lightmaps.floor.width),
+      token: state.token, programs: __perf.renderer.info.programs.length,
       textures: __perf.renderer.info.memory.textures,
       galleryRequests: performance.getEntriesByType('resource').filter(r => r.name.includes('/gallery-baked-assets/')).length }
   })
+  assert(identity.floorOriginal, 'Floor lighting must use its full-resolution original PNG, including on mobile')
   const result = { width, touch, views: [], cycles: [] }
   // First visits, not a warmed second walk. These previously added programs /
   // textures and caused ~267–300ms gaps around the bottle and lamp.
