@@ -1,0 +1,216 @@
+{
+  "browser": "Chrome 156.0.8078.48",
+  "gpu": "ANGLE Metal Apple M4",
+  "viewport": [
+    1440,
+    1000
+  ],
+  "deviceScaleFactor": 2,
+  "introSkipped": true,
+  "samples": [
+    {
+      "pass": 0,
+      "project": "Unify",
+      "programs": 35,
+      "textures": 35,
+      "programsAfter": 35,
+      "texturesAfter": 35,
+      "max": 16.800000000000182,
+      "tasks": [],
+      "draw": {
+        "frame": 319,
+        "calls": 17,
+        "triangles": 1540206,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 0,
+      "project": "Double Packaging",
+      "programs": 35,
+      "textures": 35,
+      "programsAfter": 37,
+      "texturesAfter": 39,
+      "max": 33.40000000000009,
+      "tasks": [],
+      "draw": {
+        "frame": 356,
+        "calls": 98,
+        "triangles": 4634648,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 0,
+      "project": "Mac-Lamp",
+      "programs": 37,
+      "textures": 39,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 50.09999999999991,
+      "tasks": [],
+      "draw": {
+        "frame": 393,
+        "calls": 120,
+        "triangles": 4966600,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 0,
+      "project": "Virtual Cooking",
+      "programs": 39,
+      "textures": 45,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 16.800000000000182,
+      "tasks": [],
+      "draw": {
+        "frame": 433,
+        "calls": 60,
+        "triangles": 3949640,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 0,
+      "project": "Cybercoffee",
+      "programs": 39,
+      "textures": 45,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 16.700000000000728,
+      "tasks": [],
+      "draw": {
+        "frame": 472,
+        "calls": 92,
+        "triangles": 4357432,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 0,
+      "project": "to.morrow",
+      "programs": 39,
+      "textures": 45,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 16.800000000000182,
+      "tasks": [],
+      "draw": {
+        "frame": 511,
+        "calls": 34,
+        "triangles": 3308004,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 1,
+      "project": "Unify",
+      "programs": 39,
+      "textures": 45,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 16.800000000000182,
+      "tasks": [],
+      "draw": {
+        "frame": 551,
+        "calls": 17,
+        "triangles": 1540206,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 1,
+      "project": "Double Packaging",
+      "programs": 39,
+      "textures": 45,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 16.800000000000182,
+      "tasks": [],
+      "draw": {
+        "frame": 590,
+        "calls": 98,
+        "triangles": 4634648,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 1,
+      "project": "Mac-Lamp",
+      "programs": 39,
+      "textures": 45,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 16.80000000000109,
+      "tasks": [],
+      "draw": {
+        "frame": 629,
+        "calls": 120,
+        "triangles": 4966600,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 1,
+      "project": "Virtual Cooking",
+      "programs": 39,
+      "textures": 45,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 16.80000000000109,
+      "tasks": [],
+      "draw": {
+        "frame": 669,
+        "calls": 60,
+        "triangles": 3949640,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 1,
+      "project": "Cybercoffee",
+      "programs": 39,
+      "textures": 45,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 16.80000000000109,
+      "tasks": [],
+      "draw": {
+        "frame": 708,
+        "calls": 92,
+        "triangles": 4357432,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "pass": 1,
+      "project": "to.morrow",
+      "programs": 39,
+      "textures": 45,
+      "programsAfter": 39,
+      "texturesAfter": 45,
+      "max": 16.799999999999272,
+      "tasks": [],
+      "draw": {
+        "frame": 747,
+        "calls": 34,
+        "triangles": 3308004,
+        "points": 0,
+        "lines": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "mode": "desktop",
+    "count": 24,
+    "format": [
+      1023
+    ],
+    "compressed": 0,
+    "bytes": 183151274.66666672,
+    "decoderRequests": 0,
+    "errors": []
+  },
+  {
+    "mode": "mobile",
+    "count": 24,
+    "format": [
+      37808
+    ],
+    "compressed": 24,
+    "bytes": 45788480,
+    "decoderRequests": 4,
+    "errors": []
+  },
+  {
+    "mode": "fallback",
+    "count": 24,
+    "format": [
+      1023
+    ],
+    "compressed": 0,
+    "bytes": 183151274.66666672,
+    "decoderRequests": 2,
+    "errors": []
+  }
+]

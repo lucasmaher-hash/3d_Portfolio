@@ -1,0 +1,278 @@
+{
+  "base": "http://127.0.0.1:4174",
+  "browser": "156.0.8078.48",
+  "results": [
+    {
+      "width": 1440,
+      "touch": false,
+      "views": [
+        {
+          "project": "Unify",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.700000000000273,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "Double Packaging",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.800000000000182,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "Mac-Lamp",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.799999999999727,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "Virtual Cooking",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.800000000000182,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "Cybercoffee",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.799999999999272,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "to.morrow",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.700000000000728,
+          "maxMs": 16.800000000000182
+        }
+      ],
+      "cycles": [
+        {
+          "project": "mac-lamp",
+          "token": 0.5084107852239572,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "unify",
+          "token": 0.5084107852239572,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "vaccine",
+          "token": 0.5084107852239572,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "virtual_cooking",
+          "token": 0.5084107852239572,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "kaffeemaschine",
+          "token": 0.5084107852239572,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "to.morrow",
+          "token": 0.5084107852239572,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        }
+      ],
+      "walk": {
+        "position": [
+          -0.009690324462271388,
+          1.8686630664582453,
+          -1.1210561996997395
+        ],
+        "maxMs": 16.80000000000109
+      }
+    },
+    {
+      "width": 390,
+      "touch": true,
+      "views": [
+        {
+          "project": "Unify",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.799999999999727,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "Double Packaging",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.800000000000182,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "Mac-Lamp",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.800000000000182,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "Virtual Cooking",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.699999999999818,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "Cybercoffee",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.699999999999818,
+          "maxMs": 16.800000000000182
+        },
+        {
+          "project": "to.morrow",
+          "programs": 58,
+          "textures": 45,
+          "p95Ms": 16.800000000000182,
+          "maxMs": 16.800000000000182
+        }
+      ],
+      "cycles": [
+        {
+          "project": "mac-lamp",
+          "token": 0.2493665222078315,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "unify",
+          "token": 0.2493665222078315,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "vaccine",
+          "token": 0.2493665222078315,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "virtual_cooking",
+          "token": 0.2493665222078315,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "kaffeemaschine",
+          "token": 0.2493665222078315,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        },
+        {
+          "project": "to.morrow",
+          "token": 0.2493665222078315,
+          "sameRenderer": true,
+          "textures": 45,
+          "programs": 58,
+          "position": [
+            9.684210777282715,
+            1.9386224159559822,
+            -17.526315689086914
+          ],
+          "galleryRequests": 43
+        }
+      ],
+      "walk": {
+        "position": [
+          0.11474331622066082,
+          1.8689145202276125,
+          -1.1050485826239902
+        ],
+        "maxMs": 16.80000000000109
+      }
+    }
+  ]
+}
