@@ -5,6 +5,7 @@ import { roundAndTintMacLamp } from './gallery/mac-lamp-orange.js'
 import { applyTomorrowLook } from './gallery/tomorrow-look.js'
 import { installProjectViewer } from './gallery/project-viewer.js'
 import { warmGallery } from './gallery/warmup.js'
+import { DESKTOP_VIEW, applyDesktopView } from './gallery/camera-view.js'
 
 const IS_DEFAULT_GALLERY = ['/', '/index.html'].includes(location.pathname)
 const IS_BAKED_GALLERY = IS_DEFAULT_GALLERY || ['/gallery-baked.html','/gallery-4.html'].includes(location.pathname)
@@ -50,6 +51,9 @@ camera.rotation.order = 'YXZ'
 
 // Renderer
 const isMobile = navigator.maxTouchPoints > 0
+let desktopView = { ...DESKTOP_VIEW }
+const hasReviewView = new URLSearchParams(location.search).has('view')
+if (!isMobile && !hasReviewView) applyDesktopView(camera, desktopView)
 // Per-mesh load logging ("Mesh:"/"Kollision ignoriert:") — ~400 console calls
 // with JSON.stringify per load, real milliseconds during the startup jank
 // window (Safari especially). Flip on when verifying CONTENT keys / collision
@@ -2656,6 +2660,15 @@ function sceneReady() {
   loadShown = 1
   if (window._loader) window._loader.progress(1)
   if (window._sceneReady) window._sceneReady()
+  if (!isMobile && new URLSearchParams(location.search).get('cameraTuner') === '1') {
+    import('./gallery/camera-tuner.js').then(({ installCameraTuner }) => {
+      installCameraTuner(camera, values => {
+        desktopView = values
+        applyDesktopView(camera, desktopView)
+        overlayFrameDone = false
+      }, resetSceneInput)
+    }).catch(error => console.error('Camera tuner failed:', error))
+  }
 }
 let modelLoadProgress = 0, resourceLoadProgress = 0
 const bakedResources = IS_GALLERY ? loadBakedGalleryResources(renderer, p => {
@@ -3604,7 +3617,9 @@ if (PERF_HUD) {
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
-  camera.updateProjectionMatrix()
+  if (!isMobile && (!hasReviewView || new URLSearchParams(location.search).get('cameraTuner') === '1')) {
+    applyDesktopView(camera, desktopView)
+  } else camera.updateProjectionMatrix()
   if (PERF.adaptiveRes) {
     // New window, new cap; a ratio that was too slow at the old size may be fine now.
     res.ceiling = Infinity

@@ -1,0 +1,39 @@
+.camera-tuner {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 18;
+  width: min(310px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: 24px;
+  background: #DCDCE3;
+  color: #1A1A1A;
+  box-shadow: 8px 8px 22px #0005, inset 1px 1px 0 #fff9;
+  font: 13px/1.5 'Roboto Flex', sans-serif;
+  cursor: grab;
+  touch-action: none;
+}
+.camera-tuner.is-dragging { cursor: grabbing; user-select: none; }
+.camera-tuner header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.camera-tuner strong { font-size: 15px; font-weight: 600; }
+.camera-tuner p { margin: 16px 0; color: #61616a; }
+.camera-tuner button {
+  border: 0; padding: 9px 12px; border-radius: 16px;
+  color: inherit; background: #DCDCE3; font: inherit; cursor: pointer;
+  box-shadow: 3px 3px 7px #aeaebeb0, -3px -3px 7px #fff;
+}
+.camera-tuner button:active { box-shadow: inset 2px 2px 5px #aeaebeb0, inset -2px -2px 5px #fff; }
+.camera-tuner button:focus-visible, .camera-tuner input:focus-visible, .camera-tuner textarea:focus-visible { outline: 2px solid #809BBC; outline-offset: 3px; }
+.camera-tuner .camera-tuner-toggle { width: 32px; height: 32px; padding: 0; font-size: 22px; }
+.camera-tuner-control { margin: 16px 0; }
+.camera-tuner-control label { display: block; margin-bottom: 8px; }
+.camera-tuner-control > div { display: flex; align-items: center; gap: 8px; }
+.camera-tuner input[type=range] { min-width: 0; flex: 1; accent-color: #809BBC; cursor: ew-resize; }
+.camera-tuner input[type=number] { width: 58px; padding: 7px 4px; border: 0; border-radius: 10px; background: #DCDCE3; color: inherit; font: inherit; box-shadow: inset 2px 2px 5px #aeaebeb0, inset -2px -2px 5px #fff; }
+.camera-tuner-angles { display: block; font-size: 12px; color: #61616a; }
+.camera-tuner-actions { display: flex; justify-content: space-between; gap: 10px; margin: 16px 0 12px; }
+.camera-tuner textarea { display: block; width: 100%; box-sizing: border-box; padding: 10px; resize: vertical; border: 0; border-radius: 12px; background: #d3d3dc; color: #38383e; font: 11px/1.5 monospace; cursor: text; user-select: text; }
+.camera-tuner small { display: block; margin-top: 12px; font-size: 11px; color: #61616a; }

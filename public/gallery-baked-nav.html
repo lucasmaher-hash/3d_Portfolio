@@ -377,10 +377,19 @@
       height: 2px;
       background: var(--text-secondary);
       border-radius: 2px;
-      transition: background-color 200ms var(--ease);
+      transform-origin: center;
+      transition: transform 320ms cubic-bezier(.45, 0, .2, 1),
+                  opacity 240ms ease-in-out, background-color 200ms var(--ease);
     }
     .hamburger:active span,
     .hamburger.is-open span { background: var(--text-primary); }
+
+    .hamburger.is-open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .hamburger.is-open span:nth-child(2) { opacity: 0; transform: scaleX(0.2); }
+    .hamburger.is-open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    @media (prefers-reduced-motion: reduce) {
+      .hamburger, .hamburger span { transition: none !important; }
+    }
 
     .hamburger:hover {
       transform: translateY(-2px) scale(1.03);
@@ -770,7 +779,12 @@
         let menu = null
         try { menu = window.parent.document.querySelector('.mobile-menu') } catch (e) {}
         if (!menu) return false;
-        const sync = () => btn.classList.toggle('is-open', menu.classList.contains('open'));
+        const sync = () => {
+          const open = menu.classList.contains('open');
+          btn.classList.toggle('is-open', open);
+          btn.setAttribute('aria-expanded', String(open));
+          btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        };
         new MutationObserver(sync).observe(menu, { attributes: true, attributeFilter: ['class'] });
         sync();
         return true;

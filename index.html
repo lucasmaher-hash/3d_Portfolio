@@ -21,7 +21,9 @@
         var enter3d = false;
         try { enter3d = sessionStorage.getItem('_enter3d') === '1'; } catch (e) {}
         var sameOriginRef = document.referrer.indexOf(location.origin + '/') === 0;
-        if (enter3d || sameOriginRef) {
+        // An explicit authoring link must also work when opened in a fresh tab.
+        var cameraTuner = new URLSearchParams(location.search).get('cameraTuner') === '1';
+        if (enter3d || sameOriginRef || cameraTuner) {
           try { sessionStorage.setItem('_enter3d', '1'); } catch (e) {}
         } else {
           window._redirecting2d = true;
