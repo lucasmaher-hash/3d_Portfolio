@@ -1,6 +1,6 @@
 // Keep the desktop field of view consistent across wide displays. Three.js's
 // camera.fov is vertical; a fixed 90° becomes 121° horizontally at 16:9.
-export const DESKTOP_VIEW = Object.freeze({ horizontalFov: 100, verticalLimit: 75 })
+export const DESKTOP_VIEW = Object.freeze({ horizontalFov: 92, verticalLimit: 62.5 })
 
 export function applyDesktopView(camera, settings = DESKTOP_VIEW) {
   const radians = Math.PI / 180
