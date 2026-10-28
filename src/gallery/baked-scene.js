@@ -34,7 +34,7 @@ export async function prepareBakedGallery(model,scene,renderer,onProgress=()=>{}
   }
   await Promise.all(Object.entries(settings.lightmaps).map(async ([key,info])=>{
     let texture
-    if (mobile?.maps[key]) {
+    if (key !== 'floor' && mobile?.maps[key]) {
       try {
         texture = await mobile.loader.loadAsync('/gallery-baked-assets/maps-mobile/' + mobile.maps[key].file)
       } catch (error) { console.warn('Mobile lightmap fallback:', key, error) }
