@@ -61,11 +61,14 @@ if (encode) {
 }
 console.log(`PASS: ${Object.keys(settings.lightmaps).length} full-resolution mobile lightmaps; GPU mips ${(originalBytes / 1048576).toFixed(1)} → ${(gpuBytes / 1048576).toFixed(1)} MiB; downloads ${(downloadBytes / 1048576).toFixed(1)} MiB`)
 
-// The shared faster-loading tier keeps the sensitive floor at full resolution.
+// The floor and separate ceiling recesses keep their original PNGs.
 const balanced = JSON.parse(await fs.readFile(new URL('lightmaps-balanced.json', root)))
 let balancedBytes = 0
 for (const [key, info] of Object.entries(settings.lightmaps)) {
-  if (key === 'floor') continue
+  if (key === 'floor' || /^well-\d{2}$/.test(key)) {
+    if (balanced.maps[key]) throw Error('Sensitive lightmap must remain original: ' + key)
+    continue
+  }
   const entry = balanced.maps[key]
   const source = await fs.readFile(new URL('maps/' + info.file, root))
   if (!entry || entry.sourceSHA256 !== crypto.createHash('sha256').update(source).digest('hex') || entry.range !== info.range) {
@@ -80,4 +83,4 @@ for (const [key, info] of Object.entries(settings.lightmaps)) {
   }
   balancedBytes += bytes.length
 }
-console.log(`PASS: 23 balanced lightmaps, original PNG floor; ${(balancedBytes / 1048576).toFixed(1)} MiB download plus floor`)
+console.log(`PASS: ${Object.keys(balanced.maps).length} balanced lightmaps, original PNG floor and seven light recesses; ${(balancedBytes / 1048576).toFixed(1)} MiB plus originals`)

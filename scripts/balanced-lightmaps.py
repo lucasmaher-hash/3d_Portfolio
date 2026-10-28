@@ -10,10 +10,11 @@ root = Path(__file__).resolve().parents[1] / 'public/gallery-baked-assets'
 out = root / 'maps-balanced'
 out.mkdir(exist_ok=True)
 settings = json.loads((root / 'scene.json').read_text())
-manifest = {'encoding': 'UASTC-linear-RGBM', 'recipe': 'half-resolution-rdo2-original-png-floor', 'originals': ['floor'], 'maps': {}}
+originals = ['floor'] + [key for key in settings['lightmaps'] if key.startswith('well-')]
+manifest = {'encoding': 'UASTC-linear-RGBM', 'recipe': 'half-resolution-rdo2-original-floor-and-light-wells', 'originals': originals, 'maps': {}}
 with tempfile.TemporaryDirectory(prefix='gallery-lightmaps-') as temporary:
     for key, info in settings['lightmaps'].items():
-        if key == 'floor':
+        if key in originals:
             continue
         source = root / 'maps' / info['file']
         source_hash = hashlib.sha256(source.read_bytes()).hexdigest()

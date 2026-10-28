@@ -1,6 +1,6 @@
 {
   "encoding": "UASTC-linear-RGBM",
-  "recipe": "half-resolution-rdo2-original-png-floor",
+  "recipe": "half-resolution-rdo2-original-floor-and-light-wells",
   "maps": {
     "ceiling": {
       "file": "ceiling.168a2a1aa23b.ktx2",
@@ -122,62 +122,6 @@
       "height": 512,
       "range": 2
     },
-    "well-01": {
-      "file": "well-01.2dfcb6719bec.ktx2",
-      "source": "well-01.png",
-      "sourceSHA256": "fef60b7d3581b7bfa3169bacf30a83da8c65c40a9c180e7970c8bf3995558a26",
-      "width": 256,
-      "height": 256,
-      "range": 2
-    },
-    "well-02": {
-      "file": "well-02.5b68e237d758.ktx2",
-      "source": "well-02.png",
-      "sourceSHA256": "eb21cdfd2ead331158cab45ce2fb557ef8cc62dff51030c61494f6538bc1de27",
-      "width": 256,
-      "height": 256,
-      "range": 2
-    },
-    "well-03": {
-      "file": "well-03.a4f7edcaf9bb.ktx2",
-      "source": "well-03.png",
-      "sourceSHA256": "b4fac991d22e6893f85b32791a9cd4c4a38d3068d8c957cdcc4f35362db22dcf",
-      "width": 256,
-      "height": 256,
-      "range": 2
-    },
-    "well-04": {
-      "file": "well-04.782f1402f7fe.ktx2",
-      "source": "well-04.png",
-      "sourceSHA256": "c31d3ae3ea276a59b45cde46d2db8feab44ca243bdcc668d47307969da6adce4",
-      "width": 256,
-      "height": 256,
-      "range": 2
-    },
-    "well-05": {
-      "file": "well-05.c4b5cd049010.ktx2",
-      "source": "well-05.png",
-      "sourceSHA256": "eaff89a8722ff0713723b5989073b8f3d2fd249608c3f7b90c5039a97adcee2f",
-      "width": 256,
-      "height": 256,
-      "range": 2
-    },
-    "well-06": {
-      "file": "well-06.8cbe69a20e63.ktx2",
-      "source": "well-06.png",
-      "sourceSHA256": "dee6fb53fb05fecb4692f7e8c30c8df5d12e139e9fbc4e0f9778a63383c2da37",
-      "width": 256,
-      "height": 256,
-      "range": 2
-    },
-    "well-07": {
-      "file": "well-07.40e6c89832eb.ktx2",
-      "source": "well-07.png",
-      "sourceSHA256": "b5d30406a00a3d51cea81428ac4718011783aa6537ad200abf49502b9a15ed9f",
-      "width": 256,
-      "height": 256,
-      "range": 2
-    },
     "podium-07": {
       "file": "podium-07.01366548513a.ktx2",
       "source": "podium-07.png",
@@ -188,6 +132,13 @@
     }
   },
   "originals": [
-    "floor"
+    "floor",
+    "well-01",
+    "well-02",
+    "well-03",
+    "well-04",
+    "well-05",
+    "well-06",
+    "well-07"
   ]
 }

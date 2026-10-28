@@ -38,19 +38,26 @@ async function check({ width, touch }) {
     state.renderer = __perf.renderer
     __perf.renderer.domElement.addEventListener('webglcontextlost', () => state.lost++)
     const floors = new Set()
+    const wells = new Map()
     _gallery.model.traverse(mesh => {
-      if (!mesh.isMesh || mesh.userData.galleryBakeLabel !== 'floor') return
+      if (!mesh.isMesh) return
+      const label = mesh.userData.galleryBakeLabel
+      if (label !== 'floor' && !/^well-\d{2}$/.test(label)) return
       for (const material of [mesh.material].flat()) {
         const texture = __perf.renderer.properties.get(material).uniforms?.uBakedDiffuse?.value
-        if (texture) floors.add(texture)
+        if (!texture) continue
+        if (label === 'floor') floors.add(texture)
+        else wells.set(label, texture)
       }
     })
     return { floorOriginal: floors.size > 0 && [...floors].every(t => !t.isCompressedTexture && t.image.width === _gallery.settings.lightmaps.floor.width),
+      wellsOriginal: wells.size === 7 && [...wells].every(([label, t]) => !t.isCompressedTexture && t.image.width === _gallery.settings.lightmaps[label].width),
       token: state.token, programs: __perf.renderer.info.programs.length,
       textures: __perf.renderer.info.memory.textures,
       galleryRequests: performance.getEntriesByType('resource').filter(r => r.name.includes('/gallery-baked-assets/')).length }
   })
   assert(identity.floorOriginal, 'Floor lighting must use its full-resolution original PNG, including on mobile')
+  assert(identity.wellsOriginal, 'All seven ceiling recesses must use their original PNGs without replacing the ceiling')
   const result = { width, touch, views: [], cycles: [] }
   // First visits, not a warmed second walk. These previously added programs /
   // textures and caused ~267–300ms gaps around the bottle and lamp.

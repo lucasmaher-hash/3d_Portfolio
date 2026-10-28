@@ -30,9 +30,10 @@ export async function loadBakedGalleryResources(renderer,onProgress=()=>{}) {
     }
     await Promise.all(Object.entries(settings.lightmaps).map(async ([key,info])=>{
       let texture
-      // RGBM floor gradients show visible block artifacts on mobile GPUs.
-      // Always use its original PNG, including in the full compressed tier.
-      if (key !== 'floor' && compressed?.maps[key]) {
+      // Sensitive gradients: keep the original floor and the seven separate
+      // ceiling light recesses. The large ceiling surface remains optimized.
+      const original = key === 'floor' || /^well-\d{2}$/.test(key)
+      if (!original && compressed?.maps[key]) {
         try {
           texture = await compressed.loader.loadAsync('/gallery-baked-assets/' + compressed.folder + '/' + compressed.maps[key].file)
         } catch (error) { console.warn('Compressed lightmap fallback:', key, error) }
