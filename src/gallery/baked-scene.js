@@ -31,9 +31,9 @@ export async function loadBakedGalleryResources(renderer,onProgress=()=>{}) {
     await Promise.all(Object.entries(settings.lightmaps).map(async ([key,info])=>{
       let texture
       // Sensitive gradients: keep the original floor and separate light recesses.
-      // Desktop close-ups also need Unify's full-resolution body, eyes and pupils.
-      const desktopUnify = navigator.maxTouchPoints === 0 && key.startsWith('pinkroom-creature-')
-      const original = key === 'floor' || /^well-\d{2}$/.test(key) || desktopUnify
+      // Unify close-ups need the full-resolution body, eyes and pupils on all devices.
+      const unify = key.startsWith('pinkroom-creature-')
+      const original = key === 'floor' || /^well-\d{2}$/.test(key) || unify
       if (!original && compressed?.maps[key]) {
         try {
           texture = await compressed.loader.loadAsync('/gallery-baked-assets/' + compressed.folder + '/' + compressed.maps[key].file)
