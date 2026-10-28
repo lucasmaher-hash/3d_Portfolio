@@ -1594,7 +1594,7 @@ function updateGalleryExhibits(delta) {
 const HELP_PODIUM_LABEL = 'podium-07'
 const HELP_GAP     = 0.22   // m of air between podium top and the "?" (exhibits float 0.18)
 const HELP_ROCK    = 0.35   // rad, slow turn either way (a full spin would show it mirrored)
-const CENTRE_SPAWN_Z = -3.8 // ring's inner face is at r 5.97; spawn yaw π faces +Z
+const CENTRE_SPAWN_Z = -5.3 // full help podium in view; inside the ring's r 5.97 inner face, yaw π faces +Z
 const helpIcons = []
 
 function makeQuestionGeometry() {
