@@ -21,8 +21,9 @@
         const a = source.getBoundingClientRect(), b = destination.getBoundingClientRect();
         let x1 = a.right - origin.left + 2, y1 = a.top + a.height / 2 - origin.top;
         let x2 = b.left - origin.left - 3, y2 = b.top + b.height / 2 - origin.top;
-        if (from === 'task-start') {
-          // A small direction cue in the gap between the first two phones.
+        if (from === 'task-start' || band.dataset.wireflow === 'draft') {
+          // A short direction cue in the gap between two phones, level with the source element
+          // (the draft's source and destination sit at the same height, so it reads as one link).
           const first = source.closest('.wireflow-phone').getBoundingClientRect();
           const second = destination.closest('.wireflow-phone').getBoundingClientRect();
           const center = (first.right + second.left) / 2 - origin.left;
