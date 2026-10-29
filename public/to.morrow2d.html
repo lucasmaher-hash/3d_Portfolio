@@ -4581,36 +4581,25 @@ description: Use when designing or extending any screen
     paint();
     if (k < 1) { requestAnimationFrame(frame); return; }
     running = false;
-    holdTurn = false;
     check();                                        // the reader may have scrolled back meanwhile
   }
   function go(to) { from = t; target = to; start = performance.now(); running = true; requestAnimationFrame(frame); }
   var want = 0, lock = false;                       // lock: the reader pressed the rotate button; scroll stops deciding until the stage is left
-  var seenStage = false, holdTurn = false;
   function check() {
     var r = sec.getBoundingClientRect(), sticky = sec.querySelector('.rot-sticky'), span = sec.offsetHeight - sticky.offsetHeight;
-    if (r.top < window.innerHeight && r.bottom > 0) seenStage = true;
-    else if (r.top >= window.innerHeight) seenStage = false;
     if (span > 0) {
       var p = -r.top / span;
       if (p < 0 || p > 1) lock = false;
       if (!lock) { if (p > 0.18) want = 1; else if (p < 0.13) want = 0; }   // hysteresis, so it cannot flicker at the line
       if (!running && want !== t) {
-        holdTurn = want === 1 && seenStage;
         go(want);
-      }
-      // A fast scroll can otherwise leave the sticky section before its timed
-      // turn has finished. Keep the stage visible until that turn completes;
-      // ordinary scrolling resumes immediately afterwards.
-      if (running && target === 1 && holdTurn && p > 1) {
-        window.scrollTo({ top: window.scrollY + r.top + span - 1, behavior: 'instant' });
       }
     }
   }
   var btn = document.getElementById('rot-btn');
   if (btn) btn.addEventListener('click', function () {
     if (running) return;                            // never interrupt a turn in progress
-    lock = true; want = want ? 0 : 1; holdTurn = want === 1 && seenStage; go(want);
+    lock = true; want = want ? 0 : 1; go(want);
   });
   window.addEventListener('scroll', check, { passive: true });
   window.addEventListener('resize', function () { paint(); check(); });
