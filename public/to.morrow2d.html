@@ -2748,6 +2748,13 @@
     .component-principles { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
     .component-principles li { position: relative; padding-left: 24px; }
     .component-principles li::before { content: ''; position: absolute; left: 0; top: .65em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-orange); }
+    .skill-steps { list-style: none; counter-reset: sk; padding: 0; margin: 0; display: grid; gap: 18px; }
+    .skill-steps li { counter-increment: sk; position: relative; padding-left: 46px; }
+    .skill-steps li::before { content: counter(sk); position: absolute; left: 0; top: -.1em; width: 30px; height: 30px; border-radius: 50%; background: var(--accent-orange); color: #fff; font: 500 14px/30px 'IBM Plex Mono', ui-monospace, Menlo, monospace; text-align: center; }
+    .skill-steps b.kw { color: var(--text-primary); }
+    .skill-file { margin: 0; }
+    .skill-file pre { margin: 0; padding: clamp(16px, 2.4vw, 28px); border-radius: 14px; background: rgba(0, 0, 0, 0.06); box-shadow: var(--shadow-pressed); overflow-x: auto; font: 400 clamp(12px, 1.2vw, 14px)/1.7 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size-adjust: none; color: var(--text-primary); white-space: pre; }
+    .skill-file figcaption { margin-top: 10px; font-size: 13px; color: var(--text-secondary); }
 
     /* Sketch spread: only two short annotations; explanations live above it. */
     .paper { margin: 0; padding: 0; border-radius: 6px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(40, 40, 90, 0.18), 0 8px 22px rgba(40, 40, 90, 0.1); }
@@ -3119,8 +3126,8 @@
       <div class="dna-list dna">
         <div class="dna-row">
           <div class="dna-copy">
-            <h3 class="feature-title" data-i18n="n-skill-title">Implementing it as a skill</h3>
-            <p class="stagger-copy" style="margin-top: 14px;" data-i18n="n-skill-text">Die Gestaltungsregeln habe ich anschließend in einem wiederverwendbaren Skill für Claude festgehalten.</p>
+            <h3 class="feature-title" data-i18n="n-skill-title">Als Skill umgesetzt</h3>
+            <p class="stagger-copy" style="margin-top: 14px;" data-i18n-html="n-skill-text">Die Regeln gelten für jedes Bedienelement der App. Damit sie nicht nur in meinem Kopf stecken, habe ich sie in einem <b class="kw">wiederverwendbaren Skill für Claude</b> festgehalten. Ein Skill ist eine Anleitung, die Claude lädt, sobald eine Aufgabe dazu passt. Bei mir ist das jede neue Oberfläche und jedes neue Bedienelement für to.morrow.</p>
           </div>
           <div class="dna-stack">
             <div class="dna-stage dna-stage--input sk" style="--z0: 1.16116;">
@@ -3158,6 +3165,30 @@
           </div>
         </div>
       </div>
+      <h3 class="feature-title cs-h3" data-i18n="n-skill-how-title">So habe ich daraus einen Skill gebaut</h3>
+      <p class="guide-text" data-i18n-html="n-skill-how-intro">Ein Skill ist ein Ordner mit einer Datei namens <b class="kw">SKILL.md</b>. Oben stehen Name und Beschreibung, darunter die Anweisungen. Bei mir waren es fünf Schritte:</p>
+      <ol class="guide-text skill-steps">
+        <li data-i18n-html="n-skill-s1"><b class="kw">Regeln als Vorgaben aufschreiben.</b> Aus den drei Formen wurde ein Regelwerk mit einem Grundsatz: Tiefe entsteht durch Licht von oben und nie durch Texturen. Jede Regel steht als Vorgabe da und nicht als Vorschlag, damit Claude nicht raten muss.</li>
+        <li data-i18n-html="n-skill-s2"><b class="kw">Werte aus dem Quellcode lesen.</b> Farben, Radien, Schatten und Abstände habe ich aus dem Code der App übernommen und als feste Werte notiert, statt sie nach Gefühl zu wählen. Die Farbpalette hängt an einer einzigen Stelle, sodass sich ein ganzes Thema durch den Austausch der Palette ändert.</li>
+        <li data-i18n-html="n-skill-s3"><b class="kw">Rezepte für die Bausteine mitgeben.</b> Für Eingabefeld, Knopf und Umschalter gibt es je ein Rezept mit Code. Ein neues Element baut Claude aus dem nächstliegenden Rezept, statt etwas Neues zu erfinden.</li>
+        <li data-i18n-html="n-skill-s4"><b class="kw">Eine Checkliste anhängen.</b> Vor jedem Ergebnis prüft Claude: Kommt das Licht von oben? Gibt es keine Textur? Stammen alle Werte aus den festen Werten? So fallen Abweichungen auf, bevor ich sie sehe.</li>
+        <li data-i18n-html="n-skill-s5"><b class="kw">Name und Beschreibung schreiben.</b> Die Beschreibung entscheidet, wann Claude den Skill lädt. Deshalb nennt sie die Aufgaben ausdrücklich: Oberfläche gestalten, Bedienelement bauen, Bildschirm erweitern.</li>
+      </ol>
+      <figure class="skill-file">
+        <pre aria-label="SKILL.md"><code>---
+name: skeukit
+description: Use when designing or extending any screen
+  or control for to.morrow: inputs, buttons, toggles,
+  rows, sheets.
+---
+
+# 1. Physics: light from above, no textures
+# 2. Tokens: palette, radii, shadows, spacing
+# 3. Recipes: input, button, toggle
+# 4. Checklist before you ship</code></pre>
+        <figcaption data-i18n="n-skill-file-cap">Aufbau der Datei SKILL.md, gekürzt</figcaption>
+      </figure>
+      <p class="guide-text" data-i18n="n-skill-end">Dadurch folgen auch neue Bausteine denselben Regeln, ohne dass ich sie jedes Mal neu erkläre.</p>
     </div>
 
 
@@ -3456,7 +3487,16 @@
       "n-next-question": "Does keeping an important task visible help people complete it, or do they eventually stop noticing it?",
       "n-next-test": "I would follow how people use Go Live over several weeks and ask when they notice the task and when they overlook it. Alongside that, I would track whether they complete those tasks. That would help me understand whether visibility remains useful over time.",
       "n-skill-title": "Implementing it as a skill",
-      "n-skill-text": "I then documented the design rules in a reusable skill for Claude.",
+      "n-skill-text": "The rules apply to every control in the app. So they don't live only in my head, I wrote them down in a <b class=\"kw\">reusable skill for Claude</b>. A skill is a set of instructions that Claude loads when a task matches. For me that is every new interface and every new control for to.morrow.",
+      "n-skill-how-title": "How I built the skill",
+      "n-skill-how-intro": "A skill is a folder with a file called <b class=\"kw\">SKILL.md</b>. Name and description sit at the top, the instructions below. For me it took five steps:",
+      "n-skill-s1": "<b class=\"kw\">Write the rules as constraints.</b> The three shapes became a rule set with one principle: depth comes from light above and never from textures. Every rule is a requirement, not a suggestion, so Claude has nothing to guess.",
+      "n-skill-s2": "<b class=\"kw\">Read the values from the source code.</b> Colors, radii, shadows and spacing come from the app's code and are noted as fixed values instead of being picked by feel. The color palette lives in a single place, so a whole theme changes by swapping the palette.",
+      "n-skill-s3": "<b class=\"kw\">Include recipes for the building blocks.</b> Input, button and toggle each get a recipe with code. Claude builds a new element from the closest recipe instead of inventing something new.",
+      "n-skill-s4": "<b class=\"kw\">Add a checklist.</b> Before every result Claude checks: Does the light come from above? Is there no texture? Do all values come from the fixed values? Deviations show up before I see them.",
+      "n-skill-s5": "<b class=\"kw\">Write name and description.</b> The description decides when Claude loads the skill. That is why it names the tasks explicitly: designing an interface, building a control, extending a screen.",
+      "n-skill-file-cap": "Structure of SKILL.md, shortened",
+      "n-skill-end": "That way even new building blocks follow the same rules, without me explaining them again each time.",
       "n-form-toggle": "<b class=\"kw\">Toggles combine both shapes.</b> A raised bubble sits in a recess. Press the other option to switch states and move the bubble.",
       "n-form-button": "<b class=\"kw\">Buttons are raised.</b> Their bubble-like shape suggests something you can press, like a physical button.",
       "n-form-input": "<b class=\"kw\">Inputs are recessed.</b> An indentation marks the place where you can enter text.",
@@ -3520,8 +3560,17 @@
       "n-fact-live-src": "Aus derselben Gruppe von 15 Nutzern",
       "n-next-question": "Hilft die dauerhafte Sichtbarkeit einer wichtigen Aufgabe tatsächlich beim Erledigen, oder gewöhnt man sich irgendwann daran?",
       "n-next-test": "Ich würde die Nutzung von Go Live über mehrere Wochen begleiten und nachfragen, wann die Aufgabe auffällt und wann sie übersehen wird. Gleichzeitig würde ich erfassen, ob diese Aufgaben erledigt werden. So ließe sich prüfen, ob die Sichtbarkeit auch auf Dauer hilfreich bleibt.",
-      "n-skill-title": "Implementing it as a skill",
-      "n-skill-text": "Die Gestaltungsregeln habe ich anschließend in einem wiederverwendbaren Skill für Claude festgehalten.",
+      "n-skill-title": "Als Skill umgesetzt",
+      "n-skill-text": "Die Regeln gelten für jedes Bedienelement der App. Damit sie nicht nur in meinem Kopf stecken, habe ich sie in einem <b class=\"kw\">wiederverwendbaren Skill für Claude</b> festgehalten. Ein Skill ist eine Anleitung, die Claude lädt, sobald eine Aufgabe dazu passt. Bei mir ist das jede neue Oberfläche und jedes neue Bedienelement für to.morrow.",
+      "n-skill-how-title": "So habe ich daraus einen Skill gebaut",
+      "n-skill-how-intro": "Ein Skill ist ein Ordner mit einer Datei namens <b class=\"kw\">SKILL.md</b>. Oben stehen Name und Beschreibung, darunter die Anweisungen. Bei mir waren es fünf Schritte:",
+      "n-skill-s1": "<b class=\"kw\">Regeln als Vorgaben aufschreiben.</b> Aus den drei Formen wurde ein Regelwerk mit einem Grundsatz: Tiefe entsteht durch Licht von oben und nie durch Texturen. Jede Regel steht als Vorgabe da und nicht als Vorschlag, damit Claude nicht raten muss.",
+      "n-skill-s2": "<b class=\"kw\">Werte aus dem Quellcode lesen.</b> Farben, Radien, Schatten und Abstände habe ich aus dem Code der App übernommen und als feste Werte notiert, statt sie nach Gefühl zu wählen. Die Farbpalette hängt an einer einzigen Stelle, sodass sich ein ganzes Thema durch den Austausch der Palette ändert.",
+      "n-skill-s3": "<b class=\"kw\">Rezepte für die Bausteine mitgeben.</b> Für Eingabefeld, Knopf und Umschalter gibt es je ein Rezept mit Code. Ein neues Element baut Claude aus dem nächstliegenden Rezept, statt etwas Neues zu erfinden.",
+      "n-skill-s4": "<b class=\"kw\">Eine Checkliste anhängen.</b> Vor jedem Ergebnis prüft Claude: Kommt das Licht von oben? Gibt es keine Textur? Stammen alle Werte aus den festen Werten? So fallen Abweichungen auf, bevor ich sie sehe.",
+      "n-skill-s5": "<b class=\"kw\">Name und Beschreibung schreiben.</b> Die Beschreibung entscheidet, wann Claude den Skill lädt. Deshalb nennt sie die Aufgaben ausdrücklich: Oberfläche gestalten, Bedienelement bauen, Bildschirm erweitern.",
+      "n-skill-file-cap": "Aufbau der Datei SKILL.md, gekürzt",
+      "n-skill-end": "Dadurch folgen auch neue Bausteine denselben Regeln, ohne dass ich sie jedes Mal neu erkläre.",
       "n-form-toggle": "<b class=\"kw\">Umschalter verbinden beide Formen.</b> Eine erhabene Blase sitzt in einer Mulde. Drückst du die andere Option, wechselt der Zustand und die Blase wandert dorthin.",
       "n-form-button": "<b class=\"kw\">Knöpfe sind erhaben.</b> Ihre Form ragt wie eine Blase aus der Oberfläche und lädt zum Drücken ein, wie ein echter Knopf.",
       "n-form-input": "<b class=\"kw\">Eingabefelder sind vertieft.</b> Eine Mulde zeigt, wo du Text eingeben kannst.",
