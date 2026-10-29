@@ -2701,7 +2701,7 @@
     .wireflow-step strong { font-weight: 600; color: #303030; }
     .wireflow-sr { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     /* Three-step wireflow: phones keep the size of the four-step ones, centred in the band. */
-    .wireflow--draft .wireflow-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); width: calc(75% - var(--wire-gap) * .25); margin-inline: auto; }
+    .wireflow--draft .wireflow-steps { grid-template-columns: repeat(3, calc((100cqw - 4px - 3 * var(--wire-gap)) / 4)); justify-content: center; }
     /* Desktop fits all four equal columns into the available band width.
        Only mobile receives a minimum track width and horizontal scrolling. */
     @media (max-width: 860px) {
@@ -2710,7 +2710,7 @@
       .wireflow-dragged { transform: translateX(-60px); }
       .wireflow-track { min-width: calc(4 * var(--wire-phone-min) + 3 * var(--wire-gap)); }
       .wireflow--draft .wireflow-track { min-width: calc(3 * var(--wire-phone-min) + 2 * var(--wire-gap)); }
-      .wireflow--draft .wireflow-steps { width: 100%; }
+      .wireflow--draft .wireflow-steps { grid-template-columns: repeat(3, max(var(--wire-phone-min), calc((100cqw - 3 * var(--wire-gap)) / 4))); }
       .wireflow-scroll { overflow-x: auto; scroll-snap-type: x proximity; margin-inline: calc(-1 * var(--wireflow-pad)); padding-inline: var(--wireflow-pad); scroll-padding-inline: var(--wireflow-pad); }
       .wireflow-intro { display: none; }
       .wireflow-step figure { display: flex; flex-direction: column; align-items: center; }
