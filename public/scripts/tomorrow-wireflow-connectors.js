@@ -3,7 +3,7 @@
   const graphs = {
     reschedule: [['task-start', 'task-dragged'], ['task-dragged', 'task-arrived'], ['undo', 'task-restored']],
     live: [['live-switch', 'live-card'], ['live-card', 'island-compact'], ['island-compact', 'island-expanded']],
-    draft: [['draft-start', 'draft-dragged'], ['draft-dragged', 'draft-arrived']]
+    draft: [['draft-start', 'draft-slot-from'], ['draft-slot-to', 'draft-arrived']]
   };
   document.querySelectorAll('[data-wireflow]').forEach((band, index) => {
     const track = band.querySelector('.wireflow-track'), svg = band.querySelector('.wireflow-connectors');
@@ -21,15 +21,12 @@
         const a = source.getBoundingClientRect(), b = destination.getBoundingClientRect();
         let x1 = a.right - origin.left + 2, y1 = a.top + a.height / 2 - origin.top;
         let x2 = b.left - origin.left - 3, y2 = b.top + b.height / 2 - origin.top;
-        const gapCue = from === 'task-start' || band.dataset.wireflow === 'draft';
-        if (gapCue) {
-          // A small direction cue in the gap between two phones. The draft flow centres it
-          // vertically on the phones; the reschedule flow keeps it level with the task.
+        if (from === 'task-start') {
+          // A small direction cue in the gap between the first two phones.
           const first = source.closest('.wireflow-phone').getBoundingClientRect();
           const second = destination.closest('.wireflow-phone').getBoundingClientRect();
           const center = (first.right + second.left) / 2 - origin.left;
           const length = Math.min(22, (second.left - first.right) * .45);
-          if (band.dataset.wireflow === 'draft') y1 = first.top + first.height / 2 - origin.top;
           x1 = center - length / 2; x2 = center + length / 2; y2 = y1;
         }
         const reach = Math.max(8, Math.min(100, (x2 - x1) * .58));
