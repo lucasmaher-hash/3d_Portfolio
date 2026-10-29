@@ -2757,6 +2757,7 @@
     .skill-steps { list-style: none; counter-reset: sk; padding: 0; margin: 0; display: grid; gap: 18px; }
     .skill-steps li { counter-increment: sk; position: relative; padding-left: 46px; }
     .skill-steps li::before { content: counter(sk); position: absolute; left: 0; top: -.1em; width: 30px; height: 30px; border-radius: 50%; background: var(--accent-orange); color: #fff; font: 500 14px/30px 'IBM Plex Mono', ui-monospace, Menlo, monospace; text-align: center; }
+    .feature-title + .skill-steps { margin-top: -6px; }
     .skill-steps b.kw { color: var(--text-primary); }
     .skill-file { margin: 0; }
     .skill-file pre { margin: 0; padding: clamp(16px, 2.4vw, 28px); border-radius: 14px; background: rgba(0, 0, 0, 0.06); box-shadow: var(--shadow-pressed); overflow-x: auto; font: 400 clamp(12px, 1.2vw, 14px)/1.7 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace; font-size-adjust: none; color: var(--text-primary); white-space: pre; }
