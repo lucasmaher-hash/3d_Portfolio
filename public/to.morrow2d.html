@@ -947,6 +947,8 @@
     .centered-note.note-wide { max-width: none; margin-inline: 0; text-align: left; }
     /* The note introduces the band under it, so it sits close instead of one full list gap away. */
     .note-wide + .flow-band { margin-top: calc(clamp(24px, 3vw, 40px) - clamp(56px, 8vw, 120px)); }
+    /* A note that continues the one above (e.g. first draft after the section lead) sits closer than a full list gap. */
+    .note-wide + .note-wide { margin-top: calc(clamp(32px, 4vw, 56px) - clamp(56px, 8vw, 120px)); }
 
     /* ── Pixel vs modern: two clusters that open in turn ────────────────
        Deliberately NOT scroll-scrubbed. Scroll position only picks a state
@@ -2698,6 +2700,8 @@
     .wireflow-step-no { font-size: 11px; font-variant-numeric: tabular-nums; color: #777; padding-top: 3px; }
     .wireflow-step strong { font-weight: 600; color: #303030; }
     .wireflow-sr { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    /* Three-step wireflow: phones keep the size of the four-step ones, centred in the band. */
+    .wireflow--draft .wireflow-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); width: calc(75% - var(--wire-gap) * .25); margin-inline: auto; }
     /* Desktop fits all four equal columns into the available band width.
        Only mobile receives a minimum track width and horizontal scrolling. */
     @media (max-width: 860px) {
@@ -2705,6 +2709,8 @@
       /* A shorter drag preview leaves room for its arrow in the shared mobile gap. */
       .wireflow-dragged { transform: translateX(-60px); }
       .wireflow-track { min-width: calc(4 * var(--wire-phone-min) + 3 * var(--wire-gap)); }
+      .wireflow--draft .wireflow-track { min-width: calc(3 * var(--wire-phone-min) + 2 * var(--wire-gap)); }
+      .wireflow--draft .wireflow-steps { width: 100%; }
       .wireflow-scroll { overflow-x: auto; scroll-snap-type: x proximity; margin-inline: calc(-1 * var(--wireflow-pad)); padding-inline: var(--wireflow-pad); scroll-padding-inline: var(--wireflow-pad); }
       .wireflow-intro { display: none; }
       .wireflow-step figure { display: flex; flex-direction: column; align-items: center; }
@@ -2978,6 +2984,24 @@
           <h3 class="feature-title" data-i18n="f2-title">Verschieben als Hauptgeste</h3>
           <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="f2-text">Das Verschieben sollte so direkt sein wie das Abhaken. Deshalb bewegt man die Aufgabe in der Liste selbst: <b class="kw">Ein Wisch ersetzt den Weg durch die Datumsauswahl</b>. Eine versehentliche Bewegung lässt sich rückgängig machen.</p>
         </div>
+        <div class="centered-note note-wide">
+          <h3 class="feature-title" data-i18n="n-draft-title">Erster Entwurf</h3>
+          <p class="stagger-copy" style="margin-top: 12px;" data-i18n="n-draft-text-1">Im ersten Entwurf standen alle Listen untereinander auf einer Seite: Heute, Morgen und die folgenden Tage der Woche. Eine Aufgabe ließ sich gedrückt halten und direkt in einen anderen Tag ziehen. So hatte man den ganzen Plan auf einen Blick.</p>
+          <p class="stagger-copy" style="margin-top: 1em;" data-i18n-html="n-draft-text-2">Das hat nicht funktioniert. In den Nutzertests verwirrte es die Leute, alle Aufgaben der nächsten Tage an einem Ort zu sehen. Die ganze Woche auf einmal war <b class="kw">visuell zu viel</b> und hat eher überfordert als geholfen.</p>
+        </div>
+        <div class="flow-band no-shade wireflow wireflow--draft" data-wireflow="draft">
+          <div class="band-head"><p class="band-title" data-i18n="wf-draft-band">Erster Entwurf: alles in einer Liste</p></div>
+          <p class="wireflow-intro" data-i18n="wf-draft-intro">Gedrückt halten und die Aufgabe in einen anderen Tag ziehen.</p>
+          <div class="wireflow-scroll" tabindex="0" role="group" aria-labelledby="draft-flow-label"><span class="wireflow-sr" id="draft-flow-label" data-i18n="wf-scroll-label-3">Drei Schritte. Auf Mobile horizontal wischen.</span><div class="wireflow-track"><ol class="wireflow-steps">
+            <li class="wireflow-step"><figure><svg class="wireflow-phone" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 600" role="img" aria-labelledby="draft-1-title"><title id="draft-1-title" data-i18n="wf-draft-1-alt">Alle Tage untereinander. Portfolio senden unter Heute wird gedrückt gehalten.</title><defs><clipPath id="draft-1-screen"><rect x="8" y="8" width="264" height="584" rx="33"/></clipPath></defs><g font-family="Arial, Helvetica, sans-serif"><rect x="3" y="3" width="274" height="594" rx="38" fill="#242424" stroke="none" stroke-width="1"/><rect x="8" y="8" width="264" height="584" rx="33" fill="#fff" stroke="none" stroke-width="1"/><text x="25" y="32" font-size="10" fill="#303030" font-weight="600" text-anchor="start">9:41</text><rect x="219" y="22" width="20" height="9" rx="2" fill="none" stroke="#555" stroke-width="1"/><rect x="221" y="24" width="14" height="5" rx="1" fill="#555" stroke="none" stroke-width="1"/><rect x="240" y="25" width="2" height="3" rx="1" fill="#555" stroke="none" stroke-width="1"/><rect x="100" y="18" width="80" height="22" rx="11" fill="#171717" stroke="none" stroke-width="1"/><text x="140" y="74" font-size="12" fill="#303030" font-weight="600" text-anchor="middle" letter-spacing="0.6" data-i18n="wf-draft-title">Nächste 7 Tage</text><text x="24" y="112" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-today">Heute</text><path d="M246 102v10M241 107h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="20" y="122" width="240" height="34" rx="8" fill="#ededed" stroke="none" stroke-width="1"/><circle cx="36" cy="139" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="144" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-sketches">Skizzen sortieren</text><rect x="20" y="162" width="240" height="34" rx="8" fill="#ededed" stroke="var(--wire-accent, #607D9E)" stroke-width="1.95" data-flow-anchor="draft-start" vector-effect="non-scaling-stroke"/><circle cx="36" cy="179" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="184" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-portfolio">Portfolio senden</text><text x="24" y="224" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-tomorrow">Morgen</text><path d="M246 214v10M241 219h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="20" y="234" width="240" height="34" rx="8" fill="#ededed" stroke="none" stroke-width="1"/><circle cx="36" cy="251" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="256" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-groceries">Einkaufen</text><text x="24" y="296" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-sat">Samstag</text><path d="M246 286v10M241 291h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="20" y="306" width="240" height="34" rx="8" fill="#ededed" stroke="none" stroke-width="1"/><circle cx="36" cy="323" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="328" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-tidy">Zimmer aufräumen</text><text x="24" y="372" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-sun">Sonntag</text><path d="M246 362v10M241 367h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><text x="24" y="408" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-mon">Montag</text><path d="M246 398v10M241 403h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><text x="24" y="444" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-tue">Dienstag</text><path d="M246 434v10M241 439h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><text x="24" y="480" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-wed">Mittwoch</text><path d="M246 470v10M241 475h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><g clip-path="url(#draft-1-screen)"><rect x="8" y="535" width="264" height="65" rx="0" fill="#efefef" stroke="none" stroke-width="1"/><path d="M9 535H271" stroke="#ddd"/><path d="M32 566l9-8 9 8v10h-18z" fill="none" stroke="#555" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></g></g></svg><figcaption><span class="wireflow-step-no">01</span><strong data-i18n="wf-draft1-caption">Gedrückt halten</strong></figcaption></figure></li>
+            <li class="wireflow-step"><figure><svg class="wireflow-phone" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 600" role="img" aria-labelledby="draft-2-title"><title id="draft-2-title" data-i18n="wf-draft-2-alt">Portfolio senden wird über die Liste nach unten gezogen.</title><defs><clipPath id="draft-2-screen"><rect x="8" y="8" width="264" height="584" rx="33"/></clipPath></defs><g font-family="Arial, Helvetica, sans-serif"><rect x="3" y="3" width="274" height="594" rx="38" fill="#242424" stroke="none" stroke-width="1"/><rect x="8" y="8" width="264" height="584" rx="33" fill="#fff" stroke="none" stroke-width="1"/><text x="25" y="32" font-size="10" fill="#303030" font-weight="600" text-anchor="start">9:41</text><rect x="219" y="22" width="20" height="9" rx="2" fill="none" stroke="#555" stroke-width="1"/><rect x="221" y="24" width="14" height="5" rx="1" fill="#555" stroke="none" stroke-width="1"/><rect x="240" y="25" width="2" height="3" rx="1" fill="#555" stroke="none" stroke-width="1"/><rect x="100" y="18" width="80" height="22" rx="11" fill="#171717" stroke="none" stroke-width="1"/><text x="140" y="74" font-size="12" fill="#303030" font-weight="600" text-anchor="middle" letter-spacing="0.6" data-i18n="wf-draft-title">Nächste 7 Tage</text><text x="24" y="112" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-today">Heute</text><path d="M246 102v10M241 107h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="20" y="122" width="240" height="34" rx="8" fill="#ededed" stroke="none" stroke-width="1"/><circle cx="36" cy="139" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="144" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-sketches">Skizzen sortieren</text><text x="24" y="184" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-tomorrow">Morgen</text><path d="M246 174v10M241 179h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="20" y="194" width="240" height="34" rx="8" fill="#ededed" stroke="none" stroke-width="1"/><circle cx="36" cy="211" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="216" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-groceries">Einkaufen</text><text x="24" y="256" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-sat">Samstag</text><path d="M246 246v10M241 251h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="20" y="266" width="240" height="34" rx="8" fill="#ededed" stroke="none" stroke-width="1"/><circle cx="36" cy="283" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="288" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-tidy">Zimmer aufräumen</text><text x="24" y="372" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-sun">Sonntag</text><path d="M246 362v10M241 367h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><text x="24" y="408" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-mon">Montag</text><path d="M246 398v10M241 403h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><text x="24" y="444" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-tue">Dienstag</text><path d="M246 434v10M241 439h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><text x="24" y="480" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-wed">Mittwoch</text><path d="M246 470v10M241 475h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="36" y="300" width="240" height="34" rx="8" fill="#62676F" stroke="var(--wire-accent, #607D9E)" stroke-width="1.95" data-flow-anchor="draft-dragged" vector-effect="non-scaling-stroke"/><circle cx="52" cy="317" r="7" fill="none" stroke="#fff" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="68" y="322" font-size="13" fill="#fff" font-weight="400" text-anchor="start" data-i18n="wf-portfolio">Portfolio senden</text><g clip-path="url(#draft-2-screen)"><rect x="8" y="535" width="264" height="65" rx="0" fill="#efefef" stroke="none" stroke-width="1"/><path d="M9 535H271" stroke="#ddd"/><path d="M32 566l9-8 9 8v10h-18z" fill="none" stroke="#555" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></g></g></svg><figcaption><span class="wireflow-step-no">02</span><strong data-i18n="wf-draft2-caption">In einen anderen Tag ziehen</strong></figcaption></figure></li>
+            <li class="wireflow-step"><figure><svg class="wireflow-phone" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 600" role="img" aria-labelledby="draft-3-title"><title id="draft-3-title" data-i18n="wf-draft-3-alt">Portfolio senden steht jetzt unter Samstag.</title><defs><clipPath id="draft-3-screen"><rect x="8" y="8" width="264" height="584" rx="33"/></clipPath></defs><g font-family="Arial, Helvetica, sans-serif"><rect x="3" y="3" width="274" height="594" rx="38" fill="#242424" stroke="none" stroke-width="1"/><rect x="8" y="8" width="264" height="584" rx="33" fill="#fff" stroke="none" stroke-width="1"/><text x="25" y="32" font-size="10" fill="#303030" font-weight="600" text-anchor="start">9:41</text><rect x="219" y="22" width="20" height="9" rx="2" fill="none" stroke="#555" stroke-width="1"/><rect x="221" y="24" width="14" height="5" rx="1" fill="#555" stroke="none" stroke-width="1"/><rect x="240" y="25" width="2" height="3" rx="1" fill="#555" stroke="none" stroke-width="1"/><rect x="100" y="18" width="80" height="22" rx="11" fill="#171717" stroke="none" stroke-width="1"/><text x="140" y="74" font-size="12" fill="#303030" font-weight="600" text-anchor="middle" letter-spacing="0.6" data-i18n="wf-draft-title">Nächste 7 Tage</text><text x="24" y="112" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-today">Heute</text><path d="M246 102v10M241 107h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="20" y="122" width="240" height="34" rx="8" fill="#ededed" stroke="none" stroke-width="1"/><circle cx="36" cy="139" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="144" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-sketches">Skizzen sortieren</text><text x="24" y="184" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-tomorrow">Morgen</text><path d="M246 174v10M241 179h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="20" y="194" width="240" height="34" rx="8" fill="#ededed" stroke="none" stroke-width="1"/><circle cx="36" cy="211" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="216" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-groceries">Einkaufen</text><text x="24" y="256" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-sat">Samstag</text><path d="M246 246v10M241 251h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><rect x="20" y="266" width="240" height="34" rx="8" fill="#ededed" stroke="none" stroke-width="1"/><circle cx="36" cy="283" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="288" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-tidy">Zimmer aufräumen</text><rect x="20" y="306" width="240" height="34" rx="8" fill="#ededed" stroke="var(--wire-accent, #607D9E)" stroke-width="1.95" data-flow-anchor="draft-arrived" vector-effect="non-scaling-stroke"/><circle cx="36" cy="323" r="7" fill="none" stroke="#777" stroke-width="1.5" vector-effect="non-scaling-stroke"/><text x="52" y="328" font-size="13" fill="#303030" font-weight="400" text-anchor="start" data-i18n="wf-portfolio">Portfolio senden</text><text x="24" y="372" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-sun">Sonntag</text><path d="M246 362v10M241 367h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><text x="24" y="408" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-mon">Montag</text><path d="M246 398v10M241 403h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><text x="24" y="444" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-tue">Dienstag</text><path d="M246 434v10M241 439h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><text x="24" y="480" font-size="15" fill="#303030" font-weight="600" text-anchor="start" data-i18n="wf-wed">Mittwoch</text><path d="M246 470v10M241 475h10" stroke="#777" stroke-width="1.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/><g clip-path="url(#draft-3-screen)"><rect x="8" y="535" width="264" height="65" rx="0" fill="#efefef" stroke="none" stroke-width="1"/><path d="M9 535H271" stroke="#ddd"/><path d="M32 566l9-8 9 8v10h-18z" fill="none" stroke="#555" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></g></g></svg><figcaption><span class="wireflow-step-no">03</span><strong data-i18n="wf-draft3-caption">Unter Samstag</strong></figcaption></figure></li>
+          </ol><svg class="wireflow-connectors" aria-hidden="true"></svg></div></div>
+        </div>
+        <div class="centered-note note-wide">
+          <h3 class="feature-title" data-i18n="n-second-title">Die zweite Version</h3>
+          <p class="stagger-copy" style="margin-top: 12px;" data-i18n-html="n-second-text">In der zweiten Version habe ich Heute, Morgen und Bald klar voneinander getrennt. <b class="kw">Jede Liste ist ein eigener Block</b>, und du siehst immer nur eine davon. Verschoben wird jetzt mit einem Wisch in die nächste Liste.</p>
+        </div>
 
 
         <div class="flow-band no-shade wireflow wireflow--reschedule" data-wireflow="reschedule">
@@ -2999,7 +3023,7 @@
             </div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div></div></div>
             <div class="rot-copy">
               <div class="rot-text is-a"><h3 class="feature-title" data-i18n="f2b-title">Heute, Morgen oder Bald</h3><p class="stagger-copy" data-i18n-html="f2b-text">Jede Aufgabe gehört zu einer von drei Listen. <b class="kw">Nach rechts verschiebt sie sich auf später, nach links auf früher</b>. Ein Wisch nach links aus Heute übernimmt die Aufgabe in Live. Standardmäßig bestimmt das Datum die Liste: Was für morgen geplant ist, erscheint am nächsten Tag unter Heute. Bald sammelt spätere Aufgaben und solche ohne Datum.</p></div>
-              <div class="rot-text is-b"><h3 class="feature-title" data-i18n="n-landscape-title">Querformat: alle Listen nebeneinander</h3><p class="stagger-copy" data-i18n="n-landscape-text">Heute, Morgen und Bald stehen im Querformat nebeneinander. Du siehst alle Aufgaben des aktiven Workspaces gleichzeitig und kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.</p></div>
+              <div class="rot-text is-b"><h3 class="feature-title" data-i18n="n-landscape-title">Querformat: alle Listen nebeneinander</h3><p class="stagger-copy" data-i18n="n-landscape-text">Wer doch alles auf einen Blick sehen möchte, dreht das Handy bei Bedarf ins Querformat. Dort stehen Heute, Morgen und Bald nebeneinander, und du kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.</p></div>
             </div>
           </div>
         </div>
@@ -3012,7 +3036,7 @@
             <p class="stagger-copy" data-i18n-html="f2b-text">Jede Aufgabe gehört zu einer von drei Listen. <b class="kw">Nach rechts verschiebt sie sich auf später, nach links auf früher</b>. Ein Wisch nach links aus Heute übernimmt die Aufgabe in Live. Standardmäßig bestimmt das Datum die Liste: Was für morgen geplant ist, erscheint am nächsten Tag unter Heute. Bald sammelt spätere Aufgaben und solche ohne Datum.</p>
           </div>
         </div>
-        <div class="land-row rot-fallback"><div class="land-body"><h3 class="feature-title" data-i18n="n-landscape-title">Querformat: alle Listen nebeneinander</h3><p class="stagger-copy" data-i18n="n-landscape-text">Heute, Morgen und Bald stehen im Querformat nebeneinander. Du siehst alle Aufgaben des aktiven Workspaces gleichzeitig und kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.</p></div><figure class="land-shot"><div class="land-box"><div class="ip-shot"><div class="ip-screen"><video loop muted playsinline data-nopress width="600" height="1304" aria-label="Im Querformat sind Heute, Morgen und Bald gleichzeitig offen"><source src="/videos/to.morrow/list-landscape-left.mp4?v=1" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div></div></figure></div>
+        <div class="land-row rot-fallback"><div class="land-body"><h3 class="feature-title" data-i18n="n-landscape-title">Querformat: alle Listen nebeneinander</h3><p class="stagger-copy" data-i18n="n-landscape-text">Wer doch alles auf einen Blick sehen möchte, dreht das Handy bei Bedarf ins Querformat. Dort stehen Heute, Morgen und Bald nebeneinander, und du kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.</p></div><figure class="land-shot"><div class="land-box"><div class="ip-shot"><div class="ip-screen"><video loop muted playsinline data-nopress width="600" height="1304" aria-label="Im Querformat sind Heute, Morgen und Bald gleichzeitig offen"><source src="/videos/to.morrow/list-landscape-left.mp4?v=1" type="video/mp4" /></video></div><img class="ip-frame" src="/images/unify/iphone-17-frame.png" width="876" height="1808" alt="" aria-hidden="true" /></div></div></figure></div>
 
 
 
@@ -3537,7 +3561,7 @@ description: Use when designing or extending any screen
 
   "n-study": "I followed <b class=\"kw\">15 people</b> through their experience with to.morrow and interviewed them along the way. They were the same people using the app and sharing their experiences with me.",
   "n-landscape-title": "Landscape: all lists side by side",
-  "n-landscape-text": "In landscape, Today, Tomorrow and Soon sit side by side. You can see every task in the active workspace and compare your plans without switching between lists.",
+  "n-landscape-text": "If you do want to see everything at once, turn the phone to landscape when you need it. Today, Tomorrow and Soon then sit side by side, so you can compare your plan without switching between lists.",
   "n-quote-1": "“The sharp edges and hard lines didn’t match the fluid motion.”",
   "n-quote-2": "“It was fun at first, but became more of a distraction over time.”",
   "n-quote-3": "“The look didn’t match the app’s functionality.”",
@@ -3612,7 +3636,7 @@ description: Use when designing or extending any screen
 
   "n-study": "Ich habe <b class=\"kw\">15 Menschen</b> bei ihrer Nutzung von to.morrow begleitet und mit ihnen Interviews geführt. Es war dieselbe Gruppe, die die App nutzte und mir von ihren Erfahrungen berichtete.",
   "n-landscape-title": "Querformat: alle Listen nebeneinander",
-  "n-landscape-text": "Heute, Morgen und Bald stehen im Querformat nebeneinander. Du siehst alle Aufgaben des aktiven Workspaces gleichzeitig und kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.",
+  "n-landscape-text": "Wer doch alles auf einen Blick sehen möchte, dreht das Handy bei Bedarf ins Querformat. Dort stehen Heute, Morgen und Bald nebeneinander, und du kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.",
   "n-quote-1": "„Die scharfen Kanten und harten Linien passten nicht zu den flüssigen Bewegungen.“",
   "n-quote-2": "„Am Anfang hat es Spaß gemacht. Mit der Zeit wurde es eher zur Ablenkung.“",
   "n-quote-3": "„Der Look passte nicht zu den Funktionen der App.“",
@@ -3784,6 +3808,54 @@ description: Use when designing or extending any screen
   "wf-reschedule4-caption": "Optional: Undo"
 });
     // END generated wireflow translations
+    Object.assign(TRANSLATIONS.de, {
+  "n-draft-title": "Erster Entwurf",
+  "n-draft-text-1": "Im ersten Entwurf standen alle Listen untereinander auf einer Seite: Heute, Morgen und die folgenden Tage der Woche. Eine Aufgabe ließ sich gedrückt halten und direkt in einen anderen Tag ziehen. So hatte man den ganzen Plan auf einen Blick.",
+  "n-draft-text-2": "Das hat nicht funktioniert. In den Nutzertests verwirrte es die Leute, alle Aufgaben der nächsten Tage an einem Ort zu sehen. Die ganze Woche auf einmal war <b class=\"kw\">visuell zu viel</b> und hat eher überfordert als geholfen.",
+  "n-second-title": "Die zweite Version",
+  "n-second-text": "In der zweiten Version habe ich Heute, Morgen und Bald klar voneinander getrennt. <b class=\"kw\">Jede Liste ist ein eigener Block</b>, und du siehst immer nur eine davon. Verschoben wird jetzt mit einem Wisch in die nächste Liste.",
+  "n-landscape-text": "Wer doch alles auf einen Blick sehen möchte, dreht das Handy bei Bedarf ins Querformat. Dort stehen Heute, Morgen und Bald nebeneinander, und du kannst deinen Plan vergleichen, ohne zwischen den Listen zu wechseln.",
+  "wf-draft-band": "Erster Entwurf: alles in einer Liste",
+  "wf-draft-intro": "Gedrückt halten und die Aufgabe in einen anderen Tag ziehen.",
+  "wf-scroll-label-3": "Drei Schritte. Auf Mobile horizontal wischen.",
+  "wf-draft-title": "Nächste 7 Tage",
+  "wf-sat": "Samstag",
+  "wf-sun": "Sonntag",
+  "wf-mon": "Montag",
+  "wf-tue": "Dienstag",
+  "wf-wed": "Mittwoch",
+  "wf-tidy": "Zimmer aufräumen",
+  "wf-draft-1-alt": "Alle Tage untereinander. Portfolio senden unter Heute wird gedrückt gehalten.",
+  "wf-draft1-caption": "Gedrückt halten",
+  "wf-draft-2-alt": "Portfolio senden wird über die Liste nach unten gezogen.",
+  "wf-draft2-caption": "In einen anderen Tag ziehen",
+  "wf-draft-3-alt": "Portfolio senden steht jetzt unter Samstag.",
+  "wf-draft3-caption": "Unter Samstag"
+});
+    Object.assign(TRANSLATIONS.en, {
+  "n-draft-title": "First draft",
+  "n-draft-text-1": "In the first draft, all lists sat on one page: Today, Tomorrow and the following days of the week. You could press and hold a task and drag it straight into another day, so the whole plan was visible at a glance.",
+  "n-draft-text-2": "It didn't work. In user tests, seeing every task for the coming days in one place confused people. The whole week at once was <b class=\"kw\">visually too much</b> and overwhelmed more than it helped.",
+  "n-second-title": "The second version",
+  "n-second-text": "In the second version I separated Today, Tomorrow and Soon clearly. <b class=\"kw\">Each list is its own block</b>, and you only see one at a time. Moving a task now takes one swipe into the next list.",
+  "n-landscape-text": "If you do want to see everything at once, turn the phone to landscape when you need it. Today, Tomorrow and Soon then sit side by side, so you can compare your plan without switching between lists.",
+  "wf-draft-band": "First draft: everything in one list",
+  "wf-draft-intro": "Press and hold, then drag the task into another day.",
+  "wf-scroll-label-3": "Three steps. Swipe horizontally on mobile.",
+  "wf-draft-title": "Next 7 days",
+  "wf-sat": "Saturday",
+  "wf-sun": "Sunday",
+  "wf-mon": "Monday",
+  "wf-tue": "Tuesday",
+  "wf-wed": "Wednesday",
+  "wf-tidy": "Tidy room",
+  "wf-draft-1-alt": "All days in one list. Send portfolio under Today is pressed and held.",
+  "wf-draft1-caption": "Press and hold",
+  "wf-draft-2-alt": "Send portfolio is dragged down the list.",
+  "wf-draft2-caption": "Drag to another day",
+  "wf-draft-3-alt": "Send portfolio now sits under Saturday.",
+  "wf-draft3-caption": "In Saturday"
+});
     const NARROW = window.matchMedia('(max-width: 640px)');
     function pick(t, key) {
       const m = NARROW.matches ? t[key + '@m'] : undefined;
@@ -4721,6 +4793,6 @@ description: Use when designing or extending any screen
   }, { threshold: 0.4 }).observe(band);
 })();
 </script>
-  <script src="/scripts/tomorrow-wireflow-connectors.js" defer></script>
+  <script src="/scripts/tomorrow-wireflow-connectors.js?v=2" defer></script>
 </body>
 </html>

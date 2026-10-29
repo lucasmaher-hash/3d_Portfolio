@@ -2,7 +2,8 @@
 (() => {
   const graphs = {
     reschedule: [['task-start', 'task-dragged'], ['task-dragged', 'task-arrived'], ['undo', 'task-restored']],
-    live: [['live-switch', 'live-card'], ['live-card', 'island-compact'], ['island-compact', 'island-expanded']]
+    live: [['live-switch', 'live-card'], ['live-card', 'island-compact'], ['island-compact', 'island-expanded']],
+    draft: [['draft-start', 'draft-dragged'], ['draft-dragged', 'draft-arrived']]
   };
   document.querySelectorAll('[data-wireflow]').forEach((band, index) => {
     const track = band.querySelector('.wireflow-track'), svg = band.querySelector('.wireflow-connectors');
@@ -20,7 +21,7 @@
         const a = source.getBoundingClientRect(), b = destination.getBoundingClientRect();
         let x1 = a.right - origin.left + 2, y1 = a.top + a.height / 2 - origin.top;
         let x2 = b.left - origin.left - 3, y2 = b.top + b.height / 2 - origin.top;
-        if (from === 'task-start') {
+        if (from === 'task-start' || from === 'draft-start') {
           // A small direction cue in the gap between the first two phones.
           const first = source.closest('.wireflow-phone').getBoundingClientRect();
           const second = destination.closest('.wireflow-phone').getBoundingClientRect();
