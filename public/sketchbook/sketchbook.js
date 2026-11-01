@@ -30,6 +30,21 @@ range.max = drawings.length - 1
 // the remaining pages stay where they were, so the stack visibly shrinks.
 // Placeholder tints so neighbouring sheets read as different drawings.
 const tintFor = drawingIndex => `sepia(.45) hue-rotate(${(drawingIndex * 37) % 360}deg) saturate(1.05)`
+// Lay the drawing out edge to edge along its long side and cut the glass down
+// to the two bands the square still needs. Runs again when the file has loaded.
+function fitSheet(image, art, glass) {
+  const apply = () => {
+    const nw = image.naturalWidth, nh = image.naturalHeight
+    if (!nw || !nh) return
+    const ratio = nw / nh
+    const w = ratio < 1 ? ratio : 1, h = ratio < 1 ? 1 : 1 / ratio
+    const l = (1 - w) / 2 * 100, t = (1 - h) / 2 * 100, r = l + w * 100, b = t + h * 100
+    Object.assign(art.style, { left: `${l}%`, top: `${t}%`, width: `${w * 100}%`, height: `${h * 100}%`, inset: 'auto' })
+    glass.style.clipPath = `polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, ${l}% ${t}%, ${l}% ${b}%, ${r}% ${b}%, ${r}% ${t}%, ${l}% ${t}%)`
+  }
+  if (image.complete) apply()
+  image.addEventListener('load', apply)
+}
 const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   const drawingIndex = drawings.length - 1 - slot
   const sheet = document.createElement('span')
@@ -42,6 +57,12 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   image.src = drawings[drawingIndex].src
   image.alt = ''; image.draggable = false
   image.style.filter = tintFor(drawingIndex)
+  const bleed = new Image()
+  bleed.src = image.src; bleed.alt = ''; bleed.draggable = false
+  bleed.className = 'bleed'
+  bleed.style.filter = `${tintFor(drawingIndex)} blur(16px)`
+  glass.append(bleed)
+  fitSheet(image, art, glass)
   art.append(image); sheet.append(glass, art); stack.append(sheet)
   return { sheet, drawingIndex }
 })
@@ -94,7 +115,7 @@ function select(value, animate = true) {
 }
 let preview = null, press = null, suppressClickUntil = 0
 
-const ART_INSET = .78 // share of the square the drawing may fill; the rest is glass frame
+const ART_INSET = 1 // the drawing runs edge to edge along its long side; glass only fills the rest of the square
 let lift = null
 
 function openPreview() {

@@ -29,12 +29,16 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .stack-button { position: absolute; width: var(--paper-width); aspect-ratio: 1 / 1; left: 67%; top: 56%; transform: translate(calc(-50% + 117px), calc(-50% - 22px)); border: 0; padding: 0; background: none; cursor: pointer; touch-action: pan-y; perspective: 1800px; }
 .stack { display: block; width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: scale3d(.93, .93, .93) rotateX(-13deg) rotateY(147deg) rotateZ(-1deg); }
 .sheet { position: absolute; inset: 0; display: block; backface-visibility: visible; }
-/* Liquid-glass frame: lets any drawing format sit in a perfect square. */
-.glass { position: absolute; inset: 0; border-radius: 0; border: 1px solid rgba(255,255,255,.75);
-  background: linear-gradient(135deg, rgba(255,255,255,.5), rgba(255,255,255,.14) 38%, rgba(220,230,245,.18) 62%, rgba(255,255,255,.36));
-  -webkit-backdrop-filter: blur(10px) saturate(1.6); backdrop-filter: blur(10px) saturate(1.6);
-  box-shadow: inset 0 1.5px 1px rgba(255,255,255,.95), inset 0 -10px 22px rgba(255,255,255,.2), inset 0 0 0 6px rgba(255,255,255,.07), 0 2px 5px rgba(36,40,60,.16); }
-.art { position: absolute; inset: 11%; display: block; }
+/* Liquid-glass frame: only the bands that turn the drawing's format into a
+   square (left/right for portrait, top/bottom for landscape) - the drawing runs
+   edge to edge along its long side. The bands are cut out of the square with
+   a clip-path set from the image's own ratio (sketchbook.js, fitSheet). Look
+   after the gimaguas.com header: a milky, strongly blurred wash that carries
+   the colours of what sits under it, no border, no inner shadow. */
+.glass { position: absolute; inset: 0; overflow: hidden; background: rgba(247,247,250,.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4); backdrop-filter: blur(24px) saturate(1.4); }
+.glass .bleed { position: absolute; inset: -8%; width: 116%; height: 116%; object-fit: cover; opacity: .9; display: block; }
+.art { position: absolute; inset: 0; display: block; }
 .stack.reverse .art img { transform: scaleX(-1); }
 .art img { width: 100%; height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none; }
 .lift-scene { position: fixed; perspective: 1800px; pointer-events: none; }
