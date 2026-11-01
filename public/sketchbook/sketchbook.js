@@ -197,7 +197,11 @@ function startLift(overlay, image, current, nw, nh, fit) {
   rig.append(clone); scene.append(rig); overlay.append(scene)
   image.style.visibility = 'hidden'
   current.sheet.style.visibility = 'hidden'
-  frontGlass.style.visibility = 'hidden'
+  // The frosted front glass cannot travel with the sheet (blur does not work in 3D), and the clone's
+  // own bands are flat veils: swapping one for the other popped. The frosted glass fades out in place,
+  // the clone carries none.
+  frontGlass.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, easing: 'ease-out', fill: 'forwards' })
+  for (const band of clone.querySelectorAll('.glass')) band.style.visibility = 'hidden'
 
   const z0 = new DOMMatrix(current.sheet.style.transform).m43
   const shown = Math.min(side * artInset() / nw, side * artInset() / nh) // contain-fit inside the frame
@@ -211,7 +215,6 @@ function startLift(overlay, image, current, nw, nh, fit) {
     { transform: end.toString() },
   ], timing)
   // Dissolve the glass border during the second half of the flight.
-  for (const band of clone.querySelectorAll('.glass')) band.animate([{ opacity: 1 }, { opacity: 1, offset: .3 }, { opacity: 0 }], timing)
   // The back face is seen mirrored, so the artwork is pre-flipped; hand it back
   // exactly when the sheet turns edge-on (rotation passes 90 degrees).
   if (mirrored) {
@@ -233,6 +236,7 @@ function closePreview() {
   const overlay = preview
   preview = null
   if (lift) { lift.sheet.style.visibility = ''; lift = null }
+  for (const animation of frontGlass.getAnimations()) animation.cancel()
   frontGlass.style.visibility = ''
   overlay.remove()
   stackButton.focus({ preventScroll: true })
