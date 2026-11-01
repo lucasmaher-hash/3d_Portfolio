@@ -225,7 +225,7 @@ const eBreath = (f: number) => {
 const INS_TEXT = ' on important tasks';
 const sum = (a: number[]) => a.reduce((x, y) => x + y, 0);
 const INS = (() => {
-  const t0 = GOLIVE.fade[0] + 5; // typing starts while the page is still going dark — no pause (Lucas)
+  const t0 = GOLIVE.start + sum(GOLIVE.gaps.slice(0, 6)) + 3; // the next letter right after "Go Live"'s last one, same rhythm: one typing run while the page darkens (Lucas)
   const at = GOLIVE.fade[1]; // the scene is held from the moment it is fully dark
   const type = [3, 2, 3, 2, 3, 2, 2, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 3]; // one per letter of INS_TEXT
   const typeEnd = t0 + sum(type);
@@ -431,7 +431,7 @@ const CheckToLive: React.FC<{f: number; bf?: number; p: Pal; z: number; addX: nu
      browser snap its edges to whole pixels, and the circle's centre wandered
      by up to 2px — the jitter Lucas saw. */
   const D0 = ROW.check * z;
-  const dotIn = sp(f, t0 - 2, 'layout');
+  const dotIn = ease(f, F0, F0 + 8, Easing.out(Easing.cubic)); // full size well before the line is typed: the dot is exactly the pill's glyph (r = 0.21 d)
   /* Ring and dot breathe TOGETHER (Lucas), as the app's whole Live mark does —
      see eBreath; the pill's glyph picks the same breath up at the cut. */
   void cut;
@@ -1098,7 +1098,7 @@ const HomeScreen16: React.FC<{f: number}> = ({f}) => {
    from 60). Index 1-based file names: 001 = frame 0. */
 const seqImg = (dir: string, tag: string, n: number) => staticFile(`${dir}/${tag}-${String(n + 1).padStart(3, '0')}.jpg`);
 const SEQ_STYLE: React.CSSProperties = {position: 'absolute', left: 0, top: 0, width: SCREEN_W, height: SCREEN_H, display: 'block'};
-const LOCK_HOLD = 63; // the card fully up (2.1 s into the recording), held until the swipe
+const LOCK_HOLD = 22; // card settled; the recording bounces it again from ~frame 50, which Lucas does not want
 const lockFrame = (f: number) => Math.max(0, Math.min(LOCK_HOLD, Math.round(f - (ARRIVE - 8))));
 const T_EXP = ISL_EXP - 3; // the recording's own expand (frame 45) lands on ISL_EXP
 const HOME_LAST = 131;

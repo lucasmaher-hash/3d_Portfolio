@@ -4298,3 +4298,5 @@ Source of truth is `motion/` (Remotion). Do NOT overwrite the old files blindly;
 **Status 2026-11-01:** all six to.morrow web files and the three posters are re-rendered, encoded and deployed (commit 0aebc4e), URLs at `?v=20261101a`. Nothing is pending; do not re-render unless the film changes.
 
 **Update 2026-11-02:** all six to.morrow web films now use Lucas's real lock/island recordings (`motion/public/lockseq`, `homeseq`, via `seqImg` in `Promo16.tsx` AND `PromoV16.tsx`, which had been missing them). Re-rendered, URLs at `?v=20261102a`. Landing blob shading now uses the site's raised-token reach (8px/18px); dial at `2D.html?tune=1` (`--sh-*`/`--hl-*` vars in `blob_morph_bouncy.html`).
+
+**Update 2026-11-02 (b):** `tomorrow-promo-hero-v2.mp4` (the to.morrow page's desktop hero) re-rendered with: lock card held at frame 22 (no second bounce), " on important tasks" typed straight after "Go Live" while the page darkens, ring dot full size from the start of the darkening, 2x-upscaled recording frames. Other five films still need the same render if wanted (`motion/out/v3/render.sh`); `?v=20261102b`.
