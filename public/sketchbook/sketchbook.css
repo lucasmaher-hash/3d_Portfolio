@@ -37,7 +37,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
    border, no shadow. */
 .glass { position: absolute; background: rgba(255,255,255,.38);
   -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5); }
-.glass-front { position: absolute; inset: 0; pointer-events: none; }
+.glass-front { position: absolute; inset: 0; pointer-events: none; will-change: transform; } /* own layer from the start: no late promotion (the 0.4s hitch) */
 .sheet.is-current .glass { visibility: hidden; } /* drawn by .glass-front instead */
 .art { position: absolute; inset: 0; display: block; }
 .stack.reverse .art img { transform: scaleX(-1); }

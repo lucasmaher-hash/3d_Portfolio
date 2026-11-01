@@ -76,12 +76,11 @@ frontGlass.className = 'glass-front'
 frontGlass.setAttribute('aria-hidden', 'true')
 const frontBands = [0, 1].map(() => { const band = document.createElement('span'); band.className = 'glass'; frontGlass.append(band); return band })
 stackButton.append(frontGlass)
-function syncFrontGlass(fade = false) {
+function syncFrontGlass() {
   const current = sheets.find(item => item.drawingIndex === index)
   if (!current) return
   frontGlass.style.transform = `${getComputedStyle(stack).transform} ${current.sheet.style.transform}`
   current.sheet.querySelectorAll('.glass').forEach((band, i) => { frontBands[i].style.cssText = band.style.cssText; frontBands[i].hidden = band.hidden })
-  if (fade && !reduceMotion.matches) frontGlass.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 230, easing: 'ease-in-out' })
 }
 window.addEventListener('sketchbook-orientation', () => syncFrontGlass())
 
@@ -120,7 +119,7 @@ function render(animate = true) {
       sheet.animate([{ opacity: presented }, { opacity }], { duration: 230, easing: 'ease-in-out' })
     }
   }
-  syncFrontGlass(animate)
+  syncFrontGlass()
   range.value = index
   document.querySelector('.timeline-art').style.setProperty('--progress', `${index / Math.max(1, drawings.length - 1) * 100}%`)
   range.setAttribute('aria-valuetext', `${index + 1} / ${drawings.length}: ${drawing.title[language]}`)
