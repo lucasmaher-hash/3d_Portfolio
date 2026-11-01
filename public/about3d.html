@@ -168,6 +168,14 @@
       color: var(--text-secondary);
     }
 
+    /* Inline link inside the accordion text (the "art" / "Kunst" word, 2026-11-01):
+       black and underlined so it reads as a link without the grey body colour. */
+    .text-inset a.inline-link {
+      color: var(--text-primary);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
     /* ── Mobile ────────────────────────────────────────────────────────────
        This page had no @media block at all, so phones inherited the desktop
        chrome: the 32px body padding band and the .container 1px border. With
@@ -277,42 +285,40 @@
 
     <div class="accordion">
 
-      <div class="item" data-key="background">
+      <div class="item" data-key="who">
         <div class="item-header">
-          <span class="item-label" data-i18n="label-background">Background</span>
+          <span class="item-label" data-i18n="label-who">Who I am</span>
           <div class="btn">+</div>
         </div>
         <div class="item-body">
-          <div class="text-inset" data-i18n-html="bg-text">
-            <p>Hi, I'm Lucas Maher, a 21 yo designer based in Munich.</p>
-            <p style="margin-top: 12px;">I've always created with my hands. Long before I discovered design, I was drawing, sculpting clay, cutting glass, welding metal, sewing fabric, and painting in oil and acrylic — constantly switching materials, constantly asking: what can this become?</p>
-            <p style="margin-top: 12px;">That restlessness led me to Industrial Design, where three-dimensional thinking meets real-world problems. Now, studying at Hochschule München, I'm channeling that same energy into the digital space — where 2D and 3D collide, and where screens are becoming the new material to shape.</p>
+          <div class="text-inset" data-i18n-html="who-text">
+            <p>Hi, I'm Lucas Maher, a 21-year-old digital product designer based in Munich. I study Industrial Design at Hochschule München, where the degree covers product design and digital design in parallel, and most of my time goes into the digital side. Next to it I'm in the Academic Program for Entrepreneurship (APE), which is where I'm learning to turn design into products, using design thinking and problem-based design.</p>
           </div>
         </div>
       </div>
 
-      <div class="item" data-key="things-i-love">
+      <div class="item" data-key="design">
         <div class="item-header">
-          <span class="item-label" data-i18n="label-things-i-love">Things I Love</span>
+          <span class="item-label" data-i18n="label-design">How I design</span>
           <div class="btn">+</div>
         </div>
         <div class="item-body">
-          <div class="text-inset" data-i18n-html="love-text">
-            <p>What excites me most right now is spatial computing — VR & AR. The idea that digital experiences can exist in three-dimensional space, that you can step inside a design rather than just look at it through a screen, feels like the most radical shift in how humans interact with technology. I want to be at the forefront of that.</p>
-            <p style="margin-top: 12px;">Outside of that, I find a lot of inspiration in film — the way directors use composition, light, and pacing to guide attention and evoke emotion isn't so different from what we do as designers. And sport keeps me grounded: the discipline, the consistency, the reminder that good results come from showing up every day.</p>
+          <div class="text-inset" data-i18n-html="design-text">
+            <p>I work AI-native, but the creativity and the decisions stay with me. Over time I've built a system of skills, agentic workflows and design systems, plus an Obsidian vault that captures my design approach, guidelines and taste. My daily tools are Claude Code, Codex, VS Code, Obsidian, Figma and Blender.</p>
+            <p style="margin-top: 12px;">At Allianz Technology we create design systems and experiment with AI tools to build a universal design language.</p>
           </div>
         </div>
       </div>
 
-      <div class="item" data-key="design-philosophy">
+      <div class="item" data-key="outside">
         <div class="item-header">
-          <span class="item-label" data-i18n="label-design-philosophy">Design Philosophy</span>
+          <span class="item-label" data-i18n="label-outside">Outside of work</span>
           <div class="btn">+</div>
         </div>
         <div class="item-body">
-          <div class="text-inset" data-i18n-html="philosophy-text">
-            <p>Design that only looks good has already failed. I came to this field from fine art and craft — and that background taught me one thing above all: beauty without purpose is decoration, not design.</p>
-            <p style="margin-top: 12px;">I work at the intersection of bold aesthetics and real problem-solving. I'm not afraid to experiment, to try what hasn't been done, or to borrow from unexpected places. The best ideas often live at the edges — between physical and digital, between 2D and 3D, between what exists and what could.</p>
+          <div class="text-inset" data-i18n-html="outside-text">
+            <p>I've been creative since I was young, starting with <a class="inline-link" href="/sketches.html" target="_top">art</a>, and that carried into my work. Outside it, I've long been interested in consumer electronics and, more recently, in spatial computing: digital experiences that live in 3D spaces you experience from the inside. That idea excites me.</p>
+            <p style="margin-top: 12px;">AI is the topic I keep up with most. I research new models, tools and workflows and follow the news, because I genuinely enjoy it.</p>
           </div>
         </div>
       </div>
@@ -337,23 +343,23 @@
       var T = {
         de: {
           'about-title': 'ÜBER MICH',
-          'label-background': 'Hintergrund',
-          'bg-text': '<p>Hallo, ich bin Lucas Maher, ein 21-jähriger Designer aus München.</p><p style="margin-top:12px;">Ich habe immer mit den Händen gearbeitet. Lange bevor ich zum Design kam: zeichnen, Ton formen, Glas schneiden, Metall schweißen, Stoff nähen, malen — immer neue Materialien, immer dieselbe Frage: Was wird daraus?</p><p style="margin-top:12px;">Diese Rastlosigkeit führte mich zum Industriedesign, wo räumliches Denken auf reale Probleme trifft. Heute, an der Hochschule München, steckt dieselbe Energie im digitalen Raum — wo 2D und 3D kollidieren und Bildschirme das neue Material sind.</p>',
-          'label-things-i-love': 'Interessen',
-          'love-text': '<p>Am meisten begeistert mich gerade Spatial Computing — VR & AR. Dass digitale Erlebnisse im Raum existieren und man ein Design betreten kann, statt es nur am Bildschirm zu sehen, ist für mich der radikalste Umbruch im Umgang mit Technik. Da will ich vorne dabei sein.</p><p style="margin-top:12px;">Viel Inspiration finde ich im Film — wie Regisseure Komposition, Licht und Rhythmus einsetzen, um Aufmerksamkeit zu lenken und Emotionen zu wecken, ist gar nicht so weit von unserer Arbeit entfernt. Und Sport hält mich geerdet: Disziplin, Konsequenz, tägliches Dranbleiben.</p>',
-          'label-design-philosophy': 'Designphilosophie',
+          'label-who': 'Wer ich bin',
+          'who-text': '<p>Hi, ich bin Lucas Maher, 21, digitaler Produktdesigner aus München. Ich studiere Industriedesign an der Hochschule München. Das Studium deckt Produktdesign und digitales Design parallel ab, und der größte Teil meiner Zeit gehört der digitalen Seite. Daneben bin ich im Academic Program for Entrepreneurship (APE), in dem ich lerne, Design in Produkte zu überführen, mit Design Thinking und problembasiertem Design.</p>',
+          'label-design': 'Wie ich gestalte',
+          'design-text': '<p>Ich arbeite KI-nativ, aber die Kreativität und die Entscheidungen bleiben bei mir. Über die Zeit habe ich ein System aus Skills, agentischen Workflows und Design Systems aufgebaut, dazu einen Obsidian-Vault, der meinen Designansatz, meine Richtlinien und meinen Geschmack festhält. Meine täglichen Tools sind Claude Code, Codex, VS Code, Obsidian, Figma und Blender.</p><p style="margin-top:12px;">Bei Allianz Technology entwickeln wir Design Systems und experimentieren mit KI-Tools, um eine universelle Designsprache zu schaffen.</p>',
+          'label-outside': 'Außerhalb der Arbeit',
           'label-email': 'E-Mail',
-          'philosophy-text': '<p>Design, das nur gut aussieht, hat bereits versagt. Ich komme aus Kunst und Handwerk — und das hat mich vor allem eines gelehrt: Schönheit ohne Zweck ist Dekoration, kein Design.</p><p style="margin-top:12px;">Ich arbeite zwischen mutiger Ästhetik und echter Problemlösung. Ich experimentiere gern, probiere Unerprobtes und schaue mir anderswo etwas ab. Die besten Ideen entstehen oft an den Rändern — zwischen physisch und digital, zwischen 2D und 3D, zwischen dem, was ist, und dem, was sein könnte.</p>'
+          'outside-text': '<p>Ich war schon als Kind kreativ und habe mit <a class="inline-link" href="/sketches.html" target="_top">Kunst</a> angefangen, und das hat sich in meine Arbeit übertragen. Außerhalb davon interessiere ich mich seit Langem für Consumer Electronics und seit Kurzem für Spatial Computing: digitale Erlebnisse, die in 3D-Räumen existieren und die man von innen erlebt. Die Idee begeistert mich.</p><p style="margin-top:12px;">KI ist das Thema, bei dem ich am meisten auf dem Laufenden bleibe. Ich recherchiere neue Modelle, Tools und Workflows und verfolge die Nachrichten, weil es mir wirklich Spaß macht.</p>'
         },
         en: {
           'about-title': 'ABOUT',
-          'label-background': 'Background',
-          'bg-text': '<p>Hi, I\'m Lucas Maher, a 21 yo designer based in Munich.</p><p style="margin-top:12px;">I\'ve always created with my hands. Long before I discovered design, I was drawing, sculpting clay, cutting glass, welding metal, sewing fabric, and painting in oil and acrylic — constantly switching materials, constantly asking: what can this become?</p><p style="margin-top:12px;">That restlessness led me to Industrial Design, where three-dimensional thinking meets real-world problems. Now, studying at Hochschule München, I\'m channeling that same energy into the digital space — where 2D and 3D collide, and where screens are becoming the new material to shape.</p>',
-          'label-things-i-love': 'Things I Love',
-          'love-text': '<p>What excites me most right now is spatial computing — VR & AR. The idea that digital experiences can exist in three-dimensional space, that you can step inside a design rather than just look at it through a screen, feels like the most radical shift in how humans interact with technology. I want to be at the forefront of that.</p><p style="margin-top:12px;">Outside of that, I find a lot of inspiration in film — the way directors use composition, light, and pacing to guide attention and evoke emotion isn\'t so different from what we do as designers. And sport keeps me grounded: the discipline, the consistency, the reminder that good results come from showing up every day.</p>',
-          'label-design-philosophy': 'Design Philosophy',
+          'label-who': 'Who I am',
+          'who-text': '<p>Hi, I\'m Lucas Maher, a 21-year-old digital product designer based in Munich. I study Industrial Design at Hochschule München, where the degree covers product design and digital design in parallel, and most of my time goes into the digital side. Next to it I\'m in the Academic Program for Entrepreneurship (APE), which is where I\'m learning to turn design into products, using design thinking and problem-based design.</p>',
+          'label-design': 'How I design',
+          'design-text': '<p>I work AI-native, but the creativity and the decisions stay with me. Over time I\'ve built a system of skills, agentic workflows and design systems, plus an Obsidian vault that captures my design approach, guidelines and taste. My daily tools are Claude Code, Codex, VS Code, Obsidian, Figma and Blender.</p><p style="margin-top:12px;">At Allianz Technology we create design systems and experiment with AI tools to build a universal design language.</p>',
+          'label-outside': 'Outside of work',
           'label-email': 'Email',
-          'philosophy-text': '<p>Design that only looks good has already failed. I came to this field from fine art and craft — and that background taught me one thing above all: beauty without purpose is decoration, not design.</p><p style="margin-top:12px;">I work at the intersection of bold aesthetics and real problem-solving. I\'m not afraid to experiment, to try what hasn\'t been done, or to borrow from unexpected places. The best ideas often live at the edges — between physical and digital, between 2D and 3D, between what exists and what could.</p>'
+          'outside-text': '<p>I\'ve been creative since I was young, starting with <a class="inline-link" href="/sketches.html" target="_top">art</a>, and that carried into my work. Outside it, I\'ve long been interested in consumer electronics and, more recently, in spatial computing: digital experiences that live in 3D spaces you experience from the inside. That idea excites me.</p><p style="margin-top:12px;">AI is the topic I keep up with most. I research new models, tools and workflows and follow the news, because I genuinely enjoy it.</p>'
         }
       };
       function apply(lang) {
