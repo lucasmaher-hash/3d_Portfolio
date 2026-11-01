@@ -70,5 +70,37 @@
       "de": "Skizze 9"
     },
     "src": "/sketchbook/sketch-09.jpg"
+  },
+  {
+    "date": "2026-03-05",
+    "title": {
+      "en": "Sketch 10",
+      "de": "Skizze 10"
+    },
+    "src": "/sketchbook/sketch-04.jpg"
+  },
+  {
+    "date": "2026-03-19",
+    "title": {
+      "en": "Sketch 11",
+      "de": "Skizze 11"
+    },
+    "src": "/sketchbook/sketch-07.jpg"
+  },
+  {
+    "date": "2026-04-02",
+    "title": {
+      "en": "Sketch 12",
+      "de": "Skizze 12"
+    },
+    "src": "/sketchbook/sketch-02.jpg"
+  },
+  {
+    "date": "2026-04-16",
+    "title": {
+      "en": "Sketch 13",
+      "de": "Skizze 13"
+    },
+    "src": "/sketchbook/sketch-09.jpg"
   }
 ]
