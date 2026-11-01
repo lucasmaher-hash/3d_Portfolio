@@ -250,6 +250,17 @@ function openPreview() {
   // slides out and the next one slides in; short of that it springs back. At either end it only gives a little, then returns.
   let startX = 0, startY = 0, axis = null, dragging = false, lastX = 0, lastT = 0, vx = 0, busy = false
   let ghost = null, ghostDir = 0, travel = 0
+  // Like Apple Photos: pulling a picture down drags it freely with the finger, it shrinks as it goes and the backdrop fades with it.
+  // Let go far enough (or with a downward flick) and it flies back into the stack and closes; otherwise it springs back.
+  let dismissing = false, vy = 0, lastY = 0, dismissAmount = 0
+  const backdrop = .7
+  const dismissLook = (dx, dy) => {
+    const progress = Math.min(1, Math.max(0, dy) / (innerHeight * .55))
+    dismissAmount = progress
+    image.style.transform = `translate(${dx}px, ${dy}px) scale(${1 - .5 * progress})`
+    overlay.style.background = `rgba(18, 20, 19, ${backdrop * (1 - progress)})`
+    for (const button of overlay.querySelectorAll('.preview-step')) button.style.opacity = String(1 - Math.min(1, progress * 4))
+  }
   const GAP = 24
   const removeGhost = () => { ghost?.remove(); ghost = null; ghostDir = 0 }
   // The neighbour is laid out beside the picture while dragging, so the gallery reads as a strip of pictures.
@@ -273,13 +284,22 @@ function openPreview() {
   }
   overlay.addEventListener('touchstart', event => {
     dragging = event.touches.length === 1 && !busy && image.style.visibility !== 'hidden'
-    axis = null; vx = 0
-    if (dragging) { startX = lastX = event.touches[0].clientX; startY = event.touches[0].clientY; lastT = event.timeStamp }
+    axis = null; vx = 0; vy = 0; dismissing = false
+    if (dragging) { lastY = event.touches[0].clientY; startX = lastX = event.touches[0].clientX; startY = event.touches[0].clientY; lastT = event.timeStamp }
   }, { passive: true })
   overlay.addEventListener('touchmove', event => {
     if (!dragging || event.touches.length !== 1) return
     const x = event.touches[0].clientX, dx = x - startX, dy = event.touches[0].clientY - startY
     if (!axis && Math.hypot(dx, dy) > 10) axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
+    if (axis === 'y' && dy > 0 && !ghost && (dismissing || Math.abs(dy) > 10)) dismissing = true
+    if (dismissing) {
+      event.preventDefault()
+      const dtY = event.timeStamp - lastT, y = event.touches[0].clientY
+      if (dtY > 0) vy = (y - lastY) / dtY
+      lastY = y; lastT = event.timeStamp
+      dismissLook(dx, dy)
+      return
+    }
     if (axis !== 'x') return
     event.preventDefault()
     const dt = event.timeStamp - lastT
@@ -292,6 +312,31 @@ function openPreview() {
   const endSwipe = event => {
     if (!dragging) return
     dragging = false
+    if (dismissing) {
+      dismissing = false
+      suppressClickUntil = performance.now() + 450
+      const endY = event.changedTouches?.[0]?.clientY ?? lastY, endX = event.changedTouches?.[0]?.clientX ?? lastX
+      const dy = endY - startY, dx = endX - startX
+      const ease = 'cubic-bezier(.22, .61, .36, 1)'
+      if (dy > 110 || vy > .6) {
+        // Fly back to where the picture lives in the stack, as the background clears.
+        const box = stackButton.getBoundingClientRect()
+        const scale = Math.min(1, (box.width * .55) / (image.offsetWidth || 1))
+        const toX = box.left + box.width / 2 - (innerWidth / 2), toY = box.top + box.height / 2 - (innerHeight / 2)
+        const run = reduceMotion.matches ? 0 : 280
+        const from = image.style.transform
+        if (run) {
+          image.animate([{ transform: from, opacity: 1 }, { transform: `translate(${toX}px, ${toY}px) scale(${scale})`, opacity: 0 }], { duration: run, easing: ease, fill: 'forwards' })
+          overlay.animate([{ background: overlay.style.background }, { background: 'rgba(18, 20, 19, 0)' }], { duration: run, easing: ease, fill: 'forwards' })
+        }
+        setTimeout(closePreview, run)
+      } else {
+        image.animate([{ transform: image.style.transform }, { transform: 'none' }], { duration: 300, easing: ease }); image.style.transform = ''
+        overlay.animate([{ background: overlay.style.background }, { background: `rgba(18, 20, 19, ${backdrop})` }], { duration: 300, easing: ease }).onfinish = () => { overlay.style.background = '' }
+        for (const button of overlay.querySelectorAll('.preview-step')) button.style.opacity = ''
+      }
+      return
+    }
     if (axis !== 'x') return
     suppressClickUntil = performance.now() + 450
     const dx = (event.changedTouches?.[0]?.clientX ?? lastX) - startX
