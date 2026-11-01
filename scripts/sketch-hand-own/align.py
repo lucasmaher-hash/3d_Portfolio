@@ -42,7 +42,7 @@ def align(ids, tiny=400):
             out[ny+200:ny+200+nh,nx+200:nx+200+nw]|=(m2>100).astype(np.uint8)
     return out[200:200+H,200:200+W]>0
 if __name__=='__main__':
-    ids=lambda li:[k for k in range(1,n) if line[k]==li]
+    ids=lambda li:[k for k in range(1,n) if line[k]==li and k!=17]
     import os
     res={}
     sel=align([k for k in ids(3) if k!=36])

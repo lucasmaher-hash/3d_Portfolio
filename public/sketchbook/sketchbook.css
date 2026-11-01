@@ -25,11 +25,17 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .back { display: inline-flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; pointer-events: auto; font-size: 13px; vertical-align: baseline; margin-right: 8px; }
 /* Lucas's hand-drawn arrow (2026-11-01): at rest only its head shows; on hover the head slides left and its tail grows out behind it, the text does not move. */
 .back { width: 27px; height: 21px; position: relative; vertical-align: middle; margin-right: 10px; }
-.back-arrow { position: absolute; left: 0; top: 0; width: 58px; height: 21px; background: currentColor; -webkit-mask: url(/sketchbook/hand/hand-arrow.svg) no-repeat 0 0 / 100% 100%; mask: url(/sketchbook/hand/hand-arrow.svg) no-repeat 0 0 / 100% 100%; clip-path: inset(0 54% 0 0); transition: transform 420ms cubic-bezier(.4, 0, .2, 1), clip-path 420ms cubic-bezier(.4, 0, .2, 1); }
-.back:hover .back-arrow, .back:focus-visible .back-arrow, body:has(.back-hit:hover) .back-arrow { transform: translateX(-31px); clip-path: inset(0 0 0 0); }
+.back-arrow { position: absolute; left: 0; top: 0; width: 58px; height: 21px; transition: transform 420ms cubic-bezier(.4, 0, .2, 1); }
+.back-arrow i { position: absolute; inset: 0; background: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
+.ba-head { -webkit-mask-image: url(/sketchbook/hand/hand-arrow-head.svg?v=3); mask-image: url(/sketchbook/hand/hand-arrow-head.svg?v=3); }
+.ba-tail { -webkit-mask-image: url(/sketchbook/hand/hand-arrow.svg?v=3); mask-image: url(/sketchbook/hand/hand-arrow.svg?v=3); clip-path: inset(0 100% 0 0); transition: clip-path 420ms cubic-bezier(.4, 0, .2, 1); }
+@media (hover: hover) {
+  .back:hover .back-arrow, .back:focus-visible .back-arrow, body:has(.back-hit:hover) .back-arrow { transform: translateX(-31px); }
+  .back:hover .ba-tail, .back:focus-visible .ba-tail, body:has(.back-hit:hover) .ba-tail { clip-path: inset(0 0 0 0); }
+}
 .hand { display: inline-block; vertical-align: middle; background: currentColor; -webkit-mask: var(--hand) no-repeat 0 0 / 100% 100%; mask: var(--hand) no-repeat 0 0 / 100% 100%; }
 .hand-select { --hand: url(/sketchbook/hand/hand-select.svg?v=2); width: calc(var(--k) * 1215px); height: calc(var(--k) * 112px); }
-.hand-hint { --hand: url(/sketchbook/hand/hand-hint.svg?v=2); width: calc(var(--k) * 1046px); height: calc(var(--k) * 279px); margin: 8px 0 0 16px; }
+.hand-hint { --hand: url(/sketchbook/hand/hand-hint.svg?v=3); width: calc(var(--k) * 1046px); height: calc(var(--k) * 279px); margin: 1px 0 0 16px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .intro p { font: 400 clamp(22px, 1.8vw, 27px)/1.7 'Sketch Hand', Caveat, cursive; display: inline; margin: 0; }
 .intro .hint { font-size: inherit; line-height: inherit; opacity: 1; }
@@ -68,7 +74,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .timeline-art { filter: url(#hand-rough); position: absolute; inset: 12px 0; pointer-events: none; --progress: 0%; }
 .timeline-line { position: absolute; inset: 0; width: 100%; height: 100%; fill: #a4a5a8; stroke: none; }
 .timeline-progress { fill: #20211f; clip-path: inset(calc(100% - var(--progress)) 0 0 0); }
-.timeline-circle { position: absolute; left: 50%; bottom: var(--progress); width: 26px; height: 32px; transform: translate(-50%, 50%); fill: #20211f; stroke: none; }
+.timeline-circle { position: absolute; left: 50%; bottom: var(--progress); width: 10.4px; height: 12.8px; transform: translate(-50%, 50%); fill: #20211f; stroke: none; }
 #timeline { position: relative; margin: 0; height: 100%; width: 44px; writing-mode: vertical-lr; direction: rtl; appearance: none; -webkit-appearance: none; background: transparent; cursor: ns-resize; }
 #timeline::-webkit-slider-runnable-track { width: 3px; height: 100%; background: transparent; }
 #timeline::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 26px; height: 24px; margin-left: -11.5px; border: 0; background: transparent; }
@@ -205,9 +211,12 @@ body:has(.sketch-preview) { -webkit-user-select: none; user-select: none; }
 .big-button { display: none; }
 @media (max-width: 540px) {
   .big-button { position: fixed; left: 82.2%; top: 86.3%; transform: translate(-50%, -50%); z-index: 4; display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 13px; background: none; color: #000; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-  .big-button svg { width: 31px; height: 31px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .big-button svg { width: 31px; height: 31px; fill: none; stroke: currentColor; stroke-width: 2.2; filter: url(#hand-rough); stroke-linecap: round; stroke-linejoin: round; }
   .big-button:active { opacity: .55; }
 }
 
 /* The nav iframe (z 10, 140px tall) covers the back arrow, which sits inside the transformed page frame: a transparent twin outside the frame takes the taps. */
 .back-hit { position: fixed; z-index: 15; width: 52px; height: 48px; -webkit-tap-highlight-color: transparent; }
+
+.back.is-bounce { animation: back-bounce 360ms ease-out; }
+@keyframes back-bounce { 0% { transform: translateX(0) scale(1); } 30% { transform: translateX(-5px) scale(.84); } 65% { transform: translateX(2px) scale(1.12); } 100% { transform: translateX(0) scale(1); } }

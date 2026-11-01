@@ -42,7 +42,7 @@ function readStack() {
   if (!st || st.total < 2) return
   const n = st.total - 1
   // Only the sheets already shown count: the shadow grows with the cube while it builds up.
-  const lo = st.index, hi = Math.max(lo, (st.loaded ?? st.total) - 1)
+  const lo = st.fillLo ?? st.index, hi = st.fillHi ?? Math.max(lo, (st.loaded ?? st.total) - 1)
   floor.style.visibility = st.loaded === 0 ? 'hidden' : ''
   if (st.reverse) { span.ta = (n - hi) / n; span.tb = (n - lo) / n }
   else { span.ta = lo / n; span.tb = hi / n }

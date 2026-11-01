@@ -109,9 +109,10 @@ function sizeStack() {
 // drawing loads alone, then the sheets behind it appear one by one, in stack
 // order, each the moment its picture has decoded. The later files download in
 // parallel, but a sheet never shows before the one in front of it.
+let fill = null // while the cube refills: the range of drawings shown so far
 let loaded = 0 // sheets shown so far, counted from the front (drawing 0)
 function publishStack() {
-  window.__sketchStack = { index, total: drawings.length, reverse: reverseView, loaded }
+  window.__sketchStack = { index, total: drawings.length, reverse: reverseView, loaded, ...fill }
   window.dispatchEvent(new CustomEvent('sketchbook-stack'))
 }
 const SHEET_GAP = 70 // ms at least between two sheets, so a cached load still reads as the cube building up
@@ -169,6 +170,31 @@ function select(value, animate = true) {
   const nextIndex = Math.max(0, Math.min(drawings.length - 1, Math.round(value)))
   if (nextIndex === index) return
   index = nextIndex; render(animate)
+}
+// Past the last drawing a click refills the cube: the sheets come back one by
+// one from the back to the front, about a second in all.
+let refilling = false
+function advance() {
+  if (preview || refilling) return
+  if (index < drawings.length - 1) { select(index + 1); return }
+  if (reduceMotion.matches || drawings.length < 2) { select(0); return }
+  refilling = true
+  fill = { loaded: 0 }; index = 0; render(false)
+  const depthOf = item => reverseView ? drawings.length - 1 - item.drawingIndex : item.drawingIndex
+  const order = [...sheets].sort((a, b) => depthOf(b) - depthOf(a))
+  for (const item of order) item.sheet.classList.add('is-loading')
+  frontGlass.style.visibility = 'hidden'
+  let lo = Infinity, hi = -1
+  const step = 850 / Math.max(1, order.length - 1)
+  order.forEach((item, i) => setTimeout(() => {
+    item.sheet.classList.remove('is-loading')
+    item.sheet.animate([{ opacity: 0 }, { opacity: Number(item.sheet.style.opacity) || 1 }], { duration: 150, easing: 'ease-out' })
+    lo = Math.min(lo, item.drawingIndex); hi = Math.max(hi, item.drawingIndex)
+    if (item.drawingIndex === index) { frontGlass.style.visibility = ''; syncFrontGlass() }
+    fill = { fillLo: lo, fillHi: hi }
+    if (i === order.length - 1) setTimeout(() => { fill = null; refilling = false; publishStack() }, 150)
+    else publishStack()
+  }, i * step))
 }
 let preview = null, press = null, suppressClickUntil = 0, previewControls = null
 
@@ -543,12 +569,22 @@ const back = document.querySelector('.back')
 const backHit = document.createElement('a')
 backHit.className = 'back-hit'; backHit.href = back.getAttribute('href'); backHit.tabIndex = -1; backHit.setAttribute('aria-hidden', 'true')
 document.body.append(backHit)
+if (matchMedia('(hover: none)').matches) {
+  // Touch: no expanding arrow, just a bounce, then the page changes.
+  const go = event => {
+    event.preventDefault()
+    if (back.classList.contains('is-bounce')) return
+    back.classList.add('is-bounce')
+    setTimeout(() => { location.href = back.getAttribute('href') }, reduceMotion.matches ? 0 : 300)
+  }
+  back.addEventListener('click', go); backHit.addEventListener('click', go)
+}
 const placeBackHit = () => { const box = back.getBoundingClientRect(); backHit.style.left = `${box.left + box.width / 2 - 26}px`; backHit.style.top = `${box.top + box.height / 2 - 24}px` }
 placeBackHit(); addEventListener('resize', placeBackHit); document.fonts?.ready.then(placeBackHit); addEventListener('load', placeBackHit)
 const bigButton = document.createElement('button')
 bigButton.type = 'button'; bigButton.className = 'big-button'
 bigButton.setAttribute('aria-label', language === 'de' ? 'Groß anzeigen' : 'View full screen')
-bigButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V6a2 2 0 0 1 2-2h3M15 4h3a2 2 0 0 1 2 2v3M20 15v3a2 2 0 0 1-2 2h-3M9 20H6a2 2 0 0 1-2-2v-3"/></svg>'
+bigButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.3 9.2C4 7.6 3.9 6.4 4.4 5.5C5 4.3 6.4 4 7.8 4.1C8.4 4.1 9 4 9.6 4.2M14.8 4.3C16.2 3.9 17.4 4.2 18.6 4.1C19.7 4.3 20.2 5.2 20.1 6.4C20 7.3 20.3 8.2 20.1 9.1M20.2 14.9C19.9 16.2 20.3 17.3 19.9 18.4C19.4 19.6 18.4 20 17.2 19.9C16.4 19.8 15.7 20.2 14.9 20M9.2 19.8C8 20.3 6.8 19.9 5.8 20.1C4.6 19.9 4.1 18.9 4.2 17.8C4.3 16.9 3.8 16 4.1 15"/></svg>'
 bigButton.addEventListener('click', () => {
   if (preview) return
   const at = scale => ({ transform: `translate(-50%, -50%) scale(${scale})` })
