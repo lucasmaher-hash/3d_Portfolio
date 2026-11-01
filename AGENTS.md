@@ -19,6 +19,12 @@ Do not restore retired draft quantities, retention rates or the replaced active-
 Do not invent additional findings or relabel old draft examples as actual results.
 
 
+## to.morrow page edits, 2026-11-01 (Lucas) — do not revert
+
+- The "Ich habe 15 Menschen … begleitet" intro paragraph under "Das Problem" (`n-study`) is **removed on purpose**. Do not re-add it. The `n-study` translation keys stay in the TRANSLATIONS blocks, unused. The 15-participant group is still named in the results caveat (`n-res-caveat`).
+- The SKILL.md code block (`.skill-file pre`) **wraps at the frame edge** (`white-space: pre-wrap; overflow-wrap: anywhere`) instead of scrolling sideways. Do not switch it back to `white-space: pre` / horizontal scroll.
+- Committed to main as `9944fa5`. Other chats edit this file too: re-read it before editing, and commit only your own files.
+
 Lucas Maher's portfolio website — vanilla JS + Vite, neumorphic design system, Three.js 3D mode.
 
 ## Quick Start
