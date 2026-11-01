@@ -425,7 +425,13 @@ const bigButton = document.createElement('button')
 bigButton.type = 'button'; bigButton.className = 'big-button'
 bigButton.setAttribute('aria-label', language === 'de' ? 'Groß anzeigen' : 'View full screen')
 bigButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V6a2 2 0 0 1 2-2h3M15 4h3a2 2 0 0 1 2 2v3M20 15v3a2 2 0 0 1-2 2h-3M9 20H6a2 2 0 0 1-2-2v-3"/></svg>'
-bigButton.addEventListener('click', () => { if (!preview) openPreview() })
+bigButton.addEventListener('click', () => {
+  if (preview) return
+  const at = scale => ({ transform: `translate(-50%, -50%) scale(${scale})` })
+  // Squash, overshoot, settle; the big view opens while it is still springing.
+  if (!reduceMotion.matches) bigButton.animate([at(1), at(.82), at(1.14), at(.97), at(1)], { duration: 420, easing: 'ease-out' })
+  setTimeout(() => { if (!preview) openPreview() }, reduceMotion.matches ? 0 : 140)
+})
 document.body.append(bigButton)
 stackButton.addEventListener('contextmenu', event => event.preventDefault())
 document.addEventListener('click', event => {
