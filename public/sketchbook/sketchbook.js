@@ -201,11 +201,18 @@ function openPreview() {
     overlay.append(button)
     return { button, direction }
   })
+  // One fixed spot for every drawing (so the chevrons never hop between pictures): just outside the widest
+  // picture's displayed width.
   const placeChevrons = () => {
-    const box = image.getBoundingClientRect()
+    let half = 0
+    for (const { sheet } of sheets) {
+      const img = sheet.querySelector('img')
+      if (img?.naturalWidth && img.naturalWidth <= img.naturalHeight) half = Math.max(half, img.naturalWidth * Math.min(Math.min(innerWidth * .9, 1100) / img.naturalWidth, innerHeight * .88 / img.naturalHeight) / 2)
+    }
+    if (!half) half = image.getBoundingClientRect().width / 2
     for (const { button, direction } of chevrons) {
-      button.style.top = `${box.top + box.height / 2}px`
-      button.style.left = `${direction < 0 ? Math.max(4, box.left - 56) : Math.min(innerWidth - 48, box.right + 12)}px`
+      button.style.top = `${innerHeight / 2}px`
+      button.style.left = `${Math.max(4, Math.min(innerWidth - 48, innerWidth / 2 + direction * (half + 12) - (direction < 0 ? 44 : 0)))}px`
       button.disabled = index + direction < 0 || index + direction > drawings.length - 1
     }
   }
