@@ -158,7 +158,9 @@ function openPreview() {
   document.body.append(overlay)
   preview = overlay
   overlay.focus({ preventScroll: true })
-  const nw = image.naturalWidth, nh = image.naturalHeight
+  // The new Image above may not have decoded yet (Safari): read the size from the sheet's own, already loaded picture.
+  const loaded = current?.sheet.querySelector('img')
+  const nw = image.naturalWidth || loaded?.naturalWidth || 0, nh = image.naturalHeight || loaded?.naturalHeight || 0
   if (nw && nh) {
     const fit = Math.min(Math.min(innerWidth * .9, 1100) / nw, innerHeight * .88 / nh)
     image.style.width = `${nw * fit}px`; image.style.height = `${nh * fit}px`
