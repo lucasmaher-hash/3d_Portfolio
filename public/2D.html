@@ -1676,5 +1676,30 @@
     })();
   </script>
 
+<script>
+/* Blob shading dial: open the landing page with ?tune=1 (dev only, never shown otherwise). */
+(function () {
+  if (!/[?&]tune=1/.test(location.search)) return;
+  var fr = document.querySelector('.hero-blob');
+  var D = [['sh-off','Shadow offset',0,40,8,'px'],['sh-blur','Shadow blur',0,60,18,'px'],['sh-a','Shadow strength',0,1,0.65,''],['hl-off','Highlight offset',0,40,8,'px'],['hl-blur','Highlight blur',0,60,18,'px'],['hl-a','Highlight strength',0,1,1,'']];
+  var box = document.createElement('div');
+  box.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:100000;background:#fff;border:1px solid #ccc;border-radius:12px;padding:12px 14px;font:12px/1.4 system-ui;width:230px;box-shadow:0 6px 24px rgba(0,0,0,.18)';
+  var vals = {};
+  function apply() { var d = fr.contentDocument; if (!d) return; D.forEach(function (x) { d.documentElement.style.setProperty('--' + x[0], vals[x[0]] + x[5]); }); }
+  D.forEach(function (x) {
+    vals[x[0]] = x[4];
+    var l = document.createElement('label'); l.style.cssText = 'display:block;margin-bottom:6px';
+    var o = document.createElement('output'); o.textContent = x[4] + x[5]; o.style.float = 'right';
+    var i = document.createElement('input'); i.type = 'range'; i.min = x[2]; i.max = x[3]; i.step = x[3] <= 1 ? 0.01 : 1; i.value = x[4]; i.style.width = '100%';
+    i.oninput = function () { vals[x[0]] = +i.value; o.textContent = i.value + x[5]; apply(); };
+    l.append(x[1], o, i); box.append(l);
+  });
+  var b = document.createElement('button'); b.textContent = 'Save values'; b.style.cssText = 'width:100%;padding:6px;border-radius:8px;border:1px solid #bbb;background:#f4f4f6;cursor:pointer';
+  var m = document.createElement('div'); m.style.marginTop = '6px';
+  b.onclick = function () { fetch('http://localhost:5175/save/blob-shading', {method:'POST', body: JSON.stringify(vals)}).then(function(){ m.textContent = 'Saved'; }, function(){ m.textContent = JSON.stringify(vals); }); };
+  box.append(b, m); document.body.append(box);
+  fr.addEventListener('load', apply);
+})();
+</script>
 </body>
 </html>
