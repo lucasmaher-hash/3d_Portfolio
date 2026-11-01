@@ -62,6 +62,8 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   const art = document.createElement('span')
   art.className = 'art'
   const image = new Image()
+  // The sheet that is in front first gets the bandwidth; the rest load behind it.
+  image.fetchPriority = drawingIndex === index ? 'high' : 'low'
   image.src = drawings[drawingIndex].src
   image.alt = ''; image.draggable = false
   fitSheet(image, art, bands, () => sheet.classList.contains('is-current'))
@@ -108,10 +110,13 @@ sizeStack()
 window.addEventListener('resize', sizeStack)
 
 // Decode placeholders ahead of time so changing a page never flashes a blank.
-await Promise.all(drawings.map(drawing => {
+// Only the front drawing is awaited; the others decode in the background.
+const decodeDrawing = drawing => {
   const image = new Image(); image.src = drawing.src
   return image.decode().catch(() => {})
-}))
+}
+await decodeDrawing(drawings[index])
+drawings.forEach((drawing, i) => { if (i !== index) decodeDrawing(drawing) })
 function render(animate = true) {
   const drawing = drawings[index]
   for (const { sheet, drawingIndex } of sheets) {
