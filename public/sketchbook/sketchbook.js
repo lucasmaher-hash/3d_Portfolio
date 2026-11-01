@@ -590,12 +590,13 @@ window.addEventListener('message', event => {
   }
 })
 menu.addEventListener('click', event => { if (event.target === menu) menu.classList.remove('open') })
-document.querySelector('[data-enter-3d]').addEventListener('click', () => { try { sessionStorage.setItem('_enter3d', '1') } catch {} })
+document.querySelector('[data-enter-3d]')?.addEventListener('click', () => { try { sessionStorage.setItem('_enter3d', '1') } catch {} })
 for (const button of document.querySelectorAll('[data-lang]')) button.addEventListener('click', () => {
   try { localStorage.setItem('lang', button.dataset.lang) } catch {}
   nav.contentWindow.postMessage({ type: 'lang-change', lang: button.dataset.lang }, location.origin)
 })
 document.body.dataset.ready = 'true'
+import('/sketchbook/cube-shadow.js')
 // Temporary authoring controls are available only through the explicit preview link.
 if (new URLSearchParams(location.search).get('tune') === '1') {
   import('/sketchbook/layout-tuner.js').then(({ installLayoutTuner }) => installLayoutTuner())
