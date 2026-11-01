@@ -633,7 +633,7 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
         </AbsoluteFill>
       ) : null}
 
-      {fadeOut > 0 ? (
+      {fadeOut > 0 || (insExt && insExt.chars > 0) ? (
         <>
           {/* everything goes to the Live section's dark ground — except the words */}
           <AbsoluteFill style={{background: DARK.canvas, opacity: fadeOut, top: -ext, height: H + ext}} />
@@ -855,8 +855,8 @@ const FingerOnLight: React.FC<{x: number; y: number; d: number; opacity: number;
 );
 
 /* ─── Timing of the ending, shared by the screens and the fingers ─────── */
-const unlockU = (f: number) => ease(f, UNLOCK + 6, UNLOCK + 20, Easing.out(Easing.cubic)); // the Lock Screen slides away
-const homeIn = (f: number) => ease(f, UNLOCK + 9, UNLOCK + 26, Easing.out(Easing.cubic)); // icons settle in
+const unlockU = (f: number) => ease(f, UNLOCK + 4, UNLOCK + 26, Easing.bezier(0.3, 0, 0.2, 1)); // iOS home swipe: the Lock Screen follows the finger, then carries on up with its momentum
+const homeIn = (f: number) => ease(f, UNLOCK + 8, UNLOCK + 30, Easing.out(Easing.cubic)); // the Home Screen scales down from 1.1 and fades up behind the leaving Lock Screen
 
 /* ─── Dynamic Island ──────────────────────────────────────────────────
    Three footprints, all centred on the frame's own island (x 201pt, top
@@ -1108,8 +1108,8 @@ const LockLayer16: React.FC<{f: number}> = ({f}) => {
   const u = unlockU(f);
   if (u >= 1) return null;
   return (
-    <div style={{position: 'absolute', inset: 0, background: '#FFFFFF', opacity: 1 - u}}>
-      <div style={{position: 'absolute', inset: 0, transform: `translateY(${-u * 150}px)`}}>
+    <div style={{position: 'absolute', inset: 0, background: 'transparent'}}>
+      <div style={{position: 'absolute', inset: 0, opacity: 1 - clamp01((u - 0.3) / 0.7), transform: `translateY(${-u * SCREEN_H * 0.55}px) scale(${1 - 0.06 * u})`, transformOrigin: '50% 100%'}}>
         <Img src={seqImg('lockseq', 'l', lockFrame(f))} style={SEQ_STYLE} />
       </div>
     </div>
@@ -1120,9 +1120,11 @@ const LockLayer16: React.FC<{f: number}> = ({f}) => {
 const RightScreen16: React.FC<{f: number}> = ({f}) => {
   const wake = ease(f, ARRIVE - 6, ARRIVE + 6);
   return (
-    <div style={{position: 'absolute', inset: 0, background: '#FFFFFF'}}>
-      {f >= UNLOCK + 6 ? <Img src={seqImg('homeseq', 'h', homeFrame(f))} style={SEQ_STYLE} /> : null}
+    <div style={{position: 'absolute', inset: 0, background: '#C4C4C4'}}>
+      {f >= UNLOCK ? <div style={{position: 'absolute', inset: 0, opacity: f < ISL_IN ? 0.15 + 0.85 * homeIn(f) : 1, transform: `scale(${lerp(1.1, 1, homeIn(f))})`, transformOrigin: '50% 45%'}}><Img src={seqImg('homeseq', 'h', homeFrame(f))} style={SEQ_STYLE} /></div> : null}
       <LockLayer16 f={f} />
+      {/* the task is crossed out in the island once it is ticked (the recording only ticks it) */}
+      <div style={{position: 'absolute', left: 36, top: 64.2, height: 1.7, width: 103 * ease(f, TICK + 4, TICK + 20, Easing.inOut(Easing.cubic)), background: 'rgba(255,255,255,.92)', borderRadius: 1}} />
       <div style={{position: 'absolute', inset: 0, background: '#000', opacity: 1 - wake}} />
     </div>
   );
@@ -1147,6 +1149,7 @@ const CAM_KEYS: Array<[number, Cam]> = [
   [ARRIVE + 28, CAM_R],
   [UNLOCK + 22, CAM_R],
   [ISL_IN + 44, CAM_I], // the push ends where it did; the extra second is held, not stretched
+  [TICK + 50, {...CAM_I, s: CAM_I.s * 1.14}], // then keeps creeping in while the island is open and ticked (Lucas)
 ];
 const camAt = (f: number): Cam => {
   if (f <= CAM_KEYS[0][0]) return CAM_KEYS[0][1];
@@ -1275,19 +1278,19 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
         {rings(cardG, ARRIVE - 1, 240, 2)}
         {fingerAt(ctrlG, GO)}
         {/* unlock: up from the bottom edge, fast, like a real swipe home */}
-        {f >= UNLOCK - 4 && f <= UNLOCK + 22 ? (
+        {f >= UNLOCK - 4 && f <= UNLOCK + 24 ? (
           <FingerOnLight
             x={unlockA[0]}
-            y={lerp(unlockA[1], unlockB[1], ease(f, UNLOCK + 6, UNLOCK + 15, Easing.in(Easing.quad)))}
+            y={lerp(unlockA[1], unlockB[1], clamp01(unlockU(f) / 0.62))}
             d={60}
-            opacity={ease(f, UNLOCK - 4, UNLOCK + 2) * (1 - ease(f, UNLOCK + 13, UNLOCK + 20))}
+            opacity={ease(f, UNLOCK - 4, UNLOCK + 2) * (1 - ease(f, UNLOCK + 14, UNLOCK + 21))}
             scale={1 - 0.08 * sp(f, UNLOCK + 2, 'press')}
           />
         ) : null}
       </AbsoluteFill>
       <Caption lines={['One task,', 'always in view.']} f={f} start={LIVE_CUT + 34} out={GO + 4} x={W / 2 - (PS.W * CAM_L.s) / 2 - 70} align="right" mul={capMul} />
       <Caption lines={['Right on your', 'Lock Screen.']} f={f} start={ARRIVE + 22} out={UNLOCK + 4} x={W / 2 + (PS.W * CAM_R.s) / 2 + 70} align="left" />
-      <Caption lines={['And in the', 'Dynamic Island.']} f={f} start={ISL_IN + 14} x={W / 2 + (PS.w * CAM_I.s) / 2 + 70} align="left" />
+      <Caption lines={['And in the', 'Dynamic Island.']} f={f} start={ISL_IN + 14} x={W / 2 + (PS.w * CAM_I.s * 1.14) / 2 + 70} align="left" />
     </Canvas>
   );
 };
@@ -1411,11 +1414,7 @@ const PromoE: React.FC<{variant: Variant; f0: number; ins?: boolean}> = ({varian
           breathOv={eBreath(fReal)}
         />
       ) : null}
-      {f >= FLOOD.start ? (
-        <AbsoluteFill style={{clipPath: f >= FLOOD.end ? undefined : `circle(${r}px at ${checkScreen[0]}px ${checkScreen[1]}px)`}}>
-          <SwipeScene f={0} v={variant} />
-        </AbsoluteFill>
-      ) : null}
+      <AbsoluteFill style={{background: '#000', opacity: ease(f, TICK + 30, TICK + 54, Easing.inOut(Easing.quad)), top: -extTop, height: H + extTop}} />
     </AbsoluteFill>
   );
 };
