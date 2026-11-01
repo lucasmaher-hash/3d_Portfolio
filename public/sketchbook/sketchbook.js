@@ -419,8 +419,34 @@ const bigButton = document.createElement('button')
 bigButton.type = 'button'; bigButton.className = 'big-button'
 bigButton.setAttribute('aria-label', language === 'de' ? 'Groß anzeigen' : 'View full screen')
 bigButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V6a2 2 0 0 1 2-2h3M15 4h3a2 2 0 0 1 2 2v3M20 15v3a2 2 0 0 1-2 2h-3M9 20H6a2 2 0 0 1-2-2v-3"/></svg>'
-bigButton.addEventListener('click', () => { if (!preview) openPreview() })
+bigButton.addEventListener('click', () => { if (!preview && performance.now() > bigDragUntil) openPreview() })
 document.body.append(bigButton)
+// TEMPORARY (button position tuner, remove once the spot is chosen): drag the button, a readout shows where it sits (viewport %).
+let bigDragUntil = 0
+const bigReadout = document.createElement('div')
+bigReadout.className = 'big-readout'
+document.body.append(bigReadout)
+const bigPlace = (fx, fy) => {
+  bigButton.style.cssText += `;left:${fx * 100}%;top:${fy * 100}%;bottom:auto;transform:translate(-50%,-50%)`
+  bigReadout.textContent = `left ${(fx * 100).toFixed(1)}% · top ${(fy * 100).toFixed(1)}%`
+}
+try { const saved = JSON.parse(localStorage.getItem('bigButtonPos') || 'null'); if (saved) bigPlace(saved.x, saved.y) } catch {}
+let bigDrag = null
+bigButton.addEventListener('pointerdown', event => { bigDrag = { x: event.clientX, y: event.clientY, moved: false }; bigButton.setPointerCapture(event.pointerId) })
+bigButton.addEventListener('pointermove', event => {
+  if (!bigDrag) return
+  if (!bigDrag.moved && Math.hypot(event.clientX - bigDrag.x, event.clientY - bigDrag.y) < 6) return
+  bigDrag.moved = true
+  bigPlace(Math.max(0, Math.min(1, event.clientX / innerWidth)), Math.max(0, Math.min(1, event.clientY / innerHeight)))
+})
+const bigDragEnd = () => {
+  if (bigDrag?.moved) {
+    bigDragUntil = performance.now() + 400
+    try { localStorage.setItem('bigButtonPos', JSON.stringify({ x: parseFloat(bigButton.style.left) / 100, y: parseFloat(bigButton.style.top) / 100 })) } catch {}
+  }
+  bigDrag = null
+}
+bigButton.addEventListener('pointerup', bigDragEnd); bigButton.addEventListener('pointercancel', bigDragEnd)
 stackButton.addEventListener('contextmenu', event => event.preventDefault())
 document.addEventListener('click', event => {
   if (performance.now() < suppressClickUntil && !event.target.closest('.sketch-preview')) {

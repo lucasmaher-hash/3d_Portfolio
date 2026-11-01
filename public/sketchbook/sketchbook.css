@@ -100,9 +100,10 @@ body:has(.sketch-preview) { -webkit-user-select: none; user-select: none; }
 .stack-button img, .sketch-preview img, .lift-scene img { -webkit-user-drag: none; pointer-events: none; }
 
 /* Phones only: full-screen button centred under the cube. */
-.big-button { display: none; }
+.big-button, .big-readout { display: none; }
 @media (max-width: 540px) {
-  .big-button { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 4.5svh); transform: translateX(-50%); z-index: 4; display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 13px; background: #8e8e93; color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .big-button { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 4.5svh); transform: translateX(-50%); z-index: 4; display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 13px; background: rgba(142, 142, 147, .7); color: #fff; touch-action: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .big-button svg { width: 31px; height: 31px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-  .big-button:active { background: #7c7c81; }
+  .big-button:active { background: rgba(124, 124, 129, .7); }
+  .big-readout { display: block; position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); transform: translateX(-50%); z-index: 5; padding: 4px 10px; border-radius: 8px; background: #0008; color: #fff; font: 12px/1.4 system-ui, sans-serif; pointer-events: none; }
 }
