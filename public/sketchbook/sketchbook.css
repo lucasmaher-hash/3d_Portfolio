@@ -34,8 +34,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
   .back:hover .ba-tail, .back:focus-visible .ba-tail, body:has(.back-hit:hover) .ba-tail { clip-path: inset(0 0 0 0); }
 }
 .hand { display: inline-block; vertical-align: middle; background: currentColor; -webkit-mask: var(--hand) no-repeat 0 0 / 100% 100%; mask: var(--hand) no-repeat 0 0 / 100% 100%; }
-.hand-select { --hand: url(/sketchbook/hand/hand-select.svg?v=2); width: calc(var(--k) * 1215px); height: calc(var(--k) * 112px); }
-.hand-hint { --hand: url(/sketchbook/hand/hand-hint.svg?v=3); width: calc(var(--k) * 1046px); height: calc(var(--k) * 279px); margin: 1px 0 0 16px; }
+.hand-select { --hand: url(/sketchbook/hand/hand-select.svg?v=4); width: calc(var(--k) * 1215px); height: calc(var(--k) * 112px); }
+.hand-hint { --hand: url(/sketchbook/hand/hand-hint.svg?v=4); width: calc(var(--k) * 1046px); height: calc(var(--k) * 279px); margin: 1px 0 0 16px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .intro p { font: 400 clamp(22px, 1.8vw, 27px)/1.7 'Sketch Hand', Caveat, cursive; display: inline; margin: 0; }
 .intro .hint { font-size: inherit; line-height: inherit; opacity: 1; }

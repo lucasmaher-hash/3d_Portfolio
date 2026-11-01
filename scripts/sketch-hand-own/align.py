@@ -18,6 +18,10 @@ def align(ids, tiny=400):
     for c in units: c['ok']=0.75*xh0<c['bh']<1.3*xh0
     rel=sorted([c for c in units if c['ok']],key=lambda c:c['x']+c['w']/2)
     xh=np.median([c['bh'] for c in rel]); base=np.median([c['bb'] for c in rel])
+    for c in rel:
+        if abs(base-c['bb'])>25: c['ok']=False   # band is not the letter's baseline (e.g. f): leave it where it is
+    rel=[c for c in rel if c['ok']]
+    xh=np.median([c['bh'] for c in rel]); base=np.median([c['bb'] for c in rel])
     cxs=[c['x']+c['w']/2 for c in rel]; dys=[base-c['bb'] for c in rel]
     for c in units:
         if c['ok']:
