@@ -196,6 +196,19 @@
       transform: scale(1.1);
       background-size: 100% 1px;
     }
+    /* The arrow is drawn, not typed: Roboto Flex's → is hairline next to the
+       text. A 1.5/16 stroke at 0.95em lands on the face's own stem (~1.4px at
+       15px). It is a CSS mask so it follows currentColor on hover. */
+    .tagline-block p:last-child::after {
+      content: '';
+      display: inline-block;
+      width: 0.95em; height: 0.95em;
+      margin-left: 0.35em;
+      vertical-align: -0.12em;
+      background: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 8h12M9 3l5 5-5 5'/%3E%3C/svg%3E") center / contain no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 8h12M9 3l5 5-5 5'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
     @media (prefers-reduced-motion: reduce) { .tagline-block p:last-child { transition: color 150ms ease; } }
 
     /* The to.morrow tile is the promo loop (2026-10-04) — the 16:9 cut of the
@@ -915,10 +928,15 @@
        border-radius clip it, so the renderer never has to think about the
        round shape. */
     #load-liquid {
+      /* Overscanned 2px past the circle on every side (the circle clips it):
+         a fractional layout pixel-snaps the canvas box a hair inside the
+         circle's rounded edge, which showed as a sliver of bare ball on the
+         right on phones. Explicit width/height — inset alone does not size a
+         replaced element. */
       position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+      inset: -2px;
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
       display: block;
     }
 
@@ -1188,7 +1206,7 @@
         <h1 class="hero-title">Lucas Maher</h1>
       </div>
       <div class="tagline-block">
-        <p data-i18n="tagline2" onclick="window.location.href='/about2d.html'">More about me →</p>
+        <p data-i18n="tagline2" onclick="window.location.href='/about2d.html'">More about me</p>
       </div>
     </div>
 
@@ -1583,7 +1601,7 @@
         'tag-industrial': 'Industrial', 'tag-fabrication': 'Fabrication',
         'tag-lighting': 'Lighting', 'tag-texturing': 'Texturing',
         'footer-top': 'top',
-        'tagline2': 'More about me →',
+        'tagline2': 'More about me',
         'craft-title': 'Craft',
         'btn-view-work': 'View Work',
         'footer-copyright': '© 2026 Lucas Maher. All Rights Reserved.',
@@ -1598,7 +1616,7 @@
         'tag-industrial': 'Industrie', 'tag-fabrication': 'Fertigung',
         'tag-lighting': 'Beleuchtung', 'tag-texturing': 'Texturierung',
         'footer-top': 'hoch',
-        'tagline2': 'Mehr über mich →',
+        'tagline2': 'Mehr über mich',
         'craft-title': 'Projekte',
         'btn-view-work': 'Ansehen',
         'footer-copyright': '© 2026 Lucas Maher. Alle Rechte vorbehalten.',

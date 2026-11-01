@@ -177,14 +177,14 @@ const mv = (from: number, well: number, at: number): Move => ({
   toX: wellCX(well),
   well,
   appear: at,
-  down: at + 8,
-  dragStart: at + 10,
-  release: at + 20,
-  push: at + 22, // the moment it reaches its new list and shoves the rows there down
-  land: at + 50,
+  down: at + 6,
+  dragStart: at + 8,
+  release: at + 17,
+  push: at + 19, // the moment it reaches its new list and shoves the rows there down
+  land: at + 44,
 });
-const M1 = mv(1, 2, 160); // to.morrow → Soon (to the RIGHT — Lucas)
-const M2 = mv(1, 0, 228); // Plan trip to Asia → Today
+const M1 = mv(1, 2, 148); // to.morrow → Soon (to the RIGHT — Lucas)
+const M2 = mv(1, 0, 186); // Plan trip to Asia → Today
 /* the list "Go Live" is typed into: Today, on the LEFT, under Plan trip to Asia
    (Lucas: to.morrow goes right, the close-up stays on the left as before) */
 const GL_WELL = M2.well;
@@ -225,13 +225,14 @@ const eBreath = (f: number) => {
 const INS_TEXT = ' on important tasks';
 const sum = (a: number[]) => a.reduce((x, y) => x + y, 0);
 const INS = (() => {
-  const at = GOLIVE.fade[1] + 24; // "Go Live" alone on the dark for a moment first
+  const t0 = GOLIVE.fade[0] + 5; // typing starts while the page is still going dark — no pause (Lucas)
+  const at = GOLIVE.fade[1]; // the scene is held from the moment it is fully dark
   const type = [3, 2, 3, 2, 3, 2, 2, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 3]; // one per letter of INS_TEXT
-  const typeEnd = at + sum(type);
+  const typeEnd = t0 + sum(type);
   const delStart = typeEnd + 30; // read it
   const del = [4, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]; // backspace held: a beat, then a run
   const delEnd = delStart + sum(del);
-  return {at, type, typeEnd, delStart, del, delEnd, len: delEnd + 8 - at};
+  return {t0, at, type, typeEnd, delStart, del, delEnd, len: delEnd + 8 - at};
 })();
 /* After the line is taken back, E's own hold is NOT replayed in full (Lucas:
    "Go Live" back to the button sooner): E resumes INS_SKIP frames further on,
@@ -240,7 +241,7 @@ const INS = (() => {
 const INS_SKIP = 46;
 const insWarp = (f0: number) => (f0 < INS.at ? f0 : f0 < INS.at + INS.len ? INS.at : f0 - INS.len + INS_SKIP);
 const insChars = (f0: number) =>
-  f0 < INS.at || f0 >= INS.at + INS.len ? 0 : typedCount(f0, INS.at, INS.type) - typedCount(f0, INS.delStart, INS.del);
+  f0 < INS.t0 || f0 >= INS.at + INS.len ? 0 : typedCount(f0, INS.t0, INS.type) - typedCount(f0, INS.delStart, INS.del);
 /* The line grows to the right, so the camera glides left with it until ring +
    full line sit centred in the frame (measured off a render of the full line:
    ring left 676 → text right 1622 unpanned, centre 1149), and glides back as
@@ -248,7 +249,7 @@ const insChars = (f0: number) =>
 const INS_PAN = -189;
 const insPan = (f0: number) =>
   INS_PAN *
-  (ease(f0, INS.at, INS.typeEnd + 8, Easing.inOut(Easing.cubic)) - ease(f0, INS.delStart - 2, INS.delEnd + 6, Easing.inOut(Easing.cubic)));
+  (ease(f0, INS.t0, INS.typeEnd + 8, Easing.inOut(Easing.cubic)) - ease(f0, INS.delStart - 2, INS.delEnd + 6, Easing.inOut(Easing.cubic)));
 /* ...and how long the finished button sits before the phone comes in round it */
 const E_SETTLE = 30;
 
@@ -264,7 +265,7 @@ const rowIn = (i: number, g: number) => sp(g, ZOOM_OUT[0] + 4 + i * 5, 'present'
    UNDERDAMPED spring carries it, starting at the speed the finger let go
    with, so it overshoots its slot and bounces back into place. */
 const DRAG = 112; // px — scaled with the wells
-const DRAG_FRAMES = 10;
+const DRAG_FRAMES = 9;
 const DRAG_EASE = Easing.in(Easing.cubic);
 const BOUNCE = {response: 0.55, damping: 0.62};
 const bounce = (t: number, v0: number) => {
@@ -646,14 +647,13 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
                 /* E: the light words fade in over the dark ones, set identically
                    (row setting) so the hand-over is a pure colour change */
                 ...sf(ROW.label, z, 400, -0.02),
-                ...(tr === 'golive2' ? {opacity: fadeOut} : {}),
                 lineHeight: 1.19,
                 whiteSpace: 'nowrap',
                 color: tr === 'golive2' ? DARK.ink : mix(p.ink, DARK.ink, fadeOut),
               }}
             >
-              {goLiveText(tr)}
-              {insExt ? INS_TEXT.slice(0, insExt.chars) : null}
+              <span style={tr === 'golive2' ? {opacity: fadeOut} : undefined}>{goLiveText(tr)}</span>
+              {insExt ? <span style={{opacity: 1, color: mix(p.ink, DARK.ink, fadeOut)}}>{INS_TEXT.slice(0, insExt.chars)}</span> : null}
             </div>
             {tr === 'golive2' ? <CheckToLive f={f} bf={insExt?.bf} p={p} z={z} addX={addX} addY={addY} /> : null}
           </AbsoluteFill>
@@ -1364,11 +1364,8 @@ export const DURATION_F = DURATION_E + INS.len - INS_SKIP;
 const LIVE_OFFSET = E.cut + E.hold - E.clock0 + INS.len - INS_SKIP;
 export const HERO_TIMING_16 = createHeroTiming(DURATION_F, [
   [TYPE.start + sum(TYPE.gaps), BUILD.check],
-  [CAM_MOVE[1], M1.appear],
-  [M1.land, M2.down],
   [M2.land, GZ],
   [GOLIVE.tap + 4, GOLIVE.start],
-  [GOLIVE.fade[1], INS.at],
   [INS.typeEnd, INS.delStart],
   [E.cut + INS.len - INS_SKIP + 14, E.cut + INS.len - INS_SKIP + 12 + E_SETTLE],
   [LTYPE_END + LIVE_OFFSET, GO + LIVE_OFFSET],
