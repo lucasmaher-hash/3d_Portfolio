@@ -598,7 +598,7 @@ for (const button of document.querySelectorAll('[data-lang]')) button.addEventLi
   nav.contentWindow.postMessage({ type: 'lang-change', lang: button.dataset.lang }, location.origin)
 })
 document.body.dataset.ready = 'true'
-import('/sketchbook/cube-shadow.js?v=8')
+import('/sketchbook/cube-shadow.js?v=9')
 // Temporary authoring controls are available only through the explicit preview link.
 if (new URLSearchParams(location.search).get('tune') === '1') {
   import('/sketchbook/layout-tuner.js').then(({ installLayoutTuner }) => installLayoutTuner())

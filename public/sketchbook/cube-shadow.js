@@ -2,17 +2,9 @@
 // inside .stack's preserve-3d space, at the bottom of the sheets). Light comes
 // from behind-left, so the shadow falls toward the viewer and to the right.
 // Richtung is relative to the cube's rotateY, so the shadow keeps its screen
-// direction when the layout tuner turns the cube (70° = front right, Lucas's values 2026-11-01). Always applied with the saved values;
-// the dial shows with ?shadow=1 or ?tune=1.
-const KEY = 'portfolio-sketchbook-shadow-v3'
-const defaults = { angle: 70, length: 67, blur: 40, opacity: 39, tip: 8, color: '#000000', gap: 0 }
-const fields = {
-  angle: ['Richtung', '°', -90, 180], length: ['Länge', '%', 0, 250], blur: ['Weichheit', 'px', 0, 80],
-  opacity: ['Intensität', '%', 0, 100], tip: ['Ende (Deckkraft)', '%', 0, 100], gap: ['Bodenabstand', 'px', -40, 80],
-}
-
-let values = { ...defaults }
-try { Object.assign(values, JSON.parse(localStorage.getItem(KEY)) || {}) } catch {}
+// direction when the layout tuner turns the cube (70° = front right, Lucas's values 2026-11-01).
+// The tuning dial was removed; the values above are final.
+const values = { angle: 70, length: 67, blur: 40, opacity: 39, tip: 8, color: '#000000', gap: 0 }
 
 const button = document.querySelector('.stack-button')
 const stack = document.querySelector('.stack')
@@ -92,40 +84,3 @@ function apply() {
 }
 apply()
 requestAnimationFrame(apply)
-
-const q = new URLSearchParams(location.search)
-if (q.get('shadow') === '1' || q.get('tune') === '1') {
-  const panel = document.createElement('section')
-  panel.style.cssText = 'position:fixed;left:20px;bottom:20px;z-index:9999;width:min(300px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:14px;border-radius:20px;background:rgba(240,240,245,.92);box-shadow:0 8px 30px rgba(0,0,0,.18);font:12px/1.4 "Roboto Flex UI",sans-serif;color:#222'
-  panel.addEventListener('keydown', e => e.stopPropagation())
-  panel.innerHTML = '<strong style="display:block;margin-bottom:8px">Würfel-Schatten</strong>'
-  const rows = {}
-  const out = Object.assign(document.createElement('textarea'), { readOnly: true, rows: 2 })
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(values)) } catch {} ; out.value = JSON.stringify(values) }
-  const row = (label, input, extra) => {
-    const l = document.createElement('label'); l.style.cssText = 'display:grid;grid-template-columns:96px minmax(0,1fr) 44px;gap:6px;align-items:center;margin:4px 0'
-    l.append(Object.assign(document.createElement('span'), { textContent: label }), input)
-    if (extra) l.append(extra)
-    panel.append(l)
-  }
-  for (const [k, [label, unit, min, max]] of Object.entries(fields)) {
-    const r = Object.assign(document.createElement('input'), { type: 'range', min, max, step: 1, value: values[k] })
-    const n = Object.assign(document.createElement('span'), { textContent: values[k] + unit, style: 'text-align:right' })
-    r.addEventListener('input', () => { values[k] = r.valueAsNumber; n.textContent = values[k] + unit; apply(); save() })
-    rows[k] = [r, n, unit]
-    row(label, r, n)
-  }
-  const c = Object.assign(document.createElement('input'), { type: 'color', value: values.color })
-  c.addEventListener('input', () => { values.color = c.value; apply(); save() })
-  row('Farbe', c)
-  out.style.cssText = 'width:100%;margin-top:8px;font:11px monospace'
-  out.value = JSON.stringify(values)
-  const reset = Object.assign(document.createElement('button'), { type: 'button', textContent: 'Zurücksetzen' })
-  reset.style.cssText = 'margin-top:8px'
-  reset.addEventListener('click', () => {
-    values = { ...defaults }; apply(); save(); c.value = values.color
-    for (const [k, [r, n, unit]] of Object.entries(rows)) { r.value = values[k]; n.textContent = values[k] + unit }
-  })
-  panel.append(out, reset)
-  document.body.append(panel)
-}
