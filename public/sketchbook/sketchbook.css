@@ -102,7 +102,7 @@ body:has(.sketch-preview) { -webkit-user-select: none; user-select: none; }
 /* Phones only: full-screen button centred under the cube. */
 .big-button { display: none; }
 @media (max-width: 540px) {
-  .big-button { position: fixed; left: 82.2%; top: 78.3%; transform: translate(-50%, -50%); z-index: 4; display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 13px; background: rgba(142, 142, 147, .7); color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .big-button { position: fixed; left: 82.2%; top: 78.3%; transform: translate(-50%, -50%); z-index: 4; display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 13px; background: rgba(142, 142, 147, .56); color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .big-button svg { width: 31px; height: 31px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-  .big-button:active { background: rgba(124, 124, 129, .7); }
+  .big-button:active { background: rgba(124, 124, 129, .56); }
 }
