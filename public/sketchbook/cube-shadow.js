@@ -41,6 +41,30 @@ function hull(points) {
   return lower.slice(0, -1).concat(upper.slice(0, -1))
 }
 
+// Depth the remaining (not yet viewed) sheets occupy, as fractions of the
+// stack depth from the front plane (0) to the back plane (1). The shadow's
+// footprint covers only that range and eases to it when a sheet is removed.
+const span = { a: 0, b: 1, ta: 0, tb: 1 }
+function readStack() {
+  const st = window.__sketchStack
+  if (!st || st.total < 2) return
+  const n = st.total - 1
+  if (st.reverse) { span.ta = 0; span.tb = (n - st.index) / n }
+  else { span.ta = st.index / n; span.tb = 1 }
+}
+let easing = 0
+function ease() {
+  span.a += (span.ta - span.a) * 0.18; span.b += (span.tb - span.b) * 0.18
+  if (Math.abs(span.ta - span.a) + Math.abs(span.tb - span.b) < 0.001) { span.a = span.ta; span.b = span.tb; easing = 0; apply(); return }
+  apply(); easing = requestAnimationFrame(ease)
+}
+window.addEventListener('sketchbook-stack', () => {
+  readStack()
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { span.a = span.ta; span.b = span.tb; apply(); return }
+  if (!easing) easing = requestAnimationFrame(ease)
+})
+readStack(); span.a = span.ta; span.b = span.tb
+
 function apply() {
   const v = values
   const W = button.clientWidth, H = button.clientHeight, D = W
@@ -56,10 +80,13 @@ function apply() {
   })
   Object.assign(svg.style, { position: 'absolute', left: `${-pad}px`, top: `${-pad}px`, width: `${W + 2 * pad}px`, height: `${D + 2 * pad}px`, overflow: 'visible', filter: `blur(${v.blur}px)` })
   svg.setAttribute('viewBox', `${-pad} ${-pad} ${W + 2 * pad} ${D + 2 * pad}`)
-  const base = [[0, 0], [W, 0], [W, D], [0, D]]
+  const thin = 0.03 // a single sheet still throws a sliver of shadow
+  const mid = (span.a + span.b) / 2, half = Math.max(thin / 2, (span.b - span.a) / 2)
+  const v0 = D * (1 - Math.min(1, mid + half)), v1 = D * (1 - Math.max(0, mid - half))
+  const base = [[0, v0], [W, v0], [W, v1], [0, v1]]
   poly.setAttribute('points', hull(base.concat(base.map(([x, y]) => [x + du, y + dv]))).map(p => p.join(',')).join(' '))
-  grad.setAttribute('x1', W / 2); grad.setAttribute('y1', D / 2)
-  grad.setAttribute('x2', W / 2 + du * 1.5); grad.setAttribute('y2', D / 2 + dv * 1.5)
+  grad.setAttribute('x1', W / 2); grad.setAttribute('y1', (v0 + v1) / 2)
+  grad.setAttribute('x2', W / 2 + du * 1.5); grad.setAttribute('y2', (v0 + v1) / 2 + dv * 1.5)
   stopA.setAttribute('stop-color', v.color); stopA.setAttribute('stop-opacity', v.opacity / 100)
   stopB.setAttribute('stop-color', v.color); stopB.setAttribute('stop-opacity', v.opacity / 100 * v.tip / 100)
 }

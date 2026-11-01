@@ -105,6 +105,7 @@ function sizeStack() {
     sheet.style.transform = `translateZ(${-depth * (reverseView ? drawings.length - 1 - drawingIndex : drawingIndex) / Math.max(1, drawings.length - 1)}px)`
   }
   syncFrontGlass()
+  window.__sketchStack = { index, total: drawings.length, reverse: reverseView }; window.dispatchEvent(new CustomEvent('sketchbook-stack'))
 }
 sizeStack()
 window.addEventListener('resize', sizeStack)
@@ -137,6 +138,7 @@ function render(animate = true) {
   range.setAttribute('aria-valuetext', `${index + 1} / ${drawings.length}: ${drawing.title[language]}`)
   stackButton.setAttribute('aria-label', `${drawing.title[language]}. ${copy.next}`)
   stackButton.dataset.index = index
+  window.__sketchStack = { index, total: drawings.length, reverse: reverseView }; window.dispatchEvent(new CustomEvent('sketchbook-stack'))
 }
 function select(value, animate = true) {
   if (preview) return
@@ -596,7 +598,7 @@ for (const button of document.querySelectorAll('[data-lang]')) button.addEventLi
   nav.contentWindow.postMessage({ type: 'lang-change', lang: button.dataset.lang }, location.origin)
 })
 document.body.dataset.ready = 'true'
-import('/sketchbook/cube-shadow.js?v=7')
+import('/sketchbook/cube-shadow.js?v=8')
 // Temporary authoring controls are available only through the explicit preview link.
 if (new URLSearchParams(location.search).get('tune') === '1') {
   import('/sketchbook/layout-tuner.js').then(({ installLayoutTuner }) => installLayoutTuner())
