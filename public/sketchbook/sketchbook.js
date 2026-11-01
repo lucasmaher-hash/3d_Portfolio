@@ -209,12 +209,25 @@ function openPreview() {
     const sizeOf = img => img.naturalWidth * Math.min(Math.min(innerWidth * .9, 1100) / img.naturalWidth, innerHeight * .88 / img.naturalHeight)
     const current = sheets.find(item => item.drawingIndex === index)?.sheet.querySelector('img')
     const landscape = !!current?.naturalWidth && current.naturalWidth > current.naturalHeight
-    let half = 0
+    let half = 0, halfH = 0
     for (const { sheet } of sheets) {
       const img = sheet.querySelector('img')
-      if (img?.naturalWidth && (img.naturalWidth > img.naturalHeight) === landscape) half = Math.max(half, sizeOf(img) / 2)
+      if (img?.naturalWidth && (img.naturalWidth > img.naturalHeight) === landscape) {
+        half = Math.max(half, sizeOf(img) / 2)
+        halfH = Math.max(halfH, sizeOf(img) * img.naturalHeight / img.naturalWidth / 2)
+      }
     }
     if (!half) half = image.getBoundingClientRect().width / 2
+    if (matchMedia('(max-width: 540px)').matches) {
+      // Phones: both chevrons sit centred under the picture with a gap between them, at one fixed height per orientation.
+      const top = Math.min(innerHeight - 40, innerHeight / 2 + (halfH || image.getBoundingClientRect().height / 2) + 12 + 32)
+      for (const { button, direction } of chevrons) {
+        button.style.top = `${top}px`
+        button.style.left = `${innerWidth / 2 + (direction < 0 ? -14 - 44 : 14)}px`
+        button.disabled = index + direction < 0 || index + direction > drawings.length - 1
+      }
+      return
+    }
     for (const { button, direction } of chevrons) {
       button.style.top = `${innerHeight / 2}px`
       button.style.left = `${Math.max(4, Math.min(innerWidth - 48, innerWidth / 2 + direction * (half + 12) - (direction < 0 ? 44 : 0)))}px`
