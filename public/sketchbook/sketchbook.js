@@ -112,13 +112,8 @@ await Promise.all(drawings.map(drawing => {
   const image = new Image(); image.src = drawing.src
   return image.decode().catch(() => {})
 }))
-const DISSOLVE_MS = 700
 function render(animate = true) {
   const drawing = drawings[index]
-  // The flat glass overlay belongs to the front sheet: dissolve the old one away with it instead of swapping at once.
-  const soft = animate && !reduceMotion.matches && frontGlass.isConnected
-  const oldGlass = soft ? frontGlass.cloneNode(true) : null
-  if (oldGlass) frontGlass.after(oldGlass)
   for (const { sheet, drawingIndex } of sheets) {
     const opacity = drawingIndex < index ? 0 : 1
     const presented = Number(getComputedStyle(sheet).opacity)
@@ -127,16 +122,11 @@ function render(animate = true) {
     sheet.classList.toggle('is-current', drawingIndex === index)
     sheet.classList.toggle('is-gone', drawingIndex < index)
     if (animate && !reduceMotion.matches && Math.abs(presented - opacity) > 0.001) {
-      sheet.animate([{ opacity: presented }, { opacity }], { duration: DISSOLVE_MS, easing: 'cubic-bezier(.4, 0, .2, 1)' })
+      sheet.animate([{ opacity: presented }, { opacity }], { duration: 230, easing: 'ease-in-out' })
     }
   }
   fitters.forEach(fn => fn()) // the revealed sheet drops to the slim frame at once, the others keep the wide one
   syncFrontGlass()
-  if (oldGlass) {
-    oldGlass.style.pointerEvents = 'none'
-    oldGlass.animate([{ opacity: 1 }, { opacity: 0 }], { duration: DISSOLVE_MS, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'forwards' }).finished.then(() => oldGlass.remove(), () => oldGlass.remove())
-    frontGlass.animate([{ opacity: 0 }, { opacity: 1 }], { duration: DISSOLVE_MS, easing: 'cubic-bezier(.4, 0, .2, 1)' })
-  }
   range.value = index
   document.querySelector('.timeline-art').style.setProperty('--progress', `${index / Math.max(1, drawings.length - 1) * 100}%`)
   range.setAttribute('aria-valuetext', `${index + 1} / ${drawings.length}: ${drawing.title[language]}`)
