@@ -29,9 +29,10 @@ range.max = drawings.length - 1
 // Each drawing owns a fixed position in the stack. Viewed pages disappear;
 // the remaining pages stay where they were, so the stack visibly shrinks.
 // Size the drawing's box to its own ratio, edge to edge along the long side and
-// centred; the glass behind it shows only in the two bands left over.
+// centred, and place the two glass bands in what is left of the square
+// (portrait: left + right, landscape: top + bottom; a square drawing gets none).
 // Runs again once the file has loaded (naturalWidth is 0 before that).
-function fitSheet(image, art) {
+function fitSheet(image, art, bands) {
   const apply = () => {
     const nw = image.naturalWidth, nh = image.naturalHeight
     if (!nw || !nh) return
@@ -39,30 +40,50 @@ function fitSheet(image, art) {
     const w = ratio < 1 ? ratio : 1, h = ratio < 1 ? 1 : 1 / ratio
     // inset FIRST: the shorthand would otherwise reset left/top to auto.
     Object.assign(art.style, { inset: 'auto', left: `${(1 - w) * 50}%`, top: `${(1 - h) * 50}%`, width: `${w * 100}%`, height: `${h * 100}%` })
+    const gap = `${(ratio < 1 ? 1 - w : 1 - h) * 50}%`
+    const [a, b] = bands
+    if (ratio < 1) { Object.assign(a.style, { left: 0, top: 0, bottom: 0, width: gap }); Object.assign(b.style, { right: 0, top: 0, bottom: 0, width: gap }) }
+    else { Object.assign(a.style, { top: 0, left: 0, right: 0, height: gap }); Object.assign(b.style, { bottom: 0, left: 0, right: 0, height: gap }) }
+    for (const band of bands) band.hidden = ratio === 1
   }
   if (image.complete) apply()
-  image.addEventListener('load', apply)
+  image.addEventListener('load', () => { apply(); if (typeof syncFrontGlass === 'function') syncFrontGlass() })
 }
 const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   const drawingIndex = drawings.length - 1 - slot
   const sheet = document.createElement('span')
   sheet.className = 'sheet'
-  const glass = document.createElement('span')
-  glass.className = 'glass'
+  const bands = [0, 1].map(() => { const band = document.createElement('span'); band.className = 'glass'; return band })
   const art = document.createElement('span')
   art.className = 'art'
   const image = new Image()
   image.src = drawings[drawingIndex].src
   image.alt = ''; image.draggable = false
-  const bleed = new Image()
-  bleed.src = image.src; bleed.alt = ''; bleed.draggable = false
-  bleed.className = 'bleed'
-  bleed.style.filter = 'blur(calc(var(--paper-width) * .07)) saturate(1.4)'
-  glass.append(bleed)
-  fitSheet(image, art)
-  art.append(image); sheet.append(glass, art); stack.append(sheet)
+  fitSheet(image, art, bands)
+  art.append(image); sheet.append(...bands, art); stack.append(sheet)
   return { sheet, drawingIndex }
 })
+
+// Real frosted glass for the sheet in front. backdrop-filter does nothing to an
+// element inside the stack's preserve-3d (Chrome: no blur at all, checked
+// 2026-11-01), so the current sheet's two bands are drawn again in a flat
+// overlay beside the stack, carrying the same 3D transform. Flat, its backdrop
+// is the whole rendered stack, so the sheets behind blur through it like the
+// gimaguas.com header. It paints above the stack, which is right only for the
+// front sheet - exactly the one it copies. The other sheets keep plain veils.
+const frontGlass = document.createElement('span')
+frontGlass.className = 'glass-front'
+frontGlass.setAttribute('aria-hidden', 'true')
+const frontBands = [0, 1].map(() => { const band = document.createElement('span'); band.className = 'glass'; frontGlass.append(band); return band })
+stackButton.append(frontGlass)
+function syncFrontGlass(fade = false) {
+  const current = sheets.find(item => item.drawingIndex === index)
+  if (!current) return
+  frontGlass.style.transform = `${getComputedStyle(stack).transform} ${current.sheet.style.transform}`
+  current.sheet.querySelectorAll('.glass').forEach((band, i) => { frontBands[i].style.cssText = band.style.cssText; frontBands[i].hidden = band.hidden })
+  if (fade && !reduceMotion.matches) frontGlass.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 230, easing: 'ease-in-out' })
+}
+window.addEventListener('sketchbook-orientation', () => syncFrontGlass())
 
 // At angles viewed from behind, chronological order starts on that visible side.
 let reverseView = true
@@ -77,6 +98,7 @@ function sizeStack() {
   for (const { sheet, drawingIndex } of sheets) {
     sheet.style.transform = `translateZ(${-depth * (reverseView ? drawings.length - 1 - drawingIndex : drawingIndex) / Math.max(1, drawings.length - 1)}px)`
   }
+  syncFrontGlass()
 }
 sizeStack()
 window.addEventListener('resize', sizeStack)
@@ -98,6 +120,7 @@ function render(animate = true) {
       sheet.animate([{ opacity: presented }, { opacity }], { duration: 230, easing: 'ease-in-out' })
     }
   }
+  syncFrontGlass(animate)
   range.value = index
   document.querySelector('.timeline-art').style.setProperty('--progress', `${index / Math.max(1, drawings.length - 1) * 100}%`)
   range.setAttribute('aria-valuetext', `${index + 1} / ${drawings.length}: ${drawing.title[language]}`)
@@ -168,6 +191,7 @@ function startLift(overlay, image, current, nw, nh, fit) {
   rig.append(clone); scene.append(rig); overlay.append(scene)
   image.style.visibility = 'hidden'
   current.sheet.style.visibility = 'hidden'
+  frontGlass.style.visibility = 'hidden'
 
   const z0 = new DOMMatrix(current.sheet.style.transform).m43
   const shown = Math.min(side * ART_INSET / nw, side * ART_INSET / nh) // contain-fit inside the frame
@@ -181,7 +205,7 @@ function startLift(overlay, image, current, nw, nh, fit) {
     { transform: end.toString() },
   ], timing)
   // Dissolve the glass border during the second half of the flight.
-  clone.querySelector('.glass').animate([{ opacity: 1 }, { opacity: 1, offset: .3 }, { opacity: 0 }], timing)
+  for (const band of clone.querySelectorAll('.glass')) band.animate([{ opacity: 1 }, { opacity: 1, offset: .3 }, { opacity: 0 }], timing)
   // The back face is seen mirrored, so the artwork is pre-flipped; hand it back
   // exactly when the sheet turns edge-on (rotation passes 90 degrees).
   if (mirrored) {
@@ -203,6 +227,7 @@ function closePreview() {
   const overlay = preview
   preview = null
   if (lift) { lift.sheet.style.visibility = ''; lift = null }
+  frontGlass.style.visibility = ''
   overlay.remove()
   stackButton.focus({ preventScroll: true })
 }

@@ -29,17 +29,16 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .stack-button { position: absolute; width: var(--paper-width); aspect-ratio: 1 / 1; left: 67%; top: 56%; transform: translate(calc(-50% + 117px), calc(-50% - 22px)); border: 0; padding: 0; background: none; cursor: pointer; touch-action: pan-y; perspective: 1800px; }
 .stack { display: block; width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: scale3d(.93, .93, .93) rotateX(-13deg) rotateY(147deg) rotateZ(-1deg); }
 .sheet { position: absolute; inset: 0; display: block; backface-visibility: visible; }
-/* Liquid-glass frame (rebuilt 2026-11-01): the drawing runs edge to edge along
-   its long side; the glass only shows in the two bands that square it up
-   (left/right for portrait, top/bottom for landscape). Look after the
-   gimaguas.com header: a milky wash over a heavily blurred copy of what lies
-   under it, no border, no inner shadow. The "what lies under it" is the
-   drawing itself, cover-scaled and blurred (.bleed), so its colours smear into
-   the bands. No clip-path and no backdrop-filter: both break inside the
-   stack's preserve-3d in Safari; the opaque .art box simply covers the middle. */
-.glass { position: absolute; inset: 0; overflow: hidden; background: #ececf0; }
-.glass .bleed { position: absolute; inset: -10%; width: 120%; height: 120%; object-fit: cover; display: block; }
-.glass::after { content: ''; position: absolute; inset: 0; background: rgba(236,236,240,.8); } /* light grey, the drawing's colour only as a faint hint */
+/* Frosted-glass frame (2026-11-01, Lucas): the drawing runs edge to edge along
+   its long side; two see-through bands square it up (portrait: left/right,
+   landscape: top/bottom), placed by fitSheet() in sketchbook.js. Look after
+   the gimaguas.com header: a near-clear white veil that blurs whatever lies
+   behind it - the sheets further back, the page - no colour of its own, no
+   border, no shadow. */
+.glass { position: absolute; background: rgba(255,255,255,.38);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5); }
+.glass-front { position: absolute; inset: 0; pointer-events: none; }
+.sheet.is-current .glass { visibility: hidden; } /* drawn by .glass-front instead */
 .art { position: absolute; inset: 0; display: block; }
 .stack.reverse .art img { transform: scaleX(-1); }
 .art img { width: 100%; height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none; }
