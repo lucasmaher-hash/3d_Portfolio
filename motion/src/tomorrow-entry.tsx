@@ -7,6 +7,7 @@ import {Composition, registerRoot} from 'remotion';
 import {DURATION_F, EXT, FPS, Promo, PromoTall} from './Promo';
 import {DURATION_F as DURATION_FV, EXT_V, HERO_TIMING_V, PromoV, PromoVTall} from './PromoV';
 import {DURATION_F as DURATION_F16, EXT as EXT16, HERO_TIMING_16, Promo16, Promo16Tall} from './Promo16';
+import {DURATION_F as DURATION_FV16, EXT_V16, HERO_TIMING_V16, PromoV16, PromoV16Tall} from './PromoV16';
 import {HERO_FPS} from './heroTiming';
 import {TODO_DURATION, TODO_H, TODO_W, TodoDemo, TodoDemoZoom} from './TodoDemo';
 import './sk.css';
@@ -23,6 +24,9 @@ const TomorrowRoot: React.FC = () => (
     <Composition id="TomorrowPromo16Tall" component={Promo16Tall} durationInFrames={DURATION_F16} fps={FPS} width={1920} height={1080 + EXT16} defaultProps={F} />
     <Composition id="TomorrowHeroV2" component={Promo16Tall} durationInFrames={HERO_TIMING_16.durationInFrames} fps={HERO_FPS} width={1920} height={1080 + EXT16} defaultProps={{...F, heroPace: true}} />
     <Composition id="TomorrowHeroMobileV2" component={PromoVTall} durationInFrames={HERO_TIMING_V.durationInFrames} fps={HERO_FPS} width={1080} height={1350 + EXT_V} defaultProps={{...F, heroPace: true}} />
+    <Composition id="TomorrowPromoV16" component={PromoV16} durationInFrames={DURATION_FV16} fps={FPS} width={1080} height={1350} defaultProps={F} />
+    <Composition id="TomorrowPromoV16Tall" component={PromoV16Tall} durationInFrames={DURATION_FV16} fps={FPS} width={1080} height={1350 + EXT_V16} defaultProps={F} />
+    <Composition id="TomorrowHeroMobileV3" component={PromoV16Tall} durationInFrames={HERO_TIMING_V16.durationInFrames} fps={HERO_FPS} width={1080} height={1350 + EXT_V16} defaultProps={{...F, heroPace: true}} />
     <Composition id="TodoDemo" component={TodoDemo} durationInFrames={TODO_DURATION} fps={30} width={TODO_W} height={TODO_H} />
     <Composition id="TodoDemoZoom" component={TodoDemoZoom} durationInFrames={TODO_DURATION} fps={30} width={TODO_W} height={TODO_H} />
   </>

@@ -51,6 +51,12 @@ npm run preview
 1. **Always commit, push and deploy every change immediately**, without asking, unless Lucas explicitly says otherwise for that change. Push to `main` (GitHub Actions deploys to lucasmaher.com); confirm the Pages run succeeded.
 2. **Always give two links**: the localhost link to the page worked on (dev server `http://localhost:5173/<page>.html`) and the live link on the public site (`https://lucasmaher.com/<page>.html`), if the page exists live. **Also at the very start of every chat**: state both links for the project/page in focus (or the landing page `/2D.html` if none is clear yet).
 
+## Changes 2026-11-01 (Lucas) — do not overwrite
+
+- **Loader sliver on phones (`2D.html`):** `#load-liquid` canvas is overscanned 2px past the circle on every side (`inset: -2px; width/height: calc(100% + 4px)`), the circle's `overflow: hidden` clips it. Cause was a fractional layout pixel-snapping the canvas inside the rounded edge (not reproduced headless, [vermutet]). Keep explicit width/height; `inset` alone does not size a replaced element. The older `layerPath` 1px-past-edge fix stays.
+- **"More about me" arrow (`2D.html`):** the arrow is no longer the typed `→`. `.tagline-block p:last-child::after` draws it as a CSS mask (SVG stroke 1.6/16, 0.95em) in `currentColor`, matching the text's stem weight. `tagline2` EN/DE strings and the markup have NO arrow; do not re-add one or it doubles. `public/a.html` is a stray old copy of the landing page, untouched, not linked.
+- **About rebuild: PROPOSED, NOT built.** Lucas wants about2d/about3d and the landing's cycling titles redone around AI + UX (VR/spatial computing and consumer electronics stay as interests; ID bridges physical and digital; AI as its own section). Recommended: version B (positioning line above, four frames: Who I am / How I work with AI / Where it comes from / Beyond the screen, first frame open). Proposed titles: Interaction Designer / Interface Designer / AI-Centered Designer / Digital Product Designer / Industrial Design meets UX; drop "3D & UI Hybrid" and "Motion & Interface". Current about text is unchanged. **The Allianz sentence only goes in if Lucas confirms he works there** (vault says: phone interview done, awaiting reply, 12.10.2026). Source analysis: vault `Portfolio-Analyse.md`.
+
 ## Session Startup Checklist
 
 When resuming work in a new session:

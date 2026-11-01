@@ -1,4 +1,3 @@
-<<<<<<< p16
 /* ═══ to.morrow promo — ALTERNATE: iPhone 16-class phones + a longer ending ═══
    A copy of Promo.tsx (landscape F, blue ×4) with:
    · the iPhone 12 mockups swapped for the modern frame in the project
@@ -12,24 +11,13 @@
      Dynamic Island as a compact Live Activity, a tap expands the island (a
      damped spring with a small overshoot; the compact content blurs out as
      the expanded content blurs in), and the task is ticked off there. Then
-     light floods out of the tick back to frame 0, as before. */
-=======
-/* ═══ to.morrow promo — the VERTICAL cut (4:5, 1080 x 1350) ═══════════════
-   A copy of Promo.tsx (the landscape film, version F) re-laid for a phone:
-   the same story, timing and components, with the layout rebuilt rather than
-   cropped — see CLAUDE.md "Vertical cut". What changed and why:
-   · 4:5, not 9:16: the tallest frame that still leaves room above and below
-     it on a phone page (it does not need the whole screen); 1080 wide keeps
-     every pixel of the 1080-wide UI it shows.
-   · Stack, don't flank: every caption sits ABOVE its subject, centred, never
-     beside it — there is no room beside anything in a 1080 frame.
-   · Bigger type, less at once: the lists are 13% larger (PZ 1.45), so only
-     two lists fit side by side; the camera frames the PAIR a task moves
-     between (Tomorrow+Soon, then Today+Tomorrow) in one eased move each,
-     tied to the flick, instead of showing all three small.
-   · The close-ups keep the landscape film's on-screen type size; the long
-     "Go Live on important tasks" line is centred in the frame. */
->>>>>>> vert
+     light floods out of the tick back to frame 0, as before.
+
+   VERTICAL VERSION of that film (4:5, 1080 x 1350), made by merging the
+   vertical layout of PromoV.tsx onto Promo16.tsx: captions stack ABOVE their
+   subject, one phone at a time, lists 13% larger, the wide shot follows each
+   flick to the PAIR of lists it moves between, and the Dynamic Island close-up
+   frames the island in the upper third. */
 import React from 'react';
 import {AbsoluteFill, Easing, Img, interpolate, spring, staticFile, useCurrentFrame} from 'remotion';
 import {blueHex, BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, LiveGlyph, mix, Pal, Pixel, ROW, Trough, sf} from './ui';
@@ -178,7 +166,7 @@ const CL_OFF = 5;
 /* The wide shot follows each flick to the PAIR of lists it moves between. */
 const PAIR = (340 * PZ + 38) / 2; // px: half a well + half a gap
 const panX = (f: number) =>
-  PAIR * ease(f, 158, 190, Easing.inOut(Easing.cubic)) - 2 * PAIR * ease(f, 224, 258, Easing.inOut(Easing.cubic));
+  PAIR * ease(f, M1.appear - 2, M1.release + 10, Easing.inOut(Easing.cubic)) - 2 * PAIR * ease(f, M2.appear - 4, M2.release + 10, Easing.inOut(Easing.cubic));
 const WELL_W = 340; // pt
 const ROW_X = 8; // pt
 const WELL_GAP = 38; // px
@@ -289,13 +277,8 @@ const rowIn = (i: number, g: number) => sp(g, ZOOM_OUT[0] + 4 + i * 5, 'present'
 /* The flick: pulled 140px, accelerating, let go — and from there an
    UNDERDAMPED spring carries it, starting at the speed the finger let go
    with, so it overshoots its slot and bounces back into place. */
-<<<<<<< p16
-const DRAG = 112; // px — scaled with the wells
-const DRAG_FRAMES = 9;
-=======
 const DRAG = 127; // px — scaled with the wells (112 × 1.45/1.28)
-const DRAG_FRAMES = 10;
->>>>>>> vert
+const DRAG_FRAMES = 9;
 const DRAG_EASE = Easing.in(Easing.cubic);
 const BOUNCE = {response: 0.55, damping: 0.62};
 const bounce = (t: number, v0: number) => {
@@ -441,11 +424,7 @@ const BarOwn: React.FC<{f: number; G: Geo; p: Pal; z: number}> = ({f, G, p, z}) 
    out inside the scaled phone, where the browser rounds to whole phone pixels
    (≈4 screen px at the cut); these were measured off rendered frames across
    the cut and are applied by transform, which is never rounded. */
-<<<<<<< p16
-const CUT_FIX = {textY: 0.36, ringX: 0.44, ringY: 0.09}; // refit for the 16 Pro layout: text matches on 0.30–0.42, ring ≤0.1px
-=======
-const CUT_FIX = {textY: 0.42, ringX: 0.59, ringY: 0.18}; // refit for the vertical cut: text matches on 0.30–0.55
->>>>>>> vert
+const CUT_FIX = {textY: 0.42, ringX: 0.59, ringY: 0.09}; // starting values: refit off a render of the vertical cut
 
 /* Ring + dot at breath b: full → faint and small. Its large end is the mark's
    own size (breathing past it read as big-small-big). Shared with the pill. */
@@ -1199,15 +1178,6 @@ const RightScreen16: React.FC<{f: number}> = ({f}) => {
 /* Camera: s = zoom, (fx, fy) = the point at frame centre. Each close-up
    centres its phone; the caption sits in the empty half beside it. */
 type Cam = {s: number; fx: number; fy: number};
-<<<<<<< p16
-const CAM_WIDE: Cam = {s: 1, fx: W / 2, fy: H / 2};
-const CAM_L: Cam = {s: 1.28, fx: PL_CX, fy: H / 2};
-const CAM_R: Cam = {s: 1.28, fx: PR_CX, fy: H / 2};
-/* In on the Dynamic Island for the new ending: 2.18x puts the expanded
-   island at ~750px wide; the focus sits 200pt down the screen so the island
-   lands in the upper third with the home row under it. */
-const CAM_I: Cam = {s: 2.18, fx: PR_CX, fy: PTOP + PS.y + 200 * PS.z};
-=======
 /* One phone at a time, low in the frame, its caption stacked above it; the
    wide shot (both phones, the Live ring travelling between them) is the only
    one that shows two. Phone centre (world y 675) lands at screen y 818. */
@@ -1216,7 +1186,11 @@ const PHONE_FY = 675 - (818 - H / 2) / PHONE_S;
 const CAM_WIDE: Cam = {s: 0.86, fx: (PL_CX + PR_CX) / 2, fy: 700};
 const CAM_L: Cam = {s: PHONE_S, fx: PL_CX, fy: PHONE_FY};
 const CAM_R: Cam = {s: PHONE_S, fx: PR_CX, fy: PHONE_FY};
->>>>>>> vert
+/* In on the Dynamic Island: 2.6x puts the expanded island ~890px wide in the
+   1080 frame, its centre at screen y 470 — under the stacked caption, the home
+   row below it. */
+const ISL_WORLD_Y = PTOP + PS.y + 32.5 * PS.z;
+const CAM_I: Cam = {s: 2.6, fx: PR_CX, fy: ISL_WORLD_Y - (470 - H / 2) / 2.6};
 const CAM_KEYS: Array<[number, Cam]> = [
   [LIVE_CUT + 12, CAM_WIDE],
   [LIVE_CUT + 38, CAM_L],
@@ -1410,10 +1384,9 @@ const checkScreen = toScreen(toGlobal(PR_CX, ISL_CHECK[0], ISL_CHECK[1]), camAt(
 const E = {cut: E_CUT, hold: 60 + E_SETTLE, clock0: LIVE_CUT + 30, zoom: [8 + E_SETTLE, 56 + E_SETTLE] as [number, number]};
 export const DURATION_E = FLOOD.end - E.clock0 + E.cut + E.hold + 1;
 export const DURATION_F = DURATION_E + INS.len - INS_SKIP;
-<<<<<<< p16
 // Map Live-scene cues back through both existing clocks to the film's clock.
 const LIVE_OFFSET = E.cut + E.hold - E.clock0 + INS.len - INS_SKIP;
-export const HERO_TIMING_16 = createHeroTiming(DURATION_F, [
+export const HERO_TIMING_V16 = createHeroTiming(DURATION_F, [
   [TYPE.start + sum(TYPE.gaps), BUILD.check],
   [M2.land, GZ],
   [GOLIVE.tap + 4, GOLIVE.start],
@@ -1423,20 +1396,6 @@ export const HERO_TIMING_16 = createHeroTiming(DURATION_F, [
   [ARRIVE + 28 + LIVE_OFFSET, UNLOCK + LIVE_OFFSET],
   [ISL_IN + 44 + LIVE_OFFSET, ISL_TAP + LIVE_OFFSET],
   [ISL_EXP + 24 + LIVE_OFFSET, TICK + LIVE_OFFSET],
-=======
-const LIVE_OFFSET = E.cut + E.hold - E.clock0 + INS.len - INS_SKIP;
-export const HERO_TIMING_V = createHeroTiming(DURATION_F, [
-  [TYPE.start + sum(TYPE.gaps), BUILD.check],
-  [CAM_MOVE[1], M1.appear],
-  [M1.land, M2.down],
-  [M2.land, GZ],
-  [GOLIVE.tap + 4, GOLIVE.start],
-  [GOLIVE.fade[1], INS.at],
-  [INS.typeEnd, INS.delStart],
-  [E.cut + INS.len - INS_SKIP + 14, E.cut + INS.len - INS_SKIP + 12 + E_SETTLE],
-  [LTYPE_END + LIVE_OFFSET, GO + LIVE_OFFSET],
-  [ARRIVE + 28 + LIVE_OFFSET, TICK - 10 + LIVE_OFFSET],
->>>>>>> vert
 ]);
 const eClock = (f0: number) => E.clock0 + Math.max(0, f0 - E.cut - E.hold);
 const LABEL_W = 52.9; // pt — "Go Live" in the ROW setting (SF Pro Text Regular 16.4pt, −0.05em); refit off the rendered cut
@@ -1517,15 +1476,9 @@ const PromoE: React.FC<{variant: Variant; f0: number; ins?: boolean}> = ({varian
 const GOLIVE_CUT_D = GOLIVE.fade[1] + 43; // ~1.4 s alone on dark (Lucas)
 export const GOLIVE_HOLD = GOLIVE_CUT_D - LIVE_CUT; // D's Live section runs this much later
 export const DURATION = FLOOD.end + 2;
-<<<<<<< p16
-export const Promo16: React.FC<{variant: Variant; transition?: Transition; heroPace?: boolean}> = ({variant, transition = 'line', heroPace = false}) => {
+export const PromoV16: React.FC<{variant: Variant; transition?: Transition; heroPace?: boolean}> = ({variant, transition = 'line', heroPace = false}) => {
   const frame = useCurrentFrame();
-  const f0 = heroPace ? HERO_TIMING_16.frameAt(frame) : frame;
-=======
-export const PromoV: React.FC<{variant: Variant; transition?: Transition; heroPace?: boolean}> = ({variant, transition = 'line', heroPace = false}) => {
-  const frame = useCurrentFrame();
-  const f0 = heroPace ? HERO_TIMING_V.frameAt(frame) : frame;
->>>>>>> vert
+  const f0 = heroPace ? HERO_TIMING_V16.frameAt(frame) : frame;
   if (transition === 'golive2' || transition === 'golive3') return <PromoE variant={variant} f0={f0} ins={transition === 'golive3'} />;
   const off = transition === 'golive' ? GOLIVE_HOLD : 0;
   const f = f0 - off; // the Live section's clock
@@ -1544,29 +1497,18 @@ export const PromoV: React.FC<{variant: Variant; transition?: Transition; heroPa
   );
 };
 
-<<<<<<< p16
-/* Tall cut for the website hero (2026-10-08): the same film with EXT px of canvas
-   above the frame, exactly like PromoTall in Promo.tsx. */
-export const EXT = 240; // video px; 1920 x 1320
-export const Promo16Tall: React.FC<{variant: Variant; transition?: Transition; heroPace?: boolean}> = (props) => (
-  <ExtTop.Provider value={EXT}>
-    <AbsoluteFill style={{background: LIGHT.canvas}}>
-      <div style={{position: 'absolute', left: 0, top: EXT, width: W, height: H}}>
-        <Promo16 {...props} />
-=======
 
-/* The project page's phone hero: the vertical film with EXT_V px of empty
+/* The project page's phone hero: the vertical film with EXT_V16 px of empty
    canvas on top, so it can run up under the nav bar while every caption and
    headline of the film itself stays clear of it (the Live captions start
    122px down the frame; at 390 css px wide the band is ~65 css px). Same
    mechanism as the landscape PromoTall — see ExtTop. */
-export const EXT_V = 180;
-export const PromoVTall: React.FC<{variant: Variant; transition?: Transition; heroPace?: boolean}> = (props) => (
-  <ExtTop.Provider value={EXT_V}>
+export const EXT_V16 = 180;
+export const PromoV16Tall: React.FC<{variant: Variant; transition?: Transition; heroPace?: boolean}> = (props) => (
+  <ExtTop.Provider value={EXT_V16}>
     <AbsoluteFill style={{background: LIGHT.canvas}}>
-      <div style={{position: 'absolute', left: 0, top: EXT_V, width: W, height: H}}>
-        <PromoV {...props} />
->>>>>>> vert
+      <div style={{position: 'absolute', left: 0, top: EXT_V16, width: W, height: H}}>
+        <PromoV16 {...props} />
       </div>
     </AbsoluteFill>
   </ExtTop.Provider>
