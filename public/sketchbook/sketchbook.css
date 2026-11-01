@@ -1,3 +1,5 @@
+/* Sketch Hand (2026-11-01): built from the handwriting on siqi-bside.vercel.app's intro image, see scripts/sketch-hand/. Caveat stays as the fallback for characters the font does not have. */
+@font-face { font-family: 'Sketch Hand'; src: url('/fonts/sketchbook/sketch-hand.woff') format('woff'); font-display: swap; }
 @font-face { font-family: Caveat; src: url('/fonts/sketchbook/caveat-medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
 :root { color-scheme: light; --paper-width: min(35vw, 49svh, 470px); --ink: #30322f; --surface: #dcdce3; --bg-surface: #DCDCE3; --shadow-raised-sm: 5px 5px 12px rgba(174,174,192,0.65), -5px -5px 12px rgba(255,255,255,1); --shadow-pressed: inset 5px 5px 10px rgba(174,174,192,0.6), inset -5px -5px 10px rgba(255,255,255,1); }
 * { box-sizing: border-box; }
@@ -24,12 +26,13 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .back svg { width: 25px; height: 16px; stroke-width: 2.6; }
 .back:hover svg { transform: translateX(-3px); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.intro p { font: 500 clamp(25px, 2.1vw, 32px)/1.6 Caveat, cursive; display: inline; margin: 0; }
+.intro p { font: 400 clamp(22px, 1.8vw, 27px)/1.7 'Sketch Hand', Caveat, cursive; display: inline; margin: 0; }
 .intro .hint { font-size: inherit; line-height: inherit; opacity: 1; }
 .gallery { position: fixed; inset: 0; perspective: 1800px; }
 .stack-button { position: absolute; width: var(--paper-width); aspect-ratio: 1 / 1; left: 67%; top: 56%; transform: translate(calc(-50% + 117px), calc(-50% - 22px)); border: 0; padding: 0; background: none; cursor: pointer; touch-action: pan-y; perspective: 1800px; }
 .stack { display: block; width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: scale3d(.93, .93, .93) rotateX(-13deg) rotateY(147deg) rotateZ(-1deg); }
 .sheet { position: absolute; inset: 0; display: block; backface-visibility: visible; }
+.sheet.is-loading { visibility: hidden; } /* shown front to back as each picture decodes (sketchbook.js loadSheets) */
 /* Frosted-glass frame (2026-11-01, Lucas): the drawing runs edge to edge along
    its long side; two see-through bands square it up (portrait: left/right,
    landscape: top/bottom), placed by fitSheet() in sketchbook.js. Look after
@@ -69,12 +72,12 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 @media (max-width: 860px) {
   :root { --paper-width: min(48vw, 48svh, 440px); }
   .stack-button { left: 61%; top: 56%; }
-  .intro p { font-size: 26px; max-width: 280px; }
+  .intro p { font-size: 23px; max-width: 280px; }
 }
 @media (max-width: 540px) {
   :root { --paper-width: min(65vw, 38svh); }
   .intro { left: 22px; top: 135px; gap: 14px; right: 40px; padding-left: 0; transform: translate(17px, -41px); }
-  .intro p { font-size: 23px; line-height: 1.5; max-width: 260px; }
+  .intro p { font-size: 20px; line-height: 1.6; max-width: 260px; }
   .stack-button { left: 56%; top: 56%; transform: translate(calc(-50% + 48px), calc(-50% + 14px)); }
   .timeline { display: none; }
   .timeline-track { height: 30svh; }
@@ -82,7 +85,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 @media (max-height: 540px) and (min-width: 541px) {
   :root { --paper-width: 43svh; }
   .intro { top: 145px; gap: 12px; }
-  .intro p { font-size: 22px; max-width: 200px; }
+  .intro p { font-size: 19px; max-width: 200px; }
   .timeline-track { height: 23svh; }
 }
 #top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 140px; border: none; z-index: 10; background: transparent; }
