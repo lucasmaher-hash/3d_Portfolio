@@ -415,6 +415,12 @@ function endPress(event) {
 document.addEventListener('pointerup', endPress, true)
 document.addEventListener('pointercancel', endPress, true)
 // Phones: a small button under the cube opens the current drawing big (the same view the long press opens).
+const back = document.querySelector('.back')
+const backHit = document.createElement('a')
+backHit.className = 'back-hit'; backHit.href = back.getAttribute('href'); backHit.tabIndex = -1; backHit.setAttribute('aria-hidden', 'true')
+document.body.append(backHit)
+const placeBackHit = () => { const box = back.getBoundingClientRect(); backHit.style.left = `${box.left + box.width / 2 - 26}px`; backHit.style.top = `${box.top + box.height / 2 - 24}px` }
+placeBackHit(); addEventListener('resize', placeBackHit); document.fonts?.ready.then(placeBackHit); addEventListener('load', placeBackHit)
 const bigButton = document.createElement('button')
 bigButton.type = 'button'; bigButton.className = 'big-button'
 bigButton.setAttribute('aria-label', language === 'de' ? 'Groß anzeigen' : 'View full screen')
