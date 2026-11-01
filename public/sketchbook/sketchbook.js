@@ -62,13 +62,11 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   const art = document.createElement('span')
   art.className = 'art'
   const image = new Image()
-  // The sheet that is in front first gets the bandwidth; the rest load behind it.
-  image.fetchPriority = drawingIndex === index ? 'high' : 'low'
-  image.src = drawings[drawingIndex].src
   image.alt = ''; image.draggable = false
+  sheet.classList.add('is-loading') // hidden until its picture has decoded, see loadSheets()
   fitSheet(image, art, bands, () => sheet.classList.contains('is-current'))
   art.append(image); sheet.append(...bands, art); stack.append(sheet)
-  return { sheet, drawingIndex }
+  return { sheet, drawingIndex, image }
 })
 
 // Real frosted glass for the sheet in front. backdrop-filter does nothing to an
@@ -105,19 +103,45 @@ function sizeStack() {
     sheet.style.transform = `translateZ(${-depth * (reverseView ? drawings.length - 1 - drawingIndex : drawingIndex) / Math.max(1, drawings.length - 1)}px)`
   }
   syncFrontGlass()
-  window.__sketchStack = { index, total: drawings.length, reverse: reverseView }; window.dispatchEvent(new CustomEvent('sketchbook-stack'))
+  publishStack()
+}
+// The cube builds itself front to back (after siqi-bside.vercel.app): the front
+// drawing loads alone, then the sheets behind it appear one by one, in stack
+// order, each the moment its picture has decoded. The later files download in
+// parallel, but a sheet never shows before the one in front of it.
+let loaded = 0 // sheets shown so far, counted from the front (drawing 0)
+function publishStack() {
+  window.__sketchStack = { index, total: drawings.length, reverse: reverseView, loaded }
+  window.dispatchEvent(new CustomEvent('sketchbook-stack'))
+}
+const SHEET_GAP = 70 // ms at least between two sheets, so a cached load still reads as the cube building up
+const byDrawing = [...sheets].sort((a, b) => a.drawingIndex - b.drawingIndex)
+const decodeSheet = (item, priority) => {
+  item.image.fetchPriority = priority
+  item.image.src = drawings[item.drawingIndex].src
+  return item.image.decode().catch(() => {})
+}
+function showSheet(item) {
+  item.sheet.classList.remove('is-loading')
+  loaded++
+  if (item.drawingIndex === index) { frontGlass.style.visibility = ''; syncFrontGlass() }
+  publishStack()
+}
+frontGlass.style.visibility = 'hidden'
+async function loadSheets() {
+  await decodeSheet(byDrawing[0], 'high')
+  showSheet(byDrawing[0])
+  const rest = byDrawing.slice(1).map(item => decodeSheet(item, 'low'))
+  for (let i = 1; i < byDrawing.length; i++) {
+    const gap = reduceMotion.matches ? 0 : SHEET_GAP
+    await Promise.all([rest[i - 1], new Promise(resolve => setTimeout(resolve, gap))])
+    showSheet(byDrawing[i])
+  }
 }
 sizeStack()
 window.addEventListener('resize', sizeStack)
 
-// Decode placeholders ahead of time so changing a page never flashes a blank.
-// Only the front drawing is awaited; the others decode in the background.
-const decodeDrawing = drawing => {
-  const image = new Image(); image.src = drawing.src
-  return image.decode().catch(() => {})
-}
-await decodeDrawing(drawings[index])
-drawings.forEach((drawing, i) => { if (i !== index) decodeDrawing(drawing) })
+loadSheets()
 function render(animate = true) {
   const drawing = drawings[index]
   for (const { sheet, drawingIndex } of sheets) {
@@ -138,7 +162,7 @@ function render(animate = true) {
   range.setAttribute('aria-valuetext', `${index + 1} / ${drawings.length}: ${drawing.title[language]}`)
   stackButton.setAttribute('aria-label', `${drawing.title[language]}. ${copy.next}`)
   stackButton.dataset.index = index
-  window.__sketchStack = { index, total: drawings.length, reverse: reverseView }; window.dispatchEvent(new CustomEvent('sketchbook-stack'))
+  publishStack()
 }
 function select(value, animate = true) {
   if (preview) return
@@ -598,7 +622,7 @@ for (const button of document.querySelectorAll('[data-lang]')) button.addEventLi
   nav.contentWindow.postMessage({ type: 'lang-change', lang: button.dataset.lang }, location.origin)
 })
 document.body.dataset.ready = 'true'
-import('/sketchbook/cube-shadow.js?v=9')
+import('/sketchbook/cube-shadow.js?v=10')
 // Temporary authoring controls are available only through the explicit preview link.
 if (new URLSearchParams(location.search).get('tune') === '1') {
   import('/sketchbook/layout-tuner.js').then(({ installLayoutTuner }) => installLayoutTuner())
