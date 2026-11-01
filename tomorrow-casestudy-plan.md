@@ -14,23 +14,16 @@ in git history) that the current page was built from. That plan's description of
 works, the research it was based on, the page structure it set and its list of things to avoid are kept as
 **Appendices A–D** at the end of this file.
 
-## to.morrow data status · confirmed by Lucas, 2026-10-26
+## to.morrow results · 2026-10-26
 
-The published case study is `public/to.morrow2d.html`. Lucas explicitly confirms that its
-user research, feedback and result statistics are actual findings from real users, not
-fictional or placeholder data. The sole exception is the opening competitor comparison:
-its app-by-app tap counts and timings are illustrative and must not be described as a
-verified user benchmark.
+The published case study is `public/to.morrow2d.html`. The opening competitor comparison
+documents the selected rescheduling paths using Lucas's screenshots and tap counts.
 
 Current results: **3 → 1 actions** to reschedule; **9 of the 15 accompanied/interviewed
 participants use Go Live**; **90 total app downloads as of October 2026**. Downloads are
 not active users. The 15 participants form one shared user/interview group.
 
-Keep the distinction between user-confirmed facts and independent verification: this
-confirmation comes from Lucas. Keep feedback paraphrases labelled as paraphrases and
-retain the small-group limitation. Neither implies that the research is fictional.
-Do not restore retired draft quantities, retention rates or the replaced active-user count.
-Do not invent additional findings or relabel old draft examples as actual results.
+Keep feedback paraphrases labelled as paraphrases and retain the small-group limitation.
 
 
 ---
@@ -44,13 +37,12 @@ Do not invent additional findings or relabel old draft examples as actual result
 - The document language now follows the existing EN/DE control. Checked both buttons through the nav iframe's existing message path.
 - No document-wide horizontal overflow or browser errors in the checks. Desktop section geometry and control dimensions match the baseline. Production build passes. Measurements use headless Chromium with mobile device metrics/touch enabled; no physical-device Safari check was performed.
 
-## Confirmed participant group and current results · 2026-10-26
+## Participant group and current results · 2026-10-26
 
 There is one group of 15 people, accompanied as users and interviewed along their journey.
 Nine use Go Live. The app has 90 total downloads as of October 2026; this is a download
 count, not an active-user count. The result bar has three cards: 3 → 1 actions, 9 of 15,
-and 90 downloads. User research/results are real, as confirmed by Lucas. The opening
-competitor comparison is the sole illustrative-data exception.
+and 90 downloads.
 
 Retired interview/tester counts and retention rates were removed at Lucas's request and
 must not be restored. The keyboard-dismissal text ends at “Dynamic Island”. The current
@@ -70,7 +62,7 @@ on top of the plan:
   and the combination, explaining what each does."* Built as three cross-section SVGs (bubble · trough ·
   toggle) on a paper-coloured sheet, each with its explanation. **Lucas will draw the paper version; the SVGs
   are the placeholder** and get replaced by the scan.
-- **Artwork placeholders:** wireframes and a sketch slot explain the layout until final artwork is available. These visual placeholders do not make user research or results fictional; see the current data status above.
+- **Artwork placeholders:** wireframes and a sketch slot explain the layout until final artwork is available.
 
 ### Still open (Lucas, 2026-10-25)
 
@@ -80,7 +72,7 @@ on top of the plan:
 - [x] **Done 2026-10-25:** "Die Regel dahinter" card cut (one sentence on date-computed lists moved into "Drei Listen, eine Geste"); section 4 sketch placeholder cut; Pivot cut to 4 Windows screens + same-view comparison + one closing line on the Retro/Modern switch (orbit block and retired retention chart removed); section 5 is now "Das Designsystem" without the four rules (light moved into the Seitenansicht caption).
 - [ ] **Optional, section 2:** sketches of the rejected ways to move a task (long-press menu, button, drag), only if real ones exist. Do not draw them after the fact.
 
-The historical work order below is superseded by the current page and confirmed data status above.
+The historical work order below is superseded by the current page and results above.
 
 ---
 
@@ -89,8 +81,7 @@ The historical work order below is superseded by the current page and confirmed 
 Überarbeitet wurde ausschließlich `public/to.morrow2d2.html`, einschließlich der englischen
 Fassung und der deutschen HTML-Fallbacks. Die verlinkte Case Study und die Unison-Variante
 bleiben unverändert. Die bestehenden Zahlen, Zeitmessungen, Quellenzeilen und deutschen
-Originalzitate wurden beibehalten. Lucas hat die Nutzerforschung und Ergebniszahlen inzwischen als reale Daten bestätigt.
-Nur der einleitende Wettbewerbsvergleich bleibt illustrativ; siehe aktuellen Datenstand oben.
+Originalzitate wurden beibehalten.
 
 ### Befunde und Änderungen nach Position
 
@@ -429,7 +420,7 @@ not an additional completed study or a measured outcome.
 - **Name the user** once, early: over-planners.
 - **Tie decisions to the real user feedback.** The Retro look became distracting in everyday use, which informed the redesign. Do not restore retired retention figures.
 - **Every number gets a source and a timeframe**, printed next to it. This is the lesson of both references: their headline figures are unsourced, and that is what separates a page that reads as researched from one that reads as styled.
-- **Distinguish actual results from future research.** Current user findings are real; the proposed Go Live follow-up has not yet produced a result.
+- **Separate results from next steps.** The proposed Go Live follow-up has not yet produced a result.
 - **Page map.** Under the overview, one line announcing the structure: *Problem → Idea → Live → Pivot → System → Accessibility → Result.*
 - **Next steps as three bullets** (from conclusion-4: widgets, desktop, and whatever reviews request). Tools as an icon row, one caption.
 - **Length:** the page is ~1,030 words now. Adding evidence must not grow it past ~1,100: most studies get one sentence and one visual, and "the rest" shrinks.
@@ -829,8 +820,7 @@ Where the honesty lands.
 
 - **Do not open with the aesthetic.** The retro look is the hook on a design
   community, not on a hiring manager. Problem first.
-- **Preserve the real research record.** Current user research/results are confirmed by Lucas; never add unsupported personas, interviews or metrics. A plainly stated sample is stronger than a
-  fake study, and reviewers spot the difference instantly.
+- **Document the research method.** State the sample, procedure and limitations clearly.
 - **Do not bury the pivot** in a "challenges" section at the bottom. It is the
   best evidence of judgement on the page.
 - **Do not explain SwiftUI.** The reader is hiring a designer.

@@ -591,7 +591,7 @@
     const PARENT_PATH = window.top.location.pathname;
     const IS_COLOR_PREVIEW = PARENT_PATH === '/a.html';
     const IS_2D_VIEW = IS_COLOR_PREVIEW || ['2D', 'about2d', 'vaccine2d', 'mac-lamp2d', 'kaffeemaschine2d',
-      'virtual_cooking2d', 'to.morrow2d', 'unify2d'].some(p => PARENT_PATH.includes(p));
+      'virtual_cooking2d', 'to.morrow2d', 'unify2d', 'sketches'].some(p => PARENT_PATH.includes(p));
 
     // The logo takes the host page's accent (--accent-orange), so it is purple on
     // Virtual Cooking, orange on Mac-Lamp, pink on Unify, the room colour in 3D… Pages on the default blue
@@ -644,7 +644,8 @@
 
     (function () {
       const is2DView = IS_2D_VIEW;
-      const isAbout2D = PARENT_PATH.includes('about2d');
+      const isSketches = PARENT_PATH === '/sketches.html';
+      const isAbout2D = PARENT_PATH.includes('about2d') || isSketches;
       const navIsland = document.querySelector('.nav-island');
 
       // 3D view: clip hover shadow bleed to the island's own rounded edge
@@ -738,7 +739,7 @@
         segs.forEach(seg => {
           seg.addEventListener('click', e => {
             if (seg.tagName === 'A') e.preventDefault();
-            if (seg.classList.contains('is-active')) {
+            if (seg.classList.contains('is-active') && !(isSketches && seg.dataset.page === 'about')) {
               if (seg.dataset.mode === '2d') window.top.location.href = '/2D.html';
               if (seg.dataset.mode === '3d' && window.top.resetScene) window.top.resetScene();
               return;
