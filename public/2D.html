@@ -801,6 +801,7 @@
 
     .copyright {
       justify-self: end;
+      margin-right: calc(clamp(24px, 6vw, 64px) * -1 + 20px);   /* desktop: 20px from the frame edge (Lucas, 2026-11-02) */
       text-align: right;
       font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       font-size: 14px;
@@ -814,7 +815,7 @@
     @media (max-width: 640px) {
       .footer-section { grid-template-columns: 1fr; padding: 10px 20px; }   /* 8px + 20% (Lucas) */
       .footer-links { display: none; }
-      .copyright { white-space: normal; justify-self: center; text-align: center; }
+      .copyright { white-space: normal; justify-self: center; text-align: center; margin-right: 0; }
       .copyright-full { display: none; }
       .copyright-short { display: inline; }
     }
