@@ -8,6 +8,7 @@ def band(m):
     rows=cv2.GaussianBlur(rows.reshape(-1,1),(1,0),sigmaX=0,sigmaY=3).ravel()
     ys=np.where(rows>0.4*rows.max())[0]
     return ys.min(),ys.max()
+SHEAR={1:0.324}   # k of 'click': stem leaned 18 deg, the rest of the writing ~33 deg
 def align(ids, tiny=400):
     comps=[dict(k=k,x=st[k][0],y=st[k][1],w=st[k][2],h=st[k][3],a=st[k][4]) for k in ids]
     units=[c for c in comps if c['a']>=tiny]; dots=[c for c in comps if c['a']<tiny]
@@ -40,6 +41,10 @@ def align(ids, tiny=400):
         s=c['s']; px=c['x']+c['w']/2; py=c['py']
         for p in [c]+c['kids']:
             m=(lab[p['y']:p['y']+p['h'],p['x']:p['x']+p['w']]==p['k']).astype(np.uint8)*255
+            if p['k'] in SHEAR:   # lean the stroke like the rest of the writing (about the bottom of its band)
+                sh=SHEAR[p['k']]; hb=p['bb']-p['y'] if 'bb' in p else p['h']
+                m=cv2.warpAffine(m,np.float32([[1,-sh,sh*hb],[0,1,0]]),(m.shape[1]+int(sh*hb)+2,m.shape[0]))
+                p=dict(p,w=m.shape[1])
             nw=max(1,int(round(p['w']*s))); nh=max(1,int(round(p['h']*s)))
             m2=cv2.resize(m,(nw,nh),interpolation=cv2.INTER_AREA) if s!=1.0 else m
             nx=int(round(px+(p['x']-px)*s)); ny=int(round(py+c['dy']+(p['y']-py)*s))
