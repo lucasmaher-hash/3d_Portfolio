@@ -812,9 +812,9 @@
        "© 2026 LM" so it fits beside the logo; may still wrap on very narrow screens.
        Must stay after the footer rules above (same specificity, source order wins). */
     @media (max-width: 640px) {
-      .footer-section { grid-template-columns: auto 1fr; padding: 10px 20px; }   /* 8px + 20% (Lucas) */
+      .footer-section { grid-template-columns: 1fr; padding: 10px 20px; }   /* 8px + 20% (Lucas) */
       .footer-links { display: none; }
-      .copyright { white-space: normal; }
+      .copyright { white-space: normal; justify-self: center; text-align: center; }
       .copyright-full { display: none; }
       .copyright-short { display: inline; }
     }
@@ -922,6 +922,11 @@
       background: var(--bg-surface);
       box-shadow: var(--shadow-pressed);
       overflow: hidden;
+    }
+    /* Phones: same ball as desktop (full-strength pressed shadow, not the x0.65
+       phone token); only the size stays the phone's own (Lucas, 2026-11-02). */
+    @media (max-width: 640px) {
+      #load-circle { box-shadow: inset 5px 5px 10px rgba(174,174,192,0.6), inset -5px -5px 10px rgba(255,255,255,1); }
     }
     /* The liquid is a <canvas> (2026-09-11) — the surface is drawn by the
        script in <body>, not by CSS. The circle's own overflow: hidden and
@@ -1387,7 +1392,6 @@
 
     <!-- Footer -->
     <div class="footer-section">
-      <button type="button" class="footer-logo" id="scroll-top-btn" aria-label="Back to top"><span class="logo-mark" aria-hidden="true"></span></button>
       <nav class="footer-links" aria-label="Contact">
         <a href="https://www.instagram.com/lucas.maher.visuals" target="_blank" rel="noopener">Instagram</a>
         <a href="https://www.linkedin.com/in/lucas-maher-5b53163bb/" target="_blank" rel="noopener">LinkedIn</a>
@@ -1445,7 +1449,7 @@
       if (link) link.href = 'mailto:' + user + '@' + domain;
     })();
 
-    document.getElementById('scroll-top-btn').addEventListener('click', () => {
+    document.getElementById('scroll-top-btn')?.addEventListener('click', () => {
       const start = window.scrollY;
       const duration = 700;
       const startTime = performance.now();
