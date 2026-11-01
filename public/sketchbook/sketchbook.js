@@ -28,8 +28,6 @@ range.max = drawings.length - 1
 
 // Each drawing owns a fixed position in the stack. Viewed pages disappear;
 // the remaining pages stay where they were, so the stack visibly shrinks.
-// Placeholder tints so neighbouring sheets read as different drawings.
-const tintFor = drawingIndex => `sepia(.45) hue-rotate(${(drawingIndex * 37) % 360}deg) saturate(1.05)`
 // Size the drawing's box to its own ratio, edge to edge along the long side and
 // centred; the glass behind it shows only in the two bands left over.
 // Runs again once the file has loaded (naturalWidth is 0 before that).
@@ -56,11 +54,10 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   const image = new Image()
   image.src = drawings[drawingIndex].src
   image.alt = ''; image.draggable = false
-  image.style.filter = tintFor(drawingIndex)
   const bleed = new Image()
   bleed.src = image.src; bleed.alt = ''; bleed.draggable = false
   bleed.className = 'bleed'
-  bleed.style.filter = `${tintFor(drawingIndex)} blur(calc(var(--paper-width) * .07)) saturate(1.4)`
+  bleed.style.filter = 'blur(calc(var(--paper-width) * .07)) saturate(1.4)'
   glass.append(bleed)
   fitSheet(image, art)
   art.append(image); sheet.append(glass, art); stack.append(sheet)
@@ -131,7 +128,6 @@ function openPreview() {
   const image = new Image()
   image.src = drawing.src
   image.alt = drawing.title[language]
-  image.style.filter = tintFor(index)
   overlay.append(image)
   document.body.append(overlay)
   preview = overlay
