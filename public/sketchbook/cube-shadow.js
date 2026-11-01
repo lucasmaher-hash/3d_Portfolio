@@ -24,7 +24,8 @@ function apply() {
 }
 apply()
 
-if (new URLSearchParams(location.search).get('shadow') === '1') {
+const q = new URLSearchParams(location.search)
+if (q.get('shadow') === '1' || q.get('tune') === '1') {
   const panel = document.createElement('section')
   panel.style.cssText = 'position:fixed;left:20px;bottom:20px;z-index:9999;width:min(280px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:14px;border-radius:20px;background:rgba(240,240,245,.92);box-shadow:0 8px 30px rgba(0,0,0,.18);font:12px/1.4 "Roboto Flex UI",sans-serif;color:#222'
   panel.addEventListener('keydown', e => e.stopPropagation())
