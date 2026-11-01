@@ -41,7 +41,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 /* The glass look is dialled in with the tuner (?tune=1, "Glas ..." sliders); set the
    --glass-* defaults above once Lucas has picked values. */
 .glass-front { position: absolute; inset: 0; pointer-events: none; will-change: transform; } /* own layer from the start: no late promotion (the 0.4s hitch) */
-.sheet.is-current .glass { visibility: hidden; } /* drawn by .glass-front instead */
+.sheet.is-current .glass, .sheet.is-gone .glass { visibility: hidden; } /* drawn by .glass-front instead */
 .art { position: absolute; inset: 0; display: block; }
 .stack.reverse .art img { transform: scaleX(-1); }
 .art img { width: 100%; height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none; }

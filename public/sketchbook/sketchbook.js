@@ -119,6 +119,7 @@ function render(animate = true) {
     for (const animation of sheet.getAnimations()) animation.cancel()
     sheet.style.opacity = opacity
     sheet.classList.toggle('is-current', drawingIndex === index)
+    sheet.classList.toggle('is-gone', drawingIndex < index)
     if (animate && !reduceMotion.matches && Math.abs(presented - opacity) > 0.001) {
       sheet.animate([{ opacity: presented }, { opacity }], { duration: 230, easing: 'ease-in-out' })
     }
