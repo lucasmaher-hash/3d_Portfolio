@@ -30,17 +30,17 @@ range.max = drawings.length - 1
 // the remaining pages stay where they were, so the stack visibly shrinks.
 // Placeholder tints so neighbouring sheets read as different drawings.
 const tintFor = drawingIndex => `sepia(.45) hue-rotate(${(drawingIndex * 37) % 360}deg) saturate(1.05)`
-// Lay the drawing out edge to edge along its long side and cut the glass down
-// to the two bands the square still needs. Runs again when the file has loaded.
-function fitSheet(image, art, glass) {
+// Size the drawing's box to its own ratio, edge to edge along the long side and
+// centred; the glass behind it shows only in the two bands left over.
+// Runs again once the file has loaded (naturalWidth is 0 before that).
+function fitSheet(image, art) {
   const apply = () => {
     const nw = image.naturalWidth, nh = image.naturalHeight
     if (!nw || !nh) return
     const ratio = nw / nh
     const w = ratio < 1 ? ratio : 1, h = ratio < 1 ? 1 : 1 / ratio
-    const l = (1 - w) / 2 * 100, t = (1 - h) / 2 * 100, r = l + w * 100, b = t + h * 100
-    Object.assign(art.style, { left: `${l}%`, top: `${t}%`, width: `${w * 100}%`, height: `${h * 100}%`, inset: 'auto' })
-    glass.style.clipPath = `polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, ${l}% ${t}%, ${l}% ${b}%, ${r}% ${b}%, ${r}% ${t}%, ${l}% ${t}%)`
+    // inset FIRST: the shorthand would otherwise reset left/top to auto.
+    Object.assign(art.style, { inset: 'auto', left: `${(1 - w) * 50}%`, top: `${(1 - h) * 50}%`, width: `${w * 100}%`, height: `${h * 100}%` })
   }
   if (image.complete) apply()
   image.addEventListener('load', apply)
@@ -60,9 +60,9 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   const bleed = new Image()
   bleed.src = image.src; bleed.alt = ''; bleed.draggable = false
   bleed.className = 'bleed'
-  bleed.style.filter = `${tintFor(drawingIndex)} blur(16px)`
+  bleed.style.filter = `${tintFor(drawingIndex)} blur(calc(var(--paper-width) * .07)) saturate(1.4)`
   glass.append(bleed)
-  fitSheet(image, art, glass)
+  fitSheet(image, art)
   art.append(image); sheet.append(glass, art); stack.append(sheet)
   return { sheet, drawingIndex }
 })
