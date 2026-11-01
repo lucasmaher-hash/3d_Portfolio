@@ -283,7 +283,7 @@ function openPreview() {
     if (ghost) ghost.style.transform = `translateX(${dx + ghostDir * travel}px)`
   }
   overlay.addEventListener('touchstart', event => {
-    dragging = event.touches.length === 1 && !busy && image.style.visibility !== 'hidden'
+    dragging = event.touches.length === 1 && !busy && !closing && image.style.visibility !== 'hidden'
     axis = null; vx = 0; vy = 0; dismissing = false
     if (dragging) { lastY = event.touches[0].clientY; startX = lastX = event.touches[0].clientX; startY = event.touches[0].clientY; lastT = event.timeStamp }
   }, { passive: true })
@@ -319,17 +319,7 @@ function openPreview() {
       const dy = endY - startY, dx = endX - startX
       const ease = 'cubic-bezier(.22, .61, .36, 1)'
       if (dy > 110 || vy > .6) {
-        // Fly back to where the picture lives in the stack, as the background clears.
-        const box = stackButton.getBoundingClientRect()
-        const scale = Math.min(1, (box.width * .55) / (image.offsetWidth || 1))
-        const toX = box.left + box.width / 2 - (innerWidth / 2), toY = box.top + box.height / 2 - (innerHeight / 2)
-        const run = reduceMotion.matches ? 0 : 280
-        const from = image.style.transform
-        if (run) {
-          image.animate([{ transform: from, opacity: 1 }, { transform: `translate(${toX}px, ${toY}px) scale(${scale})`, opacity: 0 }], { duration: run, easing: ease, fill: 'forwards' })
-          overlay.animate([{ background: overlay.style.background }, { background: 'rgba(18, 20, 19, 0)' }], { duration: run, easing: ease, fill: 'forwards' })
-        }
-        setTimeout(closePreview, run)
+        closeWithFlight({ x: dx, y: dy, scale: 1 - .5 * dismissAmount })
       } else {
         image.animate([{ transform: image.style.transform }, { transform: 'none' }], { duration: 300, easing: ease }); image.style.transform = ''
         overlay.animate([{ background: overlay.style.background }, { background: `rgba(18, 20, 19, ${backdrop})` }], { duration: 300, easing: ease }).onfinish = () => { overlay.style.background = '' }
@@ -367,7 +357,7 @@ function openPreview() {
   overlay.addEventListener('touchcancel', endSwipe, { passive: true })
   overlay.addEventListener('click', event => {
     event.stopPropagation()
-    if (performance.now() >= suppressClickUntil) closePreview()
+    if (performance.now() >= suppressClickUntil) closeWithFlight()
   })
 }
 
@@ -427,6 +417,60 @@ function startLift(overlay, image, current, nw, nh, fit) {
     image.style.visibility = ''
     scene.remove()
   }).catch(() => {})
+}
+
+// The opening in reverse: the picture shrinks back into its sheet, the sheet turns back into the stack's rotation and slots in
+// at its place while the backdrop clears. `drag` carries where a pull-down left the picture.
+let closing = false
+function closeWithFlight(drag = { x: 0, y: 0, scale: 1 }) {
+  if (!preview || closing) return
+  const overlay = preview
+  const image = overlay.querySelector(':scope > img')
+  const current = sheets.find(item => item.drawingIndex === index)
+  const sheetImage = current?.sheet.querySelector('img')
+  if (reduceMotion.matches || lift?.scene.isConnected || !image || !sheetImage?.naturalWidth) { closePreview(); return }
+  closing = true
+  const nw = sheetImage.naturalWidth, nh = sheetImage.naturalHeight
+  const box = stackButton.getBoundingClientRect(), side = stackButton.clientWidth
+  const scene = document.createElement('div')
+  scene.className = 'lift-scene'
+  Object.assign(scene.style, { left: `${box.left}px`, top: `${box.top}px`, width: `${box.width}px`, height: `${box.height}px` })
+  const rig = document.createElement('div')
+  rig.className = 'lift-rig'
+  const matrix = new DOMMatrix(getComputedStyle(stack).transform)
+  rig.style.transform = matrix.toString()
+  const clone = current.sheet.cloneNode(true)
+  clone.style.opacity = 1
+  clone.style.visibility = 'visible' // the sheet itself has been hidden since the lift
+  clone.classList.remove('is-current')
+  const cloneImage = clone.querySelector('img')
+  for (const band of clone.querySelectorAll('.glass')) band.style.visibility = 'hidden'
+  rig.append(clone); scene.append(rig); overlay.append(scene)
+  const fit = image.offsetWidth / nw
+  const shown = Math.min(side * artInset() / nw, side * artInset() / nh)
+  const k = fit / shown
+  const dx = innerWidth / 2 - (box.left + box.width / 2) + drag.x
+  const dy = innerHeight / 2 - (box.top + box.height / 2) + drag.y
+  const start = matrix.inverse().multiply(new DOMMatrix().translate(dx, dy).scale(k * drag.scale))
+  const z0 = new DOMMatrix(current.sheet.style.transform).m43
+  image.style.visibility = 'hidden'
+  current.sheet.style.visibility = 'hidden'
+  lift = { scene, sheet: current.sheet }
+  const faceFlip = () => {
+    const world = matrix.multiply(new DOMMatrix(getComputedStyle(clone).transform))
+    cloneImage.style.transform = world.m33 < 0 ? 'scaleX(-1)' : 'scaleX(1)'
+  }
+  faceFlip()
+  const duration = 780
+  const move = clone.animate([{ transform: start.toString() }, { transform: `translate3d(0, 0, ${z0}px)` }], { duration, easing: 'cubic-bezier(.45, 0, .3, 1)', fill: 'forwards' })
+  const watch = () => { if (!closing) return; faceFlip(); requestAnimationFrame(watch) }
+  requestAnimationFrame(watch)
+  overlay.animate([{ backgroundColor: getComputedStyle(overlay).backgroundColor }, { backgroundColor: 'rgba(18,20,19,0)' }], { duration: duration * .9, easing: 'cubic-bezier(.45, 0, .2, 1)', fill: 'forwards' })
+  overlay.style.background = 'none'
+  for (const button of overlay.querySelectorAll('.preview-step')) button.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' })
+  // The frosted glass comes back over the last stretch, as the sheet settles into the stack.
+  frontGlass.animate([{ opacity: 0 }, { opacity: 1 }], { duration: duration * .4, delay: duration * .6, fill: 'both' })
+  move.finished.then(() => { closing = false; closePreview() }, () => { closing = false; closePreview() })
 }
 
 function closePreview() {
@@ -514,7 +558,7 @@ window.addEventListener('wheel', event => {
 }, { passive: false })
 window.addEventListener('keydown', event => {
   if (preview) {
-    if (event.key === 'Escape') closePreview()
+    if (event.key === 'Escape') closeWithFlight()
     else if (['ArrowRight', 'ArrowDown'].includes(event.key)) { event.preventDefault(); stepPreview(1) }
     else if (['ArrowLeft', 'ArrowUp'].includes(event.key)) { event.preventDefault(); stepPreview(-1) }
     return
