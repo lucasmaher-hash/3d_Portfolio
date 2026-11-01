@@ -29,18 +29,6 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .stack-button { position: absolute; width: var(--paper-width); aspect-ratio: 1 / 1; left: 67%; top: 56%; transform: translate(calc(-50% + 117px), calc(-50% - 22px)); border: 0; padding: 0; background: none; cursor: pointer; touch-action: pan-y; perspective: 1800px; }
 .stack { display: block; width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: scale3d(.93, .93, .93) rotateX(-13deg) rotateY(147deg) rotateZ(-1deg); }
 .sheet { position: absolute; inset: 0; display: block; backface-visibility: visible; }
-/* Panel thickness: four edge faces folded back from the face by --sheet-t, so
-   each panel reads as a slab of frosted glass. Plain colour, no backdrop-filter
-   (it does nothing inside preserve-3d). */
-.stack { --sheet-t: calc(var(--paper-width) * .016); }
-.stack .sheet { transform-style: preserve-3d; }
-.edge { position: absolute; display: block; pointer-events: none; background: rgba(226,228,236,.92); }
-.edge-l, .edge-r { top: 0; width: var(--sheet-t); height: 100%; }
-.edge-t, .edge-b { left: 0; height: var(--sheet-t); width: 100%; }
-.edge-l { left: 0; transform-origin: left center; transform: rotateY(90deg); }
-.edge-r { right: 0; transform-origin: right center; transform: rotateY(-90deg); background: rgba(205,207,217,.92); }
-.edge-t { top: 0; transform-origin: center top; transform: rotateX(-90deg); background: rgba(244,245,250,.95); }
-.edge-b { bottom: 0; transform-origin: center bottom; transform: rotateX(90deg); background: rgba(198,200,210,.92); }
 /* Frosted-glass frame (2026-11-01, Lucas): the drawing runs edge to edge along
    its long side; two see-through bands square it up (portrait: left/right,
    landscape: top/bottom), placed by fitSheet() in sketchbook.js. Look after

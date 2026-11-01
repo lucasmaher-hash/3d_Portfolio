@@ -60,9 +60,7 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   image.src = drawings[drawingIndex].src
   image.alt = ''; image.draggable = false
   fitSheet(image, art, bands)
-  // Four edge faces give the panel its thickness (see .edge in the CSS).
-  const edges = ['t', 'r', 'b', 'l'].map(side => { const edge = document.createElement('span'); edge.className = `edge edge-${side}`; return edge })
-  art.append(image); sheet.append(...bands, art, ...edges); stack.append(sheet)
+  art.append(image); sheet.append(...bands, art); stack.append(sheet)
   return { sheet, drawingIndex }
 })
 
