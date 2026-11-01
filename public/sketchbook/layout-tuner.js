@@ -1,8 +1,8 @@
 export function installLayoutTuner() {
-  const defaults = { textX: -28, textY: -46, cubeX: 117, cubeY: -22, cubeSize: 93, dialX: 13, dialY: 29, rotateX: -13, rotateY: 147, rotateZ: -1, glassLight: 100, glassOpacity: 49, glassBlur: 6, glassSaturate: 67, glassHue: 216, glassTint: 0 }
+  const defaults = { textX: -28, textY: -46, cubeX: 117, cubeY: -22, cubeSize: 93, dialX: 13, dialY: 29, rotateX: -13, rotateY: 147, rotateZ: -1, glassLight: 100, glassOpacity: 49, glassBlur: 6, glassSaturate: 67, glassHue: 216, glassTint: 0, glassRim: 3 }
   if (matchMedia('(max-width: 540px)').matches) Object.assign(defaults, { textX: 17, textY: -41, cubeX: 36, cubeY: 14, dialX: 8, dialY: 62 })
-  const labels = { textX: 'Text X', textY: 'Text Y', cubeX: 'Würfel X', cubeY: 'Würfel Y', cubeSize: 'Würfelgröße', dialX: 'Slider X', dialY: 'Slider Y', rotateX: 'Drehung X', rotateY: 'Drehung Y', rotateZ: 'Drehung Z', glassLight: 'Glas Helligkeit (%)', glassOpacity: 'Glas Deckkraft (%)', glassBlur: 'Glas Unschärfe (px)', glassSaturate: 'Glas Sättigung der Unschärfe (%)', glassHue: 'Glas Farbton (°)', glassTint: 'Glas Farbintensität (%)' }
-  const ranges = { glassLight: [0, 100], glassOpacity: [0, 100], glassBlur: [0, 60], glassSaturate: [50, 300], glassHue: [0, 360], glassTint: [0, 100] }
+  const labels = { textX: 'Text X', textY: 'Text Y', cubeX: 'Würfel X', cubeY: 'Würfel Y', cubeSize: 'Würfelgröße', dialX: 'Slider X', dialY: 'Slider Y', rotateX: 'Drehung X', rotateY: 'Drehung Y', rotateZ: 'Drehung Z', glassLight: 'Glas Helligkeit (%)', glassOpacity: 'Glas Deckkraft (%)', glassBlur: 'Glas Unschärfe (px)', glassSaturate: 'Glas Sättigung der Unschärfe (%)', glassHue: 'Glas Farbton (°)', glassTint: 'Glas Farbintensität (%)', glassRim: 'Rahmen rundherum (% der Kante)' }
+  const ranges = { glassLight: [0, 100], glassOpacity: [0, 100], glassBlur: [0, 60], glassSaturate: [50, 300], glassHue: [0, 360], glassTint: [0, 100], glassRim: [0, 15] }
   const key = 'portfolio-sketchbook-layout-v1', uiKey = key + '-panel'
   let saved = {}, ui = {}
   try { saved = JSON.parse(localStorage.getItem(key)) || {}; ui = JSON.parse(localStorage.getItem(uiKey)) || {} } catch {}
@@ -42,7 +42,7 @@ export function installLayoutTuner() {
     const root = document.documentElement.style
     root.setProperty('--glass-light', values.glassLight + '%'); root.setProperty('--glass-alpha', values.glassOpacity / 100)
     root.setProperty('--glass-blur', values.glassBlur + 'px'); root.setProperty('--glass-saturate', values.glassSaturate + '%')
-    root.setProperty('--glass-hue', values.glassHue); root.setProperty('--glass-tint', values.glassTint + '%')
+    root.setProperty('--glass-rim', values.glassRim); root.setProperty('--glass-hue', values.glassHue); root.setProperty('--glass-tint', values.glassTint + '%')
     window.dispatchEvent(new CustomEvent('sketchbook-orientation', { detail: values.rotateY }))
     for (const row of fields.children) {
       const k = row.dataset.key; if (!k) continue

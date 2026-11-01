@@ -32,20 +32,24 @@ range.max = drawings.length - 1
 // centred, and place the two glass bands in what is left of the square
 // (portrait: left + right, landscape: top + bottom; a square drawing gets none).
 // Runs again once the file has loaded (naturalWidth is 0 before that).
+const glassRim = () => Math.min(20, Math.max(0, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--glass-rim')) || 0)) / 100
+const fitters = []
 function fitSheet(image, art, bands) {
   const apply = () => {
     const nw = image.naturalWidth, nh = image.naturalHeight
     if (!nw || !nh) return
-    const ratio = nw / nh
-    const w = ratio < 1 ? ratio : 1, h = ratio < 1 ? 1 : 1 / ratio
+    const ratio = nw / nh, rim = glassRim(), s = 1 - 2 * rim
+    const w = (ratio < 1 ? ratio : 1) * s, h = (ratio < 1 ? 1 : 1 / ratio) * s
+    const L = (1 - w) * 50, T = (1 - h) * 50
     // inset FIRST: the shorthand would otherwise reset left/top to auto.
-    Object.assign(art.style, { inset: 'auto', left: `${(1 - w) * 50}%`, top: `${(1 - h) * 50}%`, width: `${w * 100}%`, height: `${h * 100}%` })
-    const gap = `${(ratio < 1 ? 1 - w : 1 - h) * 50}%`
-    const [a, b] = bands
-    if (ratio < 1) { Object.assign(a.style, { left: 0, top: 0, bottom: 0, width: gap }); Object.assign(b.style, { right: 0, top: 0, bottom: 0, width: gap }) }
-    else { Object.assign(a.style, { top: 0, left: 0, right: 0, height: gap }); Object.assign(b.style, { bottom: 0, left: 0, right: 0, height: gap }) }
-    for (const band of bands) band.hidden = ratio === 1
+    Object.assign(art.style, { inset: 'auto', left: `${L}%`, top: `${T}%`, width: `${w * 100}%`, height: `${h * 100}%` })
+    const box = (band, l, tp, bw, bh) => Object.assign(band.style, { inset: 'auto', left: `${l}%`, top: `${tp}%`, width: `${bw}%`, height: `${bh}%` })
+    const [a, b, c, d] = bands
+    box(a, 0, 0, L, 100); box(b, 100 - L, 0, L, 100)
+    box(c, L, 0, w * 100, T); box(d, L, 100 - T, w * 100, T)
+    for (const band of bands) band.hidden = ratio === 1 && rim === 0
   }
+  fitters.push(apply)
   if (image.complete) apply()
   image.addEventListener('load', () => { apply(); if (typeof syncFrontGlass === 'function') syncFrontGlass() })
 }
@@ -53,7 +57,7 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   const drawingIndex = drawings.length - 1 - slot
   const sheet = document.createElement('span')
   sheet.className = 'sheet'
-  const bands = [0, 1].map(() => { const band = document.createElement('span'); band.className = 'glass'; return band })
+  const bands = [0, 1, 2, 3].map(() => { const band = document.createElement('span'); band.className = 'glass'; return band })
   const art = document.createElement('span')
   art.className = 'art'
   const image = new Image()
@@ -74,7 +78,7 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
 const frontGlass = document.createElement('span')
 frontGlass.className = 'glass-front'
 frontGlass.setAttribute('aria-hidden', 'true')
-const frontBands = [0, 1].map(() => { const band = document.createElement('span'); band.className = 'glass'; frontGlass.append(band); return band })
+const frontBands = [0, 1, 2, 3].map(() => { const band = document.createElement('span'); band.className = 'glass'; frontGlass.append(band); return band })
 stackButton.append(frontGlass)
 function syncFrontGlass() {
   const current = sheets.find(item => item.drawingIndex === index)
@@ -82,7 +86,7 @@ function syncFrontGlass() {
   frontGlass.style.transform = `${getComputedStyle(stack).transform} ${current.sheet.style.transform}`
   current.sheet.querySelectorAll('.glass').forEach((band, i) => { frontBands[i].style.cssText = band.style.cssText; frontBands[i].hidden = band.hidden })
 }
-window.addEventListener('sketchbook-orientation', () => syncFrontGlass())
+window.addEventListener('sketchbook-orientation', () => { fitters.forEach(fn => fn()); syncFrontGlass() })
 
 // At angles viewed from behind, chronological order starts on that visible side.
 let reverseView = true
@@ -134,7 +138,7 @@ function select(value, animate = true) {
 }
 let preview = null, press = null, suppressClickUntil = 0
 
-const ART_INSET = 1 // the drawing runs edge to edge along its long side; glass only fills the rest of the square
+const artInset = () => 1 - 2 * glassRim() // the drawing runs edge to edge along its long side; glass only fills the rest of the square
 let lift = null
 
 function openPreview() {
@@ -193,7 +197,7 @@ function startLift(overlay, image, current, nw, nh, fit) {
   frontGlass.style.visibility = 'hidden'
 
   const z0 = new DOMMatrix(current.sheet.style.transform).m43
-  const shown = Math.min(side * ART_INSET / nw, side * ART_INSET / nh) // contain-fit inside the frame
+  const shown = Math.min(side * artInset() / nw, side * artInset() / nh) // contain-fit inside the frame
   const k = fit / shown
   const dx = innerWidth / 2 - (box.left + box.width / 2)
   const dy = innerHeight / 2 - (box.top + box.height / 2)
