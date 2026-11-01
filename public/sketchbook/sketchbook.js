@@ -322,6 +322,13 @@ function endPress(event) {
 }
 document.addEventListener('pointerup', endPress, true)
 document.addEventListener('pointercancel', endPress, true)
+// Phones: a small button under the cube opens the current drawing big (the same view the long press opens).
+const bigButton = document.createElement('button')
+bigButton.type = 'button'; bigButton.className = 'big-button'
+bigButton.setAttribute('aria-label', language === 'de' ? 'Groß anzeigen' : 'View full screen')
+bigButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V6a2 2 0 0 1 2-2h3M15 4h3a2 2 0 0 1 2 2v3M20 15v3a2 2 0 0 1-2 2h-3M9 20H6a2 2 0 0 1-2-2v-3"/></svg>'
+bigButton.addEventListener('click', () => { if (!preview) openPreview() })
+document.body.append(bigButton)
 stackButton.addEventListener('contextmenu', event => event.preventDefault())
 document.addEventListener('click', event => {
   if (performance.now() < suppressClickUntil && !event.target.closest('.sketch-preview')) {

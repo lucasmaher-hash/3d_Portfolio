@@ -98,3 +98,11 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .stack-button, .stack-button *, .sketch-preview, .sketch-preview *, .lift-scene, .lift-scene * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 body:has(.sketch-preview) { -webkit-user-select: none; user-select: none; }
 .stack-button img, .sketch-preview img, .lift-scene img { -webkit-user-drag: none; pointer-events: none; }
+
+/* Phones only: full-screen button centred under the cube. */
+.big-button { display: none; }
+@media (max-width: 540px) {
+  .big-button { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 7svh); transform: translateX(-50%); z-index: 4; display: grid; place-items: center; width: 52px; height: 52px; padding: 0; border: 0; border-radius: 16px; background: #8e8e93; color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .big-button svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .big-button:active { background: #7c7c81; }
+}
