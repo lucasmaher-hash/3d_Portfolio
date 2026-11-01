@@ -201,13 +201,16 @@ function openPreview() {
     overlay.append(button)
     return { button, direction }
   })
-  // One fixed spot for every drawing (so the chevrons never hop between pictures): just outside the widest
-  // picture's displayed width.
+  // One fixed spot per orientation (so the chevrons never hop between pictures of the same kind): just
+  // outside the widest portrait picture, or outside the widest landscape one.
   const placeChevrons = () => {
+    const sizeOf = img => img.naturalWidth * Math.min(Math.min(innerWidth * .9, 1100) / img.naturalWidth, innerHeight * .88 / img.naturalHeight)
+    const current = sheets.find(item => item.drawingIndex === index)?.sheet.querySelector('img')
+    const landscape = !!current?.naturalWidth && current.naturalWidth > current.naturalHeight
     let half = 0
     for (const { sheet } of sheets) {
       const img = sheet.querySelector('img')
-      if (img?.naturalWidth && img.naturalWidth <= img.naturalHeight) half = Math.max(half, img.naturalWidth * Math.min(Math.min(innerWidth * .9, 1100) / img.naturalWidth, innerHeight * .88 / img.naturalHeight) / 2)
+      if (img?.naturalWidth && (img.naturalWidth > img.naturalHeight) === landscape) half = Math.max(half, sizeOf(img) / 2)
     }
     if (!half) half = image.getBoundingClientRect().width / 2
     for (const { button, direction } of chevrons) {
