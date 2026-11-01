@@ -35,8 +35,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
    the gimaguas.com header: a near-clear white veil that blurs whatever lies
    behind it - the sheets further back, the page - no colour of its own, no
    border, no shadow. */
-.glass { position: absolute; background: hsla(var(--glass-hue, 220), var(--glass-tint, 0%), var(--glass-light, 100%), var(--glass-alpha, .38));
-  -webkit-backdrop-filter: blur(var(--glass-blur, 22px)) saturate(var(--glass-saturate, 150%)); backdrop-filter: blur(var(--glass-blur, 22px)) saturate(var(--glass-saturate, 150%)); }
+.glass { position: absolute; background: hsla(var(--glass-hue, 216), var(--glass-tint, 0%), var(--glass-light, 100%), var(--glass-alpha, .49));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 6px)) saturate(var(--glass-saturate, 67%)); backdrop-filter: blur(var(--glass-blur, 6px)) saturate(var(--glass-saturate, 67%)); }
 /* The glass look is dialled in with the tuner (?tune=1, "Glas ..." sliders); set the
    --glass-* defaults above once Lucas has picked values. */
 .glass-front { position: absolute; inset: 0; pointer-events: none; will-change: transform; } /* own layer from the start: no late promotion (the 0.4s hitch) */
