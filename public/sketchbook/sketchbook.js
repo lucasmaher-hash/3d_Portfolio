@@ -180,8 +180,8 @@ function advance() {
   if (reduceMotion.matches || drawings.length < 2) { select(0); return }
   refilling = true
   fill = { loaded: 0 }; index = 0; render(false)
-  const depthOf = item => reverseView ? drawings.length - 1 - item.drawingIndex : item.drawingIndex
-  const order = [...sheets].sort((a, b) => depthOf(b) - depthOf(a))
+  // Drawing 0 is always the front as seen (the cube is turned to show it), so the back is the last drawing in either view.
+  const order = [...sheets].sort((a, b) => b.drawingIndex - a.drawingIndex)
   for (const item of order) item.sheet.classList.add('is-loading')
   frontGlass.style.visibility = 'hidden'
   let lo = Infinity, hi = -1
