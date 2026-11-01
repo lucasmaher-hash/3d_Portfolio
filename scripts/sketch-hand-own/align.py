@@ -8,7 +8,7 @@ def band(m):
     rows=cv2.GaussianBlur(rows.reshape(-1,1),(1,0),sigmaX=0,sigmaY=3).ravel()
     ys=np.where(rows>0.4*rows.max())[0]
     return ys.min(),ys.max()
-SHEAR={1:0.324}   # k of 'click': stem leaned 18 deg, the rest of the writing ~33 deg
+SHEAR={1:0.324,23:0.22}; BOTTOM={23}   # 23 = t of 'to'   # k of 'click': stem leaned 18 deg, the rest of the writing ~33 deg
 def align(ids, tiny=400):
     comps=[dict(k=k,x=st[k][0],y=st[k][1],w=st[k][2],h=st[k][3],a=st[k][4]) for k in ids]
     units=[c for c in comps if c['a']>=tiny]; dots=[c for c in comps if c['a']<tiny]
@@ -29,6 +29,7 @@ def align(ids, tiny=400):
             c['dy']=base-c['bb']; s=xh/c['bh']; c['s']=1+(s-1)*0.8 if 0.82<s<1.22 else 1.0; c['py']=c['bb']
         else:
             c['dy']=float(np.interp(c['x']+c['w']/2,cxs,dys)); c['s']=1.0; c['py']=c['y']+c['h']
+            if c['k'] in BOTTOM: c['dy']=base-(c['y']+c['h'])
     for d in dots:
         def gap(o):
             gx=max(o['x']-(d['x']+d['w']),d['x']-(o['x']+o['w']),0); gy=max(o['y']-(d['y']+d['h']),d['y']-(o['y']+o['h']),0)
@@ -42,7 +43,7 @@ def align(ids, tiny=400):
         for p in [c]+c['kids']:
             m=(lab[p['y']:p['y']+p['h'],p['x']:p['x']+p['w']]==p['k']).astype(np.uint8)*255
             if p['k'] in SHEAR:   # lean the stroke like the rest of the writing (about the bottom of its band)
-                sh=SHEAR[p['k']]; hb=p['bb']-p['y'] if 'bb' in p else p['h']
+                sh=SHEAR[p['k']]; hb=p['bb']-p['y'] if ('bb' in p and p['k'] not in BOTTOM) else p['h']
                 m=cv2.warpAffine(m,np.float32([[1,-sh,sh*hb],[0,1,0]]),(m.shape[1]+int(sh*hb)+2,m.shape[0]))
                 p=dict(p,w=m.shape[1])
             nw=max(1,int(round(p['w']*s))); nh=max(1,int(round(p['h']*s)))
