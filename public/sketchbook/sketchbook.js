@@ -2,8 +2,8 @@ let language = (() => { try { return localStorage.getItem('lang') === 'de' ? 'de
 document.documentElement.lang = language
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)')
 const translations = {
-  en: { back: 'Back to About', title: 'Sketchbook', intro: 'A selection of my sketches and drawings of people, objects and imagined scenes.', next: 'Next drawing', timeline: 'Drawing, oldest to newest', about: 'About' },
-  de: { back: 'Zurück zu Über mich', title: 'Skizzenbuch', intro: 'Eine Auswahl meiner Skizzen und Zeichnungen von Menschen, Dingen und erfundenen Szenen.', next: 'Nächste Zeichnung', timeline: 'Zeichnung, von alt nach neu', about: 'Über mich' },
+  en: { back: 'Back to About', title: 'Sketchbook', intro: 'A short selection of my artworks.<br><span class="hint">(click for the next one, hold to open full screen)</span>', next: 'Next drawing', timeline: 'Drawing, oldest to newest', about: 'About' },
+  de: { back: 'Zurück zu Über mich', title: 'Skizzenbuch', intro: 'Eine kleine Auswahl meiner Kunstwerke.<br><span class="hint">(klicken für das nächste, gedrückt halten für Vollbild)</span>', next: 'Nächste Zeichnung', timeline: 'Zeichnung, von alt nach neu', about: 'Über mich' },
 }
 let copy = translations[language]
 const stack = document.querySelector('.stack')
