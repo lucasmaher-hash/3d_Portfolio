@@ -137,7 +137,30 @@ function select(value, animate = true) {
   if (nextIndex === index) return
   index = nextIndex; render(animate)
 }
-let preview = null, press = null, suppressClickUntil = 0
+let preview = null, press = null, suppressClickUntil = 0, previewControls = null
+
+function fitPreviewImage(image, nw, nh) {
+  const fit = Math.min(Math.min(innerWidth * .9, 1100) / nw, innerHeight * .88 / nh)
+  image.style.width = `${nw * fit}px`; image.style.height = `${nh * fit}px`
+  return fit
+}
+function stepPreview(direction) {
+  if (!preview || !previewControls) return
+  const next = index + direction
+  if (next < 0 || next > drawings.length - 1) return
+  // Leave the lift: the sheet that flew out goes back, the new picture simply replaces the old one.
+  if (lift) { lift.scene.remove(); lift.sheet.style.visibility = ''; lift = null }
+  index = next; render(false)
+  const { image, placeChevrons } = previewControls
+  const drawing = drawings[index]
+  const sheetImage = sheets.find(item => item.drawingIndex === index)?.sheet.querySelector('img')
+  image.style.visibility = ''
+  image.src = drawing.src; image.alt = drawing.title[language]
+  preview.setAttribute('aria-label', drawing.title[language])
+  if (sheetImage?.naturalWidth) fitPreviewImage(image, sheetImage.naturalWidth, sheetImage.naturalHeight)
+  if (!reduceMotion.matches) image.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' })
+  placeChevrons()
+}
 
 const artInset = () => 1 - 2 * glassRim() // the drawing runs edge to edge along its long side; glass only fills the rest of the square
 let lift = null
@@ -167,6 +190,29 @@ function openPreview() {
     image.style.width = `${nw * fit}px`; image.style.height = `${nh * fit}px`
     if (!reduceMotion.matches && current) startLift(overlay, image, current, nw, nh, fit)
   }
+  // Two minimal chevrons beside the picture (and the arrow keys) step through the drawings while it is open.
+  const chevrons = [-1, 1].map(direction => {
+    const button = document.createElement('button')
+    button.type = 'button'; button.className = 'preview-step'
+    button.setAttribute('aria-label', direction < 0 ? copy.prev || 'Previous' : copy.next)
+    button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${direction < 0 ? 'M15 4 7 12l8 8' : 'M9 4l8 8-8 8'}"/></svg>`
+    button.addEventListener('pointerdown', event => event.stopPropagation())
+    button.addEventListener('click', event => { event.stopPropagation(); stepPreview(direction) })
+    overlay.append(button)
+    return { button, direction }
+  })
+  const placeChevrons = () => {
+    const box = image.getBoundingClientRect()
+    for (const { button, direction } of chevrons) {
+      button.style.top = `${box.top + box.height / 2}px`
+      button.style.left = `${direction < 0 ? Math.max(4, box.left - 56) : Math.min(innerWidth - 48, box.right + 12)}px`
+      button.disabled = index + direction < 0 || index + direction > drawings.length - 1
+    }
+  }
+  previewControls = { image, placeChevrons, overlay }
+  placeChevrons()
+  addEventListener('resize', () => { if (preview === overlay) placeChevrons() })
+  for (const { button } of chevrons) button.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: reduceMotion.matches ? 0 : 700, easing: 'ease-out', fill: 'backwards' })
   // A fresh press on the overlay is an intentional close, even immediately
   // after the long press. The release that opened it must not close it again.
   overlay.addEventListener('pointerdown', () => { suppressClickUntil = 0 })
@@ -299,7 +345,12 @@ window.addEventListener('wheel', event => {
   }
 }, { passive: false })
 window.addEventListener('keydown', event => {
-  if (preview) { if (event.key === 'Escape') closePreview(); return }
+  if (preview) {
+    if (event.key === 'Escape') closePreview()
+    else if (['ArrowRight', 'ArrowDown'].includes(event.key)) { event.preventDefault(); stepPreview(1) }
+    else if (['ArrowLeft', 'ArrowUp'].includes(event.key)) { event.preventDefault(); stepPreview(-1) }
+    return
+  }
   if (event.target === range || event.metaKey || event.ctrlKey || event.altKey) return
   if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); select(index + 1) }
   if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); select(index - 1) }
