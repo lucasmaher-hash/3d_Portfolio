@@ -184,7 +184,7 @@ function advance() {
   last.sheet.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: 'ease-in', fill: 'forwards' })
   frontGlass.style.visibility = 'hidden'
   fill = { loaded: 0 }; publishStack()
-  setTimeout(refill, 300)
+  setTimeout(refill, 500)
 }
 function refill() {
   fill = { loaded: 0 }; index = 0; render(false)
