@@ -1,7 +1,8 @@
 export function installLayoutTuner() {
-  const defaults = { textX: -28, textY: -46, cubeX: 117, cubeY: -22, cubeSize: 93, dialX: 13, dialY: 29, rotateX: -13, rotateY: 147, rotateZ: -1 }
+  const defaults = { textX: -28, textY: -46, cubeX: 117, cubeY: -22, cubeSize: 93, dialX: 13, dialY: 29, rotateX: -13, rotateY: 147, rotateZ: -1, glassLight: 100, glassOpacity: 38, glassBlur: 22, glassSaturate: 150, glassHue: 220, glassTint: 0 }
   if (matchMedia('(max-width: 540px)').matches) Object.assign(defaults, { textX: 17, textY: -41, cubeX: 36, cubeY: 14, dialX: 8, dialY: 62 })
-  const labels = { textX: 'Text X', textY: 'Text Y', cubeX: 'Würfel X', cubeY: 'Würfel Y', cubeSize: 'Würfelgröße', dialX: 'Slider X', dialY: 'Slider Y', rotateX: 'Drehung X', rotateY: 'Drehung Y', rotateZ: 'Drehung Z' }
+  const labels = { textX: 'Text X', textY: 'Text Y', cubeX: 'Würfel X', cubeY: 'Würfel Y', cubeSize: 'Würfelgröße', dialX: 'Slider X', dialY: 'Slider Y', rotateX: 'Drehung X', rotateY: 'Drehung Y', rotateZ: 'Drehung Z', glassLight: 'Glas Helligkeit (%)', glassOpacity: 'Glas Deckkraft (%)', glassBlur: 'Glas Unschärfe (px)', glassSaturate: 'Glas Sättigung der Unschärfe (%)', glassHue: 'Glas Farbton (°)', glassTint: 'Glas Farbintensität (%)' }
+  const ranges = { glassLight: [0, 100], glassOpacity: [0, 100], glassBlur: [0, 60], glassSaturate: [50, 300], glassHue: [0, 360], glassTint: [0, 100] }
   const key = 'portfolio-sketchbook-layout-v1', uiKey = key + '-panel'
   let saved = {}, ui = {}
   try { saved = JSON.parse(localStorage.getItem(key)) || {}; ui = JSON.parse(localStorage.getItem(uiKey)) || {} } catch {}
@@ -19,8 +20,8 @@ export function installLayoutTuner() {
   const handle = document.createElement('div'); handle.className = 'layout-dial-handle'; handle.title = 'Slider verschieben'; dial.append(handle)
   text.classList.add('tuning'); cube.classList.add('tuning'); stack.classList.add('tuning')
   for (const k of Object.keys(values)) {
-    const angle = k.startsWith('rotate'), size = k === 'cubeSize', min = size ? 25 : angle ? -180 : -1000, max = size ? 400 : angle ? 180 : 1000
-    const label = document.createElement('label'); label.textContent = labels[k] + (size ? ' (%)' : angle ? ' (°)' : ' (px)')
+    const angle = k.startsWith('rotate'), size = k === 'cubeSize', range = ranges[k], min = range ? range[0] : size ? 25 : angle ? -180 : -1000, max = range ? range[1] : size ? 400 : angle ? 180 : 1000
+    const label = document.createElement('label'); label.textContent = labels[k] + (range ? '' : size ? ' (%)' : angle ? ' (°)' : ' (px)')
     const row = document.createElement('div'); row.className = 'row'
     row.innerHTML = `<input type="range" min="${min}" max="${max}" step="1" aria-label="${labels[k]}; Punkt markiert den Ausgangswert"><input type="number" step="1" aria-label="${labels[k]} Zahlenwert">`
     const dot = document.createElement('span'); dot.className = 'default-dot'; dot.setAttribute('aria-hidden', 'true'); row.append(dot)
@@ -38,11 +39,16 @@ export function installLayoutTuner() {
     cube.style.transform = `translate(calc(-50% + ${values.cubeX}px), calc(-50% + ${values.cubeY}px))`
     dial.style.transform = `translate(${values.dialX}px, calc(-50% + ${values.dialY}px))`
     stack.style.transform = `scale3d(${values.cubeSize / 100}, ${values.cubeSize / 100}, ${values.cubeSize / 100}) rotateX(${values.rotateX}deg) rotateY(${values.rotateY}deg) rotateZ(${values.rotateZ}deg)`
+    const root = document.documentElement.style
+    root.setProperty('--glass-light', values.glassLight + '%'); root.setProperty('--glass-alpha', values.glassOpacity / 100)
+    root.setProperty('--glass-blur', values.glassBlur + 'px'); root.setProperty('--glass-saturate', values.glassSaturate + '%')
+    root.setProperty('--glass-hue', values.glassHue); root.setProperty('--glass-tint', values.glassTint + '%')
     window.dispatchEvent(new CustomEvent('sketchbook-orientation', { detail: values.rotateY }))
     for (const row of fields.children) {
       const k = row.dataset.key; if (!k) continue
       const [slider, number] = row.children, angle = k.startsWith('rotate'), size = k === 'cubeSize'
-      slider.min = Math.min(size ? 25 : angle ? -180 : -1000, values[k]); slider.max = Math.max(size ? 400 : angle ? 180 : 1000, values[k])
+      const range = ranges[k]
+      slider.min = range ? range[0] : Math.min(size ? 25 : angle ? -180 : -1000, values[k]); slider.max = range ? range[1] : Math.max(size ? 400 : angle ? 180 : 1000, values[k])
       slider.value = values[k]; if (document.activeElement !== number) number.value = values[k]
       const marker = (defaults[k] - Number(slider.min)) / (Number(slider.max) - Number(slider.min)) * 100
       row.querySelector('.default-dot').style.left = `${slider.offsetLeft + 7 + (slider.clientWidth - 14) * marker / 100}px`
