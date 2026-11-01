@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Sketchbook — Lucas Maher</title>
+  <link rel="icon" href="/images/site/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/fonts/roboto-flex-ui.css">
+  <link rel="stylesheet" href="/sketchbook/sketchbook.css">
+</head>
+<body>
+  <iframe id="top-bar" src="/top_row_permanent_V3.html" allowtransparency="true" scrolling="no" title="Portfolio navigation"></iframe>
+  <div id="mobile-menu" class="mobile-menu">
+    <div class="mobile-menu-panel">
+      <a class="mobile-nav-btn" href="/about2d.html" data-menu-about>About</a>
+      <div class="mobile-view-toggle"><a class="mobile-mode-btn is-active" href="/2D.html">2D</a><a class="mobile-mode-btn" href="/" data-enter-3d>3D</a></div>
+      <div class="mobile-view-toggle"><button class="mobile-mode-btn" type="button" data-lang="de">Deutsch</button><button class="mobile-mode-btn" type="button" data-lang="en">English</button></div>
+    </div>
+  </div>
+  <div class="page-frame">
+  <header class="intro">
+    <h1 class="sr-only" data-copy="title">Sketchbook</h1>
+    <a class="back" href="/about2d.html" aria-label="Back to About"><svg viewBox="0 0 38 20" aria-hidden="true"><path d="M34 10.5C25 10 15 10.4 4.5 9.5M13.4 2.8C10 5 6.5 7.5 3.7 9.6c3.1 2.5 6.8 5.1 9.6 7.5"/><path d="M32 11.4C24 11 15 11.2 6 10.4" opacity=".35"/></svg></a><p data-copy="intro">A selection of my sketches and drawings of people, objects and imagined scenes.</p>
+  </header>
+
+  <main class="gallery" aria-label="Sketch gallery">
+    <button class="stack-button" type="button" aria-label="Next drawing">
+      <span class="stack" aria-hidden="true"></span>
+    </button>
+  </main>
+
+  <aside class="timeline" aria-label="Drawing timeline">
+    <div class="timeline-track">
+      <div class="timeline-art" aria-hidden="true">
+        <svg class="timeline-line" viewBox="0 0 20 300" preserveAspectRatio="none"><path d="M10 0 C7 38 13 72 10 111 S8 185 11 220 9 270 10 300"/></svg>
+        <svg class="timeline-line timeline-progress" viewBox="0 0 20 300" preserveAspectRatio="none"><path d="M10 0 C7 38 13 72 10 111 S8 185 11 220 9 270 10 300"/></svg>
+        <svg class="timeline-circle" viewBox="0 0 32 32"><path d="M25 7C20 2 11 4 7 8 2 13 4 23 10 26c6 4 14 1 17-5 4-7-1-15-7-16C12 2 5 8 5 15c0 8 7 13 14 11"/></svg>
+      </div>
+      <input id="timeline" type="range" min="0" max="11" value="0" step="1" aria-label="Drawing, oldest to newest" orient="vertical">
+    </div>
+  </aside>
+
+  </div>
+
+  <script type="module" src="/sketchbook/sketchbook.js"></script>
+</body>
+</html>

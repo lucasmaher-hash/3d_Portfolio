@@ -1,0 +1,22 @@
+.page-wrapper:has(.sketchbook-link), body.sketchbook-overlay .container { position: relative; }
+.sketchbook-link {
+  position: absolute;
+  right: max(28px, env(safe-area-inset-right));
+  bottom: max(25px, env(safe-area-inset-bottom));
+  z-index: 9;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  color: #444740;
+  text-decoration: none;
+  transform: rotate(-7deg);
+}
+.sketchbook-link svg { width: 52px; height: 52px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.sketchbook-link:hover { color: #1a1a1a; transform: rotate(-3deg); }
+.sketchbook-link:active { transform: rotate(-3deg) scale(.94); }
+.sketchbook-link:focus-visible { outline: 2px solid #809bbc; outline-offset: 4px; border-radius: 8px; }
+/* The 3D About is a content-sized iframe: reserve a separate row beneath links. */
+body.sketchbook-overlay .container { padding-bottom: 90px; }
+body.sketchbook-overlay .sketchbook-link { position: absolute; right: 24px; bottom: 16px; }
+@media (max-width: 640px) { .sketchbook-link { right: 17px; bottom: max(17px, env(safe-area-inset-bottom)); width: 48px; height: 48px; } .sketchbook-link svg { width: 44px; height: 44px; } }
