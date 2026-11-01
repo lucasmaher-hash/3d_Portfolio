@@ -8,15 +8,20 @@
   <link rel="icon" href="/images/site/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/fonts/roboto-flex-ui.css">
   <link rel="stylesheet" href="/sketchbook/sketchbook.css">
+  <link rel="stylesheet" href="/theme/mobile-menu.css" />
 </head>
 <body>
   <iframe id="top-bar" src="/top_row_permanent_V3.html" allowtransparency="true" scrolling="no" title="Portfolio navigation"></iframe>
   <div id="mobile-menu" class="mobile-menu">
     <div class="mobile-menu-panel">
-      <a class="mobile-nav-btn" href="/about2d.html" data-menu-about>About</a>
-      <div class="mobile-view-toggle"><button class="mobile-mode-btn" type="button" data-lang="de">Deutsch</button><button class="mobile-mode-btn" type="button" data-lang="en">English</button></div>
+      <a class="mobile-nav-btn is-active" href="/about2d.html" data-page="about" data-menu-about>About</a>
+      <div class="mobile-view-toggle mobile-lang-toggle">
+        <button class="mobile-mode-btn" data-lang="de">Deutsch</button>
+        <button class="mobile-mode-btn" data-lang="en">English</button>
+      </div>
     </div>
   </div>
+
   <div class="page-frame">
   <header class="intro">
     <h1 class="sr-only" data-copy="title">Sketchbook</h1>
