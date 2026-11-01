@@ -179,6 +179,14 @@ function advance() {
   if (index < drawings.length - 1) { select(index + 1); return }
   if (reduceMotion.matches || drawings.length < 2) { select(0); return }
   refilling = true
+  // First the last picture goes, the cube stands empty for a moment, then it fills up.
+  const last = sheets.find(item => item.drawingIndex === index)
+  last.sheet.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: 'ease-in', fill: 'forwards' })
+  frontGlass.style.visibility = 'hidden'
+  fill = { loaded: 0 }; publishStack()
+  setTimeout(refill, 300)
+}
+function refill() {
   fill = { loaded: 0 }; index = 0; render(false)
   // Drawing 0 is always the front as seen (the cube is turned to show it), so the back is the last drawing in either view.
   const order = [...sheets].sort((a, b) => b.drawingIndex - a.drawingIndex)
