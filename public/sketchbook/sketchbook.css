@@ -71,7 +71,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
   .intro p { font-size: 26px; max-width: 280px; }
 }
 @media (max-width: 540px) {
-  :root { --paper-width: min(56vw, 35svh); }
+  :root { --paper-width: min(65vw, 38svh); }
   .intro { left: 22px; top: 135px; gap: 14px; right: 40px; padding-left: 0; transform: translate(17px, -41px); }
   .intro p { font-size: 23px; line-height: 1.5; max-width: 260px; }
   .stack-button { left: 56%; top: 56%; transform: translate(calc(-50% + 36px), calc(-50% + 14px)); }
