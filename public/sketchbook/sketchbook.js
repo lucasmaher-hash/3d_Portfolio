@@ -64,7 +64,7 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   const image = new Image()
   image.src = drawings[drawingIndex].src
   image.alt = ''; image.draggable = false
-  fitSheet(image, art, bands, () => sheet.classList.contains('is-current'))
+  fitSheet(image, art, bands, () => sheet.classList.contains('is-current') || sheet.dataset.holdFit === '1')
   art.append(image); sheet.append(...bands, art); stack.append(sheet)
   return { sheet, drawingIndex }
 })
@@ -124,6 +124,13 @@ function render(animate = true) {
     const presented = Number(getComputedStyle(sheet).opacity)
     for (const animation of sheet.getAnimations()) animation.cancel()
     sheet.style.opacity = opacity
+    // A sheet that stops being the front one keeps its front-sized frame while it dissolves, so it does not shrink first.
+    if (soft && drawingIndex !== index && sheet.classList.contains('is-current')) {
+      sheet.dataset.holdFit = '1'
+      clearTimeout(sheet._holdTimer)
+      sheet._holdTimer = setTimeout(() => { delete sheet.dataset.holdFit; fitters.forEach(fn => fn()) }, DISSOLVE_MS)
+    }
+    if (drawingIndex === index) { clearTimeout(sheet._holdTimer); delete sheet.dataset.holdFit }
     sheet.classList.toggle('is-current', drawingIndex === index)
     sheet.classList.toggle('is-gone', drawingIndex < index)
     if (animate && !reduceMotion.matches && Math.abs(presented - opacity) > 0.001) {
