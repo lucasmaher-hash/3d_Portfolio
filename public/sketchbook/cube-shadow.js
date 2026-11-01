@@ -2,10 +2,10 @@
 // inside .stack's preserve-3d space, at the bottom of the sheets). Light comes
 // from behind-left, so the shadow falls toward the viewer and to the right.
 // Richtung is relative to the cube's rotateY, so the shadow keeps its screen
-// direction when the layout tuner turns the cube (85° = front right, checked). Always applied with the saved values;
+// direction when the layout tuner turns the cube (70° = front right, Lucas's values 2026-11-01). Always applied with the saved values;
 // the dial shows with ?shadow=1 or ?tune=1.
 const KEY = 'portfolio-sketchbook-shadow-v3'
-const defaults = { angle: 85, length: 75, blur: 10, opacity: 26, tip: 0, color: '#3b3d52', gap: 0 }
+const defaults = { angle: 70, length: 67, blur: 40, opacity: 39, tip: 8, color: '#000000', gap: 0 }
 const fields = {
   angle: ['Richtung', '°', -90, 180], length: ['Länge', '%', 0, 250], blur: ['Weichheit', 'px', 0, 80],
   opacity: ['Intensität', '%', 0, 100], tip: ['Ende (Deckkraft)', '%', 0, 100], gap: ['Bodenabstand', 'px', -40, 80],
