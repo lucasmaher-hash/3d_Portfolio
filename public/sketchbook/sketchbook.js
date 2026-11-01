@@ -193,7 +193,6 @@ function startLift(overlay, image, current, nw, nh, fit) {
   clone.style.opacity = 1
   clone.classList.remove('is-current')
   const cloneImage = clone.querySelector('img')
-  const mirrored = stack.classList.contains('reverse')
   rig.append(clone); scene.append(rig); overlay.append(scene)
   image.style.visibility = 'hidden'
   current.sheet.style.visibility = 'hidden'
@@ -215,13 +214,17 @@ function startLift(overlay, image, current, nw, nh, fit) {
     { transform: end.toString() },
   ], timing)
   // Dissolve the glass border during the second half of the flight.
-  // The back face is seen mirrored, so the artwork is pre-flipped; hand it back
-  // exactly when the sheet turns edge-on (rotation passes 90 degrees).
-  if (mirrored) {
-    const tilt = Math.acos(Math.max(-1, Math.min(1, matrix.m33 / Math.hypot(matrix.m31, matrix.m32, matrix.m33)))) * 180 / Math.PI // angle between the face normal and the viewer
-    const turn = Math.max(.05, Math.min(.95, 1 - 90 / (180 - tilt || 147)))
-    cloneImage.animate([{ transform: 'scaleX(-1)' }, { transform: 'scaleX(-1)', offset: turn }, { transform: 'scaleX(1)', offset: Math.min(.99, turn + .001) }, { transform: 'scaleX(1)' }], timing)
+  // The artwork is pre-flipped while the sheet shows its back face (the stack seen from behind), and
+  // handed back the moment the sheet turns edge-on. Decided every frame from the sheet's real,
+  // animated orientation - a precomputed keyframe offset was off by a few frames and showed the
+  // painting mirrored for an instant.
+  const faceFlip = () => {
+    const world = matrix.multiply(new DOMMatrix(getComputedStyle(clone).transform))
+    cloneImage.style.transform = world.m33 < 0 ? 'scaleX(-1)' : 'scaleX(1)'
   }
+  faceFlip()
+  const watch = () => { if (lift?.scene !== scene) return; faceFlip(); requestAnimationFrame(watch) }
+  requestAnimationFrame(watch)
   overlay.animate([{ backgroundColor: 'rgba(18,20,19,0)' }, { backgroundColor: 'rgba(18,20,19,.7)' }], { duration: 950, easing: 'cubic-bezier(.45, 0, .2, 1)' })
   lift = { scene, sheet: current.sheet }
   sheetMove.finished.then(() => {
