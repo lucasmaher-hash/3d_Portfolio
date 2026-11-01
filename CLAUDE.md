@@ -4255,3 +4255,8 @@ Full record: `scripts/gallery-v06/README.md`; pipeline: `GALLERY-BAKED.md`.
 - **Floor edge glow** is still smoothed by `scripts/clean-floor-lightmap.py`, but it now
   reads the encoder's untouched output, passed as an argument (`$W/final/web-maps/floor.png`),
   not git. Its fallback `ORIGINAL_REV` is only for re-cleaning the old bake.
+
+## Standard: sofort committen, pushen, deployen + Links (Lucas, 01.11.2026)
+
+- **Immer sofort `git commit`, `git push` und Deploy für alle Änderungen**, ohne zu fragen. Nur wenn Lucas ausdrücklich das Gegenteil sagt (z. B. "nicht pushen", "erst mal lokal"), unterbleibt es. Gilt für alle Projekte; Ausnahme bleibt die GitHub-Sichtbarkeitsregel (neue Repos / Visibility / Pages nur nach Rückfrage).
+- **Am Anfang jedes Chats** (erste Antwort) immer beide Links nennen, sofern vorhanden: **Localhost-Link** der Projektseite (bei diesem Repo `http://localhost:5173`, Dev-Server ggf. mit `npm run dev` starten) und **Live-Link** der öffentlichen Seite (hier `https://lucasmaher.com`). Bei Änderungen an einer bestimmten Seite den direkten Seitenpfad nennen. Gibt es keinen, kurz "kein Link vorhanden" sagen.
