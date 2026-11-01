@@ -785,6 +785,7 @@
     .footer-logo:focus-visible { outline: 2px solid #809BBC; outline-offset: 4px; }
 
     .footer-links {
+      grid-column: 1;
       display: flex;
       gap: clamp(20px, 3vw, 40px);
       font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
@@ -801,7 +802,7 @@
 
     .copyright {
       justify-self: end;
-      margin-right: calc(clamp(24px, 6vw, 64px) * -1 + 20px);   /* desktop: 20px from the frame edge (Lucas, 2026-11-02) */
+      grid-column: 3;   /* explicit: with the logo gone, auto-placement put it in the middle column */
       text-align: right;
       font-family: 'Roboto Flex', sans-serif; font-size-adjust: none;
       font-size: 14px;
@@ -815,7 +816,7 @@
     @media (max-width: 640px) {
       .footer-section { grid-template-columns: 1fr; padding: 10px 20px; }   /* 8px + 20% (Lucas) */
       .footer-links { display: none; }
-      .copyright { white-space: normal; justify-self: center; text-align: center; margin-right: 0; }
+      .copyright { white-space: normal; justify-self: center; text-align: center; grid-column: 1; }
       .copyright-full { display: none; }
       .copyright-short { display: inline; }
     }
