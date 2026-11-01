@@ -74,7 +74,7 @@
   // leaves 17px either side, which is precisely the room that shadow needs.
   // Above ~1700px the cap takes over and the position is unchanged.
   function positionExitBtn() {
-    var wrapper = document.querySelector('.page-wrapper');
+    var wrapper = document.querySelector('.page-wrapper, .page-frame');
     if (!wrapper) return;
     var wrapperLeft = wrapper.getBoundingClientRect().left;
     var btnWidth    = btn.offsetWidth;
