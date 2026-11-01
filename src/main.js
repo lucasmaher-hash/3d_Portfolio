@@ -3668,9 +3668,16 @@ const aboutOverlay = document.getElementById('about-overlay')
 
 function openAbout() {
   if (window.track) window.track('nav_open', { panel: 'about' })
-  ensureOverlayFrameLoaded('about-frame')
-  aboutOverlay.classList.add('open')
-  isOverlayOpen = true
+  // About opens as the full 2D page in the project viewer (scene stays
+  // resident underneath, Exit pill closes it) instead of the small overlay.
+  const closeNavSel = () => {
+    const tb = document.getElementById('top-bar')
+    if (tb && tb.contentDocument) tb.contentDocument.querySelectorAll('.nav-pill .pill__seg').forEach(s => {
+      s.classList.remove('is-active'); s.setAttribute('aria-selected', 'false')
+    })
+  }
+  closeNavSel()
+  window._nav('/about2d.html?from=3d&scene=' + GALLERY_ENTRY_ID, 'left')
 }
 
 function closeAbout() {

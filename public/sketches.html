@@ -48,5 +48,13 @@
   </div>
 
   <script type="module" src="/sketchbook/sketchbook.js"></script>
+  <script src="/js/exit-3d.js?v=warm-v1"></script>
+  <script>
+    if (new URLSearchParams(location.search).get('from') === '3d') {
+      var st = document.createElement('style');
+      st.textContent = '.back{display:none!important}';
+      document.head.appendChild(st);
+    }
+  </script>
 </body>
 </html>

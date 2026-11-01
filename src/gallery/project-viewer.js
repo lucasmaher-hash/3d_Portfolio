@@ -3,6 +3,7 @@
 const PROJECT_PATHS = new Set([
   '/unify2d.html', '/vaccine2d.html', '/mac-lamp2d.html',
   '/virtual_cooking2d.html', '/kaffeemaschine2d.html', '/to.morrow2d.html',
+  '/about2d.html',
 ])
 
 export function installProjectViewer({ onOpen, onClose }) {
