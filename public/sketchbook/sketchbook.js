@@ -207,7 +207,7 @@ function openPreview() {
     const button = document.createElement('button')
     button.type = 'button'; button.className = 'preview-step'
     button.setAttribute('aria-label', direction < 0 ? copy.prev || 'Previous' : copy.next)
-    button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${direction < 0 ? 'M15 4 7 12l8 8' : 'M9 4l8 8-8 8'}"/></svg>`
+    button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${direction < 0 ? 'M15 4 8.8 10.2Q7.4 12 8.8 13.8L15 20' : 'M9 4l6.2 6.2Q16.6 12 15.2 13.8L9 20'}"/></svg>`
     button.addEventListener('pointerdown', event => event.stopPropagation())
     button.addEventListener('click', event => { event.stopPropagation(); stepPreview(direction) })
     overlay.append(button)
