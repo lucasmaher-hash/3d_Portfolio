@@ -1106,57 +1106,23 @@ const HomeScreen16: React.FC<{f: number}> = ({f}) => {
   );
 };
 
-/* ─── Lock Screen: white (Lucas) ─────────────────────────────────────── */
+/* The real recordings from the page (live-2-lock.mp4, live-3-island-delayed.mp4),
+   as frame sequences, so the hero's time warp can address any frame. */
+const seqImg = (dir: string, tag: string, n: number) => staticFile(`${dir}/${tag}-${String(n + 1).padStart(3, '0')}.jpg`);
+const SEQ_STYLE: React.CSSProperties = {position: 'absolute', left: 0, top: 0, width: SCREEN_W, height: SCREEN_H, display: 'block'};
+const LOCK_HOLD = 63;
+const lockFrame = (f: number) => Math.max(0, Math.min(LOCK_HOLD, Math.round(f - (ARRIVE - 8))));
+const T_EXP = ISL_EXP - 3;
+const HOME_LAST = 131;
+const homeFrame = (f: number) =>
+  Math.round(f < ISL_IN ? 0 : f < T_EXP ? Math.min(f - ISL_IN, 42) : Math.min(HOME_LAST, 42 + (f - T_EXP)));
 const LockLayer16: React.FC<{f: number}> = ({f}) => {
-  const p = DARK;
-  const nIn = sp(f, ARRIVE, 'present');
   const u = unlockU(f);
   if (u >= 1) return null;
-  const lift = -u * 150; // the whole Lock Screen rides up with the swipe…
   return (
     <div style={{position: 'absolute', inset: 0, background: '#FFFFFF', opacity: 1 - u}}>
-      <div style={{position: 'absolute', inset: 0, transform: `translateY(${lift}px)`}}>
-        <div style={{position: 'absolute', top: 96, width: '100%', textAlign: 'center', ...sf(19, 1, 600), color: 'rgba(28,28,30,.72)'}}>Friday 4 September</div>
-        <div
-          style={{
-            position: 'absolute',
-            top: 113,
-            width: '100%',
-            textAlign: 'center',
-            fontFamily: '"SF Pro Rounded", -apple-system, sans-serif',
-            fontSize: 108,
-            fontWeight: 600,
-            letterSpacing: '-0.02em',
-            color: 'rgba(28,28,30,.88)',
-          }}
-        >
-          16:39
-        </div>
-        <div
-          style={{
-            position: 'absolute',
-            left: CARD.x,
-            top: CARD.y,
-            opacity: clamp01(nIn * 1.5),
-            transform: `translateY(${(1 - nIn) * 44}px) scale(${0.9 + 0.1 * nIn})`,
-          }}
-        >
-          <LockCard w={CARD.w} z={1} p={p} title={TASK} done={0} strike={0} />
-        </div>
-        {/* torch and camera, in the light-wallpaper style */}
-        {[46, SCREEN_W - 46 - 50].map((x, i) => (
-          <div key={x} style={{position: 'absolute', left: x, top: 770, width: 50, height: 50, borderRadius: 999, background: 'rgba(118,118,128,.16)', display: 'grid', placeItems: 'center'}}>
-            {i === 0 ? (
-              <svg width="13" height="24" viewBox="0 0 13 24">
-                <path d="M1.2 0.8h10.6c.4 0 .7.3.7.7v3.1c0 .3-.1.6-.3.8L10 7.9c-.2.3-.3.6-.3.9v13.4c0 .9-.7 1.6-1.6 1.6H4.9c-.9 0-1.6-.7-1.6-1.6V8.8c0-.3-.1-.6-.3-.9L.8 5.4C.6 5.2.5 4.9.5 4.6V1.5c0-.4.3-.7.7-.7z M6.5 11.6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 1 0 0-3z" fill="#1C1C1E" fillRule="evenodd" />
-              </svg>
-            ) : (
-              <svg width="26" height="20" viewBox="0 0 26 20">
-                <path d="M8.9 1.2h8.2c.8 0 1.5.4 1.9 1.1l1 1.7h2.7c1.6 0 2.8 1.3 2.8 2.8v9.6c0 1.6-1.3 2.8-2.8 2.8H3.3C1.7 19.2.5 17.9.5 16.4V6.8C.5 5.3 1.7 4 3.3 4H6l1-1.7c.4-.7 1.1-1.1 1.9-1.1z M13 6.4a5.2 5.2 0 1 0 0 10.4 5.2 5.2 0 1 0 0-10.4z M13 8.4a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 1 1 0-6.4z" fill="#1C1C1E" fillRule="evenodd" />
-              </svg>
-            )}
-          </div>
-        ))}
+      <div style={{position: 'absolute', inset: 0, transform: `translateY(${-u * 150}px)`}}>
+        <Img src={seqImg('lockseq', 'l', lockFrame(f))} style={SEQ_STYLE} />
       </div>
     </div>
   );
@@ -1167,9 +1133,8 @@ const RightScreen16: React.FC<{f: number}> = ({f}) => {
   const wake = ease(f, ARRIVE - 6, ARRIVE + 6);
   return (
     <div style={{position: 'absolute', inset: 0, background: '#FFFFFF'}}>
-      {f >= UNLOCK + 6 ? <HomeScreen16 f={f} /> : null}
+      {f >= UNLOCK + 6 ? <Img src={seqImg('homeseq', 'h', homeFrame(f))} style={SEQ_STYLE} /> : null}
       <LockLayer16 f={f} />
-      <StatusBar16 color="#1C1C1E" />
       <div style={{position: 'absolute', inset: 0, background: '#000', opacity: 1 - wake}} />
     </div>
   );
@@ -1318,7 +1283,7 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
         <Phone16 left={PL_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame}>
           <AppScreen f={f} rv={rv} forceGo={forceGo} breathOv={breathOv} />
         </Phone16>
-        <Phone16 left={PR_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame} style={{opacity: rv.frame}} over={<Island16 f={f} />}>
+        <Phone16 left={PR_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame} style={{opacity: rv.frame}}>
           <RightScreen16 f={f} />
         </Phone16>
         {rings(ctrlG, GO + 1, 120)}
@@ -1340,26 +1305,6 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
             scale={1 - 0.08 * sp(f, UNLOCK + 2, 'press')}
           />
         ) : null}
-        {/* press the island, then the tick inside it */}
-        {[
-          [islandG, ISL_TAP],
-          [islCheckG, TICK],
-        ].map(([c, down]) => {
-          const [x, y] = c as P;
-          const d0 = down as number;
-          if (f < d0 - 12 || f > d0 + 14) return null;
-          return (
-            <FingerOnLight
-              key={d0}
-              x={x + lerp(40, 0, ease(f, d0 - 12, d0 - 1))}
-              y={y + lerp(46, 0, ease(f, d0 - 12, d0 - 1))}
-              d={30}
-              opacity={ease(f, d0 - 12, d0 - 7) * (1 - ease(f, d0 + 6, d0 + 14))}
-              scale={(1 - 0.08 * sp(f, d0, 'press')) * lerp(1, 1.15, ease(f, d0 + 6, d0 + 14))}
-              ripple={f >= d0 && f <= d0 + 16 ? (f - d0) / 16 : -1}
-            />
-          );
-        })}
       </AbsoluteFill>
       <Caption lines={['One task,', 'always in view.']} f={f} start={LIVE_CUT + 34} out={GO + 4} x={W / 2 - (PS.W * CAM_L.s) / 2 - 70} align="right" mul={capMul} />
       <Caption lines={['Right on your', 'Lock Screen.']} f={f} start={ARRIVE + 22} out={UNLOCK + 4} x={W / 2 + (PS.W * CAM_R.s) / 2 + 70} align="left" />
