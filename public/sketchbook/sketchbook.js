@@ -34,11 +34,12 @@ range.max = drawings.length - 1
 // Runs again once the file has loaded (naturalWidth is 0 before that).
 const glassRim = () => Math.min(20, Math.max(0, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--glass-rim')) || 0)) / 100
 const fitters = []
-function fitSheet(image, art, bands) {
+const BACK_RIM = 2.6 // sheets still waiting in the stack get a wider frame than the revealed one
+function fitSheet(image, art, bands, isCurrent) {
   const apply = () => {
     const nw = image.naturalWidth, nh = image.naturalHeight
     if (!nw || !nh) return
-    const ratio = nw / nh, rim = glassRim(), s = 1 - 2 * rim
+    const ratio = nw / nh, rim = glassRim() * (isCurrent() ? 1 : BACK_RIM), s = 1 - 2 * rim
     const w = (ratio < 1 ? ratio : 1) * s, h = (ratio < 1 ? 1 : 1 / ratio) * s
     const L = (1 - w) * 50, T = (1 - h) * 50
     // inset FIRST: the shorthand would otherwise reset left/top to auto.
@@ -63,7 +64,7 @@ const sheets = Array.from({ length: drawings.length }, (_, slot) => {
   const image = new Image()
   image.src = drawings[drawingIndex].src
   image.alt = ''; image.draggable = false
-  fitSheet(image, art, bands)
+  fitSheet(image, art, bands, () => sheet.classList.contains('is-current'))
   art.append(image); sheet.append(...bands, art); stack.append(sheet)
   return { sheet, drawingIndex }
 })
@@ -124,6 +125,7 @@ function render(animate = true) {
       sheet.animate([{ opacity: presented }, { opacity }], { duration: 230, easing: 'ease-in-out' })
     }
   }
+  fitters.forEach(fn => fn()) // the revealed sheet drops to the slim frame at once, the others keep the wide one
   syncFrontGlass()
   range.value = index
   document.querySelector('.timeline-art').style.setProperty('--progress', `${index / Math.max(1, drawings.length - 1) * 100}%`)
