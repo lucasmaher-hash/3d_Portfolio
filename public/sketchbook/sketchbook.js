@@ -146,7 +146,7 @@ function fitPreviewImage(image, nw, nh) {
   image.style.width = `${nw * fit}px`; image.style.height = `${nh * fit}px`
   return fit
 }
-function stepPreview(direction) {
+function stepPreview(direction, slide = false, onSwapped = null) {
   if (!preview || !previewControls) return
   const next = index + direction
   if (next < 0 || next > drawings.length - 1) return
@@ -160,7 +160,12 @@ function stepPreview(direction) {
   image.src = drawing.src; image.alt = drawing.title[language]
   preview.setAttribute('aria-label', drawing.title[language])
   if (sheetImage?.naturalWidth) fitPreviewImage(image, sheetImage.naturalWidth, sheetImage.naturalHeight)
-  if (!reduceMotion.matches) image.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' })
+  if (slide) {
+    // Swipe: the neighbour already slid into the middle; hand over to the real image once it has decoded.
+    image.style.transform = ''
+    const done = () => onSwapped?.()
+    image.decode ? image.decode().then(done, done) : done()
+  } else if (!reduceMotion.matches) image.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' })
   placeChevrons()
 }
 
@@ -241,6 +246,80 @@ function openPreview() {
   // A fresh press on the overlay is an intentional close, even immediately
   // after the long press. The release that opened it must not close it again.
   overlay.addEventListener('pointerdown', () => { suppressClickUntil = 0 })
+  // Phones: drag the picture sideways like a photo gallery. It follows the finger; past a quarter of the width (or a flick) it
+  // slides out and the next one slides in; short of that it springs back. At either end it only gives a little, then returns.
+  let startX = 0, startY = 0, axis = null, dragging = false, lastX = 0, lastT = 0, vx = 0, busy = false
+  let ghost = null, ghostDir = 0, travel = 0
+  const GAP = 24
+  const removeGhost = () => { ghost?.remove(); ghost = null; ghostDir = 0 }
+  // The neighbour is laid out beside the picture while dragging, so the gallery reads as a strip of pictures.
+  const makeGhost = dir => {
+    const n = index + dir
+    if (n < 0 || n > drawings.length - 1) return
+    const src = sheets.find(item => item.drawingIndex === n)?.sheet.querySelector('img')
+    if (!src?.naturalWidth) return
+    ghost = new Image(); ghost.src = drawings[n].src; ghost.alt = ''
+    const fit = Math.min(Math.min(innerWidth * .9, 1100) / src.naturalWidth, innerHeight * .88 / src.naturalHeight)
+    const gw = src.naturalWidth * fit, gh = src.naturalHeight * fit
+    Object.assign(ghost.style, { position: 'absolute', left: '50%', top: '50%', width: `${gw}px`, height: `${gh}px`, marginLeft: `${-gw / 2}px`, marginTop: `${-gh / 2}px`, pointerEvents: 'none' })
+    ghostDir = dir
+    travel = image.getBoundingClientRect().width / 2 + GAP + gw / 2
+    overlay.append(ghost)
+  }
+  const place = dx => {
+    const edge = (dx < 0 && index >= drawings.length - 1) || (dx > 0 && index <= 0)
+    image.style.transform = `translateX(${edge ? dx * .3 : dx}px)`
+    if (ghost) ghost.style.transform = `translateX(${dx + ghostDir * travel}px)`
+  }
+  overlay.addEventListener('touchstart', event => {
+    dragging = event.touches.length === 1 && !busy && image.style.visibility !== 'hidden'
+    axis = null; vx = 0
+    if (dragging) { startX = lastX = event.touches[0].clientX; startY = event.touches[0].clientY; lastT = event.timeStamp }
+  }, { passive: true })
+  overlay.addEventListener('touchmove', event => {
+    if (!dragging || event.touches.length !== 1) return
+    const x = event.touches[0].clientX, dx = x - startX, dy = event.touches[0].clientY - startY
+    if (!axis && Math.hypot(dx, dy) > 10) axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
+    if (axis !== 'x') return
+    event.preventDefault()
+    const dt = event.timeStamp - lastT
+    if (dt > 0) vx = (x - lastX) / dt
+    lastX = x; lastT = event.timeStamp
+    const dir = dx < 0 ? 1 : -1
+    if (ghostDir !== dir) { removeGhost(); makeGhost(dir) }
+    place(dx)
+  }, { passive: false })
+  const endSwipe = event => {
+    if (!dragging) return
+    dragging = false
+    if (axis !== 'x') return
+    suppressClickUntil = performance.now() + 450
+    const dx = (event.changedTouches?.[0]?.clientX ?? lastX) - startX
+    const direction = dx < 0 ? 1 : -1
+    const far = Math.abs(dx) >= Math.max(40, innerWidth * .25), flick = Math.abs(vx) >= .5 && Math.sign(vx) === Math.sign(dx)
+    const next = index + direction
+    const ease = 'cubic-bezier(.22, .61, .36, 1)'
+    if (!dx || (!far && !flick) || next < 0 || next > drawings.length - 1) {
+      const from = image.style.transform || 'none', gFrom = ghost?.style.transform
+      image.animate([{ transform: from }, { transform: 'none' }], { duration: 260, easing: ease }); image.style.transform = ''
+      if (ghost) { const g = ghost; g.animate([{ transform: gFrom }, { transform: `translateX(${ghostDir * travel}px)` }], { duration: 260, easing: ease }).onfinish = () => g.remove(); ghost = null; ghostDir = 0 }
+      return
+    }
+    busy = true
+    const run = reduceMotion.matches ? 0 : 300
+    const from = image.style.transform, gFrom = ghost?.style.transform
+    if (run) {
+      image.animate([{ transform: from }, { transform: `translateX(${-direction * travel}px)` }], { duration: run, easing: ease, fill: 'forwards' })
+      ghost?.animate([{ transform: gFrom }, { transform: 'translateX(0)' }], { duration: run, easing: ease, fill: 'forwards' })
+    }
+    setTimeout(() => {
+      // Swap under the ghost (it sits exactly where the new picture will be), then drop the ghost once the real one has decoded.
+      image.getAnimations().forEach(animation => animation.cancel())
+      stepPreview(direction, true, () => { removeGhost(); busy = false })
+    }, run)
+  }
+  overlay.addEventListener('touchend', endSwipe, { passive: true })
+  overlay.addEventListener('touchcancel', endSwipe, { passive: true })
   overlay.addEventListener('click', event => {
     event.stopPropagation()
     if (performance.now() >= suppressClickUntil) closePreview()
