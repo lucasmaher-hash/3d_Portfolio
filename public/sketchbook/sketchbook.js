@@ -423,10 +423,14 @@ function startLift(overlay, image, current, nw, nh, fit) {
   const k = fit / shown
   const dx = innerWidth / 2 - (box.left + box.width / 2)
   const dy = innerHeight / 2 - (box.top + box.height / 2)
-  const end = matrix.inverse().multiply(new DOMMatrix().translate(dx, dy).scale(k))
+  // The clone is laid out at its FINAL size and flies in shrunk (scale 1/k -> 1), never grown: a layer scaled up
+  // is rasterised small and re-rasterised sharp when the animation stops - a hitch at the very end, and the
+  // bigger the screen the bigger the hitch. Shrunk from the start, it is crisp throughout and nothing re-rasters.
+  Object.assign(clone.style, { inset: 'auto', width: `${side * k}px`, height: `${side * k}px`, left: `${side * (1 - k) / 2}px`, top: `${side * (1 - k) / 2}px`, willChange: 'transform' })
+  const end = matrix.inverse().multiply(new DOMMatrix().translate(dx, dy))
   const timing = { duration: 1050, easing: 'cubic-bezier(.5, 0, .15, 1)', fill: 'forwards' }
   const sheetMove = clone.animate([
-    { transform: `translate3d(0, 0, ${z0}px)` },
+    { transform: `translate3d(0, 0, ${z0}px) scale(${1 / k})` },
     { transform: end.toString() },
   ], timing)
   // Dissolve the glass border during the second half of the flight.
@@ -559,7 +563,7 @@ document.addEventListener('click', event => {
     event.preventDefault(); event.stopImmediatePropagation(); suppressClickUntil = 0
   }
 }, true)
-stackButton.addEventListener('click', () => select(index === drawings.length - 1 ? 0 : index + 1))
+stackButton.addEventListener('click', advance)
 document.addEventListener('click', event => {
   if (preview) return
   if (!matchMedia('(pointer: coarse)').matches) return
@@ -568,7 +572,7 @@ document.addEventListener('click', event => {
   // The intro deliberately lets pointer events through, so check its bounds too.
   const intro = document.querySelector('.intro').getBoundingClientRect()
   if (event.clientX >= intro.left && event.clientX <= intro.right && event.clientY >= intro.top && event.clientY <= intro.bottom) return
-  select(index === drawings.length - 1 ? 0 : index + 1)
+  advance()
 })
 range.addEventListener('input', () => select(Number(range.value), false))
 // Group a trackpad gesture into deliberate pages, rather than racing to the end
