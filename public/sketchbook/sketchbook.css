@@ -28,8 +28,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 .back-arrow { position: absolute; left: 0; top: 0; width: 58px; height: 21px; background: currentColor; -webkit-mask: url(/sketchbook/hand/hand-arrow.svg) no-repeat 0 0 / 100% 100%; mask: url(/sketchbook/hand/hand-arrow.svg) no-repeat 0 0 / 100% 100%; clip-path: inset(0 54% 0 0); transition: transform 420ms cubic-bezier(.4, 0, .2, 1), clip-path 420ms cubic-bezier(.4, 0, .2, 1); }
 .back:hover .back-arrow, .back:focus-visible .back-arrow, body:has(.back-hit:hover) .back-arrow { transform: translateX(-31px); clip-path: inset(0 0 0 0); }
 .hand { display: inline-block; vertical-align: middle; background: currentColor; -webkit-mask: var(--hand) no-repeat 0 0 / 100% 100%; mask: var(--hand) no-repeat 0 0 / 100% 100%; }
-.hand-select { --hand: url(/sketchbook/hand/hand-select.svg); width: calc(var(--k) * 1214px); height: calc(var(--k) * 114px); }
-.hand-hint { --hand: url(/sketchbook/hand/hand-hint.svg); width: calc(var(--k) * 1045px); height: calc(var(--k) * 280px); margin: 8px 0 0 16px; }
+.hand-select { --hand: url(/sketchbook/hand/hand-select.svg?v=2); width: calc(var(--k) * 1215px); height: calc(var(--k) * 112px); }
+.hand-hint { --hand: url(/sketchbook/hand/hand-hint.svg?v=2); width: calc(var(--k) * 1046px); height: calc(var(--k) * 279px); margin: 8px 0 0 16px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .intro p { font: 400 clamp(22px, 1.8vw, 27px)/1.7 'Sketch Hand', Caveat, cursive; display: inline; margin: 0; }
 .intro .hint { font-size: inherit; line-height: inherit; opacity: 1; }
