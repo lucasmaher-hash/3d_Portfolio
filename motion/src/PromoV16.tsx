@@ -1198,7 +1198,7 @@ const CAM_KEYS: Array<[number, Cam]> = [
   [ARRIVE + 28, CAM_R],
   [UNLOCK + 22, CAM_R],
   [ISL_IN + 44, CAM_I], // the push ends where it did; the extra second is held, not stretched
-  [TICK + 50, {...CAM_I, s: CAM_I.s * 1.14}], // then keeps creeping in while the island is open and ticked (Lucas)
+  [TICK + 54, {s: CAM_I.s * 1.2, fx: PR_CX, fy: PTOP + PS.y + (ISL.top + ISL.expanded.h / 2) * PS.z}], // keeps pushing in, island centred, never settling (Lucas)
 ];
 const camAt = (f: number): Cam => {
   if (f <= CAM_KEYS[0][0]) return CAM_KEYS[0][1];
@@ -1206,7 +1206,7 @@ const camAt = (f: number): Cam => {
     const [a, ca] = CAM_KEYS[i];
     const [b, cb] = CAM_KEYS[i + 1];
     if (f <= b) {
-      const t = ease(f, a, b, Easing.inOut(Easing.cubic));
+      const t = ease(f, a, b, i === CAM_KEYS.length - 2 ? Easing.linear : Easing.inOut(Easing.cubic));
       return {s: lerp(ca.s, cb.s, t), fx: lerp(ca.fx, cb.fx, t), fy: lerp(ca.fy, cb.fy, t)};
     }
   }
@@ -1342,7 +1342,7 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
       </AbsoluteFill>
       <Caption lines={['One task,', 'always in view.']} f={f} start={LIVE_CUT + 34} out={GO + 4} x={W / 2 - (PS.W * CAM_L.s) / 2 - 70} align="right" mul={capMul} />
       <Caption lines={['Right on your', 'Lock Screen.']} f={f} start={ARRIVE + 22} out={UNLOCK + 4} x={W / 2 + (PS.W * CAM_R.s) / 2 + 70} align="left" />
-      <Caption lines={['And in the', 'Dynamic Island.']} f={f} start={ISL_IN + 14} x={W / 2 + (PS.w * CAM_I.s * 1.14) / 2 + 70} align="left" />
+      <Caption lines={['And in the', 'Dynamic Island.']} f={f} start={ISL_IN + 14} x={W / 2 + (PS.w * CAM_I.s * 1.2) / 2 + 70} align="left" />
     </Canvas>
   );
 };
