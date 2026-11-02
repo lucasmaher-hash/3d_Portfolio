@@ -917,7 +917,8 @@ const springAt = (f: number, start: number, config: {mass: number; stiffness: nu
 const ISL_X = {textLeft: 23.2, baseline: 60.6, text: 15, check: [337.6, 52.8] as P, checkD: 24.8};
 const ISL_CHECK: P = [ISL.cx - ISL.expanded.w / 2 + ISL_X.check[0], ISL.expanded.top + ISL_X.check[1]]; // screen pt
 const ISL_FOCUS_Y = ISL.expanded.top + ISL.expanded.h / 2; // the ending's camera centres this
-const ISL_DONE = TICK + 22; // ticked off — the activity ends, the island shuts
+const END_HOLD = 24; // the crossed-out island stays open this much longer (Lucas)
+const ISL_DONE = TICK + 22 + END_HOLD; // ticked off — the activity ends, the island shuts
 const ISL_SLATE = '#3D5267';
 
 const Island16: React.FC<{f: number}> = ({f}) => {
@@ -1011,7 +1012,7 @@ const Island16: React.FC<{f: number}> = ({f}) => {
                 backgroundImage: 'linear-gradient(#8E8E93, #8E8E93)',
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'left 62%',
-                backgroundSize: `${strike * 100}% 1.3px`,
+                backgroundSize: `${strike * 100}% 1.95px`,
               }}
             >
               {TASK}
@@ -1240,7 +1241,7 @@ const camAt = (f: number): Cam => {
    going at an even pace on a log scale right into the black — it never settles
    (Lucas). The island glides to the frame's centre over the first half while
    the zoom carries on round it. */
-const PUSH: [number, number] = [UNLOCK + 20, TICK + 57];
+const PUSH: [number, number] = [UNLOCK + 20, TICK + 57 + END_HOLD];
 const PUSH_S = 3.0; // as far in as the expanded island still fits the 1080 frame
 const PUSH_RAMP = 0.32; // share of the push spent getting up to speed
 const pushEase = (u: number) => {
@@ -1400,7 +1401,7 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
 };
 
 /* ─── Back to the start: light floods out of the tick into frame 0 ──── */
-const FLOOD = {start: TICK + 28, end: TICK + 56};
+const FLOOD = {start: TICK + 28 + END_HOLD, end: TICK + 56 + END_HOLD};
 const FLOOD_R = 2300;
 const checkScreen = toScreen(toGlobal(PR_CX, ISL_CHECK[0], ISL_CHECK[1]), camAt(FLOOD.start));
 
@@ -1494,7 +1495,7 @@ const PromoE: React.FC<{variant: Variant; f0: number; ins?: boolean}> = ({varian
           filmOff={ins ? LIVE_OFFSET : E.cut + E.hold - E.clock0}
         />
       ) : null}
-      <AbsoluteFill style={{background: '#000', opacity: ease(f, TICK + 30, TICK + 54, Easing.inOut(Easing.quad)), top: -extTop, height: H + extTop}} />
+      <AbsoluteFill style={{background: '#000', opacity: ease(f, TICK + 30 + END_HOLD, TICK + 54 + END_HOLD, Easing.inOut(Easing.quad)), top: -extTop, height: H + extTop}} />
     </AbsoluteFill>
   );
 };
