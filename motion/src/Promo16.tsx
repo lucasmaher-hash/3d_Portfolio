@@ -261,7 +261,6 @@ const TYPE = {start: 8, gaps: [4, 3, 3, 4, 3, 3, 3, 4, 3]};
 const BUILD = {check: 60, slat: 62, grip: 68, well: [62, 96] as [number, number]};
 const ZOOM_OUT: [number, number] = [96, 142]; // cues for what appears during the pull-back
 const CAM_MOVE: [number, number] = [66, 142]; // the pull-back itself, one continuous move
-const LOGO_MOVE: [number, number] = [70, 132]; // the typed name gliding into the Tomorrow header, inside the pull-back
 /* The variable SF Pro (installed system font): weight and optical size interpolate. */
 const sfv = (pt: number, z: number, weight: number, trackEm: number): React.CSSProperties => ({
   fontFamily: '"SF Pro", -apple-system, sans-serif',
@@ -487,7 +486,8 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
   // ONE move, not a pan and then a zoom (Lucas): from the typed name straight
   // out to the wide shot, zoom on a log scale so it feels even throughout
   const out = ease(f, CAM_MOVE[0], CAM_MOVE[1], Easing.bezier(0.45, 0, 0.2, 1));
-  const textCX = wellX(1) + (ROW_X + ROW.touch + ROW.gap + 47.6) * z; // centre of the typed name (22pt semibold, ~95pt wide)
+  const textCX = wellX(1) + (22 + 47.6) * z; // centre of the typed name: the Tomorrow header (22pt semibold, ~95pt wide)
+  const textCY = G.top + (20 + (22 * 1.15) / 2) * z;
   // D: back in, onto Today's "add" row, where "go live" will be typed
   const goLive = tr === 'golive' || tr === 'golive2';
   const inT = goLive ? ease(f, GOLIVE.zoom[0], GOLIVE.zoom[1], Easing.bezier(0.6, 0, 0.25, 1)) : 0;
@@ -498,7 +498,7 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
   const addY = slotCY(G, 1); // Today: Plan trip to Asia, then add
   const s = lerp(Math.exp(lerp(Math.log(OPEN), 0, out)), CLOSE, inT) * push;
   const fx = lerp(lerp(textCX, W / 2, out), addX + 26 * z, inT);
-  const fy = lerp(lerp(slotCY(G, 0), G.camY, out), addY, inT);
+  const fy = lerp(lerp(textCY, G.camY, out), addY, inT);
   const camT = `translate(${W / 2 - fx * s}px, ${H / 2 - fy * s}px) scale(${s})`;
   const gl = goLiveText(tr).slice(0, typedCount(f, GOLIVE.start, GOLIVE.gaps));
   const glCaret = f >= GOLIVE.tap + 2 && f < GOLIVE.fade[0] && (f < GOLIVE.start + 26 || Math.floor(f / 15) % 2 === 0);
@@ -607,35 +607,22 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
           );
         })}
 
-        {/* "to.morrow" is typed where a task title sits — no checkbox (Lucas) — and
-            then, in the same move as the pull-back, glides up into the Tomorrow
-            well's header. It is set in the header's own type from the first letter
-            (Lucas), so the glide only moves it: nothing about the letters changes.
-            The dot stays. */}
-        {(() => {
-          const u = ease(f, LOGO_MOVE[0], LOGO_MOVE[1], Easing.bezier(0.45, 0, 0.2, 1));
-          const rowLeft = wellCX(1) - (ROW_W * z) / 2;
-          const x0 = rowLeft + (ROW.touch + ROW.gap) * z;
-          const y0 = slotCY(G, 0);
-          const x1 = wellX(1) + 22 * z;
-          const y1 = G.top + (20 + (22 * 1.15) / 2) * z;
-          return (
-            <div
-              style={{
-                position: 'absolute',
-                left: lerp(x0, x1, u),
-                top: lerp(y0, y1, u),
-                transform: 'translateY(-50%)',
-                ...sfv(22, z, 600, 0.012),
-                lineHeight: 1.15,
-                whiteSpace: 'nowrap',
-                color: p.ink,
-              }}
-            >
-              {typed}
-            </div>
-          );
-        })()}
+        {/* "to.morrow" is typed right where the Tomorrow well's header sits, in the
+            header's own type (Lucas): it never moves — the camera pulls back and
+            the well is cut in round it. It rides the well's own build scale so the
+            two stay locked together. */}
+        <div
+          style={{
+            position: 'absolute',
+            left: wellX(1),
+            top: G.top,
+            width: WELL_W * z,
+            height: G.h * z,
+            transform: `scale(${0.97 + 0.03 * wellDepth(1, f)})`,
+          }}
+        >
+          <div style={{position: 'absolute', left: 22 * z, top: 20 * z, ...sfv(22, z, 600, 0.012), color: p.ink, lineHeight: 1.15, whiteSpace: 'nowrap'}}>{typed}</div>
+        </div>
 
         {/* the finger on each flick */}
         {MOVES.map((m, i) => {
@@ -947,12 +934,12 @@ const Island16: React.FC<{f: number}> = ({f}) => {
       <div
         style={{
           position: 'absolute',
-          left: w / 2 - bw / 2,
+          left: 0,
           top: 0,
           width: bw,
           height: bh,
           opacity: op,
-          transform: `scale(${w / bw})`,
+          transform: `translate(${ISL.cx - bw / 2}px, ${top}px) scale(${w / bw})`,
           transformOrigin: '50% 0',
           filter: op < 0.999 ? `blur(${(1 - op) * 5}px)` : undefined,
         }}
@@ -964,17 +951,20 @@ const Island16: React.FC<{f: number}> = ({f}) => {
   const ringLine = 3.65;
   return (
     <div
+      /* A full-screen layer cut to the island's shape by clip-path, every animated
+         value fractional: sized with left/top/width/height the island snapped to
+         whole layout px BEFORE the camera's ~3x zoom, so it jittered against the
+         frame by a few screen px as its spring settled (Lucas). */
       style={{
         position: 'absolute',
-        left: ISL.cx - w / 2,
-        top,
-        width: w,
-        height: h,
-        borderRadius: r,
+        left: 0,
+        top: 0,
+        width: SCREEN_W,
+        height: SCREEN_H,
         background: '#000',
-        overflow: 'hidden',
+        clipPath: `inset(${top}px ${SCREEN_W - ISL.cx - w / 2}px ${SCREEN_H - top - h}px ${ISL.cx - w / 2}px round ${r}px)`,
         transform: `scale(${press})`,
-        transformOrigin: '50% 0%',
+        transformOrigin: `${ISL.cx}px ${top}px`,
       }}
     >
       {box(C.w, C.h, cOp,
