@@ -20,7 +20,7 @@
    frames the island in the upper third. */
 import React from 'react';
 import {AbsoluteFill, Easing, Img, interpolate, spring, staticFile, useCurrentFrame} from 'remotion';
-import {blueHex, BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, LiveGlyph, mix, Pal, Pixel, ROW, Trough, sf} from './ui';
+import {blueHex, BOX_LEFT, BOX_NUDGE, CHECK_RING, DARK, Finger, Glass, GLYPH, LIGHT, LiveGlyph, mix, Pal, Pixel, ROW, Trough, sf} from './ui';
 import {AddRow, KNOB, LiveBox, LiveControls, LockCard, TabBar, TaskRow, TopBar} from './app';
 import {createHeroTiming} from './heroTiming';
 
@@ -317,27 +317,22 @@ const moving = (m: Move, g: number, G: Geo): St => {
 /* Tomorrow starts as one list: to.morrow, Plan trip to Asia, Pay semester
    fee, Call grandma, add. */
 const TASKS: Task[] = [
-  {title: 'Call grandma', moves: [], at: (g, G) => still(wellCX(1), slotCY(G, 3 - close(g, M1) - close(g, M2)), rowIn(2, g))},
-  {title: 'Pay semester fee', moves: [], at: (g, G) => still(wellCX(1), slotCY(G, 2 - close(g, M1) - close(g, M2)), rowIn(1, g))},
+  {title: 'Call grandma', moves: [], at: (g, G) => still(wellCX(1), slotCY(G, 2 - close(g, M1) - close(g, M2)), rowIn(2, g))},
   {
-    title: 'Plan trip to Asia',
+    title: 'Pay semester fee',
     moves: [M2],
-    at: (g, G) => (g < M2.dragStart ? still(wellCX(1), slotCY(G, 1 - close(g, M1)), rowIn(0, g)) : moving(M2, g, G)),
+    at: (g, G) => (g < M2.dragStart ? still(wellCX(1), slotCY(G, 1 - close(g, M1)), rowIn(1, g)) : moving(M2, g, G)),
   },
   {
-    title: 'to.morrow',
+    title: 'Plan trip to Asia',
     moves: [M1],
-    at: (g, G) => {
-      const lift = liftOf(M1, g);
-      // no slat at rest — like every other row it only darkens once it is held (Lucas)
-      return {x: moveX(M1, g), y: slotCY(G, 0), lift, slat: slatOf(M1, g), content: 1, opacity: 1, scale: 1 + 0.03 * lift};
-    },
+    at: (g, G) => (g < M1.dragStart ? still(wellCX(1), slotCY(G, 0), rowIn(0, g)) : moving(M1, g, G)),
   },
 ];
 
 /* "add" closes every list, and moves as the list grows or shrinks. */
 const addSlot = (well: number, g: number) =>
-  well === M1.well ? pushed(g, M1) : well === 1 ? 4 - close(g, M1) - close(g, M2) : pushed(g, M2);
+  well === M1.well ? pushed(g, M1) : well === 1 ? 3 - close(g, M1) - close(g, M2) : pushed(g, M2);
 
 /* when each well is cut into the page */
 const wellDepth = (well: number, g: number) =>
@@ -542,7 +537,7 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
                 transform: `scale(${(0.97 + 0.03 * depth) * catchSwell})`,
               }}
             >
-              {G.titles ? <div style={{position: 'absolute', left: 22 * z, top: 20 * z, opacity: labelIn, ...sf(22, z, 600), color: p.ink, lineHeight: 1.15}}>{wl}</div> : null}
+              {G.titles && i !== 1 ? <div style={{position: 'absolute', left: 22 * z, top: 20 * z, opacity: labelIn, ...sf(22, z, 600), color: p.ink, lineHeight: 1.15}}>{wl}</div> : null}
             </Trough>
           );
         })}
@@ -582,8 +577,8 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
 
         {order.map((t) => {
           const st = t.at(f, G);
-          const isLogo = t.title === 'to.morrow';
-          const building = isLogo && f < BUILD.grip + 12;
+          const isLogo = false;
+          const building = false;
           return (
             <div
               key={t.title}
@@ -616,6 +611,42 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
             </div>
           );
         })}
+
+        {/* "to.morrow" is typed in a row, the checkbox draws round, then the ring falls away
+            and the name glides up to become the Tomorrow well's header (the dot stays) */}
+        {(() => {
+          const TS = 78;
+          const u = ease(f, TS, 126, Easing.bezier(0.45, 0, 0.2, 1));
+          const ringGone = ease(f, TS, TS + 14, Easing.inOut(Easing.cubic));
+          const rowLeft = wellCX(1) - (ROW_W * z) / 2;
+          const x0 = rowLeft + (ROW.touch + ROW.gap) * z;
+          const y0 = slotCY(G, 0);
+          const x1 = wellX(1) + 22 * z;
+          const y1 = G.top + (20 + (22 * 1.15) / 2) * z;
+          return (
+            <>
+              {ringGone < 1 ? (
+                <div style={{position: 'absolute', left: rowLeft, top: y0 - (ROW.h * z) / 2, opacity: 1 - ringGone, transform: `scale(${1 - 0.25 * ringGone})`, transformOrigin: `${(BOX_LEFT + ROW.check / 2) * z}px 50%`}}>
+                  <TaskRow title="" w={ROW_W} z={z} p={p} slat={0} grip={0} titleOpacity={0} check={1} checkDraw={ease(f, BUILD.check, BUILD.check + 20, Easing.inOut(Easing.cubic))} />
+                </div>
+              ) : null}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: lerp(x0, x1, u),
+                  top: lerp(y0, y1, u),
+                  transform: 'translateY(-50%)',
+                  ...sf(lerp(ROW.label, 22, u), z, u > 0.5 ? 600 : 400, -0.02),
+                  lineHeight: 1.19,
+                  whiteSpace: 'nowrap',
+                  color: p.ink,
+                }}
+              >
+                {typed}
+              </div>
+            </>
+          );
+        })()}
 
         {/* the finger on each flick */}
         {MOVES.map((m, i) => {
