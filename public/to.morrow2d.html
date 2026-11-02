@@ -4563,8 +4563,10 @@ description: Use when designing or extending any screen
     }
     var lo = 0, hi = pw * 3;
     for (var i = 0; i < 30; i++) { var mid = (lo + hi) / 2; if (sdf(ux * mid, uy * mid) < R + G) lo = mid; else hi = mid; }
-    st.setProperty('--bx', (ux * hi).toFixed(2) + 'px');
-    st.setProperty('--by', (uy * hi).toFixed(2) + 'px');
+    // Landscape: the button slides to just below the screen, right corner, instead of beside it (the text column stays clear).
+    var lx = hh - R, ly = hw + G + R;
+    st.setProperty('--bx', (ux * hi + (lx - ux * hi) * bp).toFixed(2) + 'px');
+    st.setProperty('--by', (uy * hi + (ly - uy * hi) * bp).toFixed(2) + 'px');
     media();
   }
   function play(v) { var q = v.play(); if (q && q.catch) q.catch(function () {}); }
