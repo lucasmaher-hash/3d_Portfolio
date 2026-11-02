@@ -776,7 +776,7 @@
     @media (max-width: 860px) { .land-row { grid-template-columns: minmax(0, 1fr); } }
     /* Scroll-driven stage: the portrait phone fades to a blank screen, turns, and the landscape screen fades in on the SAME frame. */
     .rot-scrolly { height: 400vh; margin-top: var(--block-gap); }
-    .rot-sticky { position: sticky; top: 0; height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(24px, 4vw, 64px); }
+    .rot-sticky { position: sticky; top: 0; height: 100vh; display: grid; --pw: clamp(126px, 20.33vw, 232px); grid-template-columns: calc(var(--pw) * 2.064 + 110px) minmax(0, 1fr); align-items: center; gap: clamp(24px, 4vw, 64px); } /* phone column holds the turned phone plus the button, so the text never runs under either */
     .rot-phonecol { display: flex; align-items: center; justify-content: center; }
     .rot-phonecol { position: relative; --pw: clamp(126px, 20.33vw, 232px); }
     .rot-btn { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
