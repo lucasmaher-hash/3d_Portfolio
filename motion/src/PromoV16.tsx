@@ -995,9 +995,8 @@ const Island16: React.FC<{f: number}> = ({f}) => {
         {xOp > 0.001 ? (
           <div style={{position: 'absolute', inset: 0, opacity: xOp, filter: blurX > 0.05 ? `blur(${blurX}px)` : undefined, transform: `scale(${0.96 + 0.04 * xOp})`, transformOrigin: `${ISL.cx}px ${ISL.top}px`}}>
             <div style={{position: 'absolute', left: 36, top: ISL_CHECK[1], transform: 'translateY(-50%)', ...sf(17, 1, 500), color: mix(ink, DARK.inkMuted, done), lineHeight: 1.2, whiteSpace: 'nowrap'}}>
-              <span style={{position: 'relative'}}>
+              <span style={{padding: '0 2px', margin: '0 -2px', backgroundImage: `linear-gradient(${DARK.inkMuted}, ${DARK.inkMuted})`, backgroundRepeat: 'no-repeat', backgroundPosition: 'left 55%', backgroundSize: `${strike * 100}% 1.4px`}}>
                 {TASK}
-                <span style={{position: 'absolute', left: -2, top: '55%', height: 1.4, width: `calc(${strike * 100}% + 4px)`, background: DARK.inkMuted, opacity: strike > 0 ? 1 : 0}} />
               </span>
             </div>
             <div
