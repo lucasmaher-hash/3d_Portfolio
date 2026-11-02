@@ -37,5 +37,7 @@ export const createHeroTiming = (sourceDuration: number, holds: Array<[number, n
     }
     return (low + high) / 2;
   };
-  return {durationInFrames, frameAt};
+  // source frame → output time, in source-frame units at the active speed (for moves that must run evenly in OUTPUT time)
+  const outAt = (source: number) => outputAt(source) * activeSpeed;
+  return {durationInFrames, frameAt, outAt};
 };

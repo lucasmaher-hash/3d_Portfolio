@@ -54,6 +54,9 @@ const H = 1350;
    background (Canvas, the dark overlays, the root fill) reaches up by `ext`,
    and the camera views see that much more above. 0 = the normal 16:9 film. */
 const ExtTop = React.createContext(0);
+/* Film frame → output time (identity, or the hero's time warp): moves that must run
+   evenly on screen are timed on this rather than on the film's own frame. */
+const OutClock = React.createContext<(f: number) => number>((f) => f);
 /* 240 covers the phone layout (Lucas, 2026-10-04: no gap under the nav there
    either); desktop shows only the bottom 196 of it — see .hero-promo. */
 
@@ -271,6 +274,16 @@ const TYPE = {start: 8, gaps: [4, 3, 3, 4, 3, 3, 3, 4, 3]};
 const BUILD = {check: 60, slat: 62, grip: 68, well: [62, 96] as [number, number]};
 const ZOOM_OUT: [number, number] = [96, 142]; // cues for what appears during the pull-back
 const CAM_MOVE: [number, number] = [66, 142]; // the pull-back itself, one continuous move
+const LOGO_MOVE: [number, number] = [70, 132]; // the typed name gliding into the Tomorrow header, inside the pull-back
+/* The variable SF Pro (installed system font): weight and optical size interpolate. */
+const sfv = (pt: number, z: number, weight: number, trackEm: number): React.CSSProperties => ({
+  fontFamily: '"SF Pro", -apple-system, sans-serif',
+  fontSize: pt * z,
+  fontWeight: weight,
+  fontVariationSettings: `'wght' ${weight}`,
+  fontOpticalSizing: 'auto',
+  letterSpacing: `${trackEm}em`,
+});
 /* the rest of Tomorrow's list rises in, one under the other, as the camera pulls back */
 const rowIn = (i: number, g: number) => sp(g, ZOOM_OUT[0] + 4 + i * 5, 'present');
 
@@ -487,7 +500,7 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
   // ONE move, not a pan and then a zoom (Lucas): from the typed name straight
   // out to the wide shot, zoom on a log scale so it feels even throughout
   const out = ease(f, CAM_MOVE[0], CAM_MOVE[1], Easing.bezier(0.45, 0, 0.2, 1));
-  const textCX = wellX(1) + (ROW_X + ROW.touch + ROW.gap + 33) * z; // centre of the typed name
+  const textCX = wellX(1) + (ROW_X + ROW.touch + ROW.gap + 47.6) * z; // centre of the typed name (22pt semibold, ~95pt wide)
   // D: back in, onto Today's "add" row, where "go live" will be typed
   const goLive = tr === 'golive' || tr === 'golive2';
   const inT = goLive ? ease(f, GOLIVE.zoom[0], GOLIVE.zoom[1], Easing.bezier(0.6, 0, 0.25, 1)) : 0;
@@ -509,8 +522,12 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
   const active = MOVES.filter((m) => f >= m.appear && f <= m.land + 10).pop();
   const order = [...TASKS].sort((a, b) => Number(active ? a.moves.includes(active) : 0) - Number(active ? b.moves.includes(active) : 0));
 
+  /* Once the page is fully dark, the scene's own ground is that dark, flat: the
+     Go Live pull-back scales this whole scene down, and a light ground's edge
+     showed as a faint frame round the words (Lucas: the zoom-out stutter). */
+  const darkGround = fadeOut >= 1;
   return (
-    <Canvas p={p}>
+    <Canvas p={darkGround ? DARK : p} flat={darkGround}>
       <AbsoluteFill style={{transformOrigin: '0 0', transform: camT}}>
         {WELLS.map((wl, i) => {
           const depth = wellDepth(i, f);
@@ -537,7 +554,7 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
                 transform: `scale(${(0.97 + 0.03 * depth) * catchSwell})`,
               }}
             >
-              {G.titles && i !== 1 ? <div style={{position: 'absolute', left: 22 * z, top: 20 * z, opacity: labelIn, ...sf(22, z, 600), color: p.ink, lineHeight: 1.15}}>{wl}</div> : null}
+              {G.titles && i !== 1 ? <div style={{position: 'absolute', left: 22 * z, top: 20 * z, opacity: labelIn, ...sfv(22, z, 600, 0.012), color: p.ink, lineHeight: 1.15}}>{wl}</div> : null}
             </Trough>
           );
         })}
@@ -577,8 +594,6 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
 
         {order.map((t) => {
           const st = t.at(f, G);
-          const isLogo = false;
-          const building = false;
           return (
             <div
               key={t.title}
@@ -598,53 +613,40 @@ const SwipeScene: React.FC<{f: number; v: Variant; tr?: Transition; ext?: Ext}> 
                 p={p}
                 slat={st.slat}
                 titleOpacity={st.content}
-                check={isLogo ? 1 : st.content}
-                // the first box is DRAWN on, its line running round from the top (Lucas)
-                checkDraw={isLogo ? ease(f, BUILD.check, BUILD.check + 20, Easing.inOut(Easing.cubic)) : undefined}
-                grip={isLogo ? ease(f, BUILD.grip, BUILD.grip + 8) : st.content}
-                titleNode={
-                  building ? (
-                    <span style={{display: 'inline-flex', alignItems: 'center'}}>{typed}</span>
-                  ) : undefined
-                }
+                check={st.content}
+                grip={st.content}
               />
             </div>
           );
         })}
 
-        {/* "to.morrow" is typed in a row, the checkbox draws round, then the ring falls away
-            and the name glides up to become the Tomorrow well's header (the dot stays) */}
+        {/* "to.morrow" is typed where a task title sits — no checkbox (Lucas) — and
+            then, in the same move as the pull-back, glides up into the Tomorrow
+            well's header. It is set in the header's own type from the first letter
+            (Lucas), so the glide only moves it: nothing about the letters changes.
+            The dot stays. */}
         {(() => {
-          const TS = 78;
-          const u = ease(f, TS, 126, Easing.bezier(0.45, 0, 0.2, 1));
-          const ringGone = ease(f, TS, TS + 14, Easing.inOut(Easing.cubic));
+          const u = ease(f, LOGO_MOVE[0], LOGO_MOVE[1], Easing.bezier(0.45, 0, 0.2, 1));
           const rowLeft = wellCX(1) - (ROW_W * z) / 2;
           const x0 = rowLeft + (ROW.touch + ROW.gap) * z;
           const y0 = slotCY(G, 0);
           const x1 = wellX(1) + 22 * z;
           const y1 = G.top + (20 + (22 * 1.15) / 2) * z;
           return (
-            <>
-              {ringGone < 1 ? (
-                <div style={{position: 'absolute', left: rowLeft, top: y0 - (ROW.h * z) / 2, opacity: 1 - ringGone, transform: `scale(${1 - 0.25 * ringGone})`, transformOrigin: `${(BOX_LEFT + ROW.check / 2) * z}px 50%`}}>
-                  <TaskRow title="" w={ROW_W} z={z} p={p} slat={0} grip={0} titleOpacity={0} check={1} checkDraw={ease(f, BUILD.check, BUILD.check + 20, Easing.inOut(Easing.cubic))} />
-                </div>
-              ) : null}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: lerp(x0, x1, u),
-                  top: lerp(y0, y1, u),
-                  transform: 'translateY(-50%)',
-                  ...sf(lerp(ROW.label, 22, u), z, u > 0.5 ? 600 : 400, -0.02),
-                  lineHeight: 1.19,
-                  whiteSpace: 'nowrap',
-                  color: p.ink,
-                }}
-              >
-                {typed}
-              </div>
-            </>
+            <div
+              style={{
+                position: 'absolute',
+                left: lerp(x0, x1, u),
+                top: lerp(y0, y1, u),
+                transform: 'translateY(-50%)',
+                ...sfv(22, z, 600, 0.012),
+                lineHeight: 1.15,
+                whiteSpace: 'nowrap',
+                color: p.ink,
+              }}
+            >
+              {typed}
+            </div>
           );
         })()}
 
@@ -901,63 +903,86 @@ const FingerOnLight: React.FC<{x: number; y: number; d: number; opacity: number;
 );
 
 /* ─── Timing of the ending, shared by the screens and the fingers ─────── */
-const unlockU = (f: number) => ease(f, UNLOCK + 4, UNLOCK + 26, Easing.bezier(0.3, 0, 0.2, 1)); // iOS home swipe: the Lock Screen follows the finger, then carries on up with its momentum
-const homeIn = (f: number) => ease(f, UNLOCK + 8, UNLOCK + 30, Easing.out(Easing.cubic)); // the Home Screen scales down from 1.1 and fades up behind the leaving Lock Screen
+/* iOS home swipe: the finger drags the whole Lock Screen up with it from rest,
+   lets go, and the Lock Screen carries on off the top on its own momentum; the
+   Home Screen settles in underneath from slightly too large and out of a dim. */
+const UNLOCK_SLIDE: [number, number] = [UNLOCK + 2, UNLOCK + 22];
+const unlockU = (f: number) => ease(f, UNLOCK_SLIDE[0], UNLOCK_SLIDE[1], Easing.bezier(0.42, 0, 0.18, 1));
+const homeIn = (f: number) => ease(f, UNLOCK + 5, UNLOCK + 29, Easing.bezier(0.2, 0.7, 0.2, 1));
 
 /* ─── Dynamic Island ──────────────────────────────────────────────────
-   Three footprints, all centred on the frame's own island (x 201pt, top
-   14.75pt) and growing DOWN and out from it: bare (the hardware, 105.5 x
-   35.5), compact Live Activity (190 x 36: the task's Live ring leading, the
-   title's first three letters trailing — Lucas: "only type out first 3
-   letters", clear of the hardware cutout and not flush to the edge) and expanded (374 x 84, radius
-   40: title left, tick button right — his expanded shot). Every change of
-   footprint is a damped spring, the way iOS moves the island: growth on
-   response .45 / damping .75 (a small overshoot that settles), the collapse
-   firmer (.40 / .90, barely past its target). A press squishes it 4% first.
-   Content never scales with the shape: the old content blurs (≤6px) and fades
-   out as the new content blurs and fades in a beat later, and the island
-   clips both — see the research notes in CLAUDE.md. */
-const ISL = {cx: 201, top: 14.75, bare: {w: 105.5, h: 35.5}, compact: {w: 190, h: 36}, expanded: {w: 374, h: 84, r: 40}};
+   Drawn as vectors over the recording (the recording's own island came out
+   soft at the ending's zoom — Lucas), at the recording's measured footprints:
+   bare = the frame's hardware island (105.5 x 35.5 at 14.75pt), compact Live
+   Activity 168 x 39.2, expanded 377 x 86 (radius 43), both from 12.1pt down.
+   Every change of footprint is a damped spring (growth .45 / .75, collapse
+   .40 / .90), a press squishes it 4%. The content of each state is laid out
+   in a box of that state's size and SCALED with the island's width, so it
+   grows and shrinks with the shape instead of standing still while the shape
+   clips it; the crossing-over states blur and fade. The strike-through is
+   painted on the title itself. */
+const ISL = {cx: 201, bare: {w: 105.5, h: 35.5, top: 14.75}, compact: {w: 168, h: 39.2, top: 12.1}, expanded: {w: 377, h: 86, top: 12.1, r: 43}};
 const springOf = (response: number, damping: number) => ({mass: 1, stiffness: Math.pow((2 * Math.PI) / response, 2), damping: (4 * Math.PI * damping) / response});
 const SPR_GROW = springOf(0.45, 0.75);
 const SPR_SHUT = springOf(0.4, 0.9);
 const springAt = (f: number, start: number, config: {mass: number; stiffness: number; damping: number}) => (f < start ? 0 : spring({frame: f - start, fps: FPS, config}));
-const ISL_CHECK: P = [349.7, 65.8]; // the expanded island's tick button, screen pt
+// inside the expanded box (377 x 86): the title, and the tick button's centre
+const ISL_X = {textLeft: 23.2, baseline: 60.6, text: 15, check: [337.6, 52.8] as P, checkD: 24.8};
+const ISL_CHECK: P = [ISL.cx - ISL.expanded.w / 2 + ISL_X.check[0], ISL.expanded.top + ISL_X.check[1]]; // screen pt
+const ISL_FOCUS_Y = ISL.expanded.top + ISL.expanded.h / 2; // the ending's camera centres this
 const ISL_DONE = TICK + 22; // ticked off — the activity ends, the island shuts
+const ISL_SLATE = '#3D5267';
 
 const Island16: React.FC<{f: number}> = ({f}) => {
+  if (f < ISL_IN) return null;
   const cIn = springAt(f, ISL_IN, SPR_GROW);
   const eIn = springAt(f, ISL_EXP, SPR_GROW);
   const shut = springAt(f, ISL_DONE, SPR_SHUT);
-  if (f < ISL_IN) return null;
   const B = ISL.bare;
   const C = ISL.compact;
   const X = ISL.expanded;
-  const w = lerp(lerp(lerp(B.w, C.w, cIn), X.w, eIn), B.w, shut);
-  const h = lerp(lerp(lerp(B.h, C.h, cIn), X.h, eIn), B.h, shut);
+  const pick = (k: 'w' | 'h' | 'top') => lerp(lerp(lerp(B[k], C[k], cIn), X[k], eIn), B[k], shut);
+  const w = pick('w');
+  const h = pick('h');
+  const top = pick('top');
   const r = Math.min(h / 2, lerp(h / 2, X.r, clamp01(eIn) * (1 - clamp01(shut))));
   const press = 1 - 0.04 * (sp(f, ISL_TAP, 'press') - sp(f, ISL_EXP, 'press'));
-  const left = ISL.cx - w / 2;
-  // content: compact fades/blurs out on the press, expanded in a beat after the release
-  const cOp = clamp01(cIn * 1.4) * (1 - ease(f, ISL_EXP - 1, ISL_EXP + 5));
-  const xOp = ease(f, ISL_EXP + 4, ISL_EXP + 14) * (1 - ease(f, ISL_DONE, ISL_DONE + 6));
-  const blurC = (1 - cOp) * 6;
-  const blurX = (1 - xOp) * 6;
-  const done = ease(f, TICK + 1, TICK + 6);
-  const strike = ease(f, TICK + 4, TICK + 16);
-  /* The tick button SPRINGS (Lucas): squashed to 78% under the finger, then
-     released on an underdamped spring (response .38, damping .42 — about
-     23% overshoot) that throws it past full size and lets it settle. */
+  // compact content: in with the growth, out on the press; expanded: in a beat after the release, out as it shuts
+  const cOp = clamp01((cIn - 0.25) / 0.6) * (1 - ease(f, ISL_EXP - 1, ISL_EXP + 5));
+  const xOp = ease(f, ISL_EXP + 3, ISL_EXP + 13) * (1 - ease(f, ISL_DONE, ISL_DONE + 7));
+  const done = ease(f, TICK + 1, TICK + 7);
+  const strike = ease(f, TICK + 3, TICK + 15, Easing.inOut(Easing.cubic));
+  /* The tick button SPRINGS: squashed to 78% under the finger, then released
+     on an underdamped spring (response .38, damping .42) past full size. */
   const tickSquash = ease(f, TICK - 1, TICK + 2, Easing.out(Easing.quad));
   const tickPop = springAt(f, TICK + 3, springOf(0.38, 0.42));
   const tickSwell = f < TICK + 3 ? lerp(1, 0.78, tickSquash) : lerp(0.78, 1, tickPop);
-  const ink = DARK.ink;
+  const box = (bw: number, bh: number, op: number, children: React.ReactNode) =>
+    op > 0.001 ? (
+      <div
+        style={{
+          position: 'absolute',
+          left: w / 2 - bw / 2,
+          top: 0,
+          width: bw,
+          height: bh,
+          opacity: op,
+          transform: `scale(${w / bw})`,
+          transformOrigin: '50% 0',
+          filter: op < 0.999 ? `blur(${(1 - op) * 5}px)` : undefined,
+        }}
+      >
+        {children}
+      </div>
+    ) : null;
+  const ring = 13.7;
+  const ringLine = 3.65;
   return (
     <div
       style={{
         position: 'absolute',
-        left,
-        top: ISL.top,
+        left: ISL.cx - w / 2,
+        top,
         width: w,
         height: h,
         borderRadius: r,
@@ -967,60 +992,61 @@ const Island16: React.FC<{f: number}> = ({f}) => {
         transformOrigin: '50% 0%',
       }}
     >
-      {/* children in SCREEN coordinates — the island only clips them */}
-      <div style={{position: 'absolute', left: -left, top: -ISL.top, width: SCREEN_W, height: SCREEN_H}}>
-        {cOp > 0.001 ? (
-          <div style={{position: 'absolute', inset: 0, opacity: cOp, filter: blurC > 0.05 ? `blur(${blurC}px)` : undefined}}>
-            <div style={{position: 'absolute', left: ISL.cx - C.w / 2 + 18.5, top: 32.5, transform: 'translate(-50%, -50%)'}}>
-              <LiveGlyph d={20} color={ink} line={1.9} />
-            </div>
-            {/* right-aligned 14pt in from the island's end: "Bri" sits at ~265–282pt,
-                12pt clear of the hardware cutout (148.5–253.5pt) */}
-            <div
+      {box(C.w, C.h, cOp,
+        <svg width={ring} height={ring} viewBox={`0 0 ${ring} ${ring}`} style={{position: 'absolute', left: 14.7 - ring / 2, top: C.h / 2 - ring / 2, overflow: 'visible'}}>
+          <circle cx={ring / 2} cy={ring / 2} r={(ring - ringLine) / 2} fill="none" stroke="#4A5C76" strokeWidth={ringLine} />
+        </svg>,
+      )}
+      {box(X.w, X.h, xOp,
+        <>
+          <div
+            style={{
+              position: 'absolute',
+              left: ISL_X.textLeft,
+              top: ISL_X.baseline - ISL_X.text,
+              height: ISL_X.text,
+              display: 'flex',
+              alignItems: 'flex-end',
+              ...{fontFamily: '"SF Pro", -apple-system, sans-serif', fontSize: ISL_X.text, fontWeight: 400, fontVariationSettings: "'wght' 400", letterSpacing: '0.005em'},
+              lineHeight: 0,
+              whiteSpace: 'nowrap',
+              color: mix('#FFFFFF', '#8E8E93', done),
+            }}
+          >
+            <span
               style={{
-                position: 'absolute',
-                right: SCREEN_W - (ISL.cx + C.w / 2 - 14),
-                top: 32.5,
-                transform: 'translateY(-50%)',
-                ...sf(13, 1, 600),
-                color: DARK.inkMuted,
-                whiteSpace: 'nowrap',
-                lineHeight: 1.2,
+                lineHeight: 1,
+                padding: '0 2px',
+                margin: '0 -2px',
+                backgroundImage: 'linear-gradient(#8E8E93, #8E8E93)',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'left 62%',
+                backgroundSize: `${strike * 100}% 1.3px`,
               }}
             >
-              {TASK.slice(0, 3)}
-            </div>
+              {TASK}
+            </span>
           </div>
-        ) : null}
-        {xOp > 0.001 ? (
-          <div style={{position: 'absolute', inset: 0, opacity: xOp, filter: blurX > 0.05 ? `blur(${blurX}px)` : undefined, transform: `scale(${0.96 + 0.04 * xOp})`, transformOrigin: `${ISL.cx}px ${ISL.top}px`}}>
-            <div style={{position: 'absolute', left: 36, top: ISL_CHECK[1], transform: 'translateY(-50%)', ...sf(17, 1, 500), color: mix(ink, DARK.inkMuted, done), lineHeight: 1.2, whiteSpace: 'nowrap'}}>
-              <span style={{padding: '0 2px', margin: '0 -2px', backgroundImage: `linear-gradient(${DARK.inkMuted}, ${DARK.inkMuted})`, backgroundRepeat: 'no-repeat', backgroundPosition: 'left 55%', backgroundSize: `${strike * 100}% 1.4px`}}>
-                {TASK}
-              </span>
-            </div>
-            <div
-              style={{
-                position: 'absolute',
-                left: ISL_CHECK[0] - 13,
-                top: ISL_CHECK[1] - 13,
-                width: 26,
-                height: 26,
-                borderRadius: 999,
-                background: mix('#3A3A3C', DARK.accent, done),
-                boxShadow: 'inset 0 0 0 0.75px rgba(255,255,255,.18)',
-                display: 'grid',
-                placeItems: 'center',
-                transform: `scale(${tickSwell})`,
-              }}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24">
-                <path d="M2.6 13.2l6.4 7L21.6 3.6" fill="none" stroke={ink} strokeOpacity={0.55 + 0.45 * done} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
+          <div
+            style={{
+              position: 'absolute',
+              left: ISL_X.check[0] - ISL_X.checkD / 2,
+              top: ISL_X.check[1] - ISL_X.checkD / 2,
+              width: ISL_X.checkD,
+              height: ISL_X.checkD,
+              borderRadius: 999,
+              background: ISL_SLATE,
+              display: 'grid',
+              placeItems: 'center',
+              transform: `scale(${tickSwell})`,
+            }}
+          >
+            <svg width="12.5" height="12.5" viewBox="0 0 24 24">
+              <path d="M3.2 13.4l6 6.2L20.8 4.6" fill="none" stroke="#0B0F14" strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
-        ) : null}
-      </div>
+        </>,
+      )}
     </div>
   );
 };
@@ -1141,32 +1167,47 @@ const HomeScreen16: React.FC<{f: number}> = ({f}) => {
 const seqImg = (dir: string, tag: string, n: number) => staticFile(`${dir}/${tag}-${String(n + 1).padStart(3, '0')}.jpg`);
 const SEQ_STYLE: React.CSSProperties = {position: 'absolute', left: 0, top: 0, width: SCREEN_W, height: SCREEN_H, display: 'block'};
 const LOCK_HOLD = 22; // card settled; the recording bounces it again from ~frame 50, which Lucas does not want
-const lockFrame = (f: number) => Math.max(0, Math.min(LOCK_HOLD, Math.round(f - (ARRIVE - 8))));
-const T_EXP = ISL_EXP - 3;
-const HOME_LAST = 131;
-const homeFrame = (f: number) =>
-  Math.round(f < ISL_IN ? 0 : f < T_EXP ? Math.min(f - ISL_IN, 42) : Math.min(HOME_LAST, 42 + (f - T_EXP)));
+const lockPos = (f: number) => Math.max(0, Math.min(LOCK_HOLD, f - (ARRIVE - 8)));
+/* The recording is 30 fps and the hero 60: between two recorded frames the
+   next one is faded in over the last, so the card does not step. */
+const SeqBlend: React.FC<{dir: string; tag: string; pos: number}> = ({dir, tag, pos}) => {
+  const a = Math.floor(pos);
+  const t = pos - a;
+  return (
+    <>
+      <Img src={seqImg(dir, tag, a)} style={SEQ_STYLE} />
+      {t > 0.02 ? <Img src={seqImg(dir, tag, a + 1)} style={{...SEQ_STYLE, opacity: t}} /> : null}
+    </>
+  );
+};
+/* The Home Screen is one still from the recording with the island gone (its
+   last frame): the island is drawn as vectors on top (Island16). */
+const HOME_STILL = 131;
 const LockLayer16: React.FC<{f: number}> = ({f}) => {
   const u = unlockU(f);
   if (u >= 1) return null;
+  // the whole Lock Screen rides up and off the top, dimming a little as it goes
   return (
-    <div style={{position: 'absolute', inset: 0, background: 'transparent'}}>
-      <div style={{position: 'absolute', inset: 0, opacity: 1 - clamp01((u - 0.3) / 0.7), transform: `translateY(${-u * SCREEN_H * 0.55}px) scale(${1 - 0.06 * u})`, transformOrigin: '50% 100%'}}>
-        <Img src={seqImg('lockseq', 'l', lockFrame(f))} style={SEQ_STYLE} />
-      </div>
+    <div style={{position: 'absolute', inset: 0, transform: `translateY(${-u * (SCREEN_H + 30)}px)`}}>
+      <SeqBlend dir="lockseq" tag="l" pos={lockPos(f)} />
+      <div style={{position: 'absolute', inset: 0, background: '#000', opacity: 0.18 * u}} />
     </div>
   );
 };
 
-/* The right-hand phone: Lock Screen over Home Screen, the island over both. */
+/* The right-hand phone: Lock Screen over Home Screen (the island is drawn over the frame). */
 const RightScreen16: React.FC<{f: number}> = ({f}) => {
   const wake = ease(f, ARRIVE - 6, ARRIVE + 6);
+  const k = homeIn(f);
   return (
-    <div style={{position: 'absolute', inset: 0, background: '#C4C4C4'}}>
-      {f >= UNLOCK ? <div style={{position: 'absolute', inset: 0, opacity: f < ISL_IN ? 0.15 + 0.85 * homeIn(f) : 1, transform: `scale(${lerp(1.1, 1, homeIn(f))})`, transformOrigin: '50% 45%'}}><Img src={seqImg('homeseq', 'h', homeFrame(f))} style={SEQ_STYLE} /></div> : null}
+    <div style={{position: 'absolute', inset: 0, background: '#000'}}>
+      {f >= UNLOCK ? (
+        <div style={{position: 'absolute', inset: 0, transform: `scale(${lerp(1.08, 1, k)})`, transformOrigin: '50% 45%'}}>
+          <Img src={seqImg('homeseq', 'h', HOME_STILL)} style={SEQ_STYLE} />
+          <div style={{position: 'absolute', inset: 0, background: '#000', opacity: 0.3 * (1 - k)}} />
+        </div>
+      ) : null}
       <LockLayer16 f={f} />
-      {/* the task is crossed out in the island once it is ticked (the recording only ticks it) */}
-      <div style={{position: 'absolute', left: 36, top: 64.2, height: 1.7, width: 103 * ease(f, TICK + 4, TICK + 20, Easing.inOut(Easing.cubic)), background: 'rgba(255,255,255,.92)', borderRadius: 1}} />
       <div style={{position: 'absolute', inset: 0, background: '#000', opacity: 1 - wake}} />
     </div>
   );
@@ -1183,11 +1224,6 @@ const PHONE_FY = 675 - (818 - H / 2) / PHONE_S;
 const CAM_WIDE: Cam = {s: 0.86, fx: (PL_CX + PR_CX) / 2, fy: 700};
 const CAM_L: Cam = {s: PHONE_S, fx: PL_CX, fy: PHONE_FY};
 const CAM_R: Cam = {s: PHONE_S, fx: PR_CX, fy: PHONE_FY};
-/* In on the Dynamic Island: 2.6x puts the expanded island ~890px wide in the
-   1080 frame, its centre at screen y 470 — under the stacked caption, the home
-   row below it. */
-const ISL_WORLD_Y = PTOP + PS.y + 32.5 * PS.z;
-const CAM_I: Cam = {s: 2.6, fx: PR_CX, fy: ISL_WORLD_Y - (470 - H / 2) / 2.6};
 const CAM_KEYS: Array<[number, Cam]> = [
   [LIVE_CUT + 12, CAM_WIDE],
   [LIVE_CUT + 38, CAM_L],
@@ -1195,9 +1231,6 @@ const CAM_KEYS: Array<[number, Cam]> = [
   [GO + 30, CAM_WIDE],
   [ARRIVE + 2, CAM_WIDE],
   [ARRIVE + 28, CAM_R],
-  [UNLOCK + 22, CAM_R],
-  [ISL_IN + 44, CAM_I], // the push ends where it did; the extra second is held, not stretched
-  [TICK + 54, {s: CAM_I.s * 1.2, fx: PR_CX, fy: PTOP + PS.y + (ISL.top + ISL.expanded.h / 2) * PS.z}], // keeps pushing in, island centred, never settling (Lucas)
 ];
 const camAt = (f: number): Cam => {
   if (f <= CAM_KEYS[0][0]) return CAM_KEYS[0][1];
@@ -1205,11 +1238,40 @@ const camAt = (f: number): Cam => {
     const [a, ca] = CAM_KEYS[i];
     const [b, cb] = CAM_KEYS[i + 1];
     if (f <= b) {
-      const t = ease(f, a, b, i === CAM_KEYS.length - 2 ? Easing.linear : Easing.inOut(Easing.cubic));
+      const t = ease(f, a, b, Easing.inOut(Easing.cubic));
       return {s: lerp(ca.s, cb.s, t), fx: lerp(ca.fx, cb.fx, t), fy: lerp(ca.fy, cb.fy, t)};
     }
   }
   return CAM_KEYS[CAM_KEYS.length - 1][1];
+};
+/* The ending: ONE push in on the Dynamic Island, from just after the unlock to
+   the end of the film, run on OUTPUT time (the hero speeds up its holds, and a
+   move laid over a hold would surge). The zoom starts from rest and then keeps
+   going at an even pace on a log scale right into the black — it never settles
+   (Lucas). The island glides to the frame's centre over the first half while
+   the zoom carries on round it. */
+const PUSH: [number, number] = [UNLOCK + 20, TICK + 57];
+const PUSH_S = 3.0; // as far in as the expanded island still fits the 1080 frame
+const PUSH_RAMP = 0.32; // share of the push spent getting up to speed
+const pushEase = (u: number) => {
+  const a = PUSH_RAMP;
+  const x = Math.max(0, Math.min(1, u));
+  const area = x < a ? a * ((x / a) ** 3 - (x / a) ** 4 / 2) : x - a / 2;
+  return area / (1 - a / 2);
+};
+/* Where "centre" is: the page shows the tall cut with its top 44 rows cropped
+   (object-position bottom), so the visible middle sits (EXT - 44) / 2 above the
+   film frame's own middle. */
+const VIEW_CROP = 0; // the phone hero shows the whole tall cut
+const camEnd = (T: (fl: number) => number, f: number, ext: number): Cam => {
+  const u = (T(f) - T(PUSH[0])) / (T(PUSH[1]) - T(PUSH[0]));
+  const s = Math.exp(lerp(Math.log(CAM_R.s), Math.log(PUSH_S), pushEase(u)));
+  const A = toGlobal(PR_CX, ISL.cx, ISL_FOCUS_Y);
+  const s0 = toScreen(A, CAM_R);
+  const c = ease(u, 0, 0.55, Easing.inOut(Easing.cubic));
+  const sx = lerp(s0[0], W / 2, c);
+  const sy = lerp(s0[1], H / 2 - (ext ? (ext - VIEW_CROP) / 2 : 0), c);
+  return {s, fx: A[0] - (sx - W / 2) / s, fy: A[1] - (sy - H / 2) / s};
 };
 const toScreen = (pt: P, c: Cam): P => [(pt[0] - c.fx) * c.s + W / 2, (pt[1] - c.fy) * c.s + H / 2];
 
@@ -1247,9 +1309,10 @@ const Caption: React.FC<{lines: string[]; f: number; start: number; x: number; a
   );
 };
 
-const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number; forceGo?: boolean; breathOv?: number}> = ({
+const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number; forceGo?: boolean; breathOv?: number; filmOff?: number}> = ({
   f,
   camOv,
+  filmOff = 0,
   rv = FULL,
   capMul = 1,
   forceGo = false,
@@ -1257,15 +1320,14 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
 }) => {
   const extTop = React.useContext(ExtTop);
   const p = DARK;
-  const cam = camOv ?? camAt(f);
+  const out = React.useContext(OutClock);
+  const T = (fl: number) => out(fl + filmOff); // this scene's clock → output time
+  const cam = camOv ?? (f > PUSH[0] ? camEnd(T, f, extTop) : camAt(f));
   // the Go pill / Live switch sits left of centre in its row (the bin is on its right)
   const ctrlG = toGlobal(PL_CX, SCREEN_W / 2 - (12 + 44.4) / 2, CTRL_Y + 22.2);
   const cardG = toGlobal(PR_CX, CARD.x + CARD.w / 2, CARD.y + 48);
   // the ending's touch points, on the right-hand phone
-  const unlockA = toGlobal(PR_CX, SCREEN_W / 2, SCREEN_H - 14);
-  const unlockB = toGlobal(PR_CX, SCREEN_W / 2, SCREEN_H - 330);
-  const islandG = toGlobal(PR_CX, ISL.cx + 30, ISL.top + 18);
-  const islCheckG = toGlobal(PR_CX, ISL_CHECK[0], ISL_CHECK[1]);
+  const unlockA = toGlobal(PR_CX, SCREEN_W / 2, SCREEN_H - 16);
 
   // the Live ring travelling from the switch to the Lock Screen
   const P0: P = [ctrlG[0] - 40, ctrlG[1] - 10];
@@ -1316,7 +1378,7 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
         <Phone16 left={PL_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame}>
           <AppScreen f={f} rv={rv} forceGo={forceGo} breathOv={breathOv} />
         </Phone16>
-        <Phone16 left={PR_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame} style={{opacity: rv.frame}}>
+        <Phone16 left={PR_CX - PS.W / 2} top={PTOP} H={PH} frameOpacity={rv.frame} style={{opacity: rv.frame}} over={<Island16 f={f} />}>
           <RightScreen16 f={f} />
         </Phone16>
         {rings(ctrlG, GO + 1, 120)}
@@ -1328,20 +1390,21 @@ const LiveScene: React.FC<{f: number; camOv?: Cam; rv?: Reveal; capMul?: number;
         ) : null}
         {rings(cardG, ARRIVE - 1, 240, 2)}
         {fingerAt(ctrlG, GO)}
-        {/* unlock: up from the bottom edge, fast, like a real swipe home */}
-        {f >= UNLOCK - 4 && f <= UNLOCK + 24 ? (
+        {/* unlock: the finger lands on the bottom edge, drags the Lock Screen up
+            with it and lifts off as the screen flies on by itself */}
+        {f >= UNLOCK - 8 && unlockU(f) < 0.5 ? (
           <FingerOnLight
             x={unlockA[0]}
-            y={lerp(unlockA[1], unlockB[1], clamp01(unlockU(f) / 0.62))}
+            y={unlockA[1] - unlockU(f) * (SCREEN_H + 30) * PS.z}
             d={60}
-            opacity={ease(f, UNLOCK - 4, UNLOCK + 2) * (1 - ease(f, UNLOCK + 14, UNLOCK + 21))}
-            scale={1 - 0.08 * sp(f, UNLOCK + 2, 'press')}
+            opacity={ease(f, UNLOCK - 8, UNLOCK - 1) * (1 - clamp01((unlockU(f) - 0.2) / 0.28))}
+            scale={(1 - 0.08 * sp(f, UNLOCK - 1, 'press')) * lerp(1, 1.12, clamp01((unlockU(f) - 0.2) / 0.28))}
           />
         ) : null}
       </AbsoluteFill>
       <Caption lines={['One task,', 'always in view.']} f={f} start={LIVE_CUT + 34} out={GO + 4} x={W / 2 - (PS.W * CAM_L.s) / 2 - 70} align="right" mul={capMul} />
       <Caption lines={['Right on your', 'Lock Screen.']} f={f} start={ARRIVE + 22} out={UNLOCK + 4} x={W / 2 + (PS.W * CAM_R.s) / 2 + 70} align="left" />
-      <Caption lines={['And in the', 'Dynamic Island.']} f={f} start={ISL_IN + 14} x={W / 2 + (PS.w * CAM_I.s * 1.2) / 2 + 70} align="left" />
+      <Caption lines={['And in the', 'Dynamic Island.']} f={f} start={ISL_IN + 14} x={0} align="left" />
     </Canvas>
   );
 };
@@ -1367,11 +1430,10 @@ const LIVE_OFFSET = E.cut + E.hold - E.clock0 + INS.len - INS_SKIP;
 export const HERO_TIMING_V16 = createHeroTiming(DURATION_F, [
   [TYPE.start + sum(TYPE.gaps), BUILD.check],
   [M2.land, GZ],
-  [GOLIVE.tap + 4, GOLIVE.start],
   [INS.typeEnd, INS.delStart],
-  [E.cut + INS.len - INS_SKIP + 14, E.cut + INS.len - INS_SKIP + 12 + E_SETTLE],
+  // (a 2-frame hold that sat INSIDE the Go Live pull-back is gone: it made the zoom out stutter)
   [LTYPE_END + LIVE_OFFSET, GO + LIVE_OFFSET],
-  [ARRIVE + 28 + LIVE_OFFSET, UNLOCK + LIVE_OFFSET],
+  [ARRIVE + 28 + LIVE_OFFSET, UNLOCK - 14 + LIVE_OFFSET], // ends before the finger comes in, so the swipe runs at an even pace
   [ISL_IN + 44 + LIVE_OFFSET, ISL_TAP + LIVE_OFFSET],
   [ISL_EXP + 24 + LIVE_OFFSET, TICK + LIVE_OFFSET],
 ]);
@@ -1439,6 +1501,7 @@ const PromoE: React.FC<{variant: Variant; f0: number; ins?: boolean}> = ({varian
           capMul={ease(f0, c + 40 + E_SETTLE, c + 56 + E_SETTLE)}
           forceGo
           breathOv={eBreath(fReal)}
+          filmOff={ins ? LIVE_OFFSET : E.cut + E.hold - E.clock0}
         />
       ) : null}
       <AbsoluteFill style={{background: '#000', opacity: ease(f, TICK + 30, TICK + 54, Easing.inOut(Easing.quad)), top: -extTop, height: H + extTop}} />
@@ -1454,7 +1517,12 @@ export const DURATION = FLOOD.end + 2;
 export const PromoV16: React.FC<{variant: Variant; transition?: Transition; heroPace?: boolean}> = ({variant, transition = 'line', heroPace = false}) => {
   const frame = useCurrentFrame();
   const f0 = heroPace ? HERO_TIMING_V16.frameAt(frame) : frame;
-  if (transition === 'golive2' || transition === 'golive3') return <PromoE variant={variant} f0={f0} ins={transition === 'golive3'} />;
+  if (transition === 'golive2' || transition === 'golive3')
+    return (
+      <OutClock.Provider value={heroPace ? HERO_TIMING_V16.outAt : (x: number) => x}>
+        <PromoE variant={variant} f0={f0} ins={transition === 'golive3'} />
+      </OutClock.Provider>
+    );
   const off = transition === 'golive' ? GOLIVE_HOLD : 0;
   const f = f0 - off; // the Live section's clock
   const r = FLOOD_R * ease(f, FLOOD.start, FLOOD.end, Easing.bezier(0.55, 0, 0.25, 1));
