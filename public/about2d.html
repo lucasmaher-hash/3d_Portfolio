@@ -661,6 +661,17 @@
       });
     });
 
+    // Clicking anywhere in an open frame's text closes it (links keep working;
+    // selecting text does not close it).
+    document.querySelectorAll('.item-body').forEach(body => {
+      body.addEventListener('click', e => {
+        if (e.target.closest('a')) return;
+        if (window.getSelection && String(window.getSelection())) return;
+        const item = body.closest('.item');
+        if (item.classList.contains('open') && !item.classList.contains('closing')) closeItem(item);
+      });
+    });
+
     // ── Page transitions ──────────────────────────────────────────
     (function() {
       var KF = '@keyframes _sR{from{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes _sL{from{transform:translateX(-100%)}to{transform:translateX(0)}}';
