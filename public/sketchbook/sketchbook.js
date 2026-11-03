@@ -22,7 +22,7 @@ function translate() {
 translate()
 const response = await fetch('/sketchbook/drawings.json')
 if (!response.ok) throw new Error('Sketchbook collection could not be loaded')
-const drawings = (await response.json()).sort((a, b) => a.date.localeCompare(b.date))
+const drawings = await response.json() // file order = viewing order
 let index = 0
 range.max = drawings.length - 1
 

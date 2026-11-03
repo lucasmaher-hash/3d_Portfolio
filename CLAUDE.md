@@ -4308,3 +4308,8 @@ Source of truth is `motion/` (Remotion). Do NOT overwrite the old files blindly;
 - Ending camera `camEnd()` runs on OUTPUT time (`OutClock` context = `heroTiming.outAt`), one push from `UNLOCK+20` to the end, zoom from rest then even to 3.25x desktop / 3.0x phone, island centred in the page's visible crop (`VIEW_CROP` 44 desktop, 0 phone). Rule: any move that crosses a hero hold must use `OutClock`, or the hold's speed-up surges it.
 - Hero holds: the 2-frame hold inside the Go Live pull-back (the stutter) is gone; the pre-unlock hold ends at `UNLOCK-14`. While the page is fully dark the swipe scene's ground is dark/flat (`darkGround`).
 - PromoV16 got the same changes via `git merge-file` (base = old Promo16).
+
+## Sketchbook order + new works, 2026-11-03 (Lucas) — do not revert
+
+- `public/sketchbook/drawings.json` now has **13 unique works** (the four repeats Sketch 10–13 are gone). **File order = viewing order**: `sketchbook.js` no longer sorts by `date`, the first entry is the first picture shown. New works go where you want them in the array; `date` is informational only.
+- First is the landscape blue oil painting (`sketch-10.jpg`, from IMG_9943), then the old nine, then `sketch-11..13` (orange portraits, ink figures, orange/black seated figure). Titles are "Sketch N"/"Skizze N" by position. `sketches.html` preloads `sketch-10.jpg` (the first picture).
