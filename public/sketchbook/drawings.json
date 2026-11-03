@@ -16,68 +16,68 @@
     "src": "/sketchbook/sketch-01.jpg"
   },
   {
-    "date": "2024-10-01",
+    "date": "2026-02-22",
     "title": {
       "en": "Sketch 3",
       "de": "Skizze 3"
+    },
+    "src": "/sketchbook/sketch-09.jpg"
+  },
+  {
+    "date": "2024-10-01",
+    "title": {
+      "en": "Sketch 4",
+      "de": "Skizze 4"
     },
     "src": "/sketchbook/sketch-02.jpg"
   },
   {
     "date": "2024-11-25",
     "title": {
-      "en": "Sketch 4",
-      "de": "Skizze 4"
+      "en": "Sketch 5",
+      "de": "Skizze 5"
     },
     "src": "/sketchbook/sketch-03.jpg"
   },
   {
     "date": "2024-12-18",
     "title": {
-      "en": "Sketch 5",
-      "de": "Skizze 5"
+      "en": "Sketch 6",
+      "de": "Skizze 6"
     },
     "src": "/sketchbook/sketch-04.jpg"
   },
   {
     "date": "2025-06-20",
     "title": {
-      "en": "Sketch 6",
-      "de": "Skizze 6"
+      "en": "Sketch 7",
+      "de": "Skizze 7"
     },
     "src": "/sketchbook/sketch-05.jpg"
   },
   {
     "date": "2025-08-17",
     "title": {
-      "en": "Sketch 7",
-      "de": "Skizze 7"
+      "en": "Sketch 8",
+      "de": "Skizze 8"
     },
     "src": "/sketchbook/sketch-06.jpg"
   },
   {
     "date": "2025-11-29",
     "title": {
-      "en": "Sketch 8",
-      "de": "Skizze 8"
+      "en": "Sketch 9",
+      "de": "Skizze 9"
     },
     "src": "/sketchbook/sketch-07.jpg"
   },
   {
     "date": "2025-12-14",
     "title": {
-      "en": "Sketch 9",
-      "de": "Skizze 9"
-    },
-    "src": "/sketchbook/sketch-08.jpg"
-  },
-  {
-    "date": "2026-02-22",
-    "title": {
       "en": "Sketch 10",
       "de": "Skizze 10"
     },
-    "src": "/sketchbook/sketch-09.jpg"
+    "src": "/sketchbook/sketch-08.jpg"
   },
   {
     "date": "2026-11-03",
