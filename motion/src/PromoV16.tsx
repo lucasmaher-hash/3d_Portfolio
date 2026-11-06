@@ -254,7 +254,7 @@ const INS = (() => {
    "Go Live" back to the button sooner): E resumes INS_SKIP frames further on,
    inside its still dark hold, so the button builds 12 frames after the last
    backspace instead of 58. */
-const INS_SKIP = 46;
+const INS_SKIP = 70; // same as the landscape cut (the button follows the last backspace almost at once)
 const insWarp = (f0: number) => (f0 < INS.at ? f0 : f0 < INS.at + INS.len ? INS.at : f0 - INS.len + INS_SKIP);
 const insChars = (f0: number) =>
   f0 < INS.t0 || f0 >= INS.at + INS.len ? 0 : typedCount(f0, INS.t0, INS.type) - typedCount(f0, INS.delStart, INS.del);
@@ -267,7 +267,7 @@ const insPan = (f0: number) =>
   INS_PAN *
   (ease(f0, INS.t0, INS.typeEnd + 8, Easing.inOut(Easing.cubic)) - ease(f0, INS.delStart - 2, INS.delEnd + 6, Easing.inOut(Easing.cubic)));
 /* ...and how long the finished button sits before the phone comes in round it */
-const E_SETTLE = 30;
+const E_SETTLE = 4;
 
 /* The opening. */
 const TYPE = {start: 8, gaps: [4, 3, 3, 4, 3, 3, 3, 4, 3]};
@@ -1453,10 +1453,29 @@ const camButton = (): Cam => {
    Lerping the two cameras' focus points while the zoom ran on a different
    curve made the button swing sideways and back mid-move (Lucas: "a weird
    stutter"). */
+/* The pull-back starts while the line is still being taken back (Lucas), so it
+   runs on REAL time (fReal), not on E's warped clock, which is frozen through
+   the typing. zoomU is the one progress value for both halves of the move: the
+   words scene is scaled by it before the cut (wordsView) and LiveScene's camera
+   follows it after, so the cut stays where it was and the move never stalls. */
+const ZS = INS.delStart + 18;
+const ZE = INS.delEnd + 60;
+const zoomU = (fReal: number) => ease(fReal, ZS, ZE, Easing.inOut(Easing.cubic));
+const wordsView = (fReal: number): React.CSSProperties => {
+  const a = camButton();
+  const A = labelAnchor();
+  const t = zoomU(fReal);
+  const k = Math.exp(lerp(Math.log(a.s), Math.log(CAM_L.s), t)) / a.s;
+  const s0: P = [(A[0] - a.fx) * a.s + W / 2, (A[1] - a.fy) * a.s + H / 2];
+  const s1: P = [(A[0] - CAM_L.fx) * CAM_L.s + W / 2, (A[1] - CAM_L.fy) * CAM_L.s + H / 2];
+  const dx = lerp(s0[0], s1[0], t) - s0[0];
+  const dy = lerp(s0[1], s1[1], t) - s0[1];
+  return {position: 'absolute', inset: 0, transformOrigin: `${s0[0]}px ${s0[1]}px`, transform: `translate(${dx}px, ${dy}px) scale(${k})`};
+};
 const camE = (f0: number): Cam => {
   const a = camButton();
   const A = labelAnchor();
-  const t = ease(f0, E.cut + E.zoom[0], E.cut + E.zoom[1], Easing.inOut(Easing.cubic));
+  const t = zoomU(f0);
   const s = Math.exp(lerp(Math.log(a.s), Math.log(CAM_L.s), t));
   const s0: P = [(A[0] - a.fx) * a.s + W / 2, (A[1] - a.fy) * a.s + H / 2];
   const s1: P = [(A[0] - CAM_L.fx) * CAM_L.s + W / 2, (A[1] - CAM_L.fy) * CAM_L.s + H / 2];
@@ -1480,14 +1499,19 @@ const PromoE: React.FC<{variant: Variant; f0: number; ins?: boolean}> = ({varian
   return (
     <AbsoluteFill style={{background: LIGHT.canvas}}>
       {f0 < c ? (
-        <SwipeScene f={f0} v={variant} tr="golive2" ext={ins ? {chars: insChars(fReal), pan: insPan(fReal), bf: fReal} : undefined} />
+        <>
+          <AbsoluteFill style={{background: DARK.canvas, top: -extTop, height: H + extTop}} />
+          <div style={ins ? wordsView(fReal) : {position: 'absolute', inset: 0}}>
+            <SwipeScene f={f0} v={variant} tr="golive2" ext={ins ? {chars: insChars(fReal), pan: insPan(fReal), bf: fReal} : undefined} />
+          </div>
+        </>
       ) : null}
       {f0 >= c && f < FLOOD.end + 1 ? (
         <LiveScene
           f={f}
           // after the pull-back, hold the centred phone until the Live section's own
           // camera reaches it too — its clock resumes mid-way through its own zoom-in
-          camOv={f0 < c + E.zoom[1] ? camE(f0) : f < CAM_KEYS[1][0] ? CAM_L : undefined}
+          camOv={fReal < ZE ? camE(fReal) : f < CAM_KEYS[1][0] ? CAM_L : undefined}
           rv={rv}
           capMul={ease(f0, c + 40 + E_SETTLE, c + 56 + E_SETTLE)}
           forceGo

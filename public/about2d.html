@@ -250,6 +250,21 @@
       text-underline-offset: 2px;
     }
 
+
+    /* Plus/minus drawn with two bars (2026-11-06): opening folds the vertical bar
+       away and stretches the horizontal one a little wider than the plus's. */
+    .btn { position: relative; font-size: 0; line-height: 0; color: transparent; }
+    .btn::before, .btn::after {
+      content: ''; position: absolute; left: 50%; top: 50%;
+      width: 13px; height: 2px; margin: -1px 0 0 -6.5px;
+      background: #f0f0f2; border-radius: 1px;
+      transition: transform 520ms cubic-bezier(.4, 0, .2, 1);
+    }
+    .btn::after { transform: rotate(90deg); }
+    .item.open:not(.closing) .btn::before { transform: scaleX(1.3); }
+    .item.open:not(.closing) .btn::after { transform: rotate(90deg) scaleX(0); }
+    @media (prefers-reduced-motion: reduce) { .btn::before, .btn::after { transition: none; } }
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -515,6 +530,9 @@
     .about-links a:hover { color: var(--text-primary); background-size: 100% 1px; }
     @media (prefers-reduced-motion: reduce) { .about-links a { transition: color 150ms ease; } }
     @media (max-width: 640px) { .about-links { font-size: 16px; padding: 4px 8px 0; } }
+
+    /* Touch screens have no hover: no sliding underline there (2026-11-06). */
+    @media (hover: none) { .about-links a { background-size: 0 0 !important; } }
   </style>
   <!-- <link rel="stylesheet" href="/theme/dark-mobile.css" />  dark mode detached 2026-10-06 -->
   <link rel="stylesheet" href="/theme/mobile-menu.css" />
@@ -637,8 +655,7 @@
   <script>
     function closeItem(item) {
       item.classList.add('closing');
-      item.querySelector('.btn').textContent = '+';
-      const body = item.querySelector('.item-body');
+            const body = item.querySelector('.item-body');
       body.addEventListener('transitionend', function handler(e) {
         if (e.propertyName === 'max-height') {
           item.classList.remove('open', 'closing');
@@ -656,8 +673,7 @@
         });
         if (!isOpen) {
           item.classList.add('open');
-          item.querySelector('.btn').textContent = '-';
-        }
+                  }
       });
     });
 
