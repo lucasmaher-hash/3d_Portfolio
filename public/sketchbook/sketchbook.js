@@ -1,9 +1,12 @@
 let language = (() => { try { return localStorage.getItem('lang') === 'de' ? 'de' : 'en' } catch { return 'en' } })()
 document.documentElement.lang = language
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)')
+const inViewer = new URLSearchParams(location.search).get('from') === '3d'
+// Opened from the home footer: the arrow returns there. Every other way in keeps About.
+const fromHome = !inViewer && (() => { try { const from = new URL(document.referrer); return from.origin === location.origin && /^\/2D(\.html)?$/.test(from.pathname) } catch { return false } })()
 const translations = {
-  en: { back: 'Back to About', title: 'Sketchbook', intro: '<span class="hand hand-select" role="img" aria-label="A short selection of artworks"></span><br><span class="hand hand-hint" role="img" aria-label="(click for the next one, hold to open full screen)"></span>', next: 'Next drawing', timeline: 'Drawing, oldest to newest', about: 'About' },
-  de: { back: 'Zurück zu Über mich', title: 'Skizzenbuch', intro: '<span class="hand hand-select" role="img" aria-label="Eine kleine Auswahl meiner Kunstwerke"></span><br><span class="hand hand-hint" role="img" aria-label="(klicken für das nächste, gedrückt halten für Vollbild)"></span>', next: 'Nächste Zeichnung', timeline: 'Zeichnung, von alt nach neu', about: 'Über mich' },
+  en: { back: 'Back to About', backHome: 'Back to home', title: 'Sketchbook', intro: '<span class="hand hand-select" role="img" aria-label="A short selection of artworks"></span><br><span class="hand hand-hint" role="img" aria-label="(click for the next one, hold to open full screen)"></span>', next: 'Next drawing', timeline: 'Drawing, oldest to newest', about: 'About' },
+  de: { back: 'Zurück zu Über mich', backHome: 'Zurück zur Startseite', title: 'Skizzenbuch', intro: '<span class="hand hand-select" role="img" aria-label="Eine kleine Auswahl meiner Kunstwerke"></span><br><span class="hand hand-hint" role="img" aria-label="(klicken für das nächste, gedrückt halten für Vollbild)"></span>', next: 'Nächste Zeichnung', timeline: 'Zeichnung, von alt nach neu', about: 'Über mich' },
 }
 let copy = translations[language]
 const stack = document.querySelector('.stack')
@@ -14,7 +17,7 @@ function translate() {
   document.documentElement.lang = language
   document.title = `${copy.title} — Lucas Maher`
   for (const element of document.querySelectorAll('[data-copy]')) element.innerHTML = copy[element.dataset.copy]
-  document.querySelector('.back').setAttribute('aria-label', copy.back)
+  document.querySelector('.back').setAttribute('aria-label', fromHome ? copy.backHome : copy.back)
   document.querySelector('[data-menu-about]').textContent = copy.about
   range.setAttribute('aria-label', copy.timeline)
   for (const button of document.querySelectorAll('[data-lang]')) button.classList.toggle('is-active', button.dataset.lang === language)
@@ -574,12 +577,16 @@ document.addEventListener('pointerup', endPress, true)
 document.addEventListener('pointercancel', endPress, true)
 // Phones: a small button under the cube opens the current drawing big (the same view the long press opens).
 const back = document.querySelector('.back')
+if (fromHome) back.href = '/2D.html'
 const backHit = document.createElement('a')
 backHit.className = 'back-hit'; backHit.href = back.getAttribute('href'); backHit.tabIndex = -1; backHit.setAttribute('aria-hidden', 'true')
 document.body.append(backHit)
 // In the 3D viewer leaving must add no history entry, or Exit (history.back in the scene) would step back here instead of closing the panel.
-const inViewer = new URLSearchParams(location.search).get('from') === '3d'
-const leaveTo = href => { if (inViewer) location.replace(href); else location.href = href }
+const leaveTo = href => {
+  if (inViewer) location.replace(href)
+  else if (fromHome && history.length > 1) history.back() // Lands where the visitor left the page, at the footer. A new tab has no history, so it follows the link.
+  else location.href = href
+}
 if (matchMedia('(hover: none)').matches) {
   // Touch: no expanding arrow, just a bounce, then the page changes.
   const go = event => {
@@ -589,7 +596,7 @@ if (matchMedia('(hover: none)').matches) {
     setTimeout(() => leaveTo(back.getAttribute('href')), reduceMotion.matches ? 0 : 300)
   }
   back.addEventListener('click', go); backHit.addEventListener('click', go)
-} else if (inViewer) {
+} else if (inViewer || fromHome) {
   const go = event => { event.preventDefault(); leaveTo(back.getAttribute('href')) }
   back.addEventListener('click', go); backHit.addEventListener('click', go)
 }
