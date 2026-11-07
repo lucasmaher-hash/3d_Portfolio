@@ -254,7 +254,7 @@ opened from anywhere).
 `2D.html`'s footer keeps the frame's thin lines but is now a three-column grid (`1fr auto 1fr`):
 **LM logo left** (neumorphic 44px circle with the same `logo-lm.png` mask, colours and hover lift as
 the nav logo; it is a `<button id="scroll-top-btn">`, so it took over the old "top" pill's
-scroll-to-top), **Instagram · LinkedIn · Email centred** (`.footer-links`, same face, colour and
+scroll-to-top), **Instagram · LinkedIn · Email · Art centred** (Art/Kunst links to `/sketches.html`, key `footer-art`, added 2026-11-07) (`.footer-links`, same face, colour and
 left-to-right underline as About's `.about-links`; the email `href` is assembled at runtime like on
 About, `footer-email` key EN/DE), **copyright right** (`white-space: nowrap`). Phones (≤640px): no links
 (Lucas, 2026-10-19) — logo left, copyright right on one row in its short form "© 2026 LM"
