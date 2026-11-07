@@ -49,7 +49,7 @@ npm run preview
 ## Standing rules: auto-ship + links (Lucas, 2026-11-01)
 
 1. **Always commit, push and deploy every change immediately**, without asking, unless Lucas explicitly says otherwise for that change. Push to `main` (GitHub Actions deploys to lucasmaher.com); confirm the Pages run succeeded.
-2. **Always give two links**: the localhost link to the page worked on (dev server `http://localhost:5173/<page>.html`) and the live link on the public site (`https://lucasmaher.com/<page>.html`), if the page exists live. **Also at the very start of every chat**: state both links for the project/page in focus (or the landing page `/2D.html` if none is clear yet).
+2. **Always give three links**: the localhost link to the page worked on (dev server `http://localhost:5173/<page>.html`), the mobile link for Lucas's iPhone on the same Wi-Fi (`http://<Mac-IP>:5173/<page>.html`, get the IP fresh with `ipconfig getifaddr en0`; `npm run dev` already passes `--host`; Lucas, 2026-11-07) and the live link on the public site (`https://lucasmaher.com/<page>.html`), if the page exists live. **Also at the very start of every chat**: state all three links for the project/page in focus (or the landing page `/2D.html` if none is clear yet).
 
 ## Changes 2026-11-01 (Lucas) — do not overwrite
 
