@@ -256,7 +256,7 @@ opened from anywhere).
 the nav logo; it is a `<button id="scroll-top-btn">`, so it took over the old "top" pill's
 scroll-to-top), **Instagram · LinkedIn · Email · Art centred** (Art/Kunst links to `/sketches.html`, key `footer-art`, added 2026-11-07) (`.footer-links`, same face, colour and
 left-to-right underline as About's `.about-links`; the email `href` is assembled at runtime like on
-About, `footer-email` key EN/DE), **copyright right** (`white-space: nowrap`). Phones (≤640px, Lucas 2026-11-07): one row LinkedIn · Instagram · Art spread to the button's edges (44px tap height), then full-width `.footer-contact` pill ("Get in contact"/"Kontakt aufnehmen", mailto, styled like View Work; replaces the Email link there), then the short copyright
+About, `footer-email` key EN/DE), **copyright right** (`white-space: nowrap`). Phones (≤640px, Lucas 2026-11-07): three centred rows of equal width (the column is as wide as the copyright text): LinkedIn · Instagram · Art spread to the edges (44px tap height), then `.footer-contact` pill ("Get in contact"/"Kontakt aufnehmen", mailto, styled like View Work; replaces the Email link there), then the short copyright
 (`.copyright-short`, key `footer-copyright-short`; the full name stays on desktop), 10px padding; that `@media` block sits right after
 the footer rules on purpose (same specificity, source order wins). The old `.footer-meta` wrapper
 and the phone-only `#scroll-top-btn { display: none }` are gone; `footer-top` translation keys are

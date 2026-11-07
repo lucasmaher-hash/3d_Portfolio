@@ -813,30 +813,31 @@
     }
     .copyright-short { display: none; }
     .footer-contact { display: none; }
-    /* Phones (Lucas, 2026-11-07): between the two lines, one row LinkedIn · Instagram · Art
-       spread to the button's edges (44px tall tap targets, no underline: hover sticks on touch),
+    /* Phones (Lucas, 2026-11-07): between the two lines, three rows of equal width, centred:
+       the one column is as wide as its widest row, the copyright text. One row LinkedIn ·
+       Instagram · Art spread to its edges (44px tall tap targets, no underline: hover sticks on touch),
        then a full-width "Get in contact" pill to the mail address (same look as "View Work",
        which phones hide; it replaces the Email text link here), then the short copyright.
        Must stay after the footer rules above (same specificity, source order wins). */
     @media (max-width: 640px) {
-      .footer-section { grid-template-columns: 1fr; gap: 12px; padding: 14px 20px 20px; }
-      .footer-links { grid-column: 1; justify-content: space-between; gap: 12px; font-size: 16px; }
+      .footer-section { grid-template-columns: minmax(0, max-content); justify-content: center; gap: 12px; padding: 14px 20px 20px; }
+      .footer-links { grid-column: 1; justify-content: space-between; gap: 12px; font-size: 17px; }
       .footer-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0; background: none; }
       .footer-links .footer-link-linkedin { order: -1; }
       .footer-links .footer-link-art { order: 1; }
       #footer-email-link { display: none; }
       .footer-contact {
-        display: block; box-sizing: border-box; width: 100%; padding: 15px 24px;
+        display: block; box-sizing: border-box; width: 100%; padding: 13px 16px;
         background: var(--accent-orange); border-radius: 999px; color: #f0f0f2;
         font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
-        font-size: 16px; font-weight: 500; letter-spacing: 1px; text-align: center;
+        font-size: 17px; font-weight: 500; letter-spacing: 1px; text-align: center;
         text-transform: uppercase; text-decoration: none; white-space: nowrap;
         -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
         transition: transform 150ms ease, background-color 150ms ease;
       }
       .footer-contact:active { background: #475F7E; transform: scale(.98); }
       .footer-contact:focus-visible { outline: 2px solid #809BBC; outline-offset: 4px; }
-      .copyright { white-space: normal; justify-self: center; text-align: center; grid-column: 1; }
+      .copyright { white-space: normal; justify-self: center; text-align: center; grid-column: 1; font-size: 15px; }
       .copyright-full { display: none; }
       .copyright-short { display: inline; }
     }
