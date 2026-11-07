@@ -812,12 +812,28 @@
       white-space: nowrap;
     }
     .copyright-short { display: none; }
-    /* Phones: no links (Lucas, 2026-10-19) — logo left, copyright right on one row, short form
-       "© 2026 LM" so it fits beside the logo; may still wrap on very narrow screens.
+    .footer-contact { display: none; }
+    /* Phones (Lucas, 2026-11-07): stacked between the two lines. Art, Instagram, LinkedIn,
+       then a full-width "Get in contact" pill to the mail address (same look as "View Work",
+       which phones hide; it replaces the Email text link here), then the short copyright.
        Must stay after the footer rules above (same specificity, source order wins). */
     @media (max-width: 640px) {
-      .footer-section { grid-template-columns: 1fr; padding: 10px 20px; }   /* 8px + 20% (Lucas) */
-      .footer-links { display: none; }
+      .footer-section { grid-template-columns: 1fr; gap: 20px; padding: 28px 20px 22px; }
+      .footer-links { grid-column: 1; flex-direction: column; align-items: flex-start; gap: 6px; font-size: 16px; }
+      .footer-links a { padding: 3px 0 2px; }
+      .footer-links .footer-link-art { order: -1; }
+      #footer-email-link { display: none; }
+      .footer-contact {
+        display: block; box-sizing: border-box; width: 100%; padding: 15px 24px;
+        background: var(--accent-orange); border-radius: 999px; color: #f0f0f2;
+        font-family: 'Roboto Flex UI', 'Roboto Flex', sans-serif; font-size-adjust: 0.4;
+        font-size: 16px; font-weight: 500; letter-spacing: 1px; text-align: center;
+        text-transform: uppercase; text-decoration: none; white-space: nowrap;
+        -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+        transition: transform 150ms ease, background-color 150ms ease;
+      }
+      .footer-contact:active { background: #475F7E; transform: scale(.98); }
+      .footer-contact:focus-visible { outline: 2px solid #809BBC; outline-offset: 4px; }
       .copyright { white-space: normal; justify-self: center; text-align: center; grid-column: 1; }
       .copyright-full { display: none; }
       .copyright-short { display: inline; }
@@ -1400,8 +1416,9 @@
         <a href="https://www.instagram.com/lucas.maher.visuals" target="_blank" rel="noopener">Instagram</a>
         <a href="https://www.linkedin.com/in/lucas-maher-5b53163bb/" target="_blank" rel="noopener">LinkedIn</a>
         <a href="#" id="footer-email-link" data-i18n="footer-email">Email</a>
-        <a href="/sketches.html" data-i18n="footer-art">Art</a>
+        <a href="/sketches.html" class="footer-link-art" data-i18n="footer-art">Art</a>
       </nav>
+      <a href="#" id="footer-contact-btn" class="footer-contact" data-i18n="footer-contact">Get in contact</a>
       <p class="copyright"><span class="copyright-full" data-i18n="footer-copyright">© 2026 Lucas Maher. All Rights Reserved.</span><span class="copyright-short" data-i18n="footer-copyright-short">© 2026 LM. All Rights Reserved.</span></p>
     </div>
   </div>
@@ -1450,8 +1467,10 @@
     /* Footer email: href assembled at runtime so the raw HTML never contains the address (as on About). */
     (function () {
       var user = 'lucas.maher.design', domain = 'gmail.com';
-      var link = document.getElementById('footer-email-link');
-      if (link) link.href = 'mailto:' + user + '@' + domain;
+      ['footer-email-link', 'footer-contact-btn'].forEach(function (id) {
+        var link = document.getElementById(id);
+        if (link) link.href = 'mailto:' + user + '@' + domain;
+      });
     })();
 
     document.getElementById('scroll-top-btn')?.addEventListener('click', () => {
@@ -1616,6 +1635,7 @@
         'footer-copyright': '© 2026 Lucas Maher. All Rights Reserved.',
         'footer-email': 'Email',
         'footer-art': 'Art',
+        'footer-contact': 'Get in contact',
         'footer-copyright-short': '© 2026 LM. All Rights Reserved.',
       },
       de: {
@@ -1632,6 +1652,7 @@
         'footer-copyright': '© 2026 Lucas Maher. Alle Rechte vorbehalten.',
         'footer-email': 'E-Mail',
         'footer-art': 'Kunst',
+        'footer-contact': 'Kontakt aufnehmen',
         'footer-copyright-short': '© 2026 LM. Alle Rechte vorbehalten.',
       }
     };
