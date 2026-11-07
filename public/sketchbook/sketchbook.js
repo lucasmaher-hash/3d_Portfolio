@@ -577,14 +577,20 @@ const back = document.querySelector('.back')
 const backHit = document.createElement('a')
 backHit.className = 'back-hit'; backHit.href = back.getAttribute('href'); backHit.tabIndex = -1; backHit.setAttribute('aria-hidden', 'true')
 document.body.append(backHit)
+// In the 3D viewer leaving must add no history entry, or Exit (history.back in the scene) would step back here instead of closing the panel.
+const inViewer = new URLSearchParams(location.search).get('from') === '3d'
+const leaveTo = href => { if (inViewer) location.replace(href); else location.href = href }
 if (matchMedia('(hover: none)').matches) {
   // Touch: no expanding arrow, just a bounce, then the page changes.
   const go = event => {
     event.preventDefault()
     if (back.classList.contains('is-bounce')) return
     back.classList.add('is-bounce')
-    setTimeout(() => { location.href = back.getAttribute('href') }, reduceMotion.matches ? 0 : 300)
+    setTimeout(() => leaveTo(back.getAttribute('href')), reduceMotion.matches ? 0 : 300)
   }
+  back.addEventListener('click', go); backHit.addEventListener('click', go)
+} else if (inViewer) {
+  const go = event => { event.preventDefault(); leaveTo(back.getAttribute('href')) }
   back.addEventListener('click', go); backHit.addEventListener('click', go)
 }
 const placeBackHit = () => { const box = back.getBoundingClientRect(); backHit.style.left = `${box.left + box.width / 2 - 26}px`; backHit.style.top = `${box.top + box.height / 2 - 24}px` }

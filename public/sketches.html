@@ -52,10 +52,10 @@
   <script type="module" src="/sketchbook/sketchbook.js"></script>
   <script src="/js/exit-3d.js?v=warm-v2"></script>
   <script>
+    // Opened from the 3D scene: the arrow returns to About inside the viewer.
+    // Runs before the deferred sketchbook.js, which copies this href to .back-hit.
     if (new URLSearchParams(location.search).get('from') === '3d') {
-      var st = document.createElement('style');
-      st.textContent = '.back{display:none!important}';
-      document.head.appendChild(st);
+      document.querySelector('.back').href = '/about2d.html' + location.search;
     }
   </script>
 </body>
