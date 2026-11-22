@@ -3,6 +3,7 @@
   <head>
     <script>location.replace('/gallery-4.html'+location.search+location.hash)</script>
     <meta charset="UTF-8" />
+  <script>/* lang-detect (2026-11-22, Lucas): first visit only. No stored choice yet -> the first German or English entry in the browser's language list wins (de-DE, de-AT, de-CH -> de), anything else -> en. The de/en toggle overwrites localStorage.lang, so a manual choice always wins. Identical on every page: change all (grep lang-detect). */(function(){try{if(localStorage.getItem('lang'))return;var l=(navigator.languages&&navigator.languages.length)?navigator.languages:[navigator.language||''],r='en';for(var i=0;i<l.length;i++){var c=String(l[i]).toLowerCase().slice(0,2);if(c==='de'||c==='en'){r=c;break}}localStorage.setItem('lang',r)}catch(e){}})()</script>
     <!-- DARK MODE DETACHED 2026-10-06 (Lucas): kept for a future return, see CLAUDE.md "Dark mode — detached". This pre-paint script no longer runs, so nothing sets
          data-theme: no stored choice, no evening clock.
     <script>/* dark mode before first paint. A stored choice wins; with none, 20:00-08:00 local time opens dark. Same rule as read() in /theme/theme.js — change both. See /theme/dark-mobile.css */(function(){try{var t=localStorage.getItem('theme'),h=new Date().getHours();if(t==='dark'||(t!=='light'&&(h>=20||h<8)))document.documentElement.setAttribute('data-theme','dark')}catch(e){}})()</script> -->

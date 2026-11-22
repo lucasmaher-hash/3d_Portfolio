@@ -2511,6 +2511,10 @@ Raised shadow = element pops out. Pressed/inset shadow = element pushed in (used
 - `applyLang` falls back to English for any unknown language, so nothing breaks. **Do NOT add French going forward.**
 - New placeholder sections on Unify (color palette, typography, characters) and the whole rebuilt Virtual Cooking middle are **English-only, not yet wired into `TRANSLATIONS`** — wire them up when copy is finalized.
 
+### Automatic language on first visit (2026-11-22, Lucas)
+
+An inline `<script>` marked `lang-detect`, right after `<meta charset>` on every page that reads `localStorage.lang` (23 files incl. `index.html`, the gallery root pages and the nav/overlay iframes), runs before any i18n code. Only when `localStorage.lang` is still empty, it walks `navigator.languages` and stores the first `de*` or `en*` entry (de-DE, de-AT, de-CH -> `de`); a browser with neither (es, fr, ja ...) gets `en`. A stored value is never touched, so the de/en toggle always wins and returning visitors keep their choice. Browser language, not IP geolocation, on purpose: no third-party request, no GDPR question, no delay, and it follows what the visitor reads rather than where they are. The old `|| 'de'` fallbacks stay and now only apply if localStorage is blocked. The snippet is identical everywhere: change all copies (`grep -l lang-detect`). Verified with headless Chrome `--lang` en-US/de-DE/es-ES/de-CH on the About page.
+
 ### Mobile: the language toggle lives in the hamburger menu
 
 Below 640px the nav bar's `de / en` pair is **hidden, not removed** (`.lang-toggle { display:

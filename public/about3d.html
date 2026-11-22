@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>/* lang-detect (2026-11-22, Lucas): first visit only. No stored choice yet -> the first German or English entry in the browser's language list wins (de-DE, de-AT, de-CH -> de), anything else -> en. The de/en toggle overwrites localStorage.lang, so a manual choice always wins. Identical on every page: change all (grep lang-detect). */(function(){try{if(localStorage.getItem('lang'))return;var l=(navigator.languages&&navigator.languages.length)?navigator.languages:[navigator.language||''],r='en';for(var i=0;i<l.length;i++){var c=String(l[i]).toLowerCase().slice(0,2);if(c==='de'||c==='en'){r=c;break}}localStorage.setItem('lang',r)}catch(e){}})()</script>
   <link rel="icon" type="image/svg+xml" href="/images/site/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="/images/site/favicon-32.png" />
   <link rel="apple-touch-icon" href="/images/site/favicon-180.png" />
